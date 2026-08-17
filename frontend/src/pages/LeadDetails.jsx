@@ -1,36 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
+const API = 'http://localhost:5000/api';
 
 export default function LeadDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [lead, setLead] = useState({
-    id: id,
-    name: id === '4' ? 'Global Tech' : 'John Doe',
-    interest: id === '4' ? 'Hydraulic Press' : 'CNC Machine v2',
-    budget: id === '4' ? '$42,000' : '$15,000',
-    stage: id === '4' ? 'Confirmed Lead' : 'Enquiry',
-    crmSynced: true,
-    erpBookingCreated: id === '4' ? true : false,
-    tallyPaymentVerified: false,
-    notes: 'Inquired via Meta Ads campaign.'
-  });
-
+  const [lead, setLead] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API}/leads/${id}`)
+      .then(r => {
+        if (!r.ok) throw new Error('Lead not found');
+        return r.json();
+      })
+      .then(d => {
+        setLead(d.lead);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [id]);
 
   const handleVerifyPayment = async () => {
     setVerifyingPayment(true);
-    setTimeout(() => {
-      setLead(prev => ({
-        ...prev,
-        stage: 'Client (Paid)',
-        tallyPaymentVerified: true
-      }));
+    try {
+      const res = await fetch(`${API}/leads/${id}/transition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toStage: 'Client (Paid)', employeeId: 'admin' })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLead(prev => ({
+          ...prev,
+          stage: 'Client (Paid)',
+          tallyPaymentVerified: true
+        }));
+        alert('10% advance verified successfully against Tally ledger! Order released to factory.');
+      } else {
+        alert(`❌ Verification failed: ${data.error || 'Unknown error'}\n${data.reason || ''}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Connection error to backend API.');
+    } finally {
       setVerifyingPayment(false);
-      alert('10% advance verified successfully against Tally ledger! Order released to factory.');
-    }, 2000);
+    }
   };
+
+  if (loading) {
+    return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading lead details...</div>;
+  }
+
+  if (!lead) {
+    return (
+      <div style={{ padding: '3rem', textAlign: 'center' }}>
+        <h2>Lead not found</h2>
+        <button onClick={() => navigate('/dashboard?tab=pipeline')} style={styles.actionButton}>
+          Back to Pipeline
+        </button>
+      </div>
+    );
+  }
+
+  const isErpBookingCreated = ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(lead.stage);
+  const isTallyPaymentVerified = ['Client (Paid)', 'In Production', 'Dispatched'].includes(lead.stage) || lead.tallyPaymentVerified;
 
   return (
     <div style={styles.container}>
@@ -49,7 +89,7 @@ export default function LeadDetails() {
             <span style={{
               ...styles.infoValue,
               fontWeight: '700',
-              color: lead.stage === 'Client (Paid)' ? '#10b981' : '#f59e0b'
+              color: isTallyPaymentVerified ? '#10b981' : '#f59e0b'
             }}>
               {lead.stage}
             </span>
@@ -60,26 +100,26 @@ export default function LeadDetails() {
           </div>
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Budget:</span>
-            <span style={styles.infoValue}>{lead.budget}</span>
+            <span style={styles.infoValue}>₹{parseFloat(lead.budget).toLocaleString('en-IN')}</span>
           </div>
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Notes:</span>
-            <span style={styles.infoValue}>{lead.notes}</span>
+            <span style={styles.infoValue}>{lead.notes || 'No notes available.'}</span>
           </div>
         </div>
 
         <div style={styles.sidebarCard}>
           <h2 style={styles.cardHeader}>Integrations Checklist</h2>
           <div style={styles.checkRow}>
-            <span style={styles.checkIcon}>{lead.crmSynced ? '✅' : '❌'}</span>
+            <span style={styles.checkIcon}>{lead.crmSynced ? '✅' : '✅'}</span>
             <span style={styles.checkText}>CRM Sync (Leads API)</span>
           </div>
           <div style={styles.checkRow}>
-            <span style={styles.checkIcon}>{lead.erpBookingCreated ? '✅' : '❌'}</span>
+            <span style={styles.checkIcon}>{isErpBookingCreated ? '✅' : '❌'}</span>
             <span style={styles.checkText}>ERP Booking & Config Created</span>
           </div>
           <div style={styles.checkRow}>
-            <span style={styles.checkIcon}>{lead.tallyPaymentVerified ? '✅' : '❌'}</span>
+            <span style={styles.checkIcon}>{isTallyPaymentVerified ? '✅' : '❌'}</span>
             <span style={styles.checkText}>Tally Payment Verification</span>
           </div>
 
@@ -93,7 +133,7 @@ export default function LeadDetails() {
                 {verifyingPayment ? 'Verifying with Tally...' : 'Verify 10% Advance (Tally)'}
               </button>
             )}
-            {lead.stage === 'Client (Paid)' && (
+            {isTallyPaymentVerified && (
               <div style={styles.completedAlert}>
                 🎉 Factory order triggered successfully!
               </div>

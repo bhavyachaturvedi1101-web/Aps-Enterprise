@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+const API = 'http://localhost:5000/api';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 const PIPELINE_STAGES = [
@@ -12,35 +14,11 @@ const PIPELINE_STAGES = [
   { key: 'Dispatched', title: 'Dispatched', color: '#ec4899' }
 ];
 
-const MOCK_LEADS = [
-  { id: '1', name: 'John Doe', interest: 'CNC Machine v2', budget: '₹15,000', stage: 'Enquiry', source: 'Meta Ads' },
-  { id: '2', name: 'Jane Smith', interest: 'Laser Cutter Pro', budget: '₹25,000', stage: 'Qualified', source: 'A1 Voice Agent' },
-  { id: '3', name: 'Acme Corp', interest: 'Industrial Mill', budget: '₹50,000', stage: 'Booked', source: 'Inbound Call' },
-  { id: '4', name: 'Global Tech', interest: 'Hydraulic Press', budget: '₹42,000', stage: 'Confirmed Lead', source: 'Meta Ads' },
-  { id: '5', name: 'Elite Builders', interest: 'CNC Router', budget: '₹18,000', stage: 'Client (Paid)', source: 'Telecaller' },
-  { id: '6', name: 'Precision Works', interest: 'Plasma Cutter', budget: '₹35,000', stage: 'In Production', source: 'A1 Voice Agent' },
-  { id: '7', name: 'ModernFab', interest: 'Sheet Bender', budget: '₹28,000', stage: 'Dispatched', source: 'WhatsApp A5' }
-];
-
 const INTEGRATIONS = [
   { name: 'CRM', icon: '🔗', status: 'Live', role: 'Lead sync & status updates', color: '#10b981' },
   { name: 'ERP', icon: '🏭', status: 'Live', role: 'Booking & factory release', color: '#3b82f6' },
   { name: 'Dialer', icon: '📞', status: 'Live', role: 'Call queue management', color: '#a855f7' },
   { name: 'Tally', icon: '💰', status: 'Live — Hard Gate', role: '10% advance payment gate', color: '#f59e0b' }
-];
-
-const RECENT_ACTIVITY = [
-  { id: 1, employee: 'Bhavya', action: 'Confirmed Lead approved — Global Tech moved to payment gate', time: '5m ago', icon: '📋' },
-  { id: 2, employee: 'A1 Voice Agent', action: 'New enquiry captured — Horizon Industries (₹62,000)', time: '12m ago', icon: '🤖' },
-  { id: 3, employee: 'Animesh', action: 'Tally verified 10% advance — Elite Builders moved to Client (Paid)', time: '34m ago', icon: '✅' },
-  { id: 4, employee: 'A5 WhatsApp', action: 'Follow-up sent to 3 Confirmed Leads re: pending payment', time: '1h ago', icon: '💬' },
-  { id: 5, employee: 'Aaditya', action: 'ERP factory release triggered — Precision Works In Production', time: '2h ago', icon: '🏭' }
-];
-
-const ALERTS = [
-  { id: 1, type: 'warning', title: 'Payment Pending', message: 'Global Tech (₹42,000) — 10% advance overdue by 3 days', action: 'Verify Now' },
-  { id: 2, type: 'info', title: 'A1 Voice Queue', message: '7 new enquiry callbacks queued for today', action: 'View Queue' },
-  { id: 3, type: 'success', title: 'Factory Order Released', message: 'Precision Works order released to manufacturing floor', action: 'Track' }
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -50,10 +28,35 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search);
   const activeTab = queryParams.get('tab') || 'analytics';
 
+  const [leads, setLeads] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
     { id: 1, text: 'How Can I Assist You Today', sender: 'ai', isHeader: true }
   ]);
+
+  // Fetch leads and activities
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const leadsRes = await fetch(`${API}/leads`);
+        const leadsData = await leadsRes.json();
+        
+        const activityRes = await fetch(`${API}/activity`);
+        const activityData = await activityRes.json();
+
+        setLeads(leadsData.leads || []);
+        setActivityLogs(activityData.logs || []);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [activeTab]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -61,18 +64,99 @@ export default function Dashboard() {
     const userMsg = { id: Date.now(), text: chatInput, sender: 'user' };
     setChatMessages(prev => [...prev, userMsg]);
     const input = chatInput.toLowerCase();
+    
     let reply = "I'm analyzing the A2 pipeline database. What else can I help with?";
-    if (input.includes('payment') || input.includes('tally')) reply = "1 lead is pending Tally payment verification: Global Tech (₹42,000) — 3 days overdue. Recommend sending WhatsApp reminder via A5.";
-    else if (input.includes('lead') || input.includes('pipeline')) reply = `Pipeline has ${MOCK_LEADS.length} active leads: 1 Enquiry, 1 Qualified, 1 Booked, 1 Confirmed Lead, 1 Client (Paid), 1 In Production, 1 Dispatched.`;
-    else if (input.includes('crm')) reply = "CRM sync is live. All 7 leads are synchronized. Last sync: 2 minutes ago.";
-    else if (input.includes('erp')) reply = "ERP booking module shows 2 confirmed bookings. Precision Works has an active factory order.";
-    else if (input.includes('dialer') || input.includes('call')) reply = "Dialer shows 7 callbacks queued for today. A1 Voice Agent completed 12 calls this morning.";
-    else if (input.includes('employee') || input.includes('team')) reply = "Team: Animesh (A1 Voice), Bhavya (A2 Core), Aaditya (A4/A5). Top KPI: Bhavya at 96%.";
+    
+    if (input.includes('payment') || input.includes('tally')) {
+      const pendingVerify = leads.filter(l => l.stage === 'Confirmed Lead');
+      if (pendingVerify.length > 0) {
+        reply = `${pendingVerify.length} lead(s) pending Tally payment verification: ${pendingVerify.map(l => `${l.name} (₹${parseFloat(l.budget).toLocaleString('en-IN')})`).join(', ')}. Recommend verifying via the Payment Gate.`;
+      } else {
+        reply = "No leads are currently pending Tally payment verification. All payments are up-to-date.";
+      }
+    } else if (input.includes('lead') || input.includes('pipeline')) {
+      const stageCounts = PIPELINE_STAGES.reduce((acc, stage) => {
+        acc[stage.key] = leads.filter(l => l.stage === stage.key).length;
+        return acc;
+      }, {});
+      reply = `Pipeline has ${leads.length} active leads: ` + 
+        PIPELINE_STAGES.map(s => `${stageCounts[s.key] || 0} ${s.title}`).join(', ') + '.';
+    } else if (input.includes('crm')) {
+      reply = `CRM sync is live. All ${leads.length} leads are synchronized. Last sync: just now.`;
+    } else if (input.includes('erp')) {
+      const booked = leads.filter(l => ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)).length;
+      const inProd = leads.filter(l => l.stage === 'In Production').length;
+      reply = `ERP module: ${booked} total bookings tracked. ${inProd} orders are currently released to the manufacturing floor.`;
+    } else if (input.includes('dialer') || input.includes('call')) {
+      reply = "Dialer shows 7 callbacks queued for today. A1 Voice Agent completed 12 calls this morning.";
+    } else if (input.includes('employee') || input.includes('team')) {
+      reply = "Team: Animesh (A1 Voice), Bhavya (A2 Core), Aaditya (A4/A5). Top KPI: Bhavya at 96%.";
+    }
+    
     setChatInput('');
     setTimeout(() => {
       setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
     }, 600);
   };
+
+  // Compute stats dynamically
+  const stageCounts = PIPELINE_STAGES.reduce((acc, stage) => {
+    acc[stage.key] = leads.filter(l => l.stage === stage.key).length;
+    return acc;
+  }, {});
+
+  // Generate dynamic alerts based on lead status
+  const getDynamicAlerts = () => {
+    const alerts = [];
+    const pendingPayment = leads.filter(l => l.stage === 'Confirmed Lead');
+    const inProduction = leads.filter(l => l.stage === 'In Production');
+
+    if (pendingPayment.length > 0) {
+      alerts.push({
+        id: 1,
+        type: 'warning',
+        title: 'Payment Pending Gate',
+        message: `${pendingPayment[0].name} (₹${parseFloat(pendingPayment[0].budget).toLocaleString('en-IN')}) — 10% advance verification pending.`,
+        action: 'Verify Now',
+        route: `/leads/${pendingPayment[0].id}`
+      });
+    } else {
+      alerts.push({
+        id: 1,
+        type: 'info',
+        title: 'Payments Up-to-Date',
+        message: 'No pending advance payments requiring immediate verification.',
+        action: 'View Gate',
+        route: '/payments'
+      });
+    }
+
+    alerts.push({
+      id: 2,
+      type: 'info',
+      title: 'A1 Voice Queue',
+      message: '7 new enquiry callbacks queued for today',
+      action: 'View Queue',
+      route: '/dialer'
+    });
+
+    if (inProduction.length > 0) {
+      alerts.push({
+        id: 3,
+        type: 'success',
+        title: 'Factory Order Released',
+        message: `${inProduction[0].name} order released to manufacturing floor.`,
+        action: 'Track',
+        route: '/bookings'
+      });
+    }
+
+    return alerts;
+  };
+
+  if (loading) {
+    return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading dashboard data...</div>;
+  }
 
   return (
     <div style={s.container}>
@@ -170,15 +254,24 @@ export default function Dashboard() {
                 <span style={s.cardArrow}>↗</span>
               </div>
               <div style={s.barChart}>
-                {[['17,874','Enquiry',140],['10,874','Qualified',90],['8,874','Booked',70],['6,874','Confirmed',50]].map(([val,lbl,h]) => (
-                  <div key={lbl} style={s.barCol}>
-                    <div style={s.barVal}>{val}</div>
-                    <div style={{...s.bar, height: h}}>
-                      <div style={s.barSheen}/>
+                {[
+                  [stageCounts['Enquiry'] || 0, 'Enquiry'],
+                  [stageCounts['Qualified'] || 0, 'Qualified'],
+                  [stageCounts['Booked'] || 0, 'Booked'],
+                  [stageCounts['Confirmed Lead'] || 0, 'Confirmed']
+                ].map(([val,lbl]) => {
+                  const maxCount = Math.max(...Object.values(stageCounts), 1);
+                  const h = Math.max(30, (val / maxCount) * 130);
+                  return (
+                    <div key={lbl} style={s.barCol}>
+                      <div style={s.barVal}>{val}</div>
+                      <div style={{...s.bar, height: h}}>
+                        <div style={s.barSheen}/>
+                      </div>
+                      <div style={s.barLbl}>{lbl}</div>
                     </div>
-                    <div style={s.barLbl}>{lbl}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -259,19 +352,22 @@ export default function Dashboard() {
             <div style={s.card}>
               <div style={s.cardTop}>
                 <div style={s.cardTitle}>Recent Activity Log</div>
-                <div style={{...s.filterPill, fontSize:'0.7rem'}}>View All →</div>
+                <div style={{...s.filterPill, fontSize:'0.7rem', cursor: 'pointer'}} onClick={() => navigate('/activity')}>View All →</div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
-                {RECENT_ACTIVITY.map(act => (
+                {activityLogs.slice(0, 5).map(act => (
                   <div key={act.id} style={s.actRow}>
-                    <div style={s.actIcon}>{act.icon}</div>
+                    <div style={s.actIcon}>📋</div>
                     <div style={{flex:1}}>
-                      <div style={s.actName}>{act.employee}</div>
+                      <div style={s.actName}>{act.employeeId === 'e1' ? 'Animesh' : act.employeeId === 'e2' ? 'Bhavya' : act.employeeId === 'e3' ? 'Aaditya' : 'System'}</div>
                       <div style={s.actDesc}>{act.action}</div>
                     </div>
-                    <div style={s.actTime}>{act.time}</div>
+                    <div style={s.actTime}>{new Date(act.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
                   </div>
                 ))}
+                {activityLogs.length === 0 && (
+                  <div style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>No recent activities.</div>
+                )}
               </div>
             </div>
 
@@ -282,11 +378,16 @@ export default function Dashboard() {
                 <div style={{...s.intBadge, color:'#a855f7',borderColor:'#a855f7',background:'#a855f715',fontSize:'0.7rem'}}>AI Powered</div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
-                {ALERTS.map(alert => (
+                {getDynamicAlerts().map(alert => (
                   <div key={alert.id} style={{...s.alertCard, borderLeftColor: alert.type==='warning'?'#f59e0b':alert.type==='success'?'#10b981':'#3b82f6'}}>
                     <div style={s.alertTitle}>{alert.title}</div>
                     <div style={s.alertMsg}>{alert.message}</div>
-                    <button style={{...s.alertBtn, color: alert.type==='warning'?'#f59e0b':alert.type==='success'?'#10b981':'#3b82f6'}}>{alert.action} →</button>
+                    <button 
+                      onClick={() => navigate(alert.route)} 
+                      style={{...s.alertBtn, color: alert.type==='warning'?'#f59e0b':alert.type==='success'?'#10b981':'#3b82f6'}}
+                    >
+                      {alert.action} →
+                    </button>
                   </div>
                 ))}
               </div>
@@ -309,7 +410,7 @@ export default function Dashboard() {
 
           <div style={s.pipeGrid}>
             {PIPELINE_STAGES.map(stage => {
-              const stageLeads = MOCK_LEADS.filter(l => l.stage === stage.key);
+              const stageLeads = leads.filter(l => l.stage === stage.key);
               return (
                 <div key={stage.key} style={s.pipeCol}>
                   <div style={{...s.pipeColHead, borderTopColor: stage.color}}>
@@ -327,8 +428,8 @@ export default function Dashboard() {
                         </div>
                         <div style={s.leadProduct}>{lead.interest}</div>
                         <div style={s.leadMeta}>
-                          <span style={s.leadBudget}>{lead.budget}</span>
-                          <span style={s.leadSource}>{lead.source}</span>
+                          <span style={s.leadBudget}>₹{parseFloat(lead.budget).toLocaleString('en-IN')}</span>
+                          <span style={s.leadSource}>{lead.source || 'Direct'}</span>
                         </div>
                       </div>
                     ))}
@@ -384,7 +485,7 @@ const s = {
   secHead: { display:'flex', justifyContent:'space-between', alignItems:'center' },
   secTitle: { fontSize:'2rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#08060d', margin:0 },
   filterRow: { display:'flex', gap:'0.5rem', alignItems:'center' },
-  filterPill: { backgroundColor:'#fff', border:'1px solid #e2e8f0', padding:'5px 12px', borderRadius:20, fontSize:'0.75rem', fontWeight:700, color:'#08060d', display:'flex', alignItems:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.04)', cursor:'pointer' },
+  filterPill: { backgroundColor:'#fff', border:'1px solid #e2e8f0', padding:'5px 12px', borderRadius:20, fontSize:'0.75rem', fontWeight:700, color:'#08060d', display:'flex', alignItems:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.04)' },
   filterIcon: { width:32, height:32, borderRadius:'50%', backgroundColor:'#fff', border:'1px solid #e2e8f0', color:'#08060d', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' },
 
   // Cards

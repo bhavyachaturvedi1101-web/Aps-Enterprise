@@ -1,19 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const MOCK_BOOKINGS = [
-  { id: 'BK001', client: 'Acme Corp', product: 'Industrial Mill', erpRef: 'ERP-2024-0112', status: 'Booking Created', date: '2026-07-30', amount: '₹50,000' },
-  { id: 'BK002', client: 'Global Tech', product: 'Hydraulic Press', erpRef: 'ERP-2024-0118', status: 'Confirmed', date: '2026-08-01', amount: '₹42,000' },
-  { id: 'BK003', client: 'Elite Builders', product: 'CNC Router', erpRef: 'ERP-2024-0122', status: 'Factory Released', date: '2026-08-03', amount: '₹18,000' },
-  { id: 'BK004', client: 'Precision Works', product: 'Plasma Cutter', erpRef: 'ERP-2024-0125', status: 'In Production', date: '2026-08-04', amount: '₹35,000' }
-];
+const API = 'http://localhost:5000/api';
 
 const STATUS_COLORS = {
-  'Booking Created': '#3b82f6', 'Confirmed': '#a855f7',
-  'Factory Released': '#f59e0b', 'In Production': '#10b981'
+  'Booking Created': '#3b82f6',
+  'Confirmed': '#a855f7',
+  'Factory Released': '#f59e0b',
+  'In Production': '#10b981',
+  'Dispatched': '#ec4899'
+};
+
+const mapStageToStatus = (stage) => {
+  switch (stage) {
+    case 'Booked': return 'Booking Created';
+    case 'Confirmed Lead': return 'Confirmed';
+    case 'Client (Paid)': return 'Factory Released';
+    case 'In Production': return 'In Production';
+    case 'Dispatched': return 'Dispatched';
+    default: return 'Booking Created';
+  }
 };
 
 export default function BookingsERP() {
-  const [bookings] = useState(MOCK_BOOKINGS);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API}/leads`)
+      .then(r => r.json())
+      .then(d => {
+        const activeLeads = d.leads || [];
+        // Filter for Booked or beyond stages
+        const erpLeads = activeLeads.filter(l => 
+          ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)
+        );
+        
+        // Map to booking objects
+        const mappedBookings = erpLeads.map((l, index) => ({
+          id: `BK${String(index + 1).padStart(3, '0')}`,
+          client: l.name,
+          product: l.interest,
+          erpRef: `ERP-2026-${1000 + parseInt(l.id || index)}`,
+          status: mapStageToStatus(l.stage),
+          date: '2026-08-14',
+          amount: `₹${parseFloat(l.budget).toLocaleString('en-IN')}`
+        }));
+        
+        setBookings(mappedBookings);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div style={s.loading}>Loading ERP bookings...</div>;
+  }
 
   return (
     <div style={s.page}>
@@ -26,7 +70,7 @@ export default function BookingsERP() {
       </div>
 
       <div style={s.statsRow}>
-        {[['Total Bookings', bookings.length, '#a855f7'], ['Factory Released', bookings.filter(b => b.status === 'Factory Released' || b.status === 'In Production').length, '#10b981'], ['Pending Confirm', bookings.filter(b => b.status === 'Booking Created').length, '#f59e0b']].map(([lbl, val, clr]) => (
+        {[['Total Bookings', bookings.length, '#a855f7'], ['Factory Released', bookings.filter(b => b.status === 'Factory Released' || b.status === 'In Production' || b.status === 'Dispatched').length, '#10b981'], ['Pending Confirm', bookings.filter(b => b.status === 'Booking Created').length, '#f59e0b']].map(([lbl, val, clr]) => (
           <div key={lbl} style={{...s.statCard, borderTopColor: clr}}>
             <div style={{...s.statNum, color: clr}}>{val}</div>
             <div style={s.statLbl}>{lbl}</div>
@@ -55,6 +99,7 @@ export default function BookingsERP() {
             </div>
           </div>
         ))}
+        {bookings.length === 0 && <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>No bookings active.</div>}
       </div>
     </div>
   );
@@ -62,6 +107,7 @@ export default function BookingsERP() {
 
 const s = {
   page: { padding:'2rem', fontFamily:'var(--font-body)' },
+  loading: { padding: '3rem', textAlign: 'center', color: '#64748b' },
   pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' },
   title: { fontSize:'1.8rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#08060d', margin:0 },
   sub: { fontSize:'0.78rem', color:'#64748b', marginTop:4 },
