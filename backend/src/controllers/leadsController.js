@@ -22,26 +22,37 @@ const createLead = async (req, res) => {
   const lead = {
     id: `LEAD-${String(mockLeads.length + 1).padStart(3, '0')}`,
     name,
-    interest: interest || 'Machine Unit',
+    interest: interest || 'CNC Machine Unit',
     budget: budget || '20000',
     stage: 'Enquiry',
-    notes: notes || 'Direct manual entry.',
+    notes: notes || 'Direct manual entry from A2 Cockpit.',
     crmSynced: true,
     erpBookingCreated: false,
     tallyPaymentVerified: false,
-    source: source || 'Manual Entry',
+    source: source || 'A2 Admin Cockpit',
     assignedEmployeeId: 'e1',
     createdAt: new Date()
   };
 
   mockLeads.unshift(lead);
+  
+  mockActivityLogs.unshift({
+    id: `log${Date.now()}`,
+    leadId: lead.id,
+    employeeId: req.user?.id || 'e2',
+    action: `New Lead "${lead.name}" created in A2 Admin Cockpit (Stage: Enquiry)`,
+    fromStage: 'None',
+    toStage: 'Enquiry',
+    createdAt: new Date()
+  });
+
   res.status(201).json({ success: true, lead });
 };
 
 // POST /api/leads/:id/transition — Submit status transition
 const transitionLead = async (req, res) => {
   const { id } = req.params;
-  const { toStage, employeeId, simulateError } = req.body;
+  const { toStage, employeeId, countersignedBy, simulateError } = req.body;
 
   if (!toStage) {
     return res.status(400).json({ error: 'toStage is required in the request body.' });
@@ -59,15 +70,19 @@ const transitionLead = async (req, res) => {
     });
   }
 
-  // Step 2: Execute transition side effects (including Tally 10% payment verification gate)
-  const result = await executeTransition(lead, toStage, { simulateError });
+  // Step 2: Execute transition side effects (including Tally 10% payment gate and countersign check)
+  const result = await executeTransition(lead, toStage, {
+    employeeId: employeeId || req.user?.id || 'e2',
+    countersignedBy,
+    simulateError
+  });
 
   if (!result.success) {
     return res.status(402).json({
-      error: 'Payment Gate: Transition rejected.',
-      code: 'PAYMENT_VERIFICATION_FAILED',
+      error: 'Transition rejected.',
+      code: result.code || 'TRANSITION_REJECTED',
       reason: result.reason,
-      details: 'The 10% advance payment could not be verified against Tally ledger. Please confirm payment before retrying.'
+      details: result.reason
     });
   }
 
@@ -87,7 +102,10 @@ const transitionLead = async (req, res) => {
     id: `log${Date.now()}`,
     leadId: lead.id,
     employeeId: employeeId || req.user?.id || 'system',
-    action: `Lead status transitioned from "${oldStage}" to "${toStage}"`,
+    countersignedBy: countersignedBy || null,
+    action: countersignedBy
+      ? `Lead status transitioned from "${oldStage}" to "${toStage}" (Dual-Approval Countersigned by ${countersignedBy})`
+      : `Lead status transitioned from "${oldStage}" to "${toStage}"`,
     fromStage: oldStage,
     toStage,
     createdAt: new Date()
