@@ -1,22 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const MOCK_PAYMENTS = [
-  { id: 'PAY001', lead: 'Global Tech', amount: '₹4,200', percent: '10%', status: 'Pending Verification', tallyRef: null, dueDate: '2026-08-02', daysOverdue: 3 },
-  { id: 'PAY002', lead: 'Elite Builders', amount: '₹1,800', percent: '10%', status: 'Verified', tallyRef: 'TALLY-2024-0087', dueDate: '2026-08-01', daysOverdue: 0 },
-  { id: 'PAY003', lead: 'Precision Works', amount: '₹3,500', percent: '10%', status: 'Verified', tallyRef: 'TALLY-2024-0091', dueDate: '2026-08-03', daysOverdue: 0 }
-];
+const API = 'http://localhost:5000/api';
 
 export default function PaymentGate() {
-  const [payments, setPayments] = useState(MOCK_PAYMENTS);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(null);
 
-  const handleVerify = async (payId) => {
-    setVerifying(payId);
-    await new Promise(r => setTimeout(r, 1500));
-    setPayments(prev => prev.map(p => p.id === payId ? { ...p, status: 'Verified', tallyRef: 'TALLY-2024-' + Math.floor(1000 + Math.random()*9000) } : p));
-    setVerifying(null);
-    alert('✅ Payment verified against Tally ledger. Lead can now advance to Client (Paid).');
+  const fetchPayments = async () => {
+    try {
+      const res = await fetch(`${API}/leads`);
+      const data = await res.json();
+      const activeLeads = data.leads || [];
+
+      // Filter for Confirmed Lead or beyond
+      const paymentLeads = activeLeads.filter(l =>
+        ['Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)
+      );
+
+      const mappedPayments = paymentLeads.map((l, index) => {
+        const isVerified = l.stage !== 'Confirmed Lead';
+        return {
+          id: `PAY${String(index + 1).padStart(3, '0')}`,
+          leadId: l.id,
+          lead: l.name,
+          amount: `₹${parseFloat(l.budget * 0.10).toLocaleString('en-IN')}`,
+          percent: '10%',
+          status: isVerified ? 'Verified' : 'Pending Verification',
+          tallyRef: isVerified ? `TALLY-2026-${2000 + parseInt(l.id || index)}` : null,
+          dueDate: '2026-08-11',
+          daysOverdue: isVerified ? 0 : 3
+        };
+      });
+
+      setPayments(mappedPayments);
+    } catch (err) {
+      console.error('Error fetching payments:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const handleVerify = async (pay) => {
+    setVerifying(pay.leadId);
+    try {
+      const res = await fetch(`${API}/leads/${pay.leadId}/transition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toStage: 'Client (Paid)', employeeId: 'admin' })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert('✅ Payment verified against Tally ledger. Lead can now advance to Client (Paid).');
+        await fetchPayments();
+      } else {
+        alert(`❌ Verification failed: ${data.error || 'Unknown error'}\n${data.reason || ''}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Connection error to backend API.');
+    } finally {
+      setVerifying(null);
+    }
+  };
+
+  if (loading) {
+    return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading Payment Gate...</div>;
+  }
+
+  const pendingPayments = payments.filter(p => p.status === 'Pending Verification');
 
   return (
     <div style={s.page}>
@@ -28,37 +84,60 @@ export default function PaymentGate() {
         <div style={s.tallyBadge}>Tally: Connected ✓</div>
       </div>
 
-      <div style={s.alertBox}>
-        <div style={s.alertIcon}>⚠️</div>
-        <div>
-          <div style={s.alertTitle}>1 payment pending verification</div>
-          <div style={s.alertSub}>Global Tech advance payment is 3 days overdue. Send reminder via WhatsApp A5.</div>
+      {pendingPayments.length > 0 ? (
+        <div style={s.alertBox}>
+          <div style={s.alertIcon}>⚠️</div>
+          <div>
+            <div style={s.alertTitle}>{pendingPayments.length} payment(s) pending verification</div>
+            <div style={s.alertSub}>
+              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp A5.
+            </div>
+          </div>
+          <button style={s.alertBtn}>Send Reminder</button>
         </div>
-        <button style={s.alertBtn}>Send Reminder</button>
-      </div>
+      ) : (
+        <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
+          <div style={s.alertIcon}>✅</div>
+          <div>
+            <div style={{...s.alertTitle, color: '#065f46'}}>All payments verified</div>
+            <div style={{...s.alertSub, color: '#047857'}}>No pending 10% advance payments ledger matches require action.</div>
+          </div>
+        </div>
+      )}
 
       <div style={s.card}>
+        <div style={s.tableHead}>
+          {['Payment ID', 'Lead / Client', 'Amount (10% Advance)', 'Due Date', 'Status'].map(h => (
+            <div key={h} style={{...s.th, flex: h === 'Amount (10% Advance)' || h === 'Lead / Client' ? 2 : 1}}>{h}</div>
+          ))}
+        </div>
         {payments.map(pay => (
           <div key={pay.id} style={s.payRow}>
-            <div style={s.payLeft}>
+            <div style={{...s.payLeft, flex: 1}}>
               <div style={s.payId}>{pay.id}</div>
               <div style={s.payLead}>{pay.lead}</div>
             </div>
-            <div style={s.payMid}>
+            <div style={{...s.payMid, flex: 2}}>
               <div style={s.payAmount}>{pay.amount} <span style={s.payPct}>({pay.percent} advance)</span></div>
-              <div style={s.payDue}>Due: {pay.dueDate} {pay.daysOverdue > 0 && <span style={s.overdue}>{pay.daysOverdue} days overdue</span>}</div>
               {pay.tallyRef && <div style={s.tallyRef}>Tally Ref: {pay.tallyRef}</div>}
             </div>
-            <div style={s.payRight}>
-              {pay.status === 'Verified'
-                ? <div style={s.verified}>✅ Verified</div>
-                : <button onClick={() => handleVerify(pay.id)} disabled={verifying === pay.id} style={s.verifyBtn}>
-                    {verifying === pay.id ? '🔄 Verifying…' : '🔍 Verify with Tally'}
-                  </button>
-              }
+            <div style={{...s.payMid, flex: 1}}>
+              <div style={s.payDue}>Due: {pay.dueDate} {pay.daysOverdue > 0 && <span style={s.overdue}>{pay.daysOverdue} days overdue</span>}</div>
+            </div>
+            <div style={{...s.payRight, flex: 1}}>
+              {pay.status === 'Verified' ? (
+                <div style={s.verified}>✅ Verified</div>
+              ) : (
+                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} style={s.verifyBtn}>
+                  {verifying === pay.leadId ? '🔄 Verifying…' : '🔍 Verify with Tally'}
+                </button>
+              )}
             </div>
           </div>
         ))}
+        {payments.length === 0 && (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
+        )}
       </div>
     </div>
   );
@@ -76,17 +155,19 @@ const s = {
   alertSub: { fontSize:'0.72rem', color:'#b45309', marginTop:2 },
   alertBtn: { marginLeft:'auto', padding:'6px 14px', backgroundColor:'#f59e0b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', flexShrink:0 },
   card: { backgroundColor:'#fff', borderRadius:18, border:'1px solid #e2e8f0', overflow:'hidden' },
+  tableHead: { display:'flex', backgroundColor:'#f8fafc', borderBottom:'1px solid #e2e8f0', padding:'0.65rem 1.25rem', gap:'1.5rem' },
+  th: { fontSize:'0.65rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' },
   payRow: { display:'flex', alignItems:'center', padding:'1.25rem 1.5rem', borderBottom:'1px solid #f1f5f9', gap:'1.5rem' },
-  payLeft: { width:120 },
+  payLeft: { minWidth: 120 },
   payId: { fontSize:'0.72rem', fontWeight:700, color:'#aa3bff', fontFamily:'monospace' },
   payLead: { fontSize:'0.9rem', fontWeight:800, color:'#08060d', marginTop:2 },
-  payMid: { flex:1 },
+  payMid: { minWidth: 150 },
   payAmount: { fontSize:'1rem', fontWeight:700, color:'#08060d' },
   payPct: { fontSize:'0.75rem', fontWeight:500, color:'#64748b' },
-  payDue: { fontSize:'0.72rem', color:'#64748b', marginTop:2 },
+  payDue: { fontSize:'0.72rem', color:'#64748b' },
   overdue: { backgroundColor:'#fee2e2', color:'#b91c1c', padding:'1px 7px', borderRadius:10, fontWeight:700, marginLeft:6 },
   tallyRef: { fontSize:'0.68rem', fontFamily:'monospace', color:'#10b981', marginTop:2 },
-  payRight: { width:180, textAlign:'right' },
+  payRight: { minWidth: 150, textAlign:'right' },
   verified: { color:'#10b981', fontWeight:700, fontSize:'0.85rem' },
   verifyBtn: { padding:'8px 16px', backgroundColor:'#f59e0b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer' }
 };
