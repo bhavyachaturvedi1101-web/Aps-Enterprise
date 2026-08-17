@@ -1,0 +1,17 @@
+{
+  "name": "aps-enterprise",
+  "version": "1.0.0",
+  "description": "APS Enterprise AI Admin System (A1-A5)",
+  "main": "backend/src/app.js",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "npm --prefix backend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "start:backend": "npm --prefix backend start",
+    "start:frontend": "npm --prefix frontend run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
