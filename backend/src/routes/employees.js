@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getEmployees, getActivityLogs } = require('../controllers/employeesController');
+const { getEmployees, getEmployeePerformance } = require('../controllers/employeesController');
 
-// GET employee performance metrics (A4 module)
+// GET all employees
 router.get('/', getEmployees);
+
+// GET employee detailed performance profile (A4 module)
+router.get('/:id/performance', getEmployeePerformance);
 
 module.exports = router;
