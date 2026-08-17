@@ -6,6 +6,7 @@ export default function PaymentGate() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(null);
+  const [sendingReminder, setSendingReminder] = useState(false);
 
   const fetchPayments = async () => {
     try {
@@ -68,6 +69,31 @@ export default function PaymentGate() {
     }
   };
 
+  const handleSendReminder = async () => {
+    const pending = payments.find(p => p.status === 'Pending Verification');
+    if (!pending) return;
+
+    setSendingReminder(true);
+    try {
+      const res = await fetch(`${API}/whatsapp/send-reminder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId: pending.leadId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`✅ WhatsApp payment reminder sequence triggered for "${pending.lead}"! Message ID: ${data.message.messageId}`);
+      } else {
+        alert(`❌ Reminder trigger failed: ${data.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Connection error to backend API.');
+    } finally {
+      setSendingReminder(false);
+    }
+  };
+
   if (loading) {
     return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading Payment Gate...</div>;
   }
@@ -93,7 +119,9 @@ export default function PaymentGate() {
               {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp A5.
             </div>
           </div>
-          <button style={s.alertBtn}>Send Reminder</button>
+          <button onClick={handleSendReminder} disabled={sendingReminder} style={s.alertBtn}>
+            {sendingReminder ? 'Sending…' : 'Send Reminder'}
+          </button>
         </div>
       ) : (
         <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
