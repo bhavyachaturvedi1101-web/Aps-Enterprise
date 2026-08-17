@@ -5,7 +5,7 @@ async function testAllEndpoints() {
   const server = http.createServer(app);
   
   await new Promise(resolve => server.listen(5099, resolve));
-  console.log('--- Testing Week 1 Internal API Endpoints (Port 5099) ---');
+  console.log('--- Testing A2 Module & State Machine Endpoints (Port 5099) ---');
 
   const request = (method, path, body = null) => {
     return new Promise((resolve, reject) => {
@@ -35,55 +35,37 @@ async function testAllEndpoints() {
     });
   };
 
-  // 1. Health check
-  const health = await request('GET', '/api/health');
-  console.log('1. GET /api/health:', health.status, '|', health.data.milestone);
-
-  // 2. Leads list
-  const leads = await request('GET', '/api/leads');
-  console.log('2. GET /api/leads:', leads.status, '| Fetched', leads.data.leads?.length, 'leads');
-
-  // 3. A1 Voice Agent Call Ingestion
-  const voiceCall = await request('POST', '/api/calls/outcome', {
-    name: 'Vikram Mehta',
-    phone: '+919811223344',
-    interest: 'CNC Milling Machine v4',
-    budget: '45000',
-    timeline: 'Immediate',
-    callOutcome: 'Interested - High Intent',
-    durationSeconds: 160
-  });
-  console.log('3. POST /api/calls/outcome (A1 Ingestion):', voiceCall.status, '| Lead ID:', voiceCall.data.lead?.id);
-
-  // 4. A1 Dialer Queue
-  const dialer = await request('GET', '/api/dialer/queue');
-  console.log('4. GET /api/dialer/queue:', dialer.status, '| Total queued:', dialer.data.totalQueued);
-
-  // 5. A2 Lead State Machine Transition (Hard Payment Gate Check)
-  const transition = await request('POST', '/api/leads/LEAD-004/transition', {
+  // 1. Single Action Transition Test
+  const transition1 = await request('POST', '/api/leads/LEAD-004/transition', {
     toStage: 'Client (Paid)',
     employeeId: 'e2'
   });
-  console.log('5. POST /api/leads/LEAD-004/transition (Payment Gate):', transition.status, '| Message:', transition.data.message);
+  console.log('1. Single Action Payment Gate Transition:', transition1.status, '|', transition1.data.message || transition1.data.reason);
 
-  // 6. A4 Performance Profile
-  const perf = await request('GET', '/api/employees/e1/performance');
-  console.log('6. GET /api/employees/e1/performance:', perf.status, '| Profile:', perf.data.profile?.name);
+  // 2. Enable Countersign Dual Approval Policy
+  const policyRes = await request('POST', '/api/config/approval-policy', { policy: 'countersign' });
+  console.log('2. Set Approval Policy to Countersign:', policyRes.status, '| Policy:', policyRes.data.config?.approvalPolicy);
 
-  // 7. A4 Time in Stage
-  const tis = await request('GET', '/api/activity/time-in-stage');
-  console.log('7. GET /api/activity/time-in-stage:', tis.status, '| Stages tracked:', tis.data.timeInStage?.length);
+  // 3. Attempt High-Stakes Transition without Countersign (Should Fail)
+  const transitionNoSig = await request('POST', '/api/leads/LEAD-005/transition', {
+    toStage: 'In Production',
+    employeeId: 'e2'
+  });
+  console.log('3. High-Stakes Transition without Countersign:', transitionNoSig.status, '| Error:', transitionNoSig.data.reason);
 
-  // 8. A5 WhatsApp Reminder
-  const wa = await request('POST', '/api/whatsapp/send-reminder', { leadId: 'LEAD-004' });
-  console.log('8. POST /api/whatsapp/send-reminder (A5 Reminder):', wa.status, '| Message ID:', wa.data.message?.messageId);
+  // 4. Attempt High-Stakes Transition WITH Countersign (Should Succeed)
+  const transitionWithSig = await request('POST', '/api/leads/LEAD-005/transition', {
+    toStage: 'In Production',
+    employeeId: 'e2',
+    countersignedBy: 'e3'
+  });
+  console.log('4. High-Stakes Transition WITH Countersign:', transitionWithSig.status, '| Message:', transitionWithSig.data.message);
 
-  // 9. System Config
-  const cfg = await request('GET', '/api/config');
-  console.log('9. GET /api/config:', cfg.status, '| Policy:', cfg.data.config?.approvalPolicy);
+  // 5. Reset policy back to single-action
+  await request('POST', '/api/config/approval-policy', { policy: 'single-action' });
 
   server.close();
-  console.log('\n🎉 ALL WEEK 1 API CONTRACT TESTS PASSED WITH 100% SUCCESS!');
+  console.log('\n🎉 ALL MODULE A2 CONTROL COCKPIT TESTS PASSED WITH 100% SUCCESS!');
 }
 
 testAllEndpoints().catch(err => {

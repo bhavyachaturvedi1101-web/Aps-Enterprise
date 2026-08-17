@@ -25,31 +25,120 @@ export default function CRMLeads() {
   const [transitioning, setTransitioning] = useState(null);
   const [search, setSearch] = useState('');
   const [filterStage, setFilterStage] = useState('All');
-  const [selected, setSelected] = useState(null);
+
+  // Modals & Policy State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showCountersignModal, setShowCountersignModal] = useState(false);
+  const [targetLead, setTargetLead] = useState(null);
+  const [countersignedBy, setCountersignedBy] = useState('e3');
+  const [approvalPolicy, setApprovalPolicy] = useState('single-action');
+
+  // Add Lead Form State
+  const [newLead, setNewLead] = useState({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+
+  const fetchLeads = async () => {
+    try {
+      const r = await fetch(`${API}/leads`);
+      const d = await r.json();
+      setLeads(d.leads || []);
+      setLoading(false);
+    } catch {
+      setLoading(false);
+    }
+  };
+
+  const fetchConfig = async () => {
+    try {
+      const r = await fetch(`${API}/config`);
+      const d = await r.json();
+      if (d.config?.approvalPolicy) {
+        setApprovalPolicy(d.config.approvalPolicy);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    fetch(`${API}/leads`).then(r => r.json())
-      .then(d => { setLeads(d.leads || []); setLoading(false); })
-      .catch(() => setLoading(false));
+    fetchLeads();
+    fetchConfig();
   }, []);
 
-  const handleTransition = async (lead) => {
-    const toStage = VALID_NEXT[lead.stage];
-    if (!toStage) return;
+  const handlePolicyToggle = async (newPol) => {
+    setApprovalPolicy(newPol);
+    try {
+      await fetch(`${API}/config/approval-policy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ policy: newPol })
+      });
+    } catch (err) {
+      console.error('Policy update error', err);
+    }
+  };
+
+  const executeTransitionCall = async (lead, toStage, countersignUser = null) => {
     setTransitioning(lead.id);
     try {
       const res = await fetch(`${API}/leads/${lead.id}/transition`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ toStage, employeeId: 'admin' })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toStage,
+          employeeId: 'e2',
+          countersignedBy: countersignUser
+        })
       });
       const data = await res.json();
       if (data.success) {
-        setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, stage: toStage } : l));
+        await fetchLeads();
       } else {
-        alert(`❌ ${data.error}\n${data.details || data.reason || ''}`);
+        alert(`❌ ${data.error || 'Transition Failed'}\n${data.reason || data.details || ''}`);
       }
-    } catch { alert('Backend connection error.'); }
-    setTransitioning(null);
+    } catch {
+      alert('Backend connection error.');
+    } finally {
+      setTransitioning(null);
+      setShowCountersignModal(false);
+      setTargetLead(null);
+    }
+  };
+
+  const handleTransitionClick = (lead) => {
+    const toStage = VALID_NEXT[lead.stage];
+    if (!toStage) return;
+
+    const isHighStakes = (lead.stage === 'Confirmed Lead' && toStage === 'Client (Paid)') ||
+                         (lead.stage === 'Client (Paid)' && toStage === 'In Production');
+
+    if (approvalPolicy === 'countersign' && isHighStakes) {
+      setTargetLead(lead);
+      setShowCountersignModal(true);
+    } else {
+      executeTransitionCall(lead, toStage);
+    }
+  };
+
+  const handleAddLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!newLead.name) return alert('Lead name is required!');
+    try {
+      const res = await fetch(`${API}/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLead)
+      });
+      if (res.ok) {
+        setShowAddModal(false);
+        setNewLead({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+        await fetchLeads();
+      } else {
+        alert('Failed to add lead.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error creating lead.');
+    }
   };
 
   const filtered = leads.filter(l =>
@@ -62,7 +151,7 @@ export default function CRMLeads() {
     acc[s] = leads.filter(l => l.stage === s).length; return acc;
   }, {});
 
-  if (loading) return <div style={s.loading}>Loading CRM data…</div>;
+  if (loading) return <div style={s.loading}>Loading A2 CRM Control Cockpit…</div>;
 
   return (
     <div style={s.page}>
@@ -70,10 +159,38 @@ export default function CRMLeads() {
       {/* ── Dark Hero Header ─────────────────────────────────────────── */}
       <div style={s.hero}>
         <div style={s.heroLeft}>
-          <div style={s.heroTag}>A2 MODULE · CRM LAYER</div>
-          <h1 style={s.heroTitle}>CRM / Lead Pipeline</h1>
-          <p style={s.heroSub}>7-stage state machine with Tally payment gate enforcement</p>
+          <div style={s.heroTag}>MODULE A2 · ADMIN CONTROL COCKPIT</div>
+          <h1 style={s.heroTitle}>CRM / Lead State Machine</h1>
+          <p style={s.heroSub}>Central operating dashboard with Tally 10% payment gate & Dual-Approval workflow</p>
         </div>
+
+        {/* Policy Switcher */}
+        <div style={s.policyBox}>
+          <div style={s.policyTitle}>BUSINESS APPROVAL POLICY</div>
+          <div style={s.policyToggleGroup}>
+            <button
+              onClick={() => handlePolicyToggle('single-action')}
+              style={{
+                ...s.policyBtn,
+                background: approvalPolicy === 'single-action' ? '#aa3bff' : 'transparent',
+                color: approvalPolicy === 'single-action' ? '#fff' : '#a5b4fc'
+              }}
+            >
+              ⚡ Single-Action
+            </button>
+            <button
+              onClick={() => handlePolicyToggle('countersign')}
+              style={{
+                ...s.policyBtn,
+                background: approvalPolicy === 'countersign' ? '#f59e0b' : 'transparent',
+                color: approvalPolicy === 'countersign' ? '#fff' : '#a5b4fc'
+              }}
+            >
+              🔐 Countersign (Dual)
+            </button>
+          </div>
+        </div>
+
         <div style={s.heroStats}>
           {[
             { label: 'Total Leads',  val: leads.length,                                        clr: '#a5b4fc' },
@@ -89,6 +206,38 @@ export default function CRMLeads() {
         </div>
       </div>
 
+      {/* ── Integration Connectors Status Bar ──────────────────────────────── */}
+      <div style={s.connectorBar}>
+        <div style={s.connCard}>
+          <span style={s.connDot}></span>
+          <div>
+            <div style={s.connName}>CRM Connector</div>
+            <div style={s.connSub}>Synced · Real-Time Lead Engine</div>
+          </div>
+        </div>
+        <div style={s.connCard}>
+          <span style={s.connDot}></span>
+          <div>
+            <div style={s.connName}>ERP Connector</div>
+            <div style={s.connSub}>Connected · Order Release Ready</div>
+          </div>
+        </div>
+        <div style={s.connCard}>
+          <span style={s.connDot}></span>
+          <div>
+            <div style={s.connName}>Dialer Connector</div>
+            <div style={s.connSub}>Active Queue Monitor</div>
+          </div>
+        </div>
+        <div style={{...s.connCard, backgroundColor: '#fffbeb', borderColor: '#fde68a'}}>
+          <span style={{...s.connDot, backgroundColor: '#f59e0b'}}></span>
+          <div>
+            <div style={{...s.connName, color: '#92400e'}}>Tally Accounting Ledger</div>
+            <div style={{...s.connSub, color: '#b45309'}}>10% Advance Hard Gate Active</div>
+          </div>
+        </div>
+      </div>
+
       {/* ── Pipeline Stage Swimlanes ──────────────────────────────────── */}
       <div style={s.swimlanes}>
         {STAGES.map(stage => {
@@ -99,31 +248,44 @@ export default function CRMLeads() {
             <div
               key={stage}
               onClick={() => setFilterStage(active ? 'All' : stage)}
-              style={{ ...s.swimlane, borderColor: active ? meta.color : 'transparent', background: active ? meta.gradient : '#fff' }}
+              style={{
+                ...s.swimlane,
+                borderColor: active ? meta.color : 'transparent',
+                background: active ? meta.gradient : '#fff',
+                transform: active ? 'scale(1.03)' : 'none'
+              }}
             >
               <span style={{ fontSize: '1rem' }}>{meta.icon}</span>
               <span style={{ ...s.swimlaneLbl, color: active ? '#fff' : '#08060d' }}>{stage}</span>
-              <span style={{ ...s.swimlaneCount, backgroundColor: active ? 'rgba(255,255,255,0.25)' : meta.color + '18', color: active ? '#fff' : meta.color }}>{count}</span>
+              <span style={{
+                ...s.swimlaneCount,
+                backgroundColor: active ? 'rgba(255,255,255,0.25)' : meta.color + '18',
+                color: active ? '#fff' : meta.color
+              }}>
+                {count}
+              </span>
             </div>
           );
         })}
       </div>
 
-      {/* ── Search + Add ──────────────────────────────────────────────── */}
+      {/* ── Toolbar (Search + Add) ────────────────────────────────────── */}
       <div style={s.toolbar}>
         <div style={s.searchWrap}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
-            placeholder="Search leads by name or product…"
+            placeholder="Search leads by name or product interest…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={s.searchInput}
           />
         </div>
-        <button style={s.addBtn}>+ Add Lead</button>
+        <button onClick={() => setShowAddModal(true)} style={s.addBtn}>
+          + Add New Lead
+        </button>
       </div>
 
-      {/* ── Lead Cards ───────────────────────────────────────────────── */}
+      {/* ── Lead Cards Grid ───────────────────────────────────────────── */}
       <div style={s.cardGrid}>
         {filtered.map((lead, idx) => {
           const meta = STAGE_META[lead.stage] || STAGE_META['Enquiry'];
@@ -135,8 +297,7 @@ export default function CRMLeads() {
           return (
             <div
               key={lead.id}
-              style={{ ...s.leadCard, borderLeftColor: meta.color, outline: selected === lead.id ? `2px solid ${meta.color}` : 'none' }}
-              onClick={() => setSelected(selected === lead.id ? null : lead.id)}
+              style={{ ...s.leadCard, borderLeftColor: meta.color }}
             >
               {/* Card Top */}
               <div style={s.cardTop}>
@@ -144,6 +305,7 @@ export default function CRMLeads() {
                   {lead.name?.[0] || '?'}
                 </div>
                 <div style={s.cardInfo}>
+                  <div style={s.leadIdStr}>{lead.id}</div>
                   <div style={s.leadName}>{lead.name}</div>
                   <div style={s.leadProduct}>{lead.interest}</div>
                 </div>
@@ -163,26 +325,35 @@ export default function CRMLeads() {
               {/* Card Bottom */}
               <div style={s.cardBottom}>
                 <div style={s.budgetWrap}>
-                  <div style={s.budget}>{lead.budget}</div>
-                  <div style={s.source}>{lead.source || 'Meta Ads'}</div>
+                  <div style={s.budget}>₹{parseFloat(lead.budget || 0).toLocaleString('en-IN')}</div>
+                  <div style={s.source}>{lead.source || 'A2 Cockpit'}</div>
                 </div>
                 {next && (
                   <button
                     disabled={isTransitioning}
-                    onClick={(e) => { e.stopPropagation(); handleTransition(lead); }}
+                    onClick={() => handleTransitionClick(lead)}
                     style={{ ...s.advanceBtn, background: meta.gradient, opacity: isTransitioning ? 0.6 : 1 }}
                   >
-                    {isTransitioning ? '⏳' : `→ ${next}`}
+                    {isTransitioning ? '⏳ Syncing…' : `→ ${next}`}
                   </button>
                 )}
                 {!next && (
-                  <div style={s.completedBadge}>✅ Complete</div>
+                  <div style={s.completedBadge}>✅ Dispatched</div>
                 )}
               </div>
 
-              {/* Gate Warning */}
+              {/* Gate & Dual-Approval Banners */}
               {lead.stage === 'Confirmed Lead' && (
-                <div style={s.gateBanner}>🔐 Tally payment gate — verify 10% advance before advancing</div>
+                <div style={s.gateBanner}>
+                  🔐 <strong>Tally Gate</strong>: 10% advance required
+                  {approvalPolicy === 'countersign' && ' + Dual Approval'}
+                </div>
+              )}
+              {lead.stage === 'Client (Paid)' && (
+                <div style={{...s.gateBanner, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46'}}>
+                  🏭 <strong>Factory Release Ready</strong>
+                  {approvalPolicy === 'countersign' && ' (Countersign Active)'}
+                </div>
               )}
             </div>
           );
@@ -190,35 +361,172 @@ export default function CRMLeads() {
 
         {filtered.length === 0 && (
           <div style={s.empty}>
-            <div style={{ fontSize: '2rem', marginBottom: 8 }}>🔍</div>
-            <div>No leads match your filter</div>
+            <div style={{ fontSize: '2.5rem', marginBottom: 10 }}>🔍</div>
+            <div>No lead records found in A2 database.</div>
           </div>
         )}
       </div>
+
+      {/* ── Add Lead Modal ────────────────────────────────────────────── */}
+      {showAddModal && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalHeader}>
+              <h3>Add New Lead to A2 Operating System</h3>
+              <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+            <form onSubmit={handleAddLeadSubmit} style={s.modalForm}>
+              <label style={s.label}>Customer / Company Name</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. Acme Manufacturing Ltd."
+                value={newLead.name}
+                onChange={e => setNewLead({ ...newLead, name: e.target.value })}
+              />
+
+              <label style={s.label}>Product Interest</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. CNC Router Pro v3"
+                value={newLead.interest}
+                onChange={e => setNewLead({ ...newLead, interest: e.target.value })}
+              />
+
+              <label style={s.label}>Estimated Budget (₹)</label>
+              <input
+                required
+                type="number"
+                style={s.modalInput}
+                placeholder="35000"
+                value={newLead.budget}
+                onChange={e => setNewLead({ ...newLead, budget: e.target.value })}
+              />
+
+              <label style={s.label}>Lead Source</label>
+              <select
+                style={s.modalInput}
+                value={newLead.source}
+                onChange={e => setNewLead({ ...newLead, source: e.target.value })}
+              >
+                <option value="Meta Ads">Meta Ads</option>
+                <option value="A1 Voice Agent">A1 Voice Agent</option>
+                <option value="Inbound Telecaller">Inbound Telecaller</option>
+                <option value="Direct Web">Direct Web</option>
+              </select>
+
+              <label style={s.label}>Notes & Requirements</label>
+              <textarea
+                rows="3"
+                style={{ ...s.modalInput, resize: 'vertical' }}
+                placeholder="Enter client specifications..."
+                value={newLead.notes}
+                onChange={e => setNewLead({ ...newLead, notes: e.target.value })}
+              />
+
+              <div style={s.modalActions}>
+                <button type="button" onClick={() => setShowAddModal(false)} style={s.cancelBtn}>Cancel</button>
+                <button type="submit" style={s.submitBtn}>Save Lead & Sync CRM</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Countersign Dual-Approval Modal ────────────────────────────── */}
+      {showCountersignModal && targetLead && (
+        <div style={s.modalOverlay}>
+          <div style={{ ...s.modalContent, borderTop: '6px solid #f59e0b' }}>
+            <div style={s.modalHeader}>
+              <div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#d97706' }}>BUSINESS POLICY ENFORCEMENT</div>
+                <h3 style={{ margin: 0 }}>Countersign (Dual-Approval) Required</h3>
+              </div>
+              <button onClick={() => setShowCountersignModal(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+            <div style={{ padding: '1rem 0' }}>
+              <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
+                Lead <strong>{targetLead.name} ({targetLead.id})</strong> is transitioning to <strong>{VALID_NEXT[targetLead.stage]}</strong>.
+                Under the active <strong>Countersign Policy</strong>, a second authorized officer signature is required before verifying Tally ledger or releasing factory order.
+              </p>
+
+              <label style={s.label}>Initiating Officer</label>
+              <input disabled value="Bhavya (e2 - Primary)" style={{ ...s.modalInput, backgroundColor: '#f1f5f9' }} />
+
+              <label style={s.label}>Select Countersigning Second Approver</label>
+              <select
+                style={s.modalInput}
+                value={countersignedBy}
+                onChange={e => setCountersignedBy(e.target.value)}
+              >
+                <option value="e3">Aaditya (Operations Manager)</option>
+                <option value="e1">Animesh (Senior Sales Lead)</option>
+              </select>
+            </div>
+
+            <div style={s.modalActions}>
+              <button onClick={() => setShowCountersignModal(false)} style={s.cancelBtn}>Cancel</button>
+              <button
+                onClick={() => executeTransitionCall(targetLead, VALID_NEXT[targetLead.stage], countersignedBy)}
+                style={{ ...s.submitBtn, background: 'linear-gradient(135deg,#d97706,#f59e0b)' }}
+              >
+                🔐 Sign & Execute Transition
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const s = {
-  page:    { padding: '0', fontFamily: 'var(--font-body)', backgroundColor: '#f8fafc', minHeight: '100%' },
-  loading: { padding: '4rem', textAlign: 'center', color: '#64748b' },
+  page:    { padding: '0', fontFamily: 'var(--font-body)', backgroundColor: '#f8fafc', minHeight: '100vh' },
+  loading: { padding: '4rem', textAlign: 'center', color: '#64748b', fontSize: '1rem' },
 
   // Hero
   hero: {
     background: 'linear-gradient(135deg,#0f0c1e 0%,#1e1440 60%,#0a0e1a 100%)',
-    padding: '2rem 2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+    padding: '2rem 2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    gap: '1.5rem', flexWrap: 'wrap'
   },
   heroLeft:    { display: 'flex', flexDirection: 'column', gap: '0.35rem' },
-  heroTag:     { fontSize: '0.6rem', fontWeight: 700, letterSpacing: '2px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' },
+  heroTag:     { fontSize: '0.6rem', fontWeight: 800, letterSpacing: '2px', color: '#a5b4fc', textTransform: 'uppercase' },
   heroTitle:   { fontSize: '2rem', fontWeight: 900, color: '#fff', fontFamily: 'var(--font-heading)', margin: 0, letterSpacing: '-0.5px' },
-  heroSub:     { fontSize: '0.8rem', color: 'rgba(255,255,255,0.45)', margin: 0 },
-  heroStats:   { display: 'flex', gap: '2.5rem' },
-  heroStat:    { textAlign: 'center' },
-  heroStatNum: { fontSize: '2rem', fontWeight: 900, lineHeight: 1 },
-  heroStatLbl: { fontSize: '0.65rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.5px' },
+  heroSub:     { fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', margin: 0 },
 
-  // Swimlane filter
+  policyBox: {
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '0.75rem 1.25rem',
+    border: '1px solid rgba(255,255,255,0.12)', textAlign: 'center'
+  },
+  policyTitle: { fontSize: '0.6rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', marginBottom: 6 },
+  policyToggleGroup: { display: 'flex', gap: 4, backgroundColor: 'rgba(0,0,0,0.25)', padding: 3, borderRadius: 20 },
+  policyBtn: {
+    border: 'none', padding: '5px 12px', borderRadius: 16, fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer', transition: 'all 0.2s'
+  },
+
+  heroStats:   { display: 'flex', gap: '2rem' },
+  heroStat:    { textAlign: 'center' },
+  heroStatNum: { fontSize: '1.8rem', fontWeight: 900, lineHeight: 1 },
+  heroStatLbl: { fontSize: '0.65rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 4, textTransform: 'uppercase' },
+
+  // Connector status bar
+  connectorBar: {
+    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '1rem', padding: '1.25rem 2.5rem', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0'
+  },
+  connCard: {
+    backgroundColor: '#fff', padding: '0.65rem 1rem', borderRadius: 12, border: '1px solid #e2e8f0',
+    display: 'flex', alignItems: 'center', gap: '0.75rem'
+  },
+  connDot: { width: 9, height: 9, borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 },
+  connName: { fontSize: '0.78rem', fontWeight: 800, color: '#08060d' },
+  connSub:  { fontSize: '0.65rem', color: '#64748b' },
+
+  // Swimlanes
   swimlanes: {
     display: 'flex', gap: '0.6rem', padding: '1.25rem 2.5rem',
     backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0', overflowX: 'auto'
@@ -226,8 +534,7 @@ const s = {
   swimlane: {
     display: 'flex', alignItems: 'center', gap: '0.4rem',
     padding: '0.45rem 0.9rem', borderRadius: 24, border: '2px solid',
-    cursor: 'pointer', transition: 'all 0.18s', whiteSpace: 'nowrap',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+    cursor: 'pointer', transition: 'all 0.18s', whiteSpace: 'nowrap'
   },
   swimlaneLbl:   { fontSize: '0.78rem', fontWeight: 700 },
   swimlaneCount: { fontSize: '0.68rem', fontWeight: 800, padding: '1px 7px', borderRadius: 20 },
@@ -240,7 +547,7 @@ const s = {
   searchWrap: {
     display: 'flex', alignItems: 'center', gap: '0.6rem',
     backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 24,
-    padding: '0.55rem 1rem', flex: 1, maxWidth: 420, boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+    padding: '0.55rem 1rem', flex: 1, maxWidth: 420
   },
   searchInput: {
     border: 'none', outline: 'none', fontSize: '0.82rem', fontFamily: 'var(--font-body)',
@@ -255,16 +562,13 @@ const s = {
   // Card Grid
   cardGrid: {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '1rem', padding: '0 2.5rem 2.5rem'
+    gap: '1.25rem', padding: '0 2.5rem 2.5rem'
   },
   leadCard: {
     backgroundColor: '#fff', borderRadius: 18, padding: '1.25rem',
     borderLeft: '4px solid', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-    cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s',
     display: 'flex', flexDirection: 'column', gap: '0.85rem'
   },
-
-  // Card Top
   cardTop:  { display: 'flex', alignItems: 'flex-start', gap: '0.75rem' },
   avatar: {
     width: 40, height: 40, borderRadius: '50%', color: '#fff',
@@ -272,6 +576,7 @@ const s = {
     justifyContent: 'center', flexShrink: 0
   },
   cardInfo:    { flex: 1, minWidth: 0 },
+  leadIdStr:   { fontSize: '0.65rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' },
   leadName:    { fontWeight: 800, fontSize: '0.95rem', color: '#08060d', lineHeight: 1.2 },
   leadProduct: { fontSize: '0.75rem', color: '#64748b', marginTop: 2 },
   stageBadge: {
@@ -308,7 +613,28 @@ const s = {
     borderRadius: 8, padding: '6px 10px'
   },
 
-  // Empty
+  // Modal
+  modalOverlay: {
+    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+  },
+  modalContent: {
+    backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 500,
+    padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+  },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
+  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginTop: 4 },
+  modalInput: {
+    padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1',
+    fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)'
+  },
+  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 },
+
   empty: {
     gridColumn: '1 / -1', textAlign: 'center', padding: '4rem',
     color: '#94a3b8', fontWeight: 600, fontSize: '0.88rem'
