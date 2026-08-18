@@ -43,6 +43,8 @@ function App() {
           <Route path="/email-ai" element={<EmailAIAgent />} />
           <Route path="/dialer" element={<DialerQueue />} />
 
+
+
           {/* Finance */}
           <Route path="/tally" element={<TallySync />} />
           <Route path="/invoices" element={<TallySync />} />

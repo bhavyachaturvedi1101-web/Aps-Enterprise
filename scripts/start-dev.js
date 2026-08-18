@@ -15,9 +15,10 @@ const runProcess = (name, command, args, cwd, colorCode) => {
 
   const proc = spawn(cmd, cmdArgs, {
     cwd: path.resolve(__dirname, '..', cwd),
-    stdio: 'pipe',
+    stdio: ['ignore', 'pipe', 'pipe'],
     shell: false
   });
+
 
   const prefix = `\x1b[${colorCode}m[${name}]\x1b[0m `;
 

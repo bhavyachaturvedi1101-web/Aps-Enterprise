@@ -31,6 +31,8 @@ app.use('/api/calls', require('./routes/calls'));
 app.use('/api/dialer', require('./routes/dialer'));
 app.use('/api/whatsapp', require('./routes/whatsapp'));
 app.use('/api/config', require('./routes/config'));
+app.use('/api/chat', require('./routes/chat'));
+
 
 // Safe Error handling middleware
 app.use((err, req, res, next) => {
