@@ -1,99 +1,280 @@
 import React, { useState } from 'react';
 
-const INVOICES = [
-  { id: 'INV-001', client: 'Acme Corp', product: 'Industrial Mill', amount: '₹50,000', issued: '2026-07-30', due: '2026-08-30', status: 'Sent' },
-  { id: 'INV-002', client: 'Global Tech', product: 'Hydraulic Press', amount: '₹42,000', issued: '2026-08-01', due: '2026-09-01', status: 'Draft' },
-  { id: 'INV-003', client: 'Elite Builders', product: 'CNC Router', amount: '₹18,000', issued: '2026-08-03', due: '2026-09-03', status: 'Paid' },
-  { id: 'INV-004', client: 'Precision Works', product: 'Plasma Cutter', amount: '₹35,000', issued: '2026-08-04', due: '2026-09-04', status: 'Sent' }
+const INITIAL_TAX_INVOICES = [
+  { id: 'INV-2026-8801', client: 'Apex Metalcraft', gstNo: '27AAAAA1122A1Z1', poNo: 'PO-9912', product: 'Heavy Duty CNC Router 500T', hsnCode: '8466', baseAmount: 150000, gst: 27000, issued: '2026-08-01', due: '2026-08-31', status: 'Sent', paymentTerms: 'Net 30 Days' },
+  { id: 'INV-2026-8802', client: 'Tata Heavy Tools', gstNo: '27BBBBB3344B1Z2', poNo: 'PO-9915', product: '200T Hydraulic Press Machine', hsnCode: '8462', baseAmount: 420000, gst: 75600, issued: '2026-08-03', due: '2026-08-18', status: 'Draft', paymentTerms: 'Immediate Deposit' },
+  { id: 'INV-2026-8803', client: 'Kirloskar Forge', gstNo: '27CCCC5566C1Z3', poNo: 'PO-9920', product: 'Laser Cutting Automation Arm', hsnCode: '8456', baseAmount: 280000, gst: 50400, issued: '2026-08-05', due: '2026-09-05', status: 'Paid', paymentTerms: '10% Advance Paid' },
+  { id: 'INV-2026-8804', client: 'Godrej Process Eq', gstNo: '27DDDDD7788D1Z4', poNo: 'PO-9924', product: 'Factory Automated Conveyor Line', hsnCode: '8428', baseAmount: 95000, gst: 17100, issued: '2026-08-07', due: '2026-09-07', status: 'Sent', paymentTerms: 'Net 30 Days' }
 ];
 
-const STATUS = {
-  Paid:  { bg: '#f0fdf4', color: '#16a34a', icon: '✅' },
-  Sent:  { bg: '#eff6ff', color: '#2563eb', icon: '📤' },
-  Draft: { bg: '#f8fafc', color: '#64748b', icon: '📝' }
-};
-
 export default function Invoices() {
-  const [invoices] = useState(INVOICES);
+  const [invoices, setInvoices] = useState(INITIAL_TAX_INVOICES);
+  const [viewInvoice, setViewInvoice] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+  const [newInv, setNewInv] = useState({ client: '', product: '', baseAmount: '120000', poNo: 'PO-9940' });
 
-  const total = invoices.reduce((sum, inv) => sum + parseInt(inv.amount.replace(/[₹,]/g, '')), 0);
-  const paid = invoices.filter(i => i.status === 'Paid').reduce((sum, inv) => sum + parseInt(inv.amount.replace(/[₹,]/g, '')), 0);
-  const pending = total - paid;
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleCreateInvoice = (e) => {
+    e.preventDefault();
+    if (!newInv.client || !newInv.product) return;
+    const base = parseFloat(newInv.baseAmount);
+    const invObj = {
+      id: `INV-2026-880${invoices.length + 1}`,
+      client: newInv.client,
+      gstNo: '27AAAAA0000A1Z5',
+      poNo: newInv.poNo || 'PO-9940',
+      product: newInv.product,
+      hsnCode: '8466',
+      baseAmount: base,
+      gst: Math.round(base * 0.18),
+      issued: new Date().toISOString().split('T')[0],
+      due: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'Sent',
+      paymentTerms: 'Net 30 Days'
+    };
+    setInvoices(prev => [invObj, ...prev]);
+    setShowModal(false);
+    showToast(`Invoice "${invObj.id}" generated & saved!`);
+  };
+
+  const handleDispatchWhatsAppPDF = (inv) => {
+    showToast(`GST Tax Invoice PDF "${inv.id}" dispatched to ${inv.client} via WhatsApp!`);
+  };
 
   return (
     <div style={s.page}>
+      {toastMessage && (
+        <div style={s.toast}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
       <div style={s.pageHead}>
         <div>
-          <h1 style={s.title}>Invoices</h1>
-          <p style={s.sub}>Client invoices and billing records for all APS Enterprise orders</p>
+          <h1 style={s.title}>Customer Billing & PDF Tax Invoices</h1>
+          <p style={s.sub}>Client commercial invoicing, printable PDF invoices & WhatsApp payment links</p>
         </div>
-        <button style={s.addBtn}>+ New Invoice</button>
+        <button onClick={() => setShowModal(true)} style={s.addBtn}>
+          + Create Tax Invoice
+        </button>
       </div>
 
-      {/* Summary Cards */}
-      <div style={s.statsRow}>
-        {[
-          { label: 'Total Invoiced', val: `₹${total.toLocaleString('en-IN')}`, color: '#a855f7' },
-          { label: 'Collected', val: `₹${paid.toLocaleString('en-IN')}`, color: '#10b981' },
-          { label: 'Outstanding', val: `₹${pending.toLocaleString('en-IN')}`, color: '#f59e0b' },
-          { label: 'Total Invoices', val: invoices.length, color: '#3b82f6' }
-        ].map(({ label, val, color }) => (
-          <div key={label} style={{ ...s.statCard, borderTopColor: color }}>
-            <div style={{ ...s.statNum, color }}>{val}</div>
-            <div style={s.statLbl}>{label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Invoice Table */}
-      <div style={s.card}>
-        <div style={s.tableHead}>
-          {['Invoice ID', 'Client', 'Product', 'Issued', 'Due Date', 'Amount', 'Status', 'Action'].map(h => (
-            <div key={h} style={{ ...s.th, flex: h === 'Product' ? 1.5 : 1 }}>{h}</div>
-          ))}
-        </div>
-
+      {/* Invoice Visual Cards Grid */}
+      <div style={s.cardsGrid}>
         {invoices.map(inv => {
-          const st = STATUS[inv.status];
+          const grandTotal = inv.baseAmount + inv.gst;
+          const isPaid = inv.status === 'Paid';
           return (
-            <div key={inv.id} style={s.row}>
-              <div style={{ ...s.td, fontWeight: 700, color: '#aa3bff', fontFamily: 'monospace', flex: 1 }}>{inv.id}</div>
-              <div style={{ ...s.td, fontWeight: 700, color: '#08060d', flex: 1 }}>{inv.client}</div>
-              <div style={{ ...s.td, flex: 1.5 }}>{inv.product}</div>
-              <div style={{ ...s.td, flex: 1 }}>{inv.issued}</div>
-              <div style={{ ...s.td, flex: 1 }}>{inv.due}</div>
-              <div style={{ ...s.td, fontWeight: 700, color: '#08060d', flex: 1 }}>{inv.amount}</div>
-              <div style={{ flex: 1 }}>
-                <span style={{ ...s.pill, backgroundColor: st.bg, color: st.color }}>
-                  {st.icon} {inv.status}
+            <div key={inv.id} style={s.invoiceCard}>
+              <div style={s.cardHead}>
+                <div>
+                  <span style={s.invBadge}>{inv.id}</span>
+                  <div style={s.clientTitle}>{inv.client}</div>
+                  <div style={s.poText}>PO Ref: {inv.poNo}</div>
+                </div>
+                <span style={{
+                  padding: '4px 10px',
+                  borderRadius: 20,
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
+                  color: isPaid ? '#16a34a' : '#2563eb'
+                }}>
+                  {inv.status}
                 </span>
               </div>
-              <div style={{ flex: 1 }}>
-                <button style={s.actionBtn}>View ↗</button>
+
+              <div style={s.cardBody}>
+                <div style={s.productName}>{inv.product}</div>
+                <div style={s.hsnText}>HSN Code: {inv.hsnCode} | GST Rate: 18%</div>
+                
+                <div style={s.amountRow}>
+                  <div>
+                    <div style={s.subLbl}>Base Rate</div>
+                    <div style={s.subVal}>₹{inv.baseAmount.toLocaleString('en-IN')}</div>
+                  </div>
+                  <div>
+                    <div style={s.subLbl}>GST Amount</div>
+                    <div style={s.subVal}>₹{inv.gst.toLocaleString('en-IN')}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={s.subLbl}>Grand Total</div>
+                    <div style={s.totalVal}>₹{grandTotal.toLocaleString('en-IN')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={s.cardFooter}>
+                <button onClick={() => setViewInvoice(inv)} style={s.previewBtn}>
+                  Preview & Print PDF
+                </button>
+                <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
+                  Send WhatsApp PDF
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* New Invoice Modal */}
+      {showModal && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Create New Customer Invoice</h3>
+              <button onClick={() => setShowModal(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+            <form onSubmit={handleCreateInvoice} style={s.modalForm}>
+              <label style={s.label}>Client Name</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. Mahindra Heavy Tech"
+                value={newInv.client}
+                onChange={e => setNewInv({ ...newInv, client: e.target.value })}
+              />
+              <label style={s.label}>PO Reference Number</label>
+              <input
+                style={s.modalInput}
+                placeholder="PO-9940"
+                value={newInv.poNo}
+                onChange={e => setNewInv({ ...newInv, poNo: e.target.value })}
+              />
+              <label style={s.label}>Machine / Product Description</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. Robotic Welder Station v4"
+                value={newInv.product}
+                onChange={e => setNewInv({ ...newInv, product: e.target.value })}
+              />
+              <label style={s.label}>Base Subtotal Rate (₹)</label>
+              <input
+                required
+                type="number"
+                style={s.modalInput}
+                placeholder="120000"
+                value={newInv.baseAmount}
+                onChange={e => setNewInv({ ...newInv, baseAmount: e.target.value })}
+              />
+              <div style={s.modalActions}>
+                <button type="button" onClick={() => setShowModal(false)} style={s.cancelBtn}>Cancel</button>
+                <button type="submit" style={s.submitBtn}>Generate Invoice Card</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Printable Tax Invoice Modal */}
+      {viewInvoice && (
+        <div style={s.modalOverlay}>
+          <div style={{ ...s.modalContent, maxWidth: 640, padding: '2.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #08060d', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#08060d', fontFamily: 'var(--font-heading)' }}>APS ENTERPRISE CO.</h2>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>Industrial Machinery & Automation Systems</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {viewInvoice.hsnCode}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' }}>TAX INVOICE</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#08060d' }}>{viewInvoice.id}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>PO Ref: {viewInvoice.poNo}</div>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 12, marginBottom: '1.5rem', fontSize: '0.8rem' }}>
+              <div style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.68rem', textTransform: 'uppercase' }}>Billed To Client:</div>
+              <div style={{ fontWeight: 800, color: '#08060d', fontSize: '0.95rem', marginTop: 2 }}>{viewInvoice.client}</div>
+              <div style={{ color: '#64748b', marginTop: 2 }}>GSTIN: {viewInvoice.gstNo} | Terms: {viewInvoice.paymentTerms}</div>
+            </div>
+
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', fontSize: '0.8rem' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                  <th style={{ padding: '8px 12px', color: '#475569' }}>Machine Specs</th>
+                  <th style={{ padding: '8px 12px', color: '#475569' }}>Base Rate</th>
+                  <th style={{ padding: '8px 12px', color: '#475569' }}>GST (18%)</th>
+                  <th style={{ padding: '8px 12px', color: '#475569', textAlign: 'right' }}>Total (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '10px 12px', fontWeight: 700, color: '#08060d' }}>{viewInvoice.product}</td>
+                  <td style={{ padding: '10px 12px' }}>₹{viewInvoice.baseAmount.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '10px 12px' }}>₹{viewInvoice.gst.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800 }}>₹{(viewInvoice.baseAmount + viewInvoice.gst).toLocaleString('en-IN')}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                <div><strong>Bank:</strong> HDFC Bank Ltd (Commercial Banking)</div>
+                <div><strong>A/C No:</strong> 50200098765432</div>
+                <div><strong>IFSC:</strong> HDFC0001234</div>
+              </div>
+              <div style={{ textAlign: 'right', fontSize: '0.85rem' }}>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#aa3bff' }}>
+                  Grand Total: ₹{(viewInvoice.baseAmount + viewInvoice.gst).toLocaleString('en-IN')}
+                </div>
+              </div>
+            </div>
+
+            <div style={s.modalActions}>
+              <button onClick={() => window.print()} style={{ ...s.submitBtn, backgroundColor: '#08060d' }}>
+                Print Tax Invoice
+              </button>
+              <button onClick={() => setViewInvoice(null)} style={s.cancelBtn}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 const s = {
-  page: { padding: '2rem', fontFamily: 'var(--font-body)' },
+  page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto' },
+  toast: { position: 'fixed', bottom: 24, right: 24, backgroundColor: '#0f172a', color: '#fff', padding: '0.8rem 1.4rem', borderRadius: 14, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2000, fontSize: '0.85rem', fontWeight: 600 },
   pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
   title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#08060d', margin: 0 },
-  sub: { fontSize: '0.78rem', color: '#64748b', marginTop: 4 },
-  addBtn: { padding: '0.6rem 1.25rem', backgroundColor: '#08060d', color: '#fff', border: 'none', borderRadius: 20, fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' },
-  statsRow: { display: 'flex', gap: '1rem', marginBottom: '1.5rem' },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: '1.25rem', border: '1px solid #e2e8f0', borderTop: '3px solid', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' },
-  statNum: { fontSize: '1.6rem', fontWeight: 800 },
-  statLbl: { fontSize: '0.72rem', color: '#64748b', fontWeight: 600, marginTop: 2 },
-  card: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' },
-  tableHead: { display: 'flex', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '0.65rem 1.25rem', gap: '1rem' },
-  th: { flex: 1, fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  row: { display: 'flex', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: '1px solid #f1f5f9', gap: '1rem' },
-  td: { flex: 1, fontSize: '0.8rem', color: '#475569' },
-  pill: { padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 },
-  actionBtn: { padding: '4px 12px', backgroundColor: 'transparent', border: '1px solid #e2e8f0', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, color: '#64748b', cursor: 'pointer' }
+  sub: { fontSize: '0.8rem', color: '#64748b', marginTop: 4 },
+  addBtn: { backgroundColor: '#08060d', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' },
+  cardsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
+  invoiceCard: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  cardHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' },
+  invBadge: { fontSize: '0.75rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' },
+  clientTitle: { fontSize: '1rem', fontWeight: 800, color: '#08060d', marginTop: 2 },
+  poText: { fontSize: '0.72rem', color: '#64748b', marginTop: 1 },
+  cardBody: { borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', padding: '0.85rem 0', margin: '0.5rem 0' },
+  productName: { fontSize: '0.88rem', fontWeight: 700, color: '#08060d' },
+  hsnText: { fontSize: '0.72rem', color: '#94a3b8', marginTop: 2, marginBottom: '0.75rem' },
+  amountRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', backgroundColor: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: 10 },
+  subLbl: { fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 },
+  subVal: { fontSize: '0.8rem', fontWeight: 700, color: '#475569' },
+  totalVal: { fontSize: '0.95rem', fontWeight: 800, color: '#aa3bff' },
+  cardFooter: { display: 'flex', gap: 8, marginTop: '0.5rem' },
+  previewBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#aa3bff', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
+  waBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
+  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginTop: 4 },
+  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)' },
+  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 }
 };

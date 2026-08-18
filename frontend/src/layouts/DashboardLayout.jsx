@@ -45,10 +45,6 @@ const NAV_GROUPS = [
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       },
       {
-        key: 'email-ai', label: 'Email AI Agent', badge: null,
-        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      },
-      {
         key: 'dialer', label: 'Dialer Queue', badge: '12',
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       }
@@ -91,6 +87,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const path = location.pathname;
   const queryParams = new URLSearchParams(location.search);
@@ -101,7 +98,6 @@ export default function DashboardLayout() {
      path === '/payments'  ? 'payments'  :
      path === '/voice'     ? 'voice'     :
      path === '/whatsapp'  ? 'whatsapp'  :
-     path === '/email-ai'  ? 'email-ai'  :
      path === '/dialer'    ? 'dialer'    :
      path === '/tally'     ? 'tally'     :
      path === '/invoices'  ? 'invoices'  :
@@ -119,7 +115,6 @@ export default function DashboardLayout() {
       payments:   '/payments',
       voice:      '/voice',
       whatsapp:   '/whatsapp',
-      'email-ai': '/email-ai',
       dialer:     '/dialer',
       tally:      '/tally',
       invoices:   '/invoices',
@@ -165,17 +160,45 @@ export default function DashboardLayout() {
         </div>
 
         {/* Right Actions */}
-        <div style={s.headerRight}>
+        <div style={{ ...s.headerRight, position: 'relative' }}>
           {/* Notification Bell */}
-          <div style={s.notifWrap} onClick={() => setNotifOpen(!notifOpen)}>
+          <div style={s.notifWrap} onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
             <div style={s.notifDot}/>
           </div>
 
+          {/* Notifications Dropdown */}
+          {notifOpen && (
+            <div style={s.dropdownPanel}>
+              <div style={s.dropdownHeader}>System Notifications</div>
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span>Payment Gate Pending</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Acme Manufacturing 10% advance verification required.</div>
+              </div>
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
+                  <span>A1 Voice Calls Active</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>12 automated calls processed this morning.</div>
+              </div>
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span>WhatsApp Automation</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Sequence WA-003 delivered to Global Tech.</div>
+              </div>
+            </div>
+          )}
+
           {/* User Widget */}
-          <div style={s.userWidget} onClick={() => handleTabChange('settings')}>
+          <div style={s.userWidget} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}>
             <div style={s.userAvatarInitial}>A</div>
             <div style={s.userInfo}>
               <div style={s.userName}>Admin</div>
@@ -185,6 +208,25 @@ export default function DashboardLayout() {
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </div>
+
+          {/* Profile Dropdown */}
+          {userMenuOpen && (
+            <div style={{ ...s.dropdownPanel, right: 0, width: 200 }}>
+              <div style={s.dropdownHeader}>Signed in as Admin</div>
+              <div style={s.menuItem} onClick={() => { handleTabChange('settings'); setUserMenuOpen(false); }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>System Settings</span>
+              </div>
+              <div style={s.menuItem} onClick={() => { handleTabChange('users'); setUserMenuOpen(false); }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Users & Roles</span>
+              </div>
+              <div style={{ ...s.menuItem, color: '#ef4444' }} onClick={() => navigate('/login')}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Logout</span>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -407,5 +449,11 @@ const s = {
   },
 
   // ── Main Content
-  mainContent: { flexGrow: 1, overflowY: 'auto', position: 'relative', backgroundColor: 'var(--bg-primary)' }
+  mainContent: { flexGrow: 1, overflowY: 'auto', position: 'relative', backgroundColor: 'var(--bg-primary)' },
+
+  // ── Dropdowns
+  dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
+  dropdownHeader: { fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '4px 8px', borderBottom: '1px solid #f1f5f9', marginBottom: 4 },
+  notifItem: { padding: '8px', borderRadius: 8, backgroundColor: '#f8fafc', borderLeft: '3px solid #aa3bff', display: 'flex', flexDirection: 'column', gap: 2 },
+  menuItem: { padding: '8px 12px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 600, color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.15s' }
 };

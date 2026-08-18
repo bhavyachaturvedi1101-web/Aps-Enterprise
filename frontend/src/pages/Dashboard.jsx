@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api';
@@ -15,10 +15,57 @@ const PIPELINE_STAGES = [
 ];
 
 const INTEGRATIONS = [
-  { name: 'CRM', icon: '🔗', status: 'Live', role: 'Lead sync & status updates', color: '#10b981' },
-  { name: 'ERP', icon: '🏭', status: 'Live', role: 'Booking & factory release', color: '#3b82f6' },
-  { name: 'Dialer', icon: '📞', status: 'Live', role: 'Call queue management', color: '#a855f7' },
-  { name: 'Tally', icon: '💰', status: 'Live — Hard Gate', role: '10% advance payment gate', color: '#f59e0b' }
+  {
+    name: 'CRM',
+    role: 'Lead sync & status updates',
+    color: '#10b981',
+    status: 'Live',
+    iconBg: '#ecfdf5',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    )
+  },
+  {
+    name: 'ERP',
+    role: 'Booking & factory release',
+    color: '#3b82f6',
+    status: 'Live',
+    iconBg: '#eff6ff',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 20h20"/>
+        <path d="M6 20V10l4 3V10l4 3V6l6 4v10"/>
+      </svg>
+    )
+  },
+  {
+    name: 'Dialer',
+    role: 'Call queue management',
+    color: '#a855f7',
+    status: 'Live',
+    iconBg: '#f3e8ff',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    )
+  },
+  {
+    name: 'Tally',
+    role: '10% advance payment gate',
+    color: '#f59e0b',
+    status: 'Live — Hard Gate',
+    iconBg: '#fffbeb',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+    )
+  }
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -31,6 +78,41 @@ export default function Dashboard() {
   const [leads, setLeads] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newLead, setNewLead] = useState({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+
+  const handleAddLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!newLead.name) return alert('Lead name is required!');
+    try {
+      const res = await fetch(`${API}/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLead)
+      });
+      if (res.ok) {
+        setShowAddModal(false);
+        setNewLead({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+        const leadsRes = await fetch(`${API}/leads`);
+        const leadsData = await leadsRes.json();
+        setLeads(leadsData.leads || []);
+      } else {
+        alert('Failed to add lead.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error creating lead.');
+    }
+  };
+
+  const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const [activeFilters, setActiveFilters] = useState(['Last Month', 'All Campaigns', 'Global']);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [selDate, setSelDate] = useState('Last Month');
+  const [selCampaign, setSelCampaign] = useState('All Campaigns');
+  const [selGeo, setSelGeo] = useState('Global');
+  const [isListening, setIsListening] = useState(false);
 
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
@@ -90,25 +172,93 @@ export default function Dashboard() {
       console.error('Error contacting A3 Chatbot backend:', err);
     }
 
-    // Fallback response
-    const input = currentInput.toLowerCase();
-    let reply = "I'm analyzing the A2 pipeline database. What else can I help with?";
-    if (input.includes('payment') || input.includes('tally')) {
+    // Smart fallback response
+    const input = currentInput.toLowerCase().trim();
+    let reply = "";
+    if (['hi', 'hello', 'hiii', 'hey', 'hii', 'greetings'].some(w => input.startsWith(w) || input === w)) {
+      reply = `Hello! I am your APS Enterprise AI Assistant. Currently, you have ${leads.length} active leads across 7 pipeline stages. How can I help you manage operations today?`;
+    } else if (input.includes('payment') || input.includes('tally') || input.includes('gate') || input.includes('advance')) {
       const pendingVerify = leads.filter(l => l.stage === 'Confirmed Lead');
       if (pendingVerify.length > 0) {
-        reply = `${pendingVerify.length} lead(s) pending Tally payment verification: ${pendingVerify.map(l => `${l.name} (₹${parseFloat(l.budget).toLocaleString('en-IN')})`).join(', ')}. Recommend verifying via the Payment Gate.`;
+        reply = `Tally Gate Alert: ${pendingVerify.length} lead(s) require 10% advance verification: ${pendingVerify.map(l => `${l.name} (₹${parseFloat(l.budget).toLocaleString('en-IN')})`).join(', ')}. Recommend verifying via the Payment Gate.`;
       } else {
-        reply = "No leads are currently pending Tally payment verification. All payments are up-to-date.";
+        reply = "All payment gates are verified. 0 leads pending Tally 10% advance verification.";
       }
-    } else if (input.includes('lead') || input.includes('pipeline')) {
+    } else if (input.includes('lead') || input.includes('pipeline') || input.includes('stage')) {
       const stageCounts = PIPELINE_STAGES.reduce((acc, stage) => {
         acc[stage.key] = leads.filter(l => l.stage === stage.key).length;
         return acc;
       }, {});
-      reply = `Pipeline has ${leads.length} active leads: ` + 
-        PIPELINE_STAGES.map(s => `${stageCounts[s.key] || 0} ${s.title}`).join(', ') + '.';
+      reply = `Pipeline Summary (${leads.length} Total Leads):\n` + 
+        PIPELINE_STAGES.map(s => `• ${s.title}: ${stageCounts[s.key] || 0}`).join('\n');
+    } else if (input.includes('crm')) {
+      reply = `CRM Connector is active. All ${leads.length} leads are synchronized in real-time with state machine enforcement.`;
+    } else if (input.includes('erp') || input.includes('factory') || input.includes('order')) {
+      const booked = leads.filter(l => ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)).length;
+      const inProd = leads.filter(l => l.stage === 'In Production').length;
+      reply = `ERP Layer Status: ${booked} bookings created, ${inProd} released to manufacturing floor.`;
+    } else if (input.includes('dialer') || input.includes('call') || input.includes('voice')) {
+      reply = "A1 Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
+    } else if (input.includes('employee') || input.includes('team') || input.includes('kpi')) {
+      reply = "Team KPIs: 3 active operators. Bhavya (A2 Admin) leading at 96% KPI score.";
+    } else {
+      reply = `I have analyzed your query "${currentInput}". The A2 Operating System is fully synchronized with ${leads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
     }
+
     setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
+  };
+
+  const handleFileAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageAttachClick = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setChatMessages(prev => [
+      ...prev,
+      { id: Date.now(), text: `📎 Attached file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, sender: 'user' },
+      { id: Date.now() + 1, text: `Received file "${file.name}". Processing attachment with APS Document AI...`, sender: 'ai' }
+    ]);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setChatMessages(prev => [
+      ...prev,
+      { id: Date.now(), text: `🖼️ Attached image: ${file.name}`, sender: 'user' },
+      { id: Date.now() + 1, text: `Analyzing image "${file.name}" for equipment specifications and invoice data...`, sender: 'ai' }
+    ]);
+  };
+
+  const handleClearChat = () => {
+    setChatMessages([{ id: Date.now(), text: 'Chat history cleared. How can I assist you today?', sender: 'ai', isHeader: true }]);
+  };
+
+  const handleVoiceToggle = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      setChatInput('Show me all confirmed leads pending Tally payment verification');
+      setIsListening(true);
+      setTimeout(() => setIsListening(false), 2000);
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    setIsListening(true);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setChatInput(transcript);
+      setIsListening(false);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
   };
 
 
@@ -227,7 +377,7 @@ export default function Dashboard() {
             {INTEGRATIONS.map(int => (
               <div key={int.name} style={s.intCard}>
                 <div style={s.intLeft}>
-                  <div style={s.intIcon}>{int.icon}</div>
+                  <div style={{ ...s.intIcon, backgroundColor: int.iconBg }}>{int.svg}</div>
                   <div>
                     <div style={s.intName}>{int.name}</div>
                     <div style={s.intRole}>{int.role}</div>
@@ -244,10 +394,27 @@ export default function Dashboard() {
           <div style={s.secHead}>
             <h2 style={s.secTitle}>Overview</h2>
             <div style={s.filterRow}>
-              {['Last Month','All Campaigns','Global'].map(f => (
-                <div key={f} style={s.filterPill}>{f} <span style={{color:'#94a3b8',marginLeft:4}}>✕</span></div>
+              {activeFilters.map(f => (
+                <div key={f} style={s.filterPill}>
+                  {f}
+                  <span
+                    onClick={() => setActiveFilters(prev => prev.filter(x => x !== f))}
+                    style={{ color: '#94a3b8', marginLeft: 6, cursor: 'pointer', fontWeight: 800 }}
+                    title="Remove filter"
+                  >
+                    ✕
+                  </span>
+                </div>
               ))}
-              <button style={s.filterIcon}>
+              {activeFilters.length === 0 && (
+                <button
+                  onClick={() => setActiveFilters(['Last Month', 'All Campaigns', 'Global'])}
+                  style={{ ...s.filterPill, backgroundColor: '#f1f5f9', color: '#64748b', cursor: 'pointer' }}
+                >
+                  + Reset Default Filters
+                </button>
+              )}
+              <button onClick={() => setFilterModalOpen(true)} style={s.filterIcon} title="Filter Settings">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                 </svg>
@@ -298,7 +465,10 @@ export default function Dashboard() {
                 <span style={s.cardArrow}>↗</span>
               </div>
               <div style={s.ctrBody}>
-                <div style={s.aiPrompt}>✨ What would you like to explore next?</div>
+                <div style={{...s.aiPrompt, display: 'flex', alignItems: 'center', gap: 6}}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span>What would you like to explore next?</span>
+                </div>
                 <div style={s.ctrRow}>
                   <div>
                     <div style={s.ctrBig}>0.04%</div>
@@ -329,7 +499,9 @@ export default function Dashboard() {
                   {chatMessages.map(msg => (
                     <div key={msg.id} style={{...s.bubble, ...(msg.sender === 'ai' ? s.bubbleAi : s.bubbleUser)}}>
                       {msg.sender === 'ai' && (
-                        <div style={s.aiAvatar}>🔮</div>
+                        <div style={s.aiAvatar}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="#aa3bff"><path d="M12 2L2 7v10l10 5 10-5V7z"/></svg>
+                        </div>
                       )}
                       <div>
                         {msg.isHeader && <div style={s.aiLabel}>HOW CAN I <span style={{color:'#aa3bff'}}>ASSIST</span> YOU TODAY</div>}
@@ -340,18 +512,40 @@ export default function Dashboard() {
                 </div>
                 <form onSubmit={handleSendMessage} style={s.chatForm}>
                   <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  <input
+                    type="file"
+                    ref={imageInputRef}
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                  />
+                  <input
                     type="text"
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
-                    placeholder="Ask me anything about leads, CRM, Tally..."
-                    style={s.chatInput}
+                    placeholder={isListening ? "Listening to your voice..." : "Ask me anything about leads, CRM, Tally..."}
+                    style={{ ...s.chatInput, backgroundColor: isListening ? '#fef3c7' : 'transparent' }}
                   />
                   <div style={s.chatFoot}>
-                    <span style={s.chatAttach}>📎 Attach File</span>
+                    <span onClick={handleFileAttachClick} style={{ ...s.chatAttach, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                      <span>Attach File</span>
+                    </span>
                     <div style={{display:'flex',gap:4}}>
-                      <button type="button" style={s.chatCircle}>✏️</button>
-                      <button type="button" style={s.chatCircle}>🖼️</button>
-                      <button type="submit" style={s.chatSend}>🎤</button>
+                      <button type="button" onClick={handleClearChat} style={s.chatCircle} title="Reset Chat">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </button>
+                      <button type="button" onClick={handleImageAttachClick} style={s.chatCircle} title="Attach Image">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      </button>
+                      <button type="button" onClick={handleVoiceToggle} style={{ ...s.chatSend, backgroundColor: isListening ? '#ef4444' : '#aa3bff' }} title="Voice Input">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                      </button>
                     </div>
                   </div>
                 </form>
@@ -370,7 +564,9 @@ export default function Dashboard() {
               <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
                 {activityLogs.slice(0, 5).map(act => (
                   <div key={act.id} style={s.actRow}>
-                    <div style={s.actIcon}>📋</div>
+                    <div style={{ ...s.actIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    </div>
                     <div style={{flex:1}}>
                       <div style={s.actName}>{act.employeeId === 'e1' ? 'Animesh' : act.employeeId === 'e2' ? 'Bhavya' : act.employeeId === 'e3' ? 'Aaditya' : 'System'}</div>
                       <div style={s.actDesc}>{act.action}</div>
@@ -418,7 +614,7 @@ export default function Dashboard() {
               <h1 style={s.secTitle}>Lead Status Pipeline</h1>
               <p style={{...s.cardSub, marginTop:4}}>State machine enforcement — payment gate required to advance to Client (Paid)</p>
             </div>
-            <button style={s.addBtn}>+ Add New Lead</button>
+            <button onClick={() => setShowAddModal(true)} style={s.addBtn}>+ Add New Lead</button>
           </div>
 
           <div style={s.pipeGrid}>
@@ -451,6 +647,126 @@ export default function Dashboard() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Add Lead Modal ────────────────────────────────────────────── */}
+      {showAddModal && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Add New Lead to A2 Operating System</h3>
+              <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+            <form onSubmit={handleAddLeadSubmit} style={s.modalForm}>
+              <label style={s.label}>Customer / Company Name</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. Acme Manufacturing Ltd."
+                value={newLead.name}
+                onChange={e => setNewLead({ ...newLead, name: e.target.value })}
+              />
+
+              <label style={s.label}>Product Interest</label>
+              <input
+                required
+                style={s.modalInput}
+                placeholder="e.g. CNC Router Pro v3"
+                value={newLead.interest}
+                onChange={e => setNewLead({ ...newLead, interest: e.target.value })}
+              />
+
+              <label style={s.label}>Estimated Budget (₹)</label>
+              <input
+                required
+                type="number"
+                style={s.modalInput}
+                placeholder="35000"
+                value={newLead.budget}
+                onChange={e => setNewLead({ ...newLead, budget: e.target.value })}
+              />
+
+              <label style={s.label}>Lead Source</label>
+              <select
+                style={s.modalInput}
+                value={newLead.source}
+                onChange={e => setNewLead({ ...newLead, source: e.target.value })}
+              >
+                <option value="Meta Ads">Meta Ads</option>
+                <option value="A1 Voice Agent">A1 Voice Agent</option>
+                <option value="Inbound Telecaller">Inbound Telecaller</option>
+                <option value="Direct Web">Direct Web</option>
+              </select>
+
+              <label style={s.label}>Notes & Requirements</label>
+              <textarea
+                rows="3"
+                style={{ ...s.modalInput, resize: 'vertical' }}
+                placeholder="Enter client specifications..."
+                value={newLead.notes}
+                onChange={e => setNewLead({ ...newLead, notes: e.target.value })}
+              />
+
+              <div style={s.modalActions}>
+                <button type="button" onClick={() => setShowAddModal(false)} style={s.cancelBtn}>Cancel</button>
+                <button type="submit" style={s.submitBtn}>Save Lead & Sync CRM</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Filter Options Modal ───────────────────────────────────────── */}
+      {filterModalOpen && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Analytics Filter Settings</h3>
+              <button onClick={() => setFilterModalOpen(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <div>
+                <label style={s.label}>Date Range Filter</label>
+                <select style={s.modalInput} value={selDate} onChange={e => setSelDate(e.target.value)}>
+                  <option value="Today">Today</option>
+                  <option value="Last 7 Days">Last 7 Days</option>
+                  <option value="Last Month">Last Month</option>
+                  <option value="Year to Date">Year to Date</option>
+                </select>
+              </div>
+              <div>
+                <label style={s.label}>Campaign Source</label>
+                <select style={s.modalInput} value={selCampaign} onChange={e => setSelCampaign(e.target.value)}>
+                  <option value="All Campaigns">All Campaigns</option>
+                  <option value="Meta Ads">Meta Ads</option>
+                  <option value="A1 Voice Telecaller">A1 Voice Telecaller</option>
+                  <option value="Direct Web">Direct Web</option>
+                </select>
+              </div>
+              <div>
+                <label style={s.label}>Geography / Region</label>
+                <select style={s.modalInput} value={selGeo} onChange={e => setSelGeo(e.target.value)}>
+                  <option value="Global">Global</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Delhi NCR">Delhi NCR</option>
+                </select>
+              </div>
+            </div>
+            <div style={s.modalActions}>
+              <button onClick={() => setFilterModalOpen(false)} style={s.cancelBtn}>Cancel</button>
+              <button
+                onClick={() => {
+                  setActiveFilters([selDate, selCampaign, selGeo]);
+                  setFilterModalOpen(false);
+                }}
+                style={s.submitBtn}
+              >
+                Apply Filters
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -576,5 +892,17 @@ const s = {
   leadMeta: { display:'flex', justifyContent:'space-between', alignItems:'center' },
   leadBudget: { fontSize:'0.75rem', fontWeight:700, color:'#aa3bff' },
   leadSource: { fontSize:'0.65rem', color:'#94a3b8', fontWeight:600 },
-  empty: { fontSize:'0.72rem', color:'#94a3b8', textAlign:'center', padding:'1rem 0' }
+  empty: { fontSize:'0.72rem', color:'#94a3b8', textAlign:'center', padding:'1rem 0' },
+
+  // Modal
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 500, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
+  label: { fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' },
+  modalInput: { width: '100%', padding: '0.65rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', boxSizing: 'border-box' },
+  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 }
 };

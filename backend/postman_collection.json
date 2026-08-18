@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "APS Enterprise A2 Admin System API",
+    "description": "API collection for Auth, CRM Leads CRUD, State Machine Transitions, A1 Voice Dialer, A5 WhatsApp, and A4 Team KPIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "CRM Leads - Get All Leads",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/leads",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "leads"]
+        }
+      }
+    },
+    {
+      "name": "CRM Leads - Create New Lead",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Reliance Industries\",\n  \"interest\": \"Robotic CNC Cutter\",\n  \"budget\": \"85000\",\n  \"source\": \"Meta Ads\",\n  \"notes\": \"High priority manufacturing query.\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/leads",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "leads"]
+        }
+      }
+    },
+    {
+      "name": "State Machine - Transition Lead (Tally Payment Gate)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"toStage\": \"Client (Paid)\",\n  \"employeeId\": \"admin\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/leads/LEAD-004/transition",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "leads", "LEAD-004", "transition"]
+        }
+      }
+    },
+    {
+      "name": "A1 Voice Agent - Log Call Outcome",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"leadId\": \"LEAD-002\",\n  \"phone\": \"+919876543210\",\n  \"callOutcome\": \"Interested - Demo Scheduled\",\n  \"durationSeconds\": 120,\n  \"transcript\": \"Customer confirmed interest in Laser Cutter Pro.\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/calls/outcome",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "calls", "outcome"]
+        }
+      }
+    },
+    {
+      "name": "A5 WhatsApp - Send Payment Reminder",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"leadId\": \"LEAD-004\",\n  \"leadName\": \"Global Tech\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/whatsapp/send-reminder",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "whatsapp", "send-reminder"]
+        }
+      }
+    },
+    {
+      "name": "A4 Performance - Get Employees & KPIs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "employees"]
+        }
+      }
+    },
+    {
+      "name": "A3 AI Assistant - Query Route",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"Show pipeline summary\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/chat/query",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "chat", "query"]
+        }
+      }
+    }
+  ]
+}

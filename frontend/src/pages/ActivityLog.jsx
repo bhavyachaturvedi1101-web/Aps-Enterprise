@@ -10,7 +10,12 @@ export default function ActivityLog() {
     fetch(`${API}/activity`).then(r => r.json()).then(d => { setLogs(d.logs || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  const ICONS = { e1:'🎙️', e2:'⚙️', e3:'📊', system:'🤖' };
+  const ICONS = {
+    e1: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>,
+    e2: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    e3: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+    system: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+  };
 
   if (loading) return <div style={s.loading}>Loading activity…</div>;
 
@@ -32,7 +37,10 @@ export default function ActivityLog() {
         {logs.map(log => (
           <div key={log.id} style={s.tableRow}>
             <div style={s.td}>{new Date(log.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
-            <div style={{...s.td, fontWeight:700, color:'#08060d'}}>{ICONS[log.employeeId] || '👤'} {log.employeeId}</div>
+            <div style={{...s.td, fontWeight:700, color:'#08060d', display:'flex', alignItems:'center', gap:5}}>
+              {ICONS[log.employeeId] || <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+              <span>{log.employeeId}</span>
+            </div>
             <div style={{...s.td, flex:2, fontSize:'0.75rem', color:'#475569'}}>{log.action}</div>
             <div style={s.td}><span style={{...s.stagePill, backgroundColor:'#f1f5f9', color:'#64748b'}}>{log.fromStage}</span></div>
             <div style={s.td}><span style={{...s.stagePill, backgroundColor:'#f0fdf4', color:'#16a34a'}}>{log.toStage}</span></div>

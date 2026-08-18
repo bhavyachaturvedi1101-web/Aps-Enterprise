@@ -107,12 +107,17 @@ export default function PaymentGate() {
           <h1 style={s.title}>Payment Gate</h1>
           <p style={s.sub}>Tally integration — 10% advance payment verification. Hard gate before factory release.</p>
         </div>
-        <div style={s.tallyBadge}>Tally: Connected ✓</div>
+        <div style={{ ...s.tallyBadge, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span>Tally: Connected</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
       </div>
 
       {pendingPayments.length > 0 ? (
         <div style={s.alertBox}>
-          <div style={s.alertIcon}>⚠️</div>
+          <div style={s.alertIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
           <div>
             <div style={s.alertTitle}>{pendingPayments.length} payment(s) pending verification</div>
             <div style={s.alertSub}>
@@ -125,7 +130,9 @@ export default function PaymentGate() {
         </div>
       ) : (
         <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
-          <div style={s.alertIcon}>✅</div>
+          <div style={s.alertIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <div>
             <div style={{...s.alertTitle, color: '#065f46'}}>All payments verified</div>
             <div style={{...s.alertSub, color: '#047857'}}>No pending 10% advance payments ledger matches require action.</div>
@@ -154,10 +161,14 @@ export default function PaymentGate() {
             </div>
             <div style={{...s.payRight, flex: 1}}>
               {pay.status === 'Verified' ? (
-                <div style={s.verified}>✅ Verified</div>
+                <div style={{ ...s.verified, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Verified</span>
+                </div>
               ) : (
-                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} style={s.verifyBtn}>
-                  {verifying === pay.leadId ? '🔄 Verifying…' : '🔍 Verify with Tally'}
+                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} style={{ ...s.verifyBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>{verifying === pay.leadId ? 'Verifying…' : 'Verify with Tally'}</span>
                 </button>
               )}
             </div>
