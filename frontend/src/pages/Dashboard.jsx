@@ -58,15 +58,41 @@ export default function Dashboard() {
     fetchData();
   }, [activeTab]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
     const userMsg = { id: Date.now(), text: chatInput, sender: 'user' };
     setChatMessages(prev => [...prev, userMsg]);
-    const input = chatInput.toLowerCase();
-    
+    const currentInput = chatInput;
+    setChatInput('');
+
+    try {
+      const res = await fetch(`${API}/chat/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: currentInput })
+      });
+      const data = await res.json();
+      if (data && data.answer) {
+        setChatMessages(prev => [
+          ...prev, 
+          { 
+            id: Date.now() + 1, 
+            text: data.answer, 
+            sender: 'ai',
+            chartData: data.chartData,
+            actionSuggestions: data.actionSuggestions 
+          }
+        ]);
+        return;
+      }
+    } catch (err) {
+      console.error('Error contacting A3 Chatbot backend:', err);
+    }
+
+    // Fallback response
+    const input = currentInput.toLowerCase();
     let reply = "I'm analyzing the A2 pipeline database. What else can I help with?";
-    
     if (input.includes('payment') || input.includes('tally')) {
       const pendingVerify = leads.filter(l => l.stage === 'Confirmed Lead');
       if (pendingVerify.length > 0) {
@@ -81,23 +107,10 @@ export default function Dashboard() {
       }, {});
       reply = `Pipeline has ${leads.length} active leads: ` + 
         PIPELINE_STAGES.map(s => `${stageCounts[s.key] || 0} ${s.title}`).join(', ') + '.';
-    } else if (input.includes('crm')) {
-      reply = `CRM sync is live. All ${leads.length} leads are synchronized. Last sync: just now.`;
-    } else if (input.includes('erp')) {
-      const booked = leads.filter(l => ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)).length;
-      const inProd = leads.filter(l => l.stage === 'In Production').length;
-      reply = `ERP module: ${booked} total bookings tracked. ${inProd} orders are currently released to the manufacturing floor.`;
-    } else if (input.includes('dialer') || input.includes('call')) {
-      reply = "Dialer shows 7 callbacks queued for today. A1 Voice Agent completed 12 calls this morning.";
-    } else if (input.includes('employee') || input.includes('team')) {
-      reply = "Team: Animesh (A1 Voice), Bhavya (A2 Core), Aaditya (A4/A5). Top KPI: Bhavya at 96%.";
     }
-    
-    setChatInput('');
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
-    }, 600);
+    setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
   };
+
 
   // Compute stats dynamically
   const stageCounts = PIPELINE_STAGES.reduce((acc, stage) => {
