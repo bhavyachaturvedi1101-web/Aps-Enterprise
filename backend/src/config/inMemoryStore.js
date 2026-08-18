@@ -119,6 +119,76 @@ const mockLeads = [
     source: 'WhatsApp A5', 
     assignedEmployeeId: 'e3',
     createdAt: new Date(Date.now() - 86400000 * 1)
+  },
+  { 
+    id: 'LEAD-008', 
+    name: 'Reliance Automation', 
+    interest: 'Robotic Welding Arm', 
+    budget: '75000', 
+    stage: 'Enquiry', 
+    notes: 'Inquired via Meta Ads for Pune manufacturing unit.', 
+    crmSynced: true, 
+    erpBookingCreated: false, 
+    tallyPaymentVerified: false, 
+    source: 'Meta Ads', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 43200000)
+  },
+  { 
+    id: 'LEAD-009', 
+    name: 'Tata Heavy Tools', 
+    interest: 'VMC Machining Center', 
+    budget: '120000', 
+    stage: 'Qualified', 
+    notes: 'A1 Voice Agent qualified lead intent. Scheduled demo.', 
+    crmSynced: true, 
+    erpBookingCreated: false, 
+    tallyPaymentVerified: false, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000)
+  },
+  { 
+    id: 'LEAD-010', 
+    name: 'Apex Metalcraft', 
+    interest: 'Fiber Laser Engraver', 
+    budget: '45000', 
+    stage: 'Confirmed Lead', 
+    notes: 'ERP Booking created. Pending 10% Tally advance payment.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: false, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e3',
+    createdAt: new Date(Date.now() - 172800000)
+  },
+  { 
+    id: 'LEAD-011', 
+    name: 'Kirloskar Forge', 
+    interest: 'Automatic Lathe Machine', 
+    budget: '60000', 
+    stage: 'Client (Paid)', 
+    notes: 'Advance verified by Tally. Sent to production queue.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'Telecaller', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 259200000)
+  },
+  { 
+    id: 'LEAD-012', 
+    name: 'Godrej Process Eq', 
+    interest: 'Industrial Powder Coater', 
+    budget: '38000', 
+    stage: 'In Production', 
+    notes: 'Assembly started on shop floor.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'WhatsApp A5', 
+    assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 345600000)
   }
 ];
 

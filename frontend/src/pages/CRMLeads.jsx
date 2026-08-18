@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api';
 
@@ -8,18 +9,19 @@ const VALID_NEXT = {
   'Confirmed Lead': 'Client (Paid)', 'Client (Paid)': 'In Production', 'In Production': 'Dispatched'
 };
 const STAGE_META = {
-  Enquiry:         { color: '#64748b', gradient: 'linear-gradient(135deg,#475569,#64748b)', icon: '📥', idx: 0 },
-  Qualified:       { color: '#3b82f6', gradient: 'linear-gradient(135deg,#2563eb,#3b82f6)', icon: '✅', idx: 1 },
-  Booked:          { color: '#a855f7', gradient: 'linear-gradient(135deg,#7c3aed,#a855f7)', icon: '📅', idx: 2 },
-  'Confirmed Lead':{ color: '#f59e0b', gradient: 'linear-gradient(135deg,#d97706,#f59e0b)', icon: '🔐', idx: 3 },
-  'Client (Paid)': { color: '#10b981', gradient: 'linear-gradient(135deg,#059669,#10b981)', icon: '💰', idx: 4 },
-  'In Production': { color: '#06b6d4', gradient: 'linear-gradient(135deg,#0891b2,#06b6d4)', icon: '🏭', idx: 5 },
-  Dispatched:      { color: '#ec4899', gradient: 'linear-gradient(135deg,#db2777,#ec4899)', icon: '🚚', idx: 6 }
+  Enquiry:         { color: '#64748b', gradient: 'linear-gradient(135deg,#475569,#64748b)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, idx: 0 },
+  Qualified:       { color: '#3b82f6', gradient: 'linear-gradient(135deg,#2563eb,#3b82f6)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>, idx: 1 },
+  Booked:          { color: '#a855f7', gradient: 'linear-gradient(135deg,#7c3aed,#a855f7)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, idx: 2 },
+  'Confirmed Lead':{ color: '#f59e0b', gradient: 'linear-gradient(135deg,#d97706,#f59e0b)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, idx: 3 },
+  'Client (Paid)': { color: '#10b981', gradient: 'linear-gradient(135deg,#059669,#10b981)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, idx: 4 },
+  'In Production': { color: '#06b6d4', gradient: 'linear-gradient(135deg,#0891b2,#06b6d4)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 20h20"/><path d="M6 20V10l4 3V10l4 3V6l6 4v10"/></svg>, idx: 5 },
+  Dispatched:      { color: '#ec4899', gradient: 'linear-gradient(135deg,#db2777,#ec4899)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, idx: 6 }
 };
 
 const INITIALS_BG = ['#aa3bff','#3b82f6','#10b981','#f59e0b','#ec4899','#06b6d4'];
 
 export default function CRMLeads() {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(null);
@@ -172,21 +174,29 @@ export default function CRMLeads() {
               onClick={() => handlePolicyToggle('single-action')}
               style={{
                 ...s.policyBtn,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
                 background: approvalPolicy === 'single-action' ? '#aa3bff' : 'transparent',
                 color: approvalPolicy === 'single-action' ? '#fff' : '#a5b4fc'
               }}
             >
-              ⚡ Single-Action
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Single-Action</span>
             </button>
             <button
               onClick={() => handlePolicyToggle('countersign')}
               style={{
                 ...s.policyBtn,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
                 background: approvalPolicy === 'countersign' ? '#f59e0b' : 'transparent',
                 color: approvalPolicy === 'countersign' ? '#fff' : '#a5b4fc'
               }}
             >
-              🔐 Countersign (Dual)
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Countersign (Dual)</span>
             </button>
           </div>
         </div>
@@ -297,7 +307,8 @@ export default function CRMLeads() {
           return (
             <div
               key={lead.id}
-              style={{ ...s.leadCard, borderLeftColor: meta.color }}
+              onClick={() => navigate(`/leads/${lead.id}`)}
+              style={{ ...s.leadCard, borderLeftColor: meta.color, cursor: 'pointer' }}
             >
               {/* Card Top */}
               <div style={s.cardTop}>
@@ -331,27 +342,27 @@ export default function CRMLeads() {
                 {next && (
                   <button
                     disabled={isTransitioning}
-                    onClick={() => handleTransitionClick(lead)}
+                    onClick={(e) => { e.stopPropagation(); handleTransitionClick(lead); }}
                     style={{ ...s.advanceBtn, background: meta.gradient, opacity: isTransitioning ? 0.6 : 1 }}
                   >
                     {isTransitioning ? '⏳ Syncing…' : `→ ${next}`}
                   </button>
                 )}
                 {!next && (
-                  <div style={s.completedBadge}>✅ Dispatched</div>
+                  <div style={s.completedBadge}>✓ Dispatched</div>
                 )}
               </div>
 
               {/* Gate & Dual-Approval Banners */}
               {lead.stage === 'Confirmed Lead' && (
                 <div style={s.gateBanner}>
-                  🔐 <strong>Tally Gate</strong>: 10% advance required
+                  <strong>Tally Gate</strong>: 10% advance required
                   {approvalPolicy === 'countersign' && ' + Dual Approval'}
                 </div>
               )}
               {lead.stage === 'Client (Paid)' && (
                 <div style={{...s.gateBanner, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46'}}>
-                  🏭 <strong>Factory Release Ready</strong>
+                  <strong>Factory Release Ready</strong>
                   {approvalPolicy === 'countersign' && ' (Countersign Active)'}
                 </div>
               )}
@@ -361,7 +372,7 @@ export default function CRMLeads() {
 
         {filtered.length === 0 && (
           <div style={s.empty}>
-            <div style={{ fontSize: '2.5rem', marginBottom: 10 }}>🔍</div>
+            <div style={{ fontSize: '2rem', marginBottom: 10, color: '#cbd5e1' }}>∅</div>
             <div>No lead records found in A2 database.</div>
           </div>
         )}
@@ -469,9 +480,10 @@ export default function CRMLeads() {
               <button onClick={() => setShowCountersignModal(false)} style={s.cancelBtn}>Cancel</button>
               <button
                 onClick={() => executeTransitionCall(targetLead, VALID_NEXT[targetLead.stage], countersignedBy)}
-                style={{ ...s.submitBtn, background: 'linear-gradient(135deg,#d97706,#f59e0b)' }}
+                style={{ ...s.submitBtn, background: 'linear-gradient(135deg,#d97706,#f59e0b)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
-                🔐 Sign & Execute Transition
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Sign & Execute Transition</span>
               </button>
             </div>
           </div>

@@ -13,7 +13,8 @@ import PaymentGate from './pages/PaymentGate';
 import DialerQueue from './pages/DialerQueue';
 import UsersRoles from './pages/UsersRoles';
 import TallySync from './pages/TallySync';
-import { WhatsAppAgent, EmailAIAgent, VoiceAgent } from './pages/AgentPages';
+import Invoices from './pages/Invoices';
+import { WhatsAppAgent, VoiceAgent } from './pages/AgentPages';
 import DashboardLayout from './layouts/DashboardLayout';
 import './App.css';
 
@@ -40,14 +41,13 @@ function App() {
           {/* AI Agents */}
           <Route path="/voice" element={<VoiceAgent />} />
           <Route path="/whatsapp" element={<WhatsAppAgent />} />
-          <Route path="/email-ai" element={<EmailAIAgent />} />
           <Route path="/dialer" element={<DialerQueue />} />
 
 
 
           {/* Finance */}
           <Route path="/tally" element={<TallySync />} />
-          <Route path="/invoices" element={<TallySync />} />
+          <Route path="/invoices" element={<Invoices />} />
 
           {/* Productivity */}
           <Route path="/employees" element={<TeamKPIs />} />
