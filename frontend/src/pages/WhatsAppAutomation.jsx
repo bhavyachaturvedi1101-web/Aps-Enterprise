@@ -167,7 +167,7 @@ export default function WhatsAppAutomation() {
     return (
       <div style={s.centerContainer}>
         <div style={s.spinner} />
-        <div style={s.loadingText}>Initializing A5 WhatsApp Automation Engine & WABA Bridge…</div>
+        <div style={s.loadingText}>Initializing WhatsApp Automation Engine & WABA Bridge…</div>
       </div>
     );
   }
@@ -187,10 +187,10 @@ export default function WhatsAppAutomation() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>MODULE A5 • WHATSAPP AUTOMATION</div>
+          <div style={s.badgeModule}>CUSTOMER LIFECYCLE AUTOMATION</div>
           <h1 style={s.title}>WhatsApp AI Automation & Lifecycle Messaging</h1>
           <p style={s.subtitle}>
-            Event-driven messaging synced directly to A2 pipeline transitions: payment gate reminders, Tally order release, and production tracking.
+            Event-driven messaging synced directly to pipeline transitions: payment gate reminders, Tally order release, and production tracking.
           </p>
         </div>
         <div style={s.headerActions}>
@@ -220,8 +220,9 @@ export default function WhatsAppAutomation() {
               <span style={s.kpiMainValue}>{analytics.totalMessagesSent?.toLocaleString('en-IN')}</span>
               <span style={s.kpiTrendBadge}>+14.2% wk</span>
             </div>
-            <div style={s.kpiSub}>Automated event triggers across A2 state changes</div>
+            <div style={s.kpiSub}>Automated event triggers across lead state changes</div>
           </div>
+
 
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
@@ -310,8 +311,9 @@ export default function WhatsAppAutomation() {
           <div style={s.sectionHeader}>
             <div>
               <h3 style={s.sectionTitle}>Live WhatsApp Audit & Dispatch Log</h3>
-              <p style={s.sectionSub}>Automated notifications dispatched by A5 module based on A2 state machine events</p>
+              <p style={s.sectionSub}>Automated notifications dispatched by WhatsApp Automation based on pipeline state machine events</p>
             </div>
+
           </div>
 
           <table style={s.table}>
@@ -527,11 +529,12 @@ export default function WhatsAppAutomation() {
         <div style={s.broadcastContainer}>
           <div style={s.broadcastFormCard}>
             <h3 style={s.sectionTitle}>Manual WhatsApp Dispatch & Live Sandbox</h3>
-            <p style={s.sectionSub}>Select a lead from the A2 database or enter custom parameters to fire live WhatsApp notifications</p>
+            <p style={s.sectionSub}>Select a lead from the CRM database or enter custom parameters to fire live WhatsApp notifications</p>
 
             <form onSubmit={handleSendCustomBroadcast} style={s.form}>
               <div style={s.formGroup}>
-                <label style={s.formLabel}>Select Lead Record (A2 Database)</label>
+                <label style={s.formLabel}>Select Lead Record (CRM Database)</label>
+
                 <select
                   value={broadcastData.leadId}
                   onChange={e => handleLeadSelectChange(e.target.value)}

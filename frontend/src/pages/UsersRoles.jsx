@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 
 const INITIAL_USERS = [
-  { id: 'u1', name: 'Animesh J', email: 'animesh@aps.in', role: 'Super Admin', module: 'A1 Voice', lastLogin: '5m ago', status: 'Online' },
-  { id: 'u2', name: 'Admin', email: 'admin@aps.enterprise', role: 'A2 Admin', module: 'A2 Dashboard', lastLogin: 'Now', status: 'Online' },
-  { id: 'u3', name: 'Bhavya', email: 'bhavya@aps.in', role: 'Operations', module: 'A2/A4', lastLogin: '1h ago', status: 'Away' },
-  { id: 'u4', name: 'Aaditya', email: 'aaditya@aps.in', role: 'Agent', module: 'A4/A5', lastLogin: '2h ago', status: 'Offline' }
+  { id: 'u1', name: 'Animesh J', email: 'animesh@aps.in', role: 'Super Admin', module: 'Voice AI', lastLogin: '5m ago', status: 'Online' },
+  { id: 'u2', name: 'Admin', email: 'admin@aps.enterprise', role: 'System Admin', module: 'Control Cockpit', lastLogin: 'Now', status: 'Online' },
+  { id: 'u3', name: 'Bhavya', email: 'bhavya@aps.in', role: 'Operations', module: 'Operations & Analytics', lastLogin: '1h ago', status: 'Away' },
+  { id: 'u4', name: 'Aaditya', email: 'aaditya@aps.in', role: 'Agent', module: 'Analytics & Automation', lastLogin: '2h ago', status: 'Offline' }
 ];
 
 const STATUS_CLR = { Online: '#10b981', Away: '#f59e0b', Offline: '#94a3b8' };
-const ROLES = ['Super Admin', 'A2 Admin', 'Operations', 'Telecaller', 'Accountant', 'Agent'];
-const MODULES = ['A1 Voice', 'A2 Dashboard', 'A3 Chatbot', 'A4 Performance', 'A5 WhatsApp', 'A2/A4', 'A4/A5', 'All Modules'];
+const ROLES = ['Super Admin', 'System Admin', 'Operations', 'Telecaller', 'Accountant', 'Agent'];
+const MODULES = ['Voice AI', 'Control Cockpit', 'AI Assistant', 'Performance Analytics', 'WhatsApp Automation', 'Operations & Analytics', 'All Modules'];
 
 export default function UsersRoles() {
   const [users, setUsers] = useState(INITIAL_USERS);
   const [editingUser, setEditingUser] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Operations', module: 'A2 Dashboard', status: 'Online' });
+  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Operations', module: 'Control Cockpit', status: 'Online' });
+
 
   // Open Edit Modal
   const handleEditClick = (user) => {

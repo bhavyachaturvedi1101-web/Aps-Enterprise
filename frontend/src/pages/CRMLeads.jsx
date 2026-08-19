@@ -153,7 +153,7 @@ export default function CRMLeads() {
     acc[s] = leads.filter(l => l.stage === s).length; return acc;
   }, {});
 
-  if (loading) return <div style={s.loading}>Loading A2 CRM Control Cockpit…</div>;
+  if (loading) return <div style={s.loading}>Loading CRM Control Cockpit…</div>;
 
   return (
     <div style={s.page}>
@@ -161,10 +161,11 @@ export default function CRMLeads() {
       {/* ── Dark Hero Header ─────────────────────────────────────────── */}
       <div style={s.hero}>
         <div style={s.heroLeft}>
-          <div style={s.heroTag}>MODULE A2 · ADMIN CONTROL COCKPIT</div>
+          <div style={s.heroTag}>CENTRAL LEAD PIPELINE & COCKPIT</div>
           <h1 style={s.heroTitle}>CRM / Lead State Machine</h1>
           <p style={s.heroSub}>Central operating dashboard with Tally 10% payment gate & Dual-Approval workflow</p>
         </div>
+
 
         {/* Policy Switcher */}
         <div style={s.policyBox}>
@@ -337,7 +338,7 @@ export default function CRMLeads() {
               <div style={s.cardBottom}>
                 <div style={s.budgetWrap}>
                   <div style={s.budget}>₹{parseFloat(lead.budget || 0).toLocaleString('en-IN')}</div>
-                  <div style={s.source}>{lead.source || 'A2 Cockpit'}</div>
+                  <div style={s.source}>{lead.source || 'Admin Cockpit'}</div>
                 </div>
                 {next && (
                   <button
@@ -373,7 +374,7 @@ export default function CRMLeads() {
         {filtered.length === 0 && (
           <div style={s.empty}>
             <div style={{ fontSize: '2rem', marginBottom: 10, color: '#cbd5e1' }}>∅</div>
-            <div>No lead records found in A2 database.</div>
+            <div>No lead records found in database.</div>
           </div>
         )}
       </div>
@@ -383,7 +384,8 @@ export default function CRMLeads() {
         <div style={s.modalOverlay}>
           <div style={s.modalContent}>
             <div style={s.modalHeader}>
-              <h3>Add New Lead to A2 Operating System</h3>
+              <h3>Add New Lead to System Pipeline</h3>
+
               <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
             </div>
             <form onSubmit={handleAddLeadSubmit} style={s.modalForm}>
@@ -422,10 +424,11 @@ export default function CRMLeads() {
                 onChange={e => setNewLead({ ...newLead, source: e.target.value })}
               >
                 <option value="Meta Ads">Meta Ads</option>
-                <option value="A1 Voice Agent">A1 Voice Agent</option>
+                <option value="AI Voice Agent">AI Voice Agent</option>
                 <option value="Inbound Telecaller">Inbound Telecaller</option>
                 <option value="Direct Web">Direct Web</option>
               </select>
+
 
               <label style={s.label}>Notes & Requirements</label>
               <textarea

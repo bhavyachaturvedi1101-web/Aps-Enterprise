@@ -91,11 +91,11 @@ class WhatsAppService {
       action: `Automated WhatsApp 10% advance reminder sent to ${lead.name}`,
       fromStage: lead.stage,
       toStage: lead.stage,
-      details: `Dispatched payment_reminder_advance_10pct via A5 Module (Advance: ₹${advanceAmount})`,
+      details: `Dispatched payment_reminder_advance_10pct via WhatsApp Automation (Advance: ₹${advanceAmount})`,
       createdAt: new Date()
     });
 
-    console.log(`[A5 WhatsApp] Payment reminder sent to ${lead.name} (${msg.messageId}).`);
+    console.log(`[WhatsApp Automation] Payment reminder sent to ${lead.name} (${msg.messageId}).`);
     return { success: true, message: msg };
   }
 
@@ -143,9 +143,10 @@ class WhatsAppService {
       action: `WhatsApp message (${template.name}) sent to ${targetName}`,
       fromStage: lead?.stage || 'None',
       toStage: lead?.stage || 'None',
-      details: `Sent via A5 WhatsApp Automation: ${template.id}`,
+      details: `Sent via WhatsApp Automation: ${template.id}`,
       createdAt: new Date()
     });
+
 
     return { success: true, message: msg };
   }

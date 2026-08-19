@@ -121,8 +121,9 @@ export default function PaymentGate() {
           <div>
             <div style={s.alertTitle}>{pendingPayments.length} payment(s) pending verification</div>
             <div style={s.alertSub}>
-              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp A5.
+              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp Automation.
             </div>
+
           </div>
           <button onClick={handleSendReminder} disabled={sendingReminder} style={s.alertBtn}>
             {sendingReminder ? 'Sending…' : 'Send Reminder'}

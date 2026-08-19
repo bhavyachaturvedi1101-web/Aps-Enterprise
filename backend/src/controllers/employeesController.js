@@ -103,7 +103,7 @@ const createEmployee = async (req, res) => {
     action: `Added new team member ${newEmp.name} (${newEmp.role})`,
     fromStage: 'None',
     toStage: 'None',
-    details: 'Team member provisioned in A4 Performance Module',
+    details: 'Team member provisioned in Performance Registry',
     createdAt: new Date()
   });
 
@@ -118,7 +118,7 @@ const getActivityLogs = async (req, res) => {
   });
 };
 
-// GET /api/activity/time-in-stage — Time-in-stage KPI trends & bottleneck alerts (A4 Module)
+// GET /api/activity/time-in-stage — Time-in-stage KPI trends & bottleneck alerts
 const getTimeInStage = async (req, res) => {
   const criticalWarnings = mockTimeInStage.filter(s => s.status === 'Critical Warning');
   res.json({
@@ -128,12 +128,12 @@ const getTimeInStage = async (req, res) => {
       bottleneckCount: criticalWarnings.length,
       criticalStage: 'Confirmed Lead',
       primaryBottleneckReason: 'Confirmed leads waiting for 10% Tally advance before factory release',
-      recommendation: 'Trigger automated A5 WhatsApp payment reminder sequences for deals > 24h in Confirmed Lead.'
+      recommendation: 'Trigger automated WhatsApp payment reminder sequences for deals > 24h in Confirmed Lead.'
     }
   });
 };
 
-// DELETE /api/employees/:id — Remove/Delete employee member (A4 Module)
+// DELETE /api/employees/:id — Remove/Delete employee member
 const deleteEmployee = async (req, res) => {
   const { id } = req.params;
   const index = mockEmployees.findIndex(e => e.id === id);
@@ -150,9 +150,10 @@ const deleteEmployee = async (req, res) => {
     action: `Removed team member ${deletedEmp.name} (${deletedEmp.role})`,
     fromStage: 'None',
     toStage: 'None',
-    details: `Employee ${deletedEmp.id} removed from A4 Performance registry`,
+    details: `Employee ${deletedEmp.id} removed from Performance registry`,
     createdAt: new Date()
   });
+
 
   res.json({
     success: true,
