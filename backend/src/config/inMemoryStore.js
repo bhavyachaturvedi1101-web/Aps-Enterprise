@@ -99,7 +99,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e1',
     createdAt: new Date(Date.now() - 86400000 * 1)
   },
@@ -116,7 +116,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'WhatsApp A5', 
+    source: 'WhatsApp', 
     assignedEmployeeId: 'e3',
     createdAt: new Date(Date.now() - 86400000 * 1)
   },
@@ -140,11 +140,11 @@ const mockLeads = [
     interest: 'VMC Machining Center', 
     budget: '120000', 
     stage: 'Qualified', 
-    notes: 'A1 Voice Agent qualified lead intent. Scheduled demo.', 
+    notes: 'Voice Agent qualified lead intent. Scheduled demo.', 
     crmSynced: true, 
     erpBookingCreated: false, 
     tallyPaymentVerified: false, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e2',
     createdAt: new Date(Date.now() - 86400000)
   },
@@ -158,7 +158,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: false, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e3',
     createdAt: new Date(Date.now() - 172800000)
   },
@@ -186,7 +186,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'WhatsApp A5', 
+    source: 'WhatsApp', 
     assignedEmployeeId: 'e2',
     createdAt: new Date(Date.now() - 345600000)
   }
@@ -202,7 +202,7 @@ const mockActivityLogs = [
     action: 'Lead status transitioned from "Booked" to "Confirmed Lead"', 
     fromStage: 'Booked', 
     toStage: 'Confirmed Lead', 
-    details: 'Booking configuration validated and approved in A2',
+    details: 'Booking configuration validated and approved',
     createdAt: new Date(Date.now() - 300000) 
   },
   { 
@@ -214,7 +214,7 @@ const mockActivityLogs = [
     action: 'Lead status transitioned from "Enquiry" to "Qualified"', 
     fromStage: 'Enquiry', 
     toStage: 'Qualified', 
-    details: 'A1 Voice Agent completed call qualification and captured $25k budget',
+    details: 'Voice Agent completed call qualification and captured $25k budget',
     createdAt: new Date(Date.now() - 720000) 
   },
   { 
@@ -247,7 +247,7 @@ const mockActivityLogs = [
     employeeName: 'Aaditya',
     leadId: 'LEAD-004', 
     leadName: 'Global Tech',
-    action: 'Dispatched automated WhatsApp payment reminder (A5 Module)', 
+    action: 'Dispatched automated WhatsApp payment reminder', 
     fromStage: 'Confirmed Lead', 
     toStage: 'Confirmed Lead', 
     details: 'Sent template payment_reminder_advance_10pct for $4,200 advance',
@@ -261,7 +261,7 @@ const mockEmployees = [
     name: 'Animesh', 
     email: 'animesh@aps-enterprise.com',
     phone: '+91 98201 11223',
-    role: 'Voice AI & Sales Lead', 
+    role: 'Voice Operations & Sales Lead', 
     department: 'Voice Operations & Telecalling',
     kpiScore: '94%',
     kpiScoreNum: 94,
@@ -282,7 +282,7 @@ const mockEmployees = [
     name: 'Bhavya', 
     email: 'bhavya@aps-enterprise.com',
     phone: '+91 98302 22334',
-    role: 'System Architect & Admin', 
+    role: 'Core Systems Architect & Admin', 
     department: 'Operations & Systems',
     kpiScore: '98%',
     kpiScoreNum: 98,
@@ -303,7 +303,7 @@ const mockEmployees = [
     name: 'Aaditya', 
     email: 'aaditya@aps-enterprise.com',
     phone: '+91 98403 33445',
-    role: 'Analytics & Automation Lead', 
+    role: 'Analytics & WhatsApp Lead', 
     department: 'Customer Success & Automation',
     kpiScore: '91%',
     kpiScoreNum: 91,
@@ -319,7 +319,6 @@ const mockEmployees = [
     weeklyKpiHistory: [82, 85, 88, 91],
     stageConversions: { enquiryToQualified: 29, qualifiedToBooked: 22, bookedToConfirmed: 16, confirmedToPaid: 5 }
   },
-
   { 
     id: 'e4', 
     name: 'Pooja Sharma', 
@@ -369,7 +368,7 @@ const mockCallLogs = [
     callId: 'CALL-001',
     leadId: 'LEAD-002',
     phone: '+919823456789',
-    agent: 'A1 Voice Agent',
+    agent: 'Voice Agent',
     durationSeconds: 145,
     callOutcome: 'Interested - Qualified',
     transcript: 'Customer expressed strong interest in Laser Cutter Pro for immediate purchase.',
@@ -379,7 +378,7 @@ const mockCallLogs = [
     callId: 'CALL-002',
     leadId: 'LEAD-006',
     phone: '+919833445566',
-    agent: 'A1 Voice Agent',
+    agent: 'Voice Agent',
     durationSeconds: 210,
     callOutcome: 'Interested - High Intent',
     transcript: 'Inquired about Plasma Cutter specifications and 10% advance payment details.',
@@ -446,7 +445,7 @@ const mockWhatsAppTemplates = [
     bodyText: 'Hi {{1}}, thank you for speaking with our AI specialist about the {{2}}. Attached is the full technical datasheet, tooling matrix, and ROI calculator.',
     buttons: ['Open PDF Specs', 'Book Video Demo'],
     triggerStage: 'Qualified',
-    delayDescription: 'Triggered 1 hour after A1 voice agent qualifies lead'
+    delayDescription: 'Triggered 1 hour after voice agent qualifies lead'
   }
 ];
 
@@ -507,7 +506,7 @@ const mockWhatsAppSequences = [
     id: 'SEQ-05',
     name: 'Qualified Lead Brochure & Specs Deck',
     triggerStage: 'Qualified',
-    targetAudience: 'Newly qualified leads from A1 voice agent',
+    targetAudience: 'Newly qualified leads from voice agent',
     delayHours: 1,
     templateId: 'qualified_lead_brochure_pack',
     status: 'Paused',

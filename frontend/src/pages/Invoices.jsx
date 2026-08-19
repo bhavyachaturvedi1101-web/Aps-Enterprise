@@ -59,7 +59,6 @@ export default function Invoices() {
       <div style={s.pageHead}>
         <div>
           <h1 style={s.title}>Customer Billing & PDF Tax Invoices</h1>
-          <p style={s.sub}>Client commercial invoicing, printable PDF invoices & WhatsApp payment links</p>
         </div>
         <button onClick={() => setShowModal(true)} style={s.addBtn}>
           + Create Tax Invoice
@@ -185,9 +184,9 @@ export default function Invoices() {
                 <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {viewInvoice.hsnCode}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' }}>TAX INVOICE</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#08060d' }}>{viewInvoice.id}</div>
-                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>PO Ref: {viewInvoice.poNo}</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' }}>TAX INVOICE</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#09090b' }}>{viewInvoice.id}</div>
+                <div style={{ fontSize: '0.75rem', color: '#71717a' }}>PO Ref: {viewInvoice.poNo}</div>
               </div>
             </div>
 
@@ -223,14 +222,14 @@ export default function Invoices() {
                 <div><strong>IFSC:</strong> HDFC0001234</div>
               </div>
               <div style={{ textAlign: 'right', fontSize: '0.85rem' }}>
-                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#aa3bff' }}>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#09090b' }}>
                   Grand Total: ₹{(viewInvoice.baseAmount + viewInvoice.gst).toLocaleString('en-IN')}
                 </div>
               </div>
             </div>
 
             <div style={s.modalActions}>
-              <button onClick={() => window.print()} style={{ ...s.submitBtn, backgroundColor: '#08060d' }}>
+              <button onClick={() => window.print()} style={{ ...s.submitBtn, backgroundColor: '#09090b' }}>
                 Print Tax Invoice
               </button>
               <button onClick={() => setViewInvoice(null)} style={s.cancelBtn}>
@@ -246,35 +245,35 @@ export default function Invoices() {
 
 const s = {
   page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto' },
-  toast: { position: 'fixed', bottom: 24, right: 24, backgroundColor: '#0f172a', color: '#fff', padding: '0.8rem 1.4rem', borderRadius: 14, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2000, fontSize: '0.85rem', fontWeight: 600 },
+  toast: { position: 'fixed', bottom: 24, right: 24, backgroundColor: '#09090b', color: '#fff', padding: '0.8rem 1.4rem', borderRadius: 14, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2000, fontSize: '0.85rem', fontWeight: 600 },
   pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
-  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#08060d', margin: 0 },
-  sub: { fontSize: '0.8rem', color: '#64748b', marginTop: 4 },
-  addBtn: { backgroundColor: '#08060d', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' },
+  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
+  sub: { fontSize: '0.8rem', color: '#71717a', marginTop: 4 },
+  addBtn: { backgroundColor: '#09090b', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' },
   cardsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
-  invoiceCard: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  invoiceCard: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' },
   cardHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' },
-  invBadge: { fontSize: '0.75rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' },
-  clientTitle: { fontSize: '1rem', fontWeight: 800, color: '#08060d', marginTop: 2 },
-  poText: { fontSize: '0.72rem', color: '#64748b', marginTop: 1 },
-  cardBody: { borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', padding: '0.85rem 0', margin: '0.5rem 0' },
-  productName: { fontSize: '0.88rem', fontWeight: 700, color: '#08060d' },
-  hsnText: { fontSize: '0.72rem', color: '#94a3b8', marginTop: 2, marginBottom: '0.75rem' },
-  amountRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', backgroundColor: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: 10 },
-  subLbl: { fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 },
-  subVal: { fontSize: '0.8rem', fontWeight: 700, color: '#475569' },
-  totalVal: { fontSize: '0.95rem', fontWeight: 800, color: '#aa3bff' },
+  invBadge: { fontSize: '0.75rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' },
+  clientTitle: { fontSize: '1rem', fontWeight: 800, color: '#09090b', marginTop: 2 },
+  poText: { fontSize: '0.72rem', color: '#71717a', marginTop: 1 },
+  cardBody: { borderTop: '1px solid #f4f4f5', borderBottom: '1px solid #f4f4f5', padding: '0.85rem 0', margin: '0.5rem 0' },
+  productName: { fontSize: '0.88rem', fontWeight: 700, color: '#09090b' },
+  hsnText: { fontSize: '0.72rem', color: '#71717a', marginTop: 2, marginBottom: '0.75rem' },
+  amountRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', backgroundColor: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #e4e4e7' },
+  subLbl: { fontSize: '0.65rem', color: '#71717a', fontWeight: 700 },
+  subVal: { fontSize: '0.8rem', fontWeight: 700, color: '#52525b' },
+  totalVal: { fontSize: '0.95rem', fontWeight: 800, color: '#09090b' },
   cardFooter: { display: 'flex', gap: 8, marginTop: '0.5rem' },
-  previewBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#aa3bff', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
-  waBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
-  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+  previewBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#09090b', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
+  waBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#ffffff', color: '#09090b', border: '1px solid #e4e4e7', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(9,9,11,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e4e4e7' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#71717a' },
   modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
-  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginTop: 4 },
-  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)' },
+  label: { fontSize: '0.75rem', fontWeight: 700, color: '#3f3f46', marginTop: 4 },
+  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', color: '#09090b' },
   modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
-  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 }
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#09090b', color: '#fff', cursor: 'pointer', fontWeight: 700 }
 };

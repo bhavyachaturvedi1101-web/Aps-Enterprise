@@ -105,38 +105,32 @@ export default function PaymentGate() {
       <div style={s.pageHead}>
         <div>
           <h1 style={s.title}>Payment Gate</h1>
-          <p style={s.sub}>Tally integration — 10% advance payment verification. Hard gate before factory release.</p>
-        </div>
-        <div style={{ ...s.tallyBadge, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span>Tally: Connected</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       </div>
 
       {pendingPayments.length > 0 ? (
         <div style={s.alertBox}>
           <div style={s.alertIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           <div>
             <div style={s.alertTitle}>{pendingPayments.length} payment(s) pending verification</div>
             <div style={s.alertSub}>
-              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp Automation.
+              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp.
             </div>
-
           </div>
           <button onClick={handleSendReminder} disabled={sendingReminder} style={s.alertBtn}>
             {sendingReminder ? 'Sending…' : 'Send Reminder'}
           </button>
         </div>
       ) : (
-        <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
+        <div style={{...s.alertBox, backgroundColor: '#f4f4f5', borderColor: '#e4e4e7'}}>
           <div style={s.alertIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style={{...s.alertTitle, color: '#065f46'}}>All payments verified</div>
-            <div style={{...s.alertSub, color: '#047857'}}>No pending 10% advance payments ledger matches require action.</div>
+            <div style={{...s.alertTitle, color: '#09090b'}}>All payments verified</div>
+            <div style={{...s.alertSub, color: '#52525b'}}>No pending 10% advance payments ledger matches require action.</div>
           </div>
         </div>
       )}
@@ -163,7 +157,7 @@ export default function PaymentGate() {
             <div style={{...s.payRight, flex: 1}}>
               {pay.status === 'Verified' ? (
                 <div style={{ ...s.verified, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                   <span>Verified</span>
                 </div>
               ) : (
@@ -176,7 +170,7 @@ export default function PaymentGate() {
           </div>
         ))}
         {payments.length === 0 && (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#71717a', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
         )}
       </div>
     </div>
@@ -186,28 +180,28 @@ export default function PaymentGate() {
 const s = {
   page: { padding:'2rem', fontFamily:'var(--font-body)' },
   pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' },
-  title: { fontSize:'1.8rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#08060d', margin:0 },
-  sub: { fontSize:'0.78rem', color:'#64748b', marginTop:4 },
-  tallyBadge: { backgroundColor:'#fffbeb', color:'#d97706', border:'1px solid #fde68a', borderRadius:20, padding:'6px 14px', fontSize:'0.8rem', fontWeight:700 },
-  alertBox: { backgroundColor:'#fffbeb', border:'1px solid #fde68a', borderRadius:14, padding:'1rem 1.25rem', display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.5rem' },
+  title: { fontSize:'1.8rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#09090b', margin:0 },
+  sub: { fontSize:'0.78rem', color:'#71717a', marginTop:4 },
+  tallyBadge: { backgroundColor:'#f4f4f5', color:'#09090b', border:'1px solid #e4e4e7', borderRadius:20, padding:'6px 14px', fontSize:'0.8rem', fontWeight:700 },
+  alertBox: { backgroundColor:'#f4f4f5', border:'1px solid #e4e4e7', borderRadius:14, padding:'1rem 1.25rem', display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.5rem' },
   alertIcon: { fontSize:'1.4rem' },
-  alertTitle: { fontWeight:700, color:'#92400e', fontSize:'0.88rem' },
-  alertSub: { fontSize:'0.72rem', color:'#b45309', marginTop:2 },
-  alertBtn: { marginLeft:'auto', padding:'6px 14px', backgroundColor:'#f59e0b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', flexShrink:0 },
-  card: { backgroundColor:'#fff', borderRadius:18, border:'1px solid #e2e8f0', overflow:'hidden' },
-  tableHead: { display:'flex', backgroundColor:'#f8fafc', borderBottom:'1px solid #e2e8f0', padding:'0.65rem 1.25rem', gap:'1.5rem' },
-  th: { fontSize:'0.65rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' },
-  payRow: { display:'flex', alignItems:'center', padding:'1.25rem 1.5rem', borderBottom:'1px solid #f1f5f9', gap:'1.5rem' },
+  alertTitle: { fontWeight:700, color:'#09090b', fontSize:'0.88rem' },
+  alertSub: { fontSize:'0.72rem', color:'#52525b', marginTop:2 },
+  alertBtn: { marginLeft:'auto', padding:'6px 14px', backgroundColor:'#09090b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', flexShrink:0, boxShadow: '0 2px 6px rgba(0,0,0,0.12)' },
+  card: { backgroundColor:'#fff', borderRadius:18, border:'1px solid #e4e4e7', overflow:'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' },
+  tableHead: { display:'flex', backgroundColor:'#f8fafc', borderBottom:'1px solid #e4e4e7', padding:'0.65rem 1.25rem', gap:'1.5rem' },
+  th: { fontSize:'0.65rem', fontWeight:700, color:'#71717a', textTransform:'uppercase', letterSpacing:'0.5px' },
+  payRow: { display:'flex', alignItems:'center', padding:'1.25rem 1.5rem', borderBottom:'1px solid #f4f4f5', gap:'1.5rem' },
   payLeft: { minWidth: 120 },
-  payId: { fontSize:'0.72rem', fontWeight:700, color:'#aa3bff', fontFamily:'monospace' },
-  payLead: { fontSize:'0.9rem', fontWeight:800, color:'#08060d', marginTop:2 },
+  payId: { fontSize:'0.72rem', fontWeight:700, color:'#09090b', fontFamily:'monospace' },
+  payLead: { fontSize:'0.9rem', fontWeight:800, color:'#09090b', marginTop:2 },
   payMid: { minWidth: 150 },
-  payAmount: { fontSize:'1rem', fontWeight:700, color:'#08060d' },
-  payPct: { fontSize:'0.75rem', fontWeight:500, color:'#64748b' },
-  payDue: { fontSize:'0.72rem', color:'#64748b' },
-  overdue: { backgroundColor:'#fee2e2', color:'#b91c1c', padding:'1px 7px', borderRadius:10, fontWeight:700, marginLeft:6 },
-  tallyRef: { fontSize:'0.68rem', fontFamily:'monospace', color:'#10b981', marginTop:2 },
+  payAmount: { fontSize:'1rem', fontWeight:700, color:'#09090b' },
+  payPct: { fontSize:'0.75rem', fontWeight:500, color:'#71717a' },
+  payDue: { fontSize:'0.72rem', color:'#71717a' },
+  overdue: { backgroundColor:'#f4f4f5', color:'#09090b', border: '1px solid #e4e4e7', padding:'1px 7px', borderRadius:10, fontWeight:700, marginLeft:6 },
+  tallyRef: { fontSize:'0.68rem', fontFamily:'monospace', color:'#52525b', marginTop:2 },
   payRight: { minWidth: 150, textAlign:'right' },
-  verified: { color:'#10b981', fontWeight:700, fontSize:'0.85rem' },
-  verifyBtn: { padding:'8px 16px', backgroundColor:'#f59e0b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer' }
+  verified: { color:'#09090b', fontWeight:700, fontSize:'0.85rem' },
+  verifyBtn: { padding:'8px 16px', backgroundColor:'#09090b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }
 };

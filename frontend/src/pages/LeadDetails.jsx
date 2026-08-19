@@ -87,7 +87,7 @@ export default function LeadDetails() {
         })
       });
       if (res.ok) {
-        alert('📞 Voice Call initiated and logged successfully!');
+        alert('Voice call initiated and logged successfully!');
         await fetchLeadData();
       }
     } catch (err) {
@@ -118,7 +118,7 @@ export default function LeadDetails() {
   if (!lead) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center' }}>
-        <h2>Lead record not found in system</h2>
+        <h2>Lead record not found</h2>
         <button onClick={() => navigate('/crm')} style={styles.actionButton}>
           Back to Lead Pipeline
         </button>
@@ -132,36 +132,41 @@ export default function LeadDetails() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => navigate('/crm')} style={styles.backButton}>← Back</button>
-          <div>
-            <h1 style={styles.title}>{lead.name}</h1>
-            <div style={styles.subtitle}>ID: {lead.id} · Budget: ₹{parseFloat(lead.budget || 0).toLocaleString('en-IN')}</div>
-          </div>
+        <button onClick={() => navigate('/crm')} style={styles.backButton}>
+          ← Back to Lead Pipeline
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+          <h1 style={styles.title}>{lead.name}</h1>
+          <span style={styles.idBadge}>{lead.id}</span>
         </div>
-        <div style={styles.statusBadge}>Stage: {lead.stage}</div>
       </div>
 
       <div style={styles.grid}>
         {/* Main Details Panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={styles.mainCard}>
-            <h2 style={styles.cardHeader}>Overview & Specification</h2>
+            <h2 style={styles.cardHeader}>Object Information & Parameters</h2>
             <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>Company / Account:</span>
-              <span style={styles.infoValue}>{lead.company || lead.name}</span>
+              <span style={styles.infoLabel}>Status Stage:</span>
+              <span style={{
+                ...styles.infoValue,
+                fontWeight: '800',
+                color: isTallyPaymentVerified ? '#10b981' : '#f59e0b'
+              }}>
+                {lead.stage}
+              </span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>Product Interest:</span>
-              <span style={styles.infoValue}>{lead.interest || 'Machinery Unit'}</span>
+              <span style={styles.infoValue}>{lead.interest}</span>
             </div>
             <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>Lead Source:</span>
-              <span style={styles.infoValue}>{lead.source || 'Direct Contact'}</span>
+              <span style={styles.infoLabel}>Budget:</span>
+              <span style={styles.infoValue}>₹{parseFloat(lead.budget || 0).toLocaleString('en-IN')}</span>
             </div>
             <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>Phone:</span>
-              <span style={styles.infoValue}>{lead.phone || '+91 99887 76655'}</span>
+              <span style={styles.infoLabel}>Source:</span>
+              <span style={styles.infoValue}>{lead.source || 'Meta Ads'}</span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>Assigned Staff:</span>
@@ -177,14 +182,14 @@ export default function LeadDetails() {
           <div style={styles.mainCard}>
             <h2 style={{ ...styles.cardHeader, display: 'flex', alignItems: 'center', gap: 8 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-              <span>AI Voice Agent Call Logs</span>
+              <span>Voice Agent Call Logs</span>
             </h2>
             {callLogs.length > 0 ? (
               callLogs.map(c => (
                 <div key={c.callId} style={styles.logCard}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#aa3bff' }}>{c.callId} · {c.agent}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{c.durationSeconds}s duration</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#09090b', fontFamily: 'monospace' }}>{c.callId} · {c.agent}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#71717a' }}>{c.durationSeconds}s duration</span>
                   </div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#08060d' }}>Outcome: {c.callOutcome}</div>
                   <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: 4, italic: 'true' }}>"{c.transcript}"</div>
@@ -216,32 +221,26 @@ export default function LeadDetails() {
           </div>
         </div>
 
-        {/* Sidebar Panel */}
+        {/* Sidebar Status & Action Triggers */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={styles.sidebarCard}>
-            <h2 style={styles.cardHeader}>Integrations Checklist</h2>
-            <div style={styles.checkRow}>
-              <span style={styles.checkIcon}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
-              <span style={styles.checkText}>CRM Sync (Leads API)</span>
-            </div>
+            <h2 style={styles.cardHeader}>Automation Policy Gates</h2>
             <div style={styles.checkRow}>
               <span style={styles.checkIcon}>
                 {isErpBookingCreated ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/></svg>
                 )}
               </span>
-              <span style={styles.checkText}>ERP Booking & Config Created</span>
+              <span style={styles.checkText}>ERP Order Manifest Generation</span>
             </div>
             <div style={styles.checkRow}>
               <span style={styles.checkIcon}>
                 {isTallyPaymentVerified ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 )}
               </span>
               <span style={styles.checkText}>Tally 10% Advance Verification</span>
@@ -250,15 +249,14 @@ export default function LeadDetails() {
             <div style={styles.actionContainer}>
               <button
                 onClick={handleTriggerVoiceCall}
-                style={{ ...styles.actionButton, background: '#a855f7', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                style={{ ...styles.actionButton, background: '#09090b', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
-                <span>Trigger AI Voice Call</span>
+                <span>Trigger Voice Call</span>
               </button>
-
               <button
                 onClick={handleSendWhatsApp}
-                style={{ ...styles.actionButton, background: '#10b981', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                style={{ ...styles.actionButton, background: '#ffffff', color: '#09090b', border: '1px solid #e4e4e7', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <span>Send WhatsApp Reminder</span>
@@ -274,7 +272,7 @@ export default function LeadDetails() {
               )}
               {isTallyPaymentVerified && (
                 <div style={{ ...styles.completedAlert, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   <span>Factory production order released in ERP!</span>
                 </div>
               )}
@@ -284,15 +282,15 @@ export default function LeadDetails() {
           {/* WhatsApp Log */}
           <div style={styles.sidebarCard}>
             <h2 style={{ ...styles.cardHeader, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span>WhatsApp Automated Messages</span>
             </h2>
             {waMessages.length > 0 ? (
               waMessages.map(w => (
-                <div key={w.messageId} style={{ padding: '0.6rem 0', borderBottom: '1px solid #f1f5f9' }}>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#059669' }}>{w.sequenceType}</div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Template: {w.template}</div>
-                  <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Status: {w.status}</div>
+                <div key={w.messageId} style={{ padding: '0.6rem 0', borderBottom: '1px solid #f4f4f5' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#09090b' }}>{w.sequenceType}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#52525b' }}>Template: {w.template}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#71717a' }}>Status: {w.status}</div>
                 </div>
               ))
             ) : (
@@ -308,7 +306,7 @@ export default function LeadDetails() {
 const styles = {
   container: {
     padding: '2.5rem',
-    color: '#0f172a',
+    color: '#09090b',
     fontFamily: 'var(--font-body)',
     boxSizing: 'border-box'
   },
@@ -318,7 +316,7 @@ const styles = {
   backButton: {
     background: 'none',
     border: 'none',
-    color: '#aa3bff',
+    color: '#09090b',
     cursor: 'pointer',
     fontSize: '0.85rem',
     fontWeight: '700',
@@ -330,15 +328,17 @@ const styles = {
     fontSize: '2rem',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
+    color: '#09090b',
     margin: 0
   },
   idBadge: {
-    backgroundColor: '#f1f5f9',
-    color: '#aa3bff',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
     fontSize: '0.78rem',
     fontWeight: '800',
     padding: '4px 10px',
     borderRadius: '12px',
+    border: '1px solid #e4e4e7',
     fontFamily: 'monospace'
   },
   grid: {
@@ -350,37 +350,37 @@ const styles = {
     backgroundColor: '#ffffff',
     borderRadius: '24px',
     padding: '2rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
   },
   sidebarCard: {
     backgroundColor: '#ffffff',
     borderRadius: '24px',
     padding: '2rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
   },
   cardHeader: {
     fontSize: '1.1rem',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
-    color: '#08060d',
+    color: '#09090b',
     marginBottom: '1.25rem'
   },
   infoRow: {
     display: 'flex',
     marginBottom: '1rem',
-    borderBottom: '1px solid #f1f3f7',
+    borderBottom: '1px solid #f4f4f5',
     paddingBottom: '0.6rem'
   },
   infoLabel: {
     width: '160px',
     fontWeight: '700',
-    color: '#64748b',
+    color: '#71717a',
     fontSize: '0.85rem'
   },
   infoValue: {
-    color: '#0f172a',
+    color: '#09090b',
     fontWeight: '600',
     fontSize: '0.85rem'
   },
@@ -389,7 +389,7 @@ const styles = {
     borderRadius: '12px',
     padding: '0.85rem 1rem',
     marginBottom: '0.75rem',
-    border: '1px solid #e2e8f0'
+    border: '1px solid #e4e4e7'
   },
   checkRow: {
     display: 'flex',
@@ -403,38 +403,38 @@ const styles = {
     fontSize: '1rem'
   },
   checkText: {
-    color: '#08060d'
+    color: '#09090b'
   },
   actionContainer: {
     marginTop: '2rem',
-    borderTop: '1px solid #f1f3f7',
+    borderTop: '1px solid #f4f4f5',
     paddingTop: '1.25rem'
   },
   actionButton: {
     width: '100%',
     padding: '0.8rem',
-    backgroundColor: '#aa3bff',
+    backgroundColor: '#09090b',
     color: '#ffffff',
     border: 'none',
     borderRadius: '14px',
     fontSize: '0.88rem',
     fontWeight: '700',
     cursor: 'pointer',
-    boxShadow: '0 4px 10px rgba(170, 59, 255, 0.2)'
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)'
   },
   completedAlert: {
-    backgroundColor: '#ecfdf5',
-    color: '#10b981',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
     padding: '0.85rem',
     borderRadius: '14px',
     textAlign: 'center',
     fontWeight: '700',
     fontSize: '0.85rem',
-    border: '1px solid #10b981'
+    border: '1px solid #e4e4e7'
   },
   emptySub: {
     fontSize: '0.78rem',
-    color: '#94a3b8',
+    color: '#71717a',
     fontStyle: 'italic'
   }
 };

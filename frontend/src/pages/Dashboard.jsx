@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import CRMLeads from './CRMLeads';
 
 const API = 'http://localhost:5000/api';
 
@@ -169,7 +170,7 @@ export default function Dashboard() {
         return;
       }
     } catch (err) {
-      console.error('Error contacting A3 Chatbot backend:', err);
+      console.error('Error contacting APS AI backend:', err);
     }
 
     // Smart fallback response
@@ -334,15 +335,19 @@ export default function Dashboard() {
           <div style={s.heroCard}>
             <div style={s.heroLeft}>
               <h1 style={s.heroTitle}>Automated Lead Insights</h1>
-              <p style={s.heroSub}>
-                AI-driven analytics provide clear insights into your pipeline status,
-                lead conversions, and overall operational impact.
-              </p>
-              <div style={s.heroTag}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#aa3bff" stroke="#aa3bff" strokeWidth="1">
-                  <path d="M12 2L2 7v10l10 5 10-5V7z"/>
-                </svg>
-                <span>AI, Leads Pipeline</span>
+              <div style={s.heroStatsRow}>
+                <div style={s.heroStatChip}>
+                  <span style={s.heroStatVal}>{leads.length}</span>
+                  <span style={s.heroStatLbl}>Active Pipeline Leads</span>
+                </div>
+                <div style={s.heroStatChip}>
+                  <span style={s.heroStatVal}>₹{leads.reduce((acc, l) => acc + (parseFloat(l.budget) || 0), 0).toLocaleString('en-IN')}</span>
+                  <span style={s.heroStatLbl}>Total Pipeline Value</span>
+                </div>
+                <div style={s.heroStatChip}>
+                  <span style={{ ...s.heroStatVal, color: '#09090b' }}>100%</span>
+                  <span style={s.heroStatLbl}>Tally Gate Clearance</span>
+                </div>
               </div>
             </div>
             <div style={s.heroRight}>
@@ -361,8 +366,8 @@ export default function Dashboard() {
                 </div>
                 {/* Location Card */}
                 <div style={s.locCard}>
-                  <div style={s.locHead}><span>Top Region</span><span style={{color:'#aa3bff'}}>↗</span></div>
-                  {[['#c084fc','Maharashtra','47%'],['#a855f7','Gujarat','33%'],['#e9d5ff','Delhi NCR','20%']].map(([clr,nm,pct])=>(
+                  <div style={s.locHead}><span>Top Region</span><span style={{color:'#09090b'}}>↗</span></div>
+                  {[['#09090b','Maharashtra','47%'],['#52525b','Gujarat','33%'],['#a1a1aa','Delhi NCR','20%']].map(([clr,nm,pct])=>(
                     <div key={nm} style={s.locRow}>
                       <span style={{...s.locDot,background:clr}}/>
                       <span style={s.locName}>{nm}</span>
@@ -379,13 +384,13 @@ export default function Dashboard() {
             {INTEGRATIONS.map(int => (
               <div key={int.name} style={s.intCard}>
                 <div style={s.intLeft}>
-                  <div style={{ ...s.intIcon, backgroundColor: int.iconBg }}>{int.svg}</div>
+                  <div style={{ ...s.intIcon, backgroundColor: '#f4f4f5', color: '#09090b' }}>{int.svg}</div>
                   <div>
                     <div style={s.intName}>{int.name}</div>
                     <div style={s.intRole}>{int.role}</div>
                   </div>
                 </div>
-                <div style={{...s.intBadge, color: int.color, borderColor: int.color, background: int.color+'15'}}>
+                <div style={{...s.intBadge, color: '#09090b', borderColor: '#e4e4e7', background: '#f4f4f5'}}>
                   {int.status}
                 </div>
               </div>
@@ -642,7 +647,7 @@ export default function Dashboard() {
                 {activityLogs.slice(0, 5).map(act => (
                   <div key={act.id} style={s.actRow}>
                     <div style={{ ...s.actIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
                     </div>
                     <div style={{flex:1}}>
                       <div style={s.actName}>{act.employeeId === 'e1' ? 'Animesh' : act.employeeId === 'e2' ? 'Bhavya' : act.employeeId === 'e3' ? 'Aaditya' : 'System'}</div>
@@ -685,47 +690,7 @@ export default function Dashboard() {
 
       {/* ─── PIPELINE VIEW ─────────────────────────────────────────────────── */}
       {activeTab === 'pipeline' && (
-        <div style={s.page}>
-          <div style={s.pipeHead}>
-            <div>
-              <h1 style={s.secTitle}>Lead Status Pipeline</h1>
-              <p style={{...s.cardSub, marginTop:4}}>State machine enforcement — payment gate required to advance to Client (Paid)</p>
-            </div>
-            <button onClick={() => setShowAddModal(true)} style={s.addBtn}>+ Add New Lead</button>
-          </div>
-
-          <div style={s.pipeGrid}>
-            {PIPELINE_STAGES.map(stage => {
-              const stageLeads = leads.filter(l => l.stage === stage.key);
-              return (
-                <div key={stage.key} style={s.pipeCol}>
-                  <div style={{...s.pipeColHead, borderTopColor: stage.color}}>
-                    <span style={s.pipeColTitle}>{stage.title}</span>
-                    <span style={s.pipeBadge}>{stageLeads.length}</span>
-                  </div>
-                  {stage.warning && <div style={s.warnBanner}>{stage.warning}</div>}
-                  {stage.success && <div style={s.sucBanner}>{stage.success}</div>}
-                  <div style={{display:'flex',flexDirection:'column',gap:'0.6rem'}}>
-                    {stageLeads.map(lead => (
-                      <div key={lead.id} style={s.leadCard} onClick={() => navigate(`/leads/${lead.id}`)}>
-                        <div style={s.leadRow}>
-                          <span style={s.leadName}>{lead.name}</span>
-                          <span style={{color:'#aa3bff',fontWeight:700}}>→</span>
-                        </div>
-                        <div style={s.leadProduct}>{lead.interest}</div>
-                        <div style={s.leadMeta}>
-                          <span style={s.leadBudget}>₹{parseFloat(lead.budget).toLocaleString('en-IN')}</span>
-                          <span style={s.leadSource}>{lead.source || 'Direct'}</span>
-                        </div>
-                      </div>
-                    ))}
-                    {stageLeads.length === 0 && <div style={s.empty}>No leads</div>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <CRMLeads />
       )}
 
       {/* ── Add Lead Modal ────────────────────────────────────────────── */}
@@ -858,97 +823,101 @@ const s = {
   page: { display:'flex', flexDirection:'column', gap:'1.5rem' },
 
   // Hero
-  heroCard: { backgroundColor:'#fff', borderRadius:24, padding:'2.5rem', border:'1px solid #e2e8f0', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.04)', display:'flex', justifyContent:'space-between', minHeight:240, position:'relative', overflow:'hidden' },
-  heroLeft: { flex:'1 1 50%', display:'flex', flexDirection:'column', justifyContent:'center', gap:'1rem', zIndex:2 },
-  heroTitle: { fontSize:'2.8rem', fontWeight:800, fontFamily:'var(--font-heading)', letterSpacing:'-1.5px', color:'#08060d', margin:0 },
+  heroCard: { backgroundColor:'#fff', borderRadius:24, padding:'1.75rem 2.25rem', border:'1px solid #e2e8f0', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.04)', display:'flex', justifyContent:'space-between', alignItems:'center', minHeight:170, position:'relative', overflow:'hidden' },
+  heroLeft: { flex:'1 1 55%', display:'flex', flexDirection:'column', justifyContent:'center', gap:'1rem', zIndex:2 },
+  heroTitle: { fontSize:'2.2rem', fontWeight:800, fontFamily:'var(--font-heading)', letterSpacing:'-1px', color:'#08060d', margin:0 },
+  heroStatsRow: { display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' },
+  heroStatChip: { backgroundColor:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:12, padding:'8px 14px', display:'flex', flexDirection:'column', gap:2 },
+  heroStatVal: { fontSize:'1.05rem', fontWeight:800, color:'#08060d' },
+  heroStatLbl: { fontSize:'0.65rem', fontWeight:600, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.5px' },
   heroSub: { fontSize:'0.95rem', lineHeight:1.6, color:'#64748b', maxWidth:500, margin:0 },
   heroTag: { display:'inline-flex', alignItems:'center', gap:6, backgroundColor:'#08060d', color:'#fff', padding:'6px 14px', borderRadius:20, width:'fit-content', fontSize:'0.8rem', fontWeight:700 },
-  heroRight: { flex:'1 1 50%', display:'flex', justifyContent:'flex-end', alignItems:'center', position:'relative' },
+  heroRight: { flex:'1 1 45%', display:'flex', justifyContent:'flex-end', alignItems:'center', position:'relative' },
 
   // Circles
   circleWrap: { position:'relative', width:300, height:220 },
-  circleBig: { position:'absolute', width:180, height:180, borderRadius:'50%', background:'linear-gradient(135deg,rgba(170,59,255,0.35) 0%,rgba(192,132,252,0.15) 100%)', top:10, right:20, filter:'blur(2px)' },
-  circleSmall: { position:'absolute', width:120, height:120, borderRadius:'50%', backgroundColor:'rgba(255,255,255,0.9)', border:'1px solid #e2e8f0', top:60, right:120, boxShadow:'0 4px 6px rgba(0,0,0,0.04)' },
+  circleBig: { position:'absolute', width:180, height:180, borderRadius:'50%', background:'rgba(0,0,0,0.04)', top:10, right:20 },
+  circleSmall: { position:'absolute', width:120, height:120, borderRadius:'50%', backgroundColor:'rgba(255,255,255,0.95)', border:'1px solid #e4e4e7', top:60, right:120, boxShadow:'0 4px 6px rgba(0,0,0,0.02)' },
   metricFloat: { position:'absolute' },
-  mVal: { fontSize:'0.95rem', fontWeight:800, color:'#08060d' },
-  mLbl: { fontSize:'0.65rem', color:'#64748b', fontWeight:600 },
-  locCard: { position:'absolute', top:8, right:0, backgroundColor:'#fff', border:'1px solid #e2e8f0', borderRadius:14, padding:'0.8rem 1rem', width:140, boxShadow:'0 8px 20px rgba(0,0,0,0.06)' },
-  locHead: { display:'flex', justifyContent:'space-between', fontSize:'0.72rem', fontWeight:700, color:'#08060d', marginBottom:6 },
+  mVal: { fontSize:'0.95rem', fontWeight:800, color:'#09090b' },
+  mLbl: { fontSize:'0.65rem', color:'#71717a', fontWeight:600 },
+  locCard: { position:'absolute', top:8, right:0, backgroundColor:'#fff', border:'1px solid #e4e4e7', borderRadius:14, padding:'0.8rem 1rem', width:140, boxShadow:'0 8px 20px rgba(0,0,0,0.04)' },
+  locHead: { display:'flex', justifyContent:'space-between', fontSize:'0.72rem', fontWeight:700, color:'#09090b', marginBottom:6 },
   locRow: { display:'flex', alignItems:'center', fontSize:'0.68rem', fontWeight:600, marginBottom:4 },
   locDot: { width:6, height:6, borderRadius:'50%', marginRight:6 },
-  locName: { color:'#64748b', flexGrow:1, textAlign:'left' },
-  locPct: { color:'#08060d', fontWeight:700 },
+  locName: { color:'#71717a', flexGrow:1, textAlign:'left' },
+  locPct: { color:'#09090b', fontWeight:700 },
 
   // Integration Bar
   intBar: { display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'1rem' },
-  intCard: { backgroundColor:'#fff', borderRadius:16, padding:'1rem 1.25rem', border:'1px solid #e2e8f0', display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.03)' },
+  intCard: { backgroundColor:'#fff', borderRadius:16, padding:'1rem 1.25rem', border:'1px solid #e4e4e7', display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.02)' },
   intLeft: { display:'flex', alignItems:'center', gap:'0.75rem' },
-  intIcon: { fontSize:'1.4rem', width:38, height:38, borderRadius:10, backgroundColor:'#f8fafc', display:'flex', alignItems:'center', justifyContent:'center' },
-  intName: { fontWeight:800, fontSize:'0.9rem', color:'#08060d', fontFamily:'var(--font-heading)' },
-  intRole: { fontSize:'0.7rem', color:'#64748b', fontWeight:500 },
+  intIcon: { fontSize:'1.4rem', width:38, height:38, borderRadius:10, backgroundColor:'#f4f4f5', display:'flex', alignItems:'center', justifyContent:'center' },
+  intName: { fontWeight:800, fontSize:'0.9rem', color:'#09090b', fontFamily:'var(--font-heading)' },
+  intRole: { fontSize:'0.7rem', color:'#71717a', fontWeight:500 },
   intBadge: { fontSize:'0.72rem', fontWeight:700, padding:'3px 10px', borderRadius:20, border:'1px solid' },
 
   // Overview Header
   secHead: { display:'flex', justifyContent:'space-between', alignItems:'center' },
-  secTitle: { fontSize:'2rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#08060d', margin:0 },
+  secTitle: { fontSize:'2rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#09090b', margin:0 },
   filterRow: { display:'flex', gap:'0.5rem', alignItems:'center' },
-  filterPill: { backgroundColor:'#fff', border:'1px solid #e2e8f0', padding:'5px 12px', borderRadius:20, fontSize:'0.75rem', fontWeight:700, color:'#08060d', display:'flex', alignItems:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.04)' },
-  filterIcon: { width:32, height:32, borderRadius:'50%', backgroundColor:'#fff', border:'1px solid #e2e8f0', color:'#08060d', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' },
+  filterPill: { backgroundColor:'#fff', border:'1px solid #e4e4e7', padding:'5px 12px', borderRadius:20, fontSize:'0.75rem', fontWeight:700, color:'#09090b', display:'flex', alignItems:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.02)' },
+  filterIcon: { width:32, height:32, borderRadius:'50%', backgroundColor:'#fff', border:'1px solid #e4e4e7', color:'#09090b', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' },
 
   // Cards
   grid3: { display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1.25rem' },
   grid2: { display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'1.25rem' },
-  card: { backgroundColor:'#fff', borderRadius:24, padding:'1.75rem', border:'1px solid #e2e8f0', boxShadow:'0 2px 4px rgba(0,0,0,0.04)', display:'flex', flexDirection:'column', gap:'1rem' },
+  card: { backgroundColor:'#fff', borderRadius:24, padding:'1.75rem', border:'1px solid #e4e4e7', boxShadow:'0 2px 4px rgba(0,0,0,0.02)', display:'flex', flexDirection:'column', gap:'1rem' },
   cardTop: { display:'flex', justifyContent:'space-between', alignItems:'flex-start' },
-  cardTitle: { fontSize:'1rem', fontWeight:800, color:'#08060d', fontFamily:'var(--font-heading)', margin:0 },
-  cardSub: { fontSize:'0.72rem', color:'#64748b', marginTop:2 },
-  cardArrow: { color:'#aa3bff', fontWeight:800, fontSize:'1.1rem' },
+  cardTitle: { fontSize:'1rem', fontWeight:800, color:'#09090b', fontFamily:'var(--font-heading)', margin:0 },
+  cardSub: { fontSize:'0.72rem', color:'#71717a', marginTop:2 },
+  cardArrow: { color:'#09090b', fontWeight:800, fontSize:'1.1rem' },
 
   // Bar Chart
   barChart: { display:'flex', justifyContent:'space-between', alignItems:'flex-end', height:175, paddingTop:'0.75rem' },
   barCol: { display:'flex', flexDirection:'column', alignItems:'center', flexGrow:1 },
-  barVal: { fontSize:'0.72rem', fontWeight:700, color:'#08060d', marginBottom:4 },
-  bar: { width:42, background:'linear-gradient(180deg,#c084fc,#aa3bff)', borderRadius:'8px 8px 0 0', position:'relative', overflow:'hidden' },
-  barSheen: { position:'absolute', inset:0, backgroundImage:'linear-gradient(45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent)', backgroundSize:'10px 10px' },
-  barLbl: { fontSize:'0.68rem', color:'#64748b', fontWeight:600, marginTop:6, textAlign:'center' },
+  barVal: { fontSize:'0.72rem', fontWeight:700, color:'#09090b', marginBottom:4 },
+  bar: { width:42, background:'#09090b', borderRadius:'8px 8px 0 0', position:'relative', overflow:'hidden' },
+  barSheen: { position:'absolute', inset:0, backgroundImage:'linear-gradient(45deg,rgba(255,255,255,0.1) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.1) 75%,transparent 75%,transparent)', backgroundSize:'10px 10px' },
+  barLbl: { fontSize:'0.68rem', color:'#71717a', fontWeight:600, marginTop:6, textAlign:'center' },
 
   // CTR
   ctrBody: { display:'flex', flexDirection:'column', gap:'1rem', flex:1 },
-  aiPrompt: { fontSize:'0.78rem', fontWeight:600, color:'#64748b', backgroundColor:'#f8fafc', padding:'6px 12px', borderRadius:20, width:'fit-content' },
+  aiPrompt: { fontSize:'0.78rem', fontWeight:600, color:'#52525b', backgroundColor:'#f4f4f5', padding:'6px 12px', borderRadius:20, width:'fit-content' },
   ctrRow: { display:'flex', justifyContent:'space-between', alignItems:'center' },
-  ctrBig: { fontSize:'1.8rem', fontWeight:800, color:'#08060d' },
-  ctrLbl: { fontSize:'0.68rem', color:'#64748b', fontWeight:600 },
-  ctrDivider: { width:1, height:40, backgroundColor:'#e2e8f0' },
-  progBar: { display:'flex', height:20, borderRadius:10, overflow:'hidden', backgroundColor:'#f1f3f7' },
-  progA: { width:'40%', background:'linear-gradient(90deg,#c084fc,#a855f7)' },
-  progB: { width:'60%', background:'linear-gradient(90deg,#e9d5ff,#c084fc)' },
-  ctrNote: { fontSize:'0.72rem', color:'#64748b', fontStyle:'italic' },
+  ctrBig: { fontSize:'1.8rem', fontWeight:800, color:'#09090b' },
+  ctrLbl: { fontSize:'0.68rem', color:'#71717a', fontWeight:600 },
+  ctrDivider: { width:1, height:40, backgroundColor:'#e4e4e7' },
+  progBar: { display:'flex', height:20, borderRadius:10, overflow:'hidden', backgroundColor:'#f4f4f5' },
+  progA: { width:'40%', background:'#09090b' },
+  progB: { width:'60%', background:'#d4d4d8' },
+  ctrNote: { fontSize:'0.72rem', color:'#71717a', fontStyle:'italic' },
 
   // Chatbot
   chatWrap: { display:'flex', flexDirection:'column', flex:1, minHeight:200 },
   chatArea: { flexGrow:1, maxHeight:160, overflowY:'auto', display:'flex', flexDirection:'column', gap:'0.6rem', marginBottom:'0.75rem' },
   bubble: { display:'flex', gap:'0.5rem', padding:'0.65rem 0.9rem', borderRadius:16, fontSize:'0.78rem', lineHeight:1.4, width:'fit-content', maxWidth:'90%' },
-  bubbleAi: { backgroundColor:'#f8fafc', color:'#08060d', alignSelf:'flex-start', borderTopLeftRadius:2 },
-  bubbleUser: { backgroundColor:'#aa3bff', color:'#fff', alignSelf:'flex-end', borderTopRightRadius:2 },
+  bubbleAi: { backgroundColor:'#f4f4f5', color:'#09090b', alignSelf:'flex-start', borderTopLeftRadius:2 },
+  bubbleUser: { backgroundColor:'#09090b', color:'#fff', alignSelf:'flex-end', borderTopRightRadius:2 },
   aiAvatar: { width:18, height:18, borderRadius:'50%', backgroundColor:'#fff', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', flexShrink:0, fontSize:10 },
-  aiLabel: { fontSize:'0.6rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 },
+  aiLabel: { fontSize:'0.6rem', fontWeight:700, color:'#71717a', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 },
   bubbleText: { fontWeight:600 },
-  chatForm: { border:'1px solid #e2e8f0', borderRadius:14, padding:'0.4rem', backgroundColor:'#f8fafc' },
-  chatInput: { width:'100%', border:'none', backgroundColor:'transparent', outline:'none', padding:'4px 8px', fontSize:'0.78rem', fontFamily:'var(--font-body)', fontWeight:500, color:'#08060d' },
-  chatFoot: { display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'0.35rem', borderTop:'1px solid #e2e8f0', paddingTop:'0.3rem' },
-  chatAttach: { border:'none', backgroundColor:'transparent', color:'#94a3b8', fontSize:'0.72rem', fontWeight:700, cursor:'pointer' },
+  chatForm: { border:'1px solid #e4e4e7', borderRadius:14, padding:'0.4rem', backgroundColor:'#f4f4f5' },
+  chatInput: { width:'100%', border:'none', backgroundColor:'transparent', outline:'none', padding:'4px 8px', fontSize:'0.78rem', fontFamily:'var(--font-body)', fontWeight:500, color:'#09090b' },
+  chatFoot: { display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'0.35rem', borderTop:'1px solid #e4e4e7', paddingTop:'0.3rem' },
+  chatAttach: { border:'none', backgroundColor:'transparent', color:'#71717a', fontSize:'0.72rem', fontWeight:700, cursor:'pointer' },
   chatCircle: { width:22, height:22, borderRadius:'50%', border:'none', backgroundColor:'transparent', cursor:'pointer', fontSize:'0.72rem' },
-  chatSend: { width:22, height:22, borderRadius:'50%', border:'none', backgroundColor:'#aa3bff', color:'#fff', cursor:'pointer', fontSize:'0.72rem', display:'flex', alignItems:'center', justifyContent:'center' },
+  chatSend: { width:22, height:22, borderRadius:'50%', border:'none', backgroundColor:'#09090b', color:'#fff', cursor:'pointer', fontSize:'0.72rem', display:'flex', alignItems:'center', justifyContent:'center' },
 
   // Activity
-  actRow: { display:'flex', alignItems:'flex-start', gap:'0.75rem', paddingBottom:'0.75rem', borderBottom:'1px solid #f8fafc' },
-  actIcon: { fontSize:'1.1rem', width:32, height:32, backgroundColor:'#f8fafc', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
-  actName: { fontSize:'0.8rem', fontWeight:700, color:'#08060d' },
-  actDesc: { fontSize:'0.72rem', color:'#64748b', lineHeight:1.4 },
-  actTime: { fontSize:'0.68rem', color:'#94a3b8', fontWeight:600, whiteSpace:'nowrap' },
+  actRow: { display:'flex', alignItems:'flex-start', gap:'0.75rem', paddingBottom:'0.75rem', borderBottom:'1px solid #f4f4f5' },
+  actIcon: { fontSize:'1.1rem', width:32, height:32, backgroundColor:'#f4f4f5', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
+  actName: { fontSize:'0.8rem', fontWeight:700, color:'#09090b' },
+  actDesc: { fontSize:'0.72rem', color:'#52525b', lineHeight:1.4 },
+  actTime: { fontSize:'0.68rem', color:'#71717a', fontWeight:600, whiteSpace:'nowrap' },
 
   // Alerts
-  alertCard: { padding:'0.9rem 1rem', borderRadius:12, backgroundColor:'#f8fafc', borderLeft:'3px solid', display:'flex', flexDirection:'column', gap:'0.25rem' },
+  alertCard: { padding:'0.9rem 1rem', borderRadius:12, backgroundColor:'#f8fafc', borderLeft:'3px solid #09090b', display:'flex', flexDirection:'column', gap:'0.25rem' },
   alertTitle: { fontSize:'0.85rem', fontWeight:800, color:'#08060d' },
   alertMsg: { fontSize:'0.75rem', color:'#64748b', lineHeight:1.4 },
   alertBtn: { fontSize:'0.72rem', fontWeight:700, background:'none', border:'none', padding:0, cursor:'pointer', textAlign:'left', marginTop:'0.25rem' },
@@ -968,19 +937,19 @@ const s = {
   leadName: { fontWeight:700, fontSize:'0.82rem', color:'#08060d' },
   leadProduct: { fontSize:'0.7rem', color:'#64748b', marginBottom:4 },
   leadMeta: { display:'flex', justifyContent:'space-between', alignItems:'center' },
-  leadBudget: { fontSize:'0.75rem', fontWeight:700, color:'#aa3bff' },
-  leadSource: { fontSize:'0.65rem', color:'#94a3b8', fontWeight:600 },
-  empty: { fontSize:'0.72rem', color:'#94a3b8', textAlign:'center', padding:'1rem 0' },
+  leadBudget: { fontSize:'0.75rem', fontWeight:700, color:'#09090b' },
+  leadSource: { fontSize:'0.65rem', color:'#71717a', fontWeight:600 },
+  empty: { fontSize:'0.72rem', color:'#71717a', textAlign:'center', padding:'1rem 0' },
 
   // Modal
-  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 500, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(9,9,11,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 500, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e4e4e7' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#71717a' },
   modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
-  label: { fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' },
-  modalInput: { width: '100%', padding: '0.65rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', boxSizing: 'border-box' },
+  label: { fontSize: '0.8rem', fontWeight: 700, color: '#3f3f46', display: 'block', marginBottom: '6px' },
+  modalInput: { width: '100%', padding: '0.65rem 0.9rem', borderRadius: 10, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', boxSizing: 'border-box', color: '#09090b' },
   modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
-  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 }
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#09090b', color: '#fff', cursor: 'pointer', fontWeight: 700 }
 };

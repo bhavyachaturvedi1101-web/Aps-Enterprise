@@ -1,42 +1,134 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api';
 
-const STAGES = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
+const STAGES = [
+  'Enquiry',
+  'Qualified',
+  'Booked',
+  'Confirmed Lead',
+  'Client (Paid)',
+  'In Production',
+  'Dispatched'
+];
+
 const VALID_NEXT = {
-  Enquiry: 'Qualified', Qualified: 'Booked', Booked: 'Confirmed Lead',
-  'Confirmed Lead': 'Client (Paid)', 'Client (Paid)': 'In Production', 'In Production': 'Dispatched'
-};
-const STAGE_META = {
-  Enquiry:         { color: '#64748b', gradient: 'linear-gradient(135deg,#475569,#64748b)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, idx: 0 },
-  Qualified:       { color: '#3b82f6', gradient: 'linear-gradient(135deg,#2563eb,#3b82f6)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>, idx: 1 },
-  Booked:          { color: '#a855f7', gradient: 'linear-gradient(135deg,#7c3aed,#a855f7)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, idx: 2 },
-  'Confirmed Lead':{ color: '#f59e0b', gradient: 'linear-gradient(135deg,#d97706,#f59e0b)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, idx: 3 },
-  'Client (Paid)': { color: '#10b981', gradient: 'linear-gradient(135deg,#059669,#10b981)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, idx: 4 },
-  'In Production': { color: '#06b6d4', gradient: 'linear-gradient(135deg,#0891b2,#06b6d4)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 20h20"/><path d="M6 20V10l4 3V10l4 3V6l6 4v10"/></svg>, idx: 5 },
-  Dispatched:      { color: '#ec4899', gradient: 'linear-gradient(135deg,#db2777,#ec4899)', icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, idx: 6 }
+  Enquiry: 'Qualified',
+  Qualified: 'Booked',
+  Booked: 'Confirmed Lead',
+  'Confirmed Lead': 'Client (Paid)',
+  'Client (Paid)': 'In Production',
+  'In Production': 'Dispatched'
 };
 
-const INITIALS_BG = ['#aa3bff','#3b82f6','#10b981','#f59e0b','#ec4899','#06b6d4'];
+const STAGE_META = {
+  Enquiry: {
+    color: '#09090b',
+    borderTop: '#09090b',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 0
+  },
+  Qualified: {
+    color: '#27272a',
+    borderTop: '#27272a',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 1
+  },
+  Booked: {
+    color: '#3f3f46',
+    borderTop: '#3f3f46',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 2
+  },
+  'Confirmed Lead': {
+    color: '#52525b',
+    borderTop: '#52525b',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 3
+  },
+  'Client (Paid)': {
+    color: '#09090b',
+    borderTop: '#09090b',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 4
+  },
+  'In Production': {
+    color: '#27272a',
+    borderTop: '#27272a',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 5
+  },
+  Dispatched: {
+    color: '#3f3f46',
+    borderTop: '#3f3f46',
+    bg: '#ffffff',
+    pillBg: '#f4f4f5',
+    pillClr: '#09090b',
+    idx: 6
+  }
+};
+
+const PRIORITY_THEMES = {
+  Hot:  { bg: '#09090b', color: '#ffffff', border: '#09090b' },
+  Warm: { bg: '#f4f4f5', color: '#09090b', border: '#e4e4e7' },
+  Cold: { bg: '#ffffff', color: '#71717a', border: '#e4e4e7' }
+};
+
+const SOURCE_THEMES = {
+  WhatsApp:         { bg: '#f4f4f5', color: '#09090b' },
+  'Meta Ads':       { bg: '#f4f4f5', color: '#09090b' },
+  'Facebook Ad':    { bg: '#f4f4f5', color: '#09090b' },
+  'Voice Agent':    { bg: '#f4f4f5', color: '#09090b' },
+  'Inbound Call':   { bg: '#f4f4f5', color: '#09090b' },
+  'Direct Web':     { bg: '#f4f4f5', color: '#09090b' },
+  Default:          { bg: '#f4f4f5', color: '#09090b' }
+};
 
 export default function CRMLeads() {
   const navigate = useNavigate();
+  const boardRef = useRef(null);
+
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(null);
   const [search, setSearch] = useState('');
-  const [filterStage, setFilterStage] = useState('All');
+  const [selectedSource, setSelectedSource] = useState('All');
 
-  // Modals & Policy State
+  // Modals
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showCountersignModal, setShowCountersignModal] = useState(false);
   const [targetLead, setTargetLead] = useState(null);
-  const [countersignedBy, setCountersignedBy] = useState('e3');
-  const [approvalPolicy, setApprovalPolicy] = useState('single-action');
+  const [editingLead, setEditingLead] = useState(null);
 
-  // Add Lead Form State
-  const [newLead, setNewLead] = useState({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+  // Form states
+  const [approvalPolicy, setApprovalPolicy] = useState('single-action');
+  const [countersignedBy, setCountersignedBy] = useState('e3');
+
+  const [newLead, setNewLead] = useState({
+    name: '',
+    phone: '',
+    company: '',
+    interest: 'CNC Router Pro v3',
+    budget: '35000',
+    source: 'WhatsApp',
+    stage: 'Enquiry',
+    priority: 'Warm',
+    notes: 'No pitch yet'
+  });
 
   const fetchLeads = async () => {
     try {
@@ -65,6 +157,19 @@ export default function CRMLeads() {
     fetchLeads();
     fetchConfig();
   }, []);
+
+  // Arrow Horizontal Scroll Handlers
+  const scrollLeft = () => {
+    if (boardRef.current) {
+      boardRef.current.scrollBy({ left: -360, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (boardRef.current) {
+      boardRef.current.scrollBy({ left: 360, behavior: 'smooth' });
+    }
+  };
 
   const handlePolicyToggle = async (newPol) => {
     setApprovalPolicy(newPol);
@@ -95,7 +200,7 @@ export default function CRMLeads() {
       if (data.success) {
         await fetchLeads();
       } else {
-        alert(`❌ ${data.error || 'Transition Failed'}\n${data.reason || data.details || ''}`);
+        alert(`${data.error || 'Transition Failed'}\n${data.reason || data.details || ''}`);
       }
     } catch {
       alert('Backend connection error.');
@@ -106,8 +211,8 @@ export default function CRMLeads() {
     }
   };
 
-  const handleTransitionClick = (lead) => {
-    const toStage = VALID_NEXT[lead.stage];
+  const handleTransitionClick = (lead, explicitStage = null) => {
+    const toStage = explicitStage || VALID_NEXT[lead.stage];
     if (!toStage) return;
 
     const isHighStakes = (lead.stage === 'Confirmed Lead' && toStage === 'Client (Paid)') ||
@@ -121,6 +226,12 @@ export default function CRMLeads() {
     }
   };
 
+  // Open Quick Add Modal for a specific column
+  const handleOpenAddForStage = (stage) => {
+    setNewLead(prev => ({ ...prev, stage }));
+    setShowAddModal(true);
+  };
+
   const handleAddLeadSubmit = async (e) => {
     e.preventDefault();
     if (!newLead.name) return alert('Lead name is required!');
@@ -132,7 +243,17 @@ export default function CRMLeads() {
       });
       if (res.ok) {
         setShowAddModal(false);
-        setNewLead({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
+        setNewLead({
+          name: '',
+          phone: '',
+          company: '',
+          interest: 'CNC Router Pro v3',
+          budget: '35000',
+          source: 'WhatsApp',
+          stage: 'Enquiry',
+          priority: 'Warm',
+          notes: 'No pitch yet'
+        });
         await fetchLeads();
       } else {
         alert('Failed to add lead.');
@@ -143,515 +264,1169 @@ export default function CRMLeads() {
     }
   };
 
-  const filtered = leads.filter(l =>
-    (filterStage === 'All' || l.stage === filterStage) &&
-    (l.name?.toLowerCase().includes(search.toLowerCase()) ||
-     l.interest?.toLowerCase().includes(search.toLowerCase()))
-  );
+  // Edit Lead
+  const handleOpenEdit = (lead, e) => {
+    if (e) e.stopPropagation();
+    setEditingLead({ ...lead });
+    setShowEditModal(true);
+  };
 
-  const stageCounts = STAGES.reduce((acc, s) => {
-    acc[s] = leads.filter(l => l.stage === s).length; return acc;
-  }, {});
+  const handleEditLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingLead) return;
+    try {
+      const res = await fetch(`${API}/leads/${editingLead.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingLead)
+      });
+      if (res.ok) {
+        setShowEditModal(false);
+        setEditingLead(null);
+        await fetchLeads();
+      } else {
+        alert('Failed to update lead');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating lead.');
+    }
+  };
 
-  if (loading) return <div style={s.loading}>Loading CRM Control Cockpit…</div>;
+  // Delete Lead
+  const handleDeleteLead = async (lead, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm(`Are you sure you want to delete lead "${lead.name}"?`)) return;
+    try {
+      const res = await fetch(`${API}/leads/${lead.id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        await fetchLeads();
+      } else {
+        alert('Failed to delete lead');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting lead.');
+    }
+  };
+
+  // Filter leads by search & source
+  const filteredLeads = useMemo(() => {
+    return leads.filter(l => {
+      const matchSearch =
+        (l.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (l.phone || '').includes(search) ||
+        (l.interest || '').toLowerCase().includes(search.toLowerCase()) ||
+        (l.company || '').toLowerCase().includes(search.toLowerCase());
+
+      const matchSource = selectedSource === 'All' || l.source === selectedSource;
+      return matchSearch && matchSource;
+    });
+  }, [leads, search, selectedSource]);
+
+  // Group leads by stage
+  const leadsByStage = useMemo(() => {
+    const map = {};
+    STAGES.forEach(s => { map[s] = []; });
+    filteredLeads.forEach(l => {
+      if (map[l.stage]) {
+        map[l.stage].push(l);
+      } else {
+        map['Enquiry'].push(l);
+      }
+    });
+    return map;
+  }, [filteredLeads]);
+
+  // Format date helper
+  const formatDate = (d) => {
+    if (!d) return '17 Aug 2026';
+    try {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+      return '17 Aug 2026';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={s.loadingContainer}>
+        <div style={s.spinner} />
+        <div style={s.loadingText}>Loading CRM Lead Pipeline…</div>
+      </div>
+    );
+  }
 
   return (
     <div style={s.page}>
-
-      {/* ── Dark Hero Header ─────────────────────────────────────────── */}
-      <div style={s.hero}>
-        <div style={s.heroLeft}>
-          <div style={s.heroTag}>CENTRAL LEAD PIPELINE & COCKPIT</div>
-          <h1 style={s.heroTitle}>CRM / Lead State Machine</h1>
-          <p style={s.heroSub}>Central operating dashboard with Tally 10% payment gate & Dual-Approval workflow</p>
-        </div>
-
-
-        {/* Policy Switcher */}
-        <div style={s.policyBox}>
-          <div style={s.policyTitle}>BUSINESS APPROVAL POLICY</div>
-          <div style={s.policyToggleGroup}>
-            <button
-              onClick={() => handlePolicyToggle('single-action')}
-              style={{
-                ...s.policyBtn,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                background: approvalPolicy === 'single-action' ? '#aa3bff' : 'transparent',
-                color: approvalPolicy === 'single-action' ? '#fff' : '#a5b4fc'
-              }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Single-Action</span>
-            </button>
-            <button
-              onClick={() => handlePolicyToggle('countersign')}
-              style={{
-                ...s.policyBtn,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                background: approvalPolicy === 'countersign' ? '#f59e0b' : 'transparent',
-                color: approvalPolicy === 'countersign' ? '#fff' : '#a5b4fc'
-              }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>Countersign (Dual)</span>
-            </button>
-          </div>
-        </div>
-
-        <div style={s.heroStats}>
-          {[
-            { label: 'Total Leads',  val: leads.length,                                        clr: '#a5b4fc' },
-            { label: 'Paid Clients', val: stageCounts['Client (Paid)'],                        clr: '#6ee7b7' },
-            { label: 'Gate Pending', val: stageCounts['Confirmed Lead'],                       clr: '#fde68a' },
-            { label: 'In Production',val: stageCounts['In Production'],                        clr: '#67e8f9' }
-          ].map(({ label, val, clr }) => (
-            <div key={label} style={s.heroStat}>
-              <div style={{ ...s.heroStatNum, color: clr }}>{val}</div>
-              <div style={s.heroStatLbl}>{label}</div>
+      {/* ── Top Header Control Bar ──────────────────────────────────── */}
+      <div style={s.topBar}>
+        <div style={s.topBarLeft}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <h1 style={s.pageTitle}>CRM / Lead Pipeline</h1>
+            <div style={s.leadCountChip}>
+              {leads.length} Total Leads
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Action Controls & Arrow Buttons */}
+        <div style={s.topBarRight}>
+          {/* Arrow Navigation Scroll Controls */}
+          <div style={s.arrowControls}>
+            <button
+              onClick={scrollLeft}
+              style={s.arrowBtn}
+              title="Scroll Kanban Left"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <span style={s.arrowDivider} />
+            <button
+              onClick={scrollRight}
+              style={s.arrowBtn}
+              title="Scroll Kanban Right"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div style={s.searchBox}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by name, phone or product…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={s.searchInput}
+            />
+            {search && (
+              <button onClick={() => setSearch('')} style={s.clearSearchBtn}>✕</button>
+            )}
+          </div>
+
+          {/* Source Filter */}
+          <select
+            value={selectedSource}
+            onChange={e => setSelectedSource(e.target.value)}
+            style={s.sourceSelect}
+          >
+            <option value="All">All Sources</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Meta Ads">Meta Ads</option>
+            <option value="Facebook Ad">Facebook Ad</option>
+            <option value="Voice Agent">Voice Agent</option>
+            <option value="Inbound Call">Inbound Call</option>
+            <option value="Direct Web">Direct Web</option>
+          </select>
+
+          {/* Policy Toggle */}
+          <div style={s.policyToggle}>
+            <span style={s.policyLabel}>Policy:</span>
+            <button
+              onClick={() => handlePolicyToggle(approvalPolicy === 'single-action' ? 'countersign' : 'single-action')}
+              style={{
+                ...s.policyBadge,
+                backgroundColor: approvalPolicy === 'countersign' ? '#fef3c7' : '#f1f5f9',
+                color: approvalPolicy === 'countersign' ? '#b45309' : '#475569',
+                borderColor: approvalPolicy === 'countersign' ? '#fde68a' : '#e2e8f0'
+              }}
+            >
+              {approvalPolicy === 'countersign' ? 'Dual Countersign' : 'Single Action'}
+            </button>
+          </div>
+
+          {/* Add New Lead Button */}
+          <button onClick={() => setShowAddModal(true)} style={s.addLeadBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Add Lead</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Integration Connectors Status Bar ──────────────────────────────── */}
-      <div style={s.connectorBar}>
-        <div style={s.connCard}>
-          <span style={s.connDot}></span>
-          <div>
-            <div style={s.connName}>CRM Connector</div>
-            <div style={s.connSub}>Synced · Real-Time Lead Engine</div>
-          </div>
-        </div>
-        <div style={s.connCard}>
-          <span style={s.connDot}></span>
-          <div>
-            <div style={s.connName}>ERP Connector</div>
-            <div style={s.connSub}>Connected · Order Release Ready</div>
-          </div>
-        </div>
-        <div style={s.connCard}>
-          <span style={s.connDot}></span>
-          <div>
-            <div style={s.connName}>Dialer Connector</div>
-            <div style={s.connSub}>Active Queue Monitor</div>
-          </div>
-        </div>
-        <div style={{...s.connCard, backgroundColor: '#fffbeb', borderColor: '#fde68a'}}>
-          <span style={{...s.connDot, backgroundColor: '#f59e0b'}}></span>
-          <div>
-            <div style={{...s.connName, color: '#92400e'}}>Tally Accounting Ledger</div>
-            <div style={{...s.connSub, color: '#b45309'}}>10% Advance Hard Gate Active</div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Pipeline Stage Swimlanes ──────────────────────────────────── */}
-      <div style={s.swimlanes}>
+      {/* ── Main Kanban Swimlane Columns (Horizontally Scrollable) ─── */}
+      <div ref={boardRef} style={s.kanbanBoard}>
         {STAGES.map(stage => {
           const meta = STAGE_META[stage];
-          const count = stageCounts[stage];
-          const active = filterStage === stage;
-          return (
-            <div
-              key={stage}
-              onClick={() => setFilterStage(active ? 'All' : stage)}
-              style={{
-                ...s.swimlane,
-                borderColor: active ? meta.color : 'transparent',
-                background: active ? meta.gradient : '#fff',
-                transform: active ? 'scale(1.03)' : 'none'
-              }}
-            >
-              <span style={{ fontSize: '1rem' }}>{meta.icon}</span>
-              <span style={{ ...s.swimlaneLbl, color: active ? '#fff' : '#08060d' }}>{stage}</span>
-              <span style={{
-                ...s.swimlaneCount,
-                backgroundColor: active ? 'rgba(255,255,255,0.25)' : meta.color + '18',
-                color: active ? '#fff' : meta.color
-              }}>
-                {count}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ── Toolbar (Search + Add) ────────────────────────────────────── */}
-      <div style={s.toolbar}>
-        <div style={s.searchWrap}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input
-            placeholder="Search leads by name or product interest…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={s.searchInput}
-          />
-        </div>
-        <button onClick={() => setShowAddModal(true)} style={s.addBtn}>
-          + Add New Lead
-        </button>
-      </div>
-
-      {/* ── Lead Cards Grid ───────────────────────────────────────────── */}
-      <div style={s.cardGrid}>
-        {filtered.map((lead, idx) => {
-          const meta = STAGE_META[lead.stage] || STAGE_META['Enquiry'];
-          const progress = ((meta.idx + 1) / STAGES.length) * 100;
-          const next = VALID_NEXT[lead.stage];
-          const isTransitioning = transitioning === lead.id;
-          const avatarBg = INITIALS_BG[idx % INITIALS_BG.length];
+          const columnLeads = leadsByStage[stage] || [];
+          const count = columnLeads.length;
 
           return (
-            <div
-              key={lead.id}
-              onClick={() => navigate(`/leads/${lead.id}`)}
-              style={{ ...s.leadCard, borderLeftColor: meta.color, cursor: 'pointer' }}
-            >
-              {/* Card Top */}
-              <div style={s.cardTop}>
-                <div style={{ ...s.avatar, background: avatarBg }}>
-                  {lead.name?.[0] || '?'}
-                </div>
-                <div style={s.cardInfo}>
-                  <div style={s.leadIdStr}>{lead.id}</div>
-                  <div style={s.leadName}>{lead.name}</div>
-                  <div style={s.leadProduct}>{lead.interest}</div>
-                </div>
-                <div style={{ ...s.stageBadge, background: meta.gradient }}>
-                  {meta.icon} {lead.stage}
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div style={s.progWrap}>
-                <div style={s.progTrack}>
-                  <div style={{ ...s.progFill, width: `${progress}%`, background: meta.gradient }}/>
-                </div>
-                <span style={s.progPct}>Step {meta.idx + 1}/7</span>
-              </div>
-
-              {/* Card Bottom */}
-              <div style={s.cardBottom}>
-                <div style={s.budgetWrap}>
-                  <div style={s.budget}>₹{parseFloat(lead.budget || 0).toLocaleString('en-IN')}</div>
-                  <div style={s.source}>{lead.source || 'Admin Cockpit'}</div>
-                </div>
-                {next && (
+            <div key={stage} style={s.kanbanColumn}>
+              {/* Column Top Header */}
+              <div style={{ ...s.columnHeader, borderTopColor: meta.borderTop }}>
+                <div style={s.columnTitleRow}>
+                  <div style={s.columnTitleLeft}>
+                    <span style={s.columnTitle}>{stage}</span>
+                    {/* Numbers Display (e.g. "Doing 11") */}
+                    <span style={s.columnCountBadge}>
+                      {count}
+                    </span>
+                  </div>
+                  {/* Quick Add Button in Header */}
                   <button
-                    disabled={isTransitioning}
-                    onClick={(e) => { e.stopPropagation(); handleTransitionClick(lead); }}
-                    style={{ ...s.advanceBtn, background: meta.gradient, opacity: isTransitioning ? 0.6 : 1 }}
+                    onClick={() => handleOpenAddForStage(stage)}
+                    style={s.columnAddBtn}
+                    title={`Add new lead to ${stage}`}
                   >
-                    {isTransitioning ? '⏳ Syncing…' : `→ ${next}`}
+                    +
                   </button>
-                )}
-                {!next && (
-                  <div style={s.completedBadge}>✓ Dispatched</div>
-                )}
+                </div>
               </div>
 
-              {/* Gate & Dual-Approval Banners */}
-              {lead.stage === 'Confirmed Lead' && (
-                <div style={s.gateBanner}>
-                  <strong>Tally Gate</strong>: 10% advance required
-                  {approvalPolicy === 'countersign' && ' + Dual Approval'}
-                </div>
-              )}
-              {lead.stage === 'Client (Paid)' && (
-                <div style={{...s.gateBanner, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46'}}>
-                  <strong>Factory Release Ready</strong>
-                  {approvalPolicy === 'countersign' && ' (Countersign Active)'}
-                </div>
-              )}
+              {/* Column Cards Container */}
+              <div style={s.columnBody}>
+                {columnLeads.map((lead) => {
+                  const priorityStyle = PRIORITY_THEMES[lead.priority] || PRIORITY_THEMES['Warm'];
+                  const sourceStyle = SOURCE_THEMES[lead.source] || SOURCE_THEMES['Default'];
+                  const nextStage = VALID_NEXT[lead.stage];
+                  const isTransitioning = transitioning === lead.id;
+
+                  return (
+                    <div
+                      key={lead.id}
+                      style={s.leadCard}
+                      onClick={() => navigate(`/leads/${lead.id}`)}
+                    >
+                      {/* Top Row: Lead Name + Edit/Delete Icons */}
+                      <div style={s.cardHeadRow}>
+                        <div style={s.cardLeadName}>{lead.name}</div>
+                        <div style={s.cardActions} onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => handleOpenEdit(lead, e)}
+                            style={s.actionIconBtn}
+                            title="Edit Lead"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteLead(lead, e)}
+                            style={{ ...s.actionIconBtn, color: '#ef4444' }}
+                            title="Delete Lead"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.2">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Phone Number Row (Show Numbers) */}
+                      <div style={s.phoneRow}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
+                        </svg>
+                        <span style={s.phoneText}>
+                          {lead.phone ? lead.phone.replace(/^\+91/, '') : '8120590466'}
+                        </span>
+                      </div>
+
+                      {/* Tags Row: Priority (Warm) + Source (WhatsApp / Facebook Ad) */}
+                      <div style={s.tagsRow}>
+                        <span style={{
+                          ...s.tagPill,
+                          backgroundColor: priorityStyle.bg,
+                          color: priorityStyle.color,
+                          borderColor: priorityStyle.border
+                        }}>
+                          {lead.priority || 'Warm'}
+                        </span>
+                        <span style={{
+                          ...s.tagPill,
+                          backgroundColor: sourceStyle.bg,
+                          color: sourceStyle.color
+                        }}>
+                          {lead.source || 'WhatsApp'}
+                        </span>
+                      </div>
+
+                      {/* Product Interest / Note & Date Row */}
+                      <div style={s.metaRow}>
+                        <span style={s.notesText}>
+                          {lead.notes && lead.notes !== 'No pitch yet' ? lead.notes : (lead.interest || 'No pitch yet')}
+                        </span>
+                        <span style={s.dateText}>
+                          {formatDate(lead.createdAt)}
+                        </span>
+                      </div>
+
+                      {/* Quick Stage Transition Buttons */}
+                      <div style={s.transitionRow} onClick={e => e.stopPropagation()}>
+                        {nextStage ? (
+                          <button
+                            disabled={isTransitioning}
+                            onClick={() => handleTransitionClick(lead)}
+                            style={s.quickNextBtn}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <line x1="5" y1="12" x2="19" y2="12" />
+                              <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                            <span>{isTransitioning ? 'Moving…' : `→ ${nextStage}`}</span>
+                          </button>
+                        ) : (
+                          <div style={s.completedBadge}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>Dispatched / Completed</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Tally Hard Gate Warning */}
+                      {lead.stage === 'Confirmed Lead' && (
+                        <div style={s.tallyGateTag}>
+                          <span>10% Advance Deposit Required</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {columnLeads.length === 0 && (
+                  <div style={s.emptyColumn}>
+                    <div style={s.emptyColumnPlus}>+</div>
+                    <div style={s.emptyColumnText}>No leads in {stage}</div>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
-
-        {filtered.length === 0 && (
-          <div style={s.empty}>
-            <div style={{ fontSize: '2rem', marginBottom: 10, color: '#cbd5e1' }}>∅</div>
-            <div>No lead records found in database.</div>
-          </div>
-        )}
       </div>
 
-      {/* ── Add Lead Modal ────────────────────────────────────────────── */}
+      {/* ── Modal: Add New Lead ─────────────────────────────────────── */}
       {showAddModal && (
-        <div style={s.modalOverlay}>
-          <div style={s.modalContent}>
-            <div style={s.modalHeader}>
-              <h3>Add New Lead to System Pipeline</h3>
-
-              <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
+        <div style={s.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={s.modalHead}>
+              <h3 style={s.modalTitle}>Add New Lead</h3>
+              <button onClick={() => setShowAddModal(false)} style={s.modalCloseBtn}>✕</button>
             </div>
             <form onSubmit={handleAddLeadSubmit} style={s.modalForm}>
-              <label style={s.label}>Customer / Company Name</label>
-              <input
-                required
-                style={s.modalInput}
-                placeholder="e.g. Acme Manufacturing Ltd."
-                value={newLead.name}
-                onChange={e => setNewLead({ ...newLead, name: e.target.value })}
-              />
+              <div style={s.formGrid}>
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Client / Lead Name *</label>
+                  <input
+                    required
+                    style={s.formInput}
+                    placeholder="e.g. Bhavya"
+                    value={newLead.name}
+                    onChange={e => setNewLead({ ...newLead, name: e.target.value })}
+                  />
+                </div>
 
-              <label style={s.label}>Product Interest</label>
-              <input
-                required
-                style={s.modalInput}
-                placeholder="e.g. CNC Router Pro v3"
-                value={newLead.interest}
-                onChange={e => setNewLead({ ...newLead, interest: e.target.value })}
-              />
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Phone Number *</label>
+                  <input
+                    required
+                    style={s.formInput}
+                    placeholder="e.g. 8120590466"
+                    value={newLead.phone}
+                    onChange={e => setNewLead({ ...newLead, phone: e.target.value })}
+                  />
+                </div>
 
-              <label style={s.label}>Estimated Budget (₹)</label>
-              <input
-                required
-                type="number"
-                style={s.modalInput}
-                placeholder="35000"
-                value={newLead.budget}
-                onChange={e => setNewLead({ ...newLead, budget: e.target.value })}
-              />
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Initial Pipeline Stage</label>
+                  <select
+                    style={s.formSelect}
+                    value={newLead.stage}
+                    onChange={e => setNewLead({ ...newLead, stage: e.target.value })}
+                  >
+                    {STAGES.map(st => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <label style={s.label}>Lead Source</label>
-              <select
-                style={s.modalInput}
-                value={newLead.source}
-                onChange={e => setNewLead({ ...newLead, source: e.target.value })}
-              >
-                <option value="Meta Ads">Meta Ads</option>
-                <option value="AI Voice Agent">AI Voice Agent</option>
-                <option value="Inbound Telecaller">Inbound Telecaller</option>
-                <option value="Direct Web">Direct Web</option>
-              </select>
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Priority / Warmth</label>
+                  <select
+                    style={s.formSelect}
+                    value={newLead.priority}
+                    onChange={e => setNewLead({ ...newLead, priority: e.target.value })}
+                  >
+                    <option value="Warm">Warm</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Cold">Cold</option>
+                  </select>
+                </div>
 
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Lead Source</label>
+                  <select
+                    style={s.formSelect}
+                    value={newLead.source}
+                    onChange={e => setNewLead({ ...newLead, source: e.target.value })}
+                  >
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Facebook Ad">Facebook Ad</option>
+                    <option value="Meta Ads">Meta Ads</option>
+                    <option value="Voice Agent">Voice Agent</option>
+                    <option value="Inbound Call">Inbound Call</option>
+                    <option value="Direct Web">Direct Web</option>
+                  </select>
+                </div>
 
-              <label style={s.label}>Notes & Requirements</label>
-              <textarea
-                rows="3"
-                style={{ ...s.modalInput, resize: 'vertical' }}
-                placeholder="Enter client specifications..."
-                value={newLead.notes}
-                onChange={e => setNewLead({ ...newLead, notes: e.target.value })}
-              />
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Product Interest</label>
+                  <input
+                    style={s.formInput}
+                    placeholder="e.g. CNC Router Pro v3"
+                    value={newLead.interest}
+                    onChange={e => setNewLead({ ...newLead, interest: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Estimated Deal Value (₹)</label>
+                  <input
+                    type="number"
+                    style={s.formInput}
+                    placeholder="35000"
+                    value={newLead.budget}
+                    onChange={e => setNewLead({ ...newLead, budget: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Company / Organization</label>
+                  <input
+                    style={s.formInput}
+                    placeholder="e.g. Precision Tools Ltd"
+                    value={newLead.company}
+                    onChange={e => setNewLead({ ...newLead, company: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <label style={s.formLabel}>Pitch Note / Summary</label>
+                <input
+                  style={s.formInput}
+                  placeholder="e.g. No pitch yet"
+                  value={newLead.notes}
+                  onChange={e => setNewLead({ ...newLead, notes: e.target.value })}
+                />
+              </div>
 
               <div style={s.modalActions}>
-                <button type="button" onClick={() => setShowAddModal(false)} style={s.cancelBtn}>Cancel</button>
-                <button type="submit" style={s.submitBtn}>Save Lead & Sync CRM</button>
+                <button type="button" onClick={() => setShowAddModal(false)} style={s.modalCancelBtn}>
+                  Cancel
+                </button>
+                <button type="submit" style={s.modalSubmitBtn}>
+                  Create Lead
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* ── Countersign Dual-Approval Modal ────────────────────────────── */}
+      {/* ── Modal: Edit Lead ────────────────────────────────────────── */}
+      {showEditModal && editingLead && (
+        <div style={s.modalOverlay} onClick={() => setShowEditModal(false)}>
+          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={s.modalHead}>
+              <h3 style={s.modalTitle}>Edit Lead: {editingLead.name}</h3>
+              <button onClick={() => setShowEditModal(false)} style={s.modalCloseBtn}>✕</button>
+            </div>
+            <form onSubmit={handleEditLeadSubmit} style={s.modalForm}>
+              <div style={s.formGrid}>
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Client / Lead Name</label>
+                  <input
+                    required
+                    style={s.formInput}
+                    value={editingLead.name}
+                    onChange={e => setEditingLead({ ...editingLead, name: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Phone Number</label>
+                  <input
+                    style={s.formInput}
+                    value={editingLead.phone || ''}
+                    onChange={e => setEditingLead({ ...editingLead, phone: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Pipeline Stage</label>
+                  <select
+                    style={s.formSelect}
+                    value={editingLead.stage}
+                    onChange={e => setEditingLead({ ...editingLead, stage: e.target.value })}
+                  >
+                    {STAGES.map(st => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Priority / Warmth</label>
+                  <select
+                    style={s.formSelect}
+                    value={editingLead.priority || 'Warm'}
+                    onChange={e => setEditingLead({ ...editingLead, priority: e.target.value })}
+                  >
+                    <option value="Warm">Warm</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Cold">Cold</option>
+                  </select>
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Lead Source</label>
+                  <select
+                    style={s.formSelect}
+                    value={editingLead.source || 'WhatsApp'}
+                    onChange={e => setEditingLead({ ...editingLead, source: e.target.value })}
+                  >
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Facebook Ad">Facebook Ad</option>
+                    <option value="Meta Ads">Meta Ads</option>
+                    <option value="Voice Agent">Voice Agent</option>
+                    <option value="Inbound Call">Inbound Call</option>
+                    <option value="Direct Web">Direct Web</option>
+                  </select>
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Product Interest</label>
+                  <input
+                    style={s.formInput}
+                    value={editingLead.interest || ''}
+                    onChange={e => setEditingLead({ ...editingLead, interest: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Deal Budget (₹)</label>
+                  <input
+                    type="number"
+                    style={s.formInput}
+                    value={editingLead.budget || ''}
+                    onChange={e => setEditingLead({ ...editingLead, budget: e.target.value })}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Company</label>
+                  <input
+                    style={s.formInput}
+                    value={editingLead.company || ''}
+                    onChange={e => setEditingLead({ ...editingLead, company: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <label style={s.formLabel}>Pitch Note</label>
+                <input
+                  style={s.formInput}
+                  value={editingLead.notes || ''}
+                  onChange={e => setEditingLead({ ...editingLead, notes: e.target.value })}
+                />
+              </div>
+
+              <div style={s.modalActions}>
+                <button type="button" onClick={() => setShowEditModal(false)} style={s.modalCancelBtn}>
+                  Cancel
+                </button>
+                <button type="submit" style={s.modalSubmitBtn}>
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Dual Countersign Approval ────────────────────────── */}
       {showCountersignModal && targetLead && (
         <div style={s.modalOverlay}>
-          <div style={{ ...s.modalContent, borderTop: '6px solid #f59e0b' }}>
-            <div style={s.modalHeader}>
+          <div style={{ ...s.modalBox, borderTop: '4px solid #f59e0b' }}>
+            <div style={s.modalHead}>
               <div>
-                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#d97706' }}>BUSINESS POLICY ENFORCEMENT</div>
-                <h3 style={{ margin: 0 }}>Countersign (Dual-Approval) Required</h3>
+                <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#d97706' }}>DUAL APPROVAL POLICY</div>
+                <h3 style={s.modalTitle}>Countersign Authorization Required</h3>
               </div>
-              <button onClick={() => setShowCountersignModal(false)} style={s.closeModalBtn}>✕</button>
+              <button onClick={() => setShowCountersignModal(false)} style={s.modalCloseBtn}>✕</button>
             </div>
             <div style={{ padding: '1rem 0' }}>
-              <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '0.84rem', color: '#475569', lineHeight: 1.5 }}>
                 Lead <strong>{targetLead.name} ({targetLead.id})</strong> is transitioning to <strong>{VALID_NEXT[targetLead.stage]}</strong>.
-                Under the active <strong>Countersign Policy</strong>, a second authorized officer signature is required before verifying Tally ledger or releasing factory order.
+                Please assign a second officer to countersign this transition.
               </p>
 
-              <label style={s.label}>Initiating Officer</label>
-              <input disabled value="Bhavya (e2 - Primary)" style={{ ...s.modalInput, backgroundColor: '#f1f5f9' }} />
+              <div style={{ marginTop: 12 }}>
+                <label style={s.formLabel}>Initiating Officer</label>
+                <input disabled value="Bhavya (Primary Admin)" style={{ ...s.formInput, backgroundColor: '#f1f5f9' }} />
+              </div>
 
-              <label style={s.label}>Select Countersigning Second Approver</label>
-              <select
-                style={s.modalInput}
-                value={countersignedBy}
-                onChange={e => setCountersignedBy(e.target.value)}
-              >
-                <option value="e3">Aaditya (Operations Manager)</option>
-                <option value="e1">Animesh (Senior Sales Lead)</option>
-              </select>
+              <div style={{ marginTop: 12 }}>
+                <label style={s.formLabel}>Countersigning Officer</label>
+                <select
+                  style={s.formSelect}
+                  value={countersignedBy}
+                  onChange={e => setCountersignedBy(e.target.value)}
+                >
+                  <option value="e3">Aaditya (Operations Manager)</option>
+                  <option value="e1">Animesh (Senior Sales Lead)</option>
+                </select>
+              </div>
             </div>
 
             <div style={s.modalActions}>
-              <button onClick={() => setShowCountersignModal(false)} style={s.cancelBtn}>Cancel</button>
+              <button onClick={() => setShowCountersignModal(false)} style={s.modalCancelBtn}>
+                Cancel
+              </button>
               <button
                 onClick={() => executeTransitionCall(targetLead, VALID_NEXT[targetLead.stage], countersignedBy)}
-                style={{ ...s.submitBtn, background: 'linear-gradient(135deg,#d97706,#f59e0b)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                style={{ ...s.modalSubmitBtn, backgroundColor: '#f59e0b' }}
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>Sign & Execute Transition</span>
+                Sign & Transition
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
+// ─── STYLES ──────────────────────────────────────────────────────────────────
 const s = {
-  page:    { padding: '0', fontFamily: 'var(--font-body)', backgroundColor: '#f8fafc', minHeight: '100vh' },
-  loading: { padding: '4rem', textAlign: 'center', color: '#64748b', fontSize: '1rem' },
+  page: {
+    padding: '1.25rem 1.75rem',
+    fontFamily: 'var(--font-body, "Inter", sans-serif)',
+    backgroundColor: '#f8fafc',
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  loadingContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '6rem 0',
+    color: '#64748b'
+  },
+  spinner: {
+    width: 36,
+    height: 36,
+    border: '3px solid #e2e8f0',
+    borderTopColor: '#2563eb',
+    borderRadius: '50%',
+    animation: 'spin 0.8s linear infinite',
+    marginBottom: 14
+  },
+  loadingText: {
+    fontSize: '0.9rem',
+    fontWeight: 600
+  },
 
-  // Hero
-  hero: {
-    background: 'linear-gradient(135deg,#0f0c1e 0%,#1e1440 60%,#0a0e1a 100%)',
-    padding: '2rem 2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    gap: '1.5rem', flexWrap: 'wrap'
+  // Top Bar
+  topBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 14,
+    marginBottom: '1.25rem'
   },
-  heroLeft:    { display: 'flex', flexDirection: 'column', gap: '0.35rem' },
-  heroTag:     { fontSize: '0.6rem', fontWeight: 800, letterSpacing: '2px', color: '#a5b4fc', textTransform: 'uppercase' },
-  heroTitle:   { fontSize: '2rem', fontWeight: 900, color: '#fff', fontFamily: 'var(--font-heading)', margin: 0, letterSpacing: '-0.5px' },
-  heroSub:     { fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', margin: 0 },
+  topBarLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12
+  },
+  pageTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 800,
+    color: '#0f172a',
+    margin: 0,
+    letterSpacing: '-0.3px'
+  },
+  leadCountChip: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    border: '1px solid #e4e4e7',
+    padding: '3px 10px',
+    borderRadius: 20
+  },
 
-  policyBox: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '0.75rem 1.25rem',
-    border: '1px solid rgba(255,255,255,0.12)', textAlign: 'center'
-  },
-  policyTitle: { fontSize: '0.6rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', marginBottom: 6 },
-  policyToggleGroup: { display: 'flex', gap: 4, backgroundColor: 'rgba(0,0,0,0.25)', padding: 3, borderRadius: 20 },
-  policyBtn: {
-    border: 'none', padding: '5px 12px', borderRadius: 16, fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer', transition: 'all 0.2s'
+  topBarRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap'
   },
 
-  heroStats:   { display: 'flex', gap: '2rem' },
-  heroStat:    { textAlign: 'center' },
-  heroStatNum: { fontSize: '1.8rem', fontWeight: 900, lineHeight: 1 },
-  heroStatLbl: { fontSize: '0.65rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 4, textTransform: 'uppercase' },
+  // Arrow Controls
+  arrowControls: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    border: '1px solid #e4e4e7',
+    borderRadius: 10,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+    overflow: 'hidden'
+  },
+  arrowBtn: {
+    background: 'none',
+    border: 'none',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    color: '#09090b',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.15s ease'
+  },
+  arrowDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: '#e4e4e7'
+  },
 
-  // Connector status bar
-  connectorBar: {
-    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '1rem', padding: '1.25rem 2.5rem', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0'
-  },
-  connCard: {
-    backgroundColor: '#fff', padding: '0.65rem 1rem', borderRadius: 12, border: '1px solid #e2e8f0',
-    display: 'flex', alignItems: 'center', gap: '0.75rem'
-  },
-  connDot: { width: 9, height: 9, borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 },
-  connName: { fontSize: '0.78rem', fontWeight: 800, color: '#08060d' },
-  connSub:  { fontSize: '0.65rem', color: '#64748b' },
-
-  // Swimlanes
-  swimlanes: {
-    display: 'flex', gap: '0.6rem', padding: '1.25rem 2.5rem',
-    backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0', overflowX: 'auto'
-  },
-  swimlane: {
-    display: 'flex', alignItems: 'center', gap: '0.4rem',
-    padding: '0.45rem 0.9rem', borderRadius: 24, border: '2px solid',
-    cursor: 'pointer', transition: 'all 0.18s', whiteSpace: 'nowrap'
-  },
-  swimlaneLbl:   { fontSize: '0.78rem', fontWeight: 700 },
-  swimlaneCount: { fontSize: '0.68rem', fontWeight: 800, padding: '1px 7px', borderRadius: 20 },
-
-  // Toolbar
-  toolbar: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '1.1rem 2.5rem', gap: '1rem'
-  },
-  searchWrap: {
-    display: 'flex', alignItems: 'center', gap: '0.6rem',
-    backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 24,
-    padding: '0.55rem 1rem', flex: 1, maxWidth: 420
+  // Search
+  searchBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#ffffff',
+    border: '1px solid #e4e4e7',
+    borderRadius: 10,
+    padding: '6px 12px',
+    width: 260,
+    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
   },
   searchInput: {
-    border: 'none', outline: 'none', fontSize: '0.82rem', fontFamily: 'var(--font-body)',
-    color: '#08060d', backgroundColor: 'transparent', flex: 1, fontWeight: 500
+    border: 'none',
+    outline: 'none',
+    fontSize: '0.82rem',
+    color: '#09090b',
+    width: '100%',
+    background: 'transparent'
   },
-  addBtn: {
-    padding: '0.6rem 1.4rem', background: 'linear-gradient(135deg,#aa3bff,#7c3aed)',
-    color: '#fff', border: 'none', borderRadius: 24, fontWeight: 700, fontSize: '0.82rem',
-    cursor: 'pointer', boxShadow: '0 4px 12px rgba(170,59,255,0.35)', whiteSpace: 'nowrap'
+  clearSearchBtn: {
+    background: 'none',
+    border: 'none',
+    color: '#71717a',
+    cursor: 'pointer',
+    fontSize: '0.75rem',
+    padding: 0
   },
 
-  // Card Grid
-  cardGrid: {
-    display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '1.25rem', padding: '0 2.5rem 2.5rem'
+  sourceSelect: {
+    padding: '7px 12px',
+    borderRadius: 10,
+    border: '1px solid #e4e4e7',
+    backgroundColor: '#ffffff',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    color: '#09090b',
+    outline: 'none',
+    cursor: 'pointer'
   },
+
+  // Policy
+  policyToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  },
+  policyLabel: {
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: '#71717a'
+  },
+  policyBadge: {
+    padding: '6px 12px',
+    borderRadius: 20,
+    border: '1px solid',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.15s ease'
+  },
+
+  addLeadBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#09090b',
+    color: '#ffffff',
+    border: 'none',
+    padding: '8px 16px',
+    borderRadius: 10,
+    fontWeight: 700,
+    fontSize: '0.82rem',
+    cursor: 'pointer',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
+    transition: 'all 0.15s ease'
+  },
+
+  // Kanban Board Container
+  kanbanBoard: {
+    display: 'flex',
+    gap: '16px',
+    overflowX: 'auto',
+    paddingBottom: '2rem',
+    alignItems: 'flex-start',
+    scrollBehavior: 'smooth',
+    flex: 1
+  },
+
+  // Kanban Column
+  kanbanColumn: {
+    width: '280px',
+    minWidth: '280px',
+    maxWidth: '280px',
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    border: '1px solid #e4e4e7',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+  },
+
+  columnHeader: {
+    padding: '12px 14px',
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 13,
+    borderTopRightRadius: 13,
+    borderTopWidth: 3,
+    borderTopStyle: 'solid',
+    borderBottom: '1px solid #e4e4e7'
+  },
+  columnTitleRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  columnTitleLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+  columnTitle: {
+    fontSize: '0.88rem',
+    fontWeight: 800,
+    color: '#09090b'
+  },
+  columnCountBadge: {
+    fontSize: '0.75rem',
+    fontWeight: 800,
+    color: '#09090b',
+    backgroundColor: '#f4f4f5',
+    padding: '2px 8px',
+    borderRadius: 12
+  },
+  columnAddBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.1rem',
+    fontWeight: 600,
+    color: '#71717a',
+    cursor: 'pointer',
+    lineHeight: 1,
+    padding: '0 4px',
+    transition: 'color 0.15s ease'
+  },
+
+  columnBody: {
+    padding: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+    maxHeight: 'calc(100vh - 210px)',
+    overflowY: 'auto'
+  },
+
+  // Lead Card
   leadCard: {
-    backgroundColor: '#fff', borderRadius: 18, padding: '1.25rem',
-    borderLeft: '4px solid', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-    display: 'flex', flexDirection: 'column', gap: '0.85rem'
-  },
-  cardTop:  { display: 'flex', alignItems: 'flex-start', gap: '0.75rem' },
-  avatar: {
-    width: 40, height: 40, borderRadius: '50%', color: '#fff',
-    fontWeight: 900, fontSize: '1rem', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', flexShrink: 0
-  },
-  cardInfo:    { flex: 1, minWidth: 0 },
-  leadIdStr:   { fontSize: '0.65rem', fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace' },
-  leadName:    { fontWeight: 800, fontSize: '0.95rem', color: '#08060d', lineHeight: 1.2 },
-  leadProduct: { fontSize: '0.75rem', color: '#64748b', marginTop: 2 },
-  stageBadge: {
-    fontSize: '0.62rem', fontWeight: 700, color: '#fff',
-    padding: '4px 9px', borderRadius: 20, whiteSpace: 'nowrap',
-    display: 'flex', alignItems: 'center', gap: 3
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    border: '1px solid #e4e4e7',
+    padding: '12px 14px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+    cursor: 'pointer',
+    transition: 'all 0.18s ease',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8
   },
 
-  // Progress
-  progWrap:  { display: 'flex', alignItems: 'center', gap: '0.65rem' },
-  progTrack: { flex: 1, height: 5, backgroundColor: '#f1f5f9', borderRadius: 10, overflow: 'hidden' },
-  progFill:  { height: '100%', borderRadius: 10, transition: 'width 0.4s ease' },
-  progPct:   { fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', whiteSpace: 'nowrap' },
+  cardHeadRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start'
+  },
+  cardLeadName: {
+    fontSize: '0.95rem',
+    fontWeight: 800,
+    color: '#09090b',
+    letterSpacing: '-0.2px'
+  },
+  cardActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4
+  },
+  actionIconBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 3,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    opacity: 0.8
+  },
 
-  // Card Bottom
-  cardBottom: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  budgetWrap: {},
-  budget: { fontSize: '1.1rem', fontWeight: 900, color: '#08060d' },
-  source: { fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, marginTop: 1 },
-  advanceBtn: {
-    padding: '6px 14px', color: '#fff', border: 'none', borderRadius: 20,
-    fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer', transition: 'opacity 0.15s',
-    whiteSpace: 'nowrap'
+  phoneRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    color: '#52525b',
+    fontSize: '0.8rem',
+    fontWeight: 600
+  },
+  phoneText: {
+    color: '#09090b',
+    fontWeight: 600
+  },
+
+  tagsRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap'
+  },
+  tagPill: {
+    fontSize: '0.68rem',
+    fontWeight: 700,
+    padding: '2px 8px',
+    borderRadius: 6,
+    border: '1px solid transparent'
+  },
+
+  metaRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: '0.72rem',
+    color: '#71717a',
+    paddingTop: 4,
+    borderTop: '1px solid #f4f4f5'
+  },
+  notesText: {
+    fontWeight: 500,
+    color: '#52525b',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '150px'
+  },
+  dateText: {
+    fontWeight: 500,
+    color: '#71717a'
+  },
+
+  transitionRow: {
+    marginTop: 2
+  },
+  quickNextBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#ffffff',
+    color: '#09090b',
+    border: '1px solid #e4e4e7',
+    padding: '4px 10px',
+    borderRadius: 8,
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    width: '100%',
+    justifyContent: 'center',
+    transition: 'all 0.15s ease'
   },
   completedBadge: {
-    fontSize: '0.72rem', fontWeight: 700, color: '#059669',
-    backgroundColor: '#ecfdf5', padding: '4px 10px', borderRadius: 20
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    color: '#09090b',
+    padding: '4px 0'
+  },
+  tallyGateTag: {
+    fontSize: '0.65rem',
+    fontWeight: 700,
+    color: '#09090b',
+    backgroundColor: '#f4f4f5',
+    border: '1px dashed #d4d4d8',
+    padding: '3px 6px',
+    borderRadius: 6,
+    textAlign: 'center'
   },
 
-  // Gate banner
-  gateBanner: {
-    fontSize: '0.7rem', fontWeight: 600, color: '#92400e',
-    backgroundColor: '#fffbeb', border: '1px solid #fde68a',
-    borderRadius: 8, padding: '6px 10px'
+  emptyColumn: {
+    padding: '2rem 1rem',
+    textAlign: 'center',
+    border: '2px dashed #cbd5e1',
+    borderRadius: 10,
+    color: '#94a3b8'
+  },
+  emptyColumnPlus: {
+    fontSize: '1.4rem',
+    lineHeight: 1,
+    marginBottom: 4
+  },
+  emptyColumnText: {
+    fontSize: '0.75rem',
+    fontWeight: 600
   },
 
-  // Modal
+  // Modals
   modalOverlay: {
-    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backdropFilter: 'blur(3px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '1rem'
   },
-  modalContent: {
-    backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 500,
-    padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+  modalBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    width: '100%',
+    maxWidth: 540,
+    padding: '1.75rem',
+    maxHeight: '90vh',
+    overflowY: 'auto'
   },
-  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
-  modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
-  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginTop: 4 },
-  modalInput: {
-    padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1',
-    fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)'
+  modalHead: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1.25rem',
+    paddingBottom: '0.75rem',
+    borderBottom: '1px solid #f1f5f9'
   },
-  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
-  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 },
-
-  empty: {
-    gridColumn: '1 / -1', textAlign: 'center', padding: '4rem',
-    color: '#94a3b8', fontWeight: 600, fontSize: '0.88rem'
+  modalTitle: {
+    fontSize: '1.15rem',
+    fontWeight: 800,
+    color: '#0f172a',
+    margin: 0
+  },
+  modalCloseBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.1rem',
+    color: '#94a3b8',
+    cursor: 'pointer'
+  },
+  modalForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12
+  },
+  formGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: 12
+  },
+  formGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4
+  },
+  formLabel: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: '#475569'
+  },
+  formInput: {
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.82rem',
+    color: '#0f172a',
+    outline: 'none'
+  },
+  formSelect: {
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.82rem',
+    color: '#0f172a',
+    outline: 'none',
+    backgroundColor: '#ffffff'
+  },
+  modalActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: '1.25rem',
+    paddingTop: '1rem',
+    borderTop: '1px solid #f1f5f9'
+  },
+  modalCancelBtn: {
+    padding: '8px 16px',
+    backgroundColor: '#f1f5f9',
+    color: '#475569',
+    border: 'none',
+    borderRadius: 8,
+    fontWeight: 700,
+    fontSize: '0.8rem',
+    cursor: 'pointer'
+  },
+  modalSubmitBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#2563eb',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: 8,
+    fontWeight: 700,
+    fontSize: '0.8rem',
+    cursor: 'pointer'
   }
 };

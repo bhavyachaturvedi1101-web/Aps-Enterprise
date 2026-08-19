@@ -14,7 +14,6 @@ export default function Settings() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>System Control Settings</h1>
-      <p style={styles.subtitle}>Configure approval workflows and API connections for existing enterprise systems</p>
 
       <form onSubmit={handleSave} style={styles.card}>
         <div style={styles.section}>
@@ -123,7 +122,7 @@ const styles = {
     fontSize: '1.25rem',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
-    color: '#aa3bff',
+    color: '#09090b',
     marginTop: 0,
     marginBottom: '1.25rem'
   },
@@ -134,25 +133,21 @@ const styles = {
     display: 'block',
     fontSize: '0.85rem',
     fontWeight: '700',
-    color: '#334155',
+    color: '#3f3f46',
     marginBottom: '0.5rem'
   },
   input: {
     width: '100%',
     padding: '0.8rem 1rem',
     borderRadius: '12px',
-    border: '1px solid #cbd5e1',
+    border: '1px solid #e4e4e7',
     backgroundColor: '#f8fafc',
-    color: '#0f172a',
+    color: '#09090b',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'var(--font-body)',
     fontSize: '0.9rem',
-    transition: 'all 0.2s',
-    ':focus': {
-      borderColor: '#aa3bff',
-      backgroundColor: '#ffffff'
-    }
+    transition: 'all 0.2s'
   },
   radioGroup: {
     display: 'flex',
@@ -166,15 +161,15 @@ const styles = {
     gap: '0.5rem',
     fontSize: '0.9rem',
     fontWeight: '600',
-    color: '#334155',
+    color: '#3f3f46',
     cursor: 'pointer'
   },
   radioInput: {
-    accentColor: '#aa3bff'
+    accentColor: '#09090b'
   },
   saveButton: {
     padding: '0.8rem 1.75rem',
-    backgroundColor: '#08060d',
+    backgroundColor: '#09090b',
     color: '#ffffff',
     border: 'none',
     borderRadius: '12px',
@@ -183,9 +178,6 @@ const styles = {
     cursor: 'pointer',
     fontFamily: 'var(--font-body)',
     transition: 'all 0.2s',
-    boxShadow: 'var(--shadow-md)',
-    ':hover': {
-      backgroundColor: '#aa3bff'
-    }
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
   }
 };

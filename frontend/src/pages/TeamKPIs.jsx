@@ -218,11 +218,7 @@ export default function TeamKPIs() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>ENTERPRISE PERFORMANCE ANALYTICS</div>
           <h1 style={s.title}>Employee Performance & Time-in-Stage Profiles</h1>
-          <p style={s.subtitle}>
-            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on system activity logs.
-          </p>
         </div>
         <div style={s.headerActions}>
           <button onClick={exportCSV} style={s.exportBtn}>
@@ -249,9 +245,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Team Average KPI Score</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M6 9a6 6 0 0 0 12 0V4H6v5z"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{summary.teamAvgKpiScore}</span>
@@ -263,9 +256,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Total Revenue Closed</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(16,185,129,0.12)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>₹{summary.totalRevenueClosed?.toLocaleString('en-IN')}</span>
@@ -277,23 +267,17 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Voice & Telecall Velocity</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{summary.totalCallsHandled} Calls</span>
               <span style={s.kpiSubTag}>Avg 112s</span>
             </div>
-            <div style={s.kpiSub}>AI Voice Agent + human telecalling queue sync</div>
+            <div style={s.kpiSub}>Voice Agent + human telecalling queue sync</div>
           </div>
 
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Bottleneck Alert SLA</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={{ ...s.kpiMainValue, color: '#f59e0b' }}>{summary.bottleneckAlertCount} Stage Alert</span>
@@ -358,7 +342,7 @@ export default function TeamKPIs() {
               <div key={emp.id} style={{ ...s.empCard, ...(isTop ? s.empCardTop : {}) }}>
                 {isTop && (
                   <div style={s.topRibbon}>
-                    <span>⭐ TOP PERFORMER</span>
+                    #1
                   </div>
                 )}
 
@@ -403,7 +387,7 @@ export default function TeamKPIs() {
           {/* Critical Warning Alert Banner */}
           <div style={s.alertBanner}>
             <div style={s.alertIconBox}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                 <line x1="12" y1="9" x2="12" y2="13"/>
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -529,7 +513,7 @@ export default function TeamKPIs() {
           </td>
           <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
           <td style={s.td}>₹42,000</td>
-          <td style={{ ...s.td, fontWeight: 700, color: '#aa3bff' }}>₹4,200</td>
+          <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
           <td style={s.td}>Aaditya (Analytics)</td>
           <td style={s.td}>
             <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -674,7 +658,7 @@ export default function TeamKPIs() {
             {/* Metric Strip */}
             <div style={s.drillStatGrid}>
               <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#aa3bff' }}>{employeeDetails.metrics.kpiScore}</div>
+                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.kpiScore}</div>
                 <div style={s.drillLbl}>KPI Score</div>
               </div>
               <div style={s.drillStat}>
@@ -682,7 +666,7 @@ export default function TeamKPIs() {
                 <div style={s.drillLbl}>Assigned Pipeline</div>
               </div>
               <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#10b981' }}>{employeeDetails.metrics.salesClosed}</div>
+                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.salesClosed}</div>
                 <div style={s.drillLbl}>Closed Deals</div>
               </div>
               <div style={s.drillStat}>
@@ -690,7 +674,7 @@ export default function TeamKPIs() {
                 <div style={s.drillLbl}>Total Revenue</div>
               </div>
               <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#06b6d4' }}>{employeeDetails.metrics.conversionRate}</div>
+                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.conversionRate}</div>
                 <div style={s.drillLbl}>Conversion Velocity</div>
               </div>
             </div>
@@ -701,16 +685,16 @@ export default function TeamKPIs() {
               
               <div style={{ marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
-                  <span style={{ color: '#64748b' }}>Target Attainment ({selectedEmployee.salesClosed || 0} / {selectedEmployee.targetSales || 10} Deals)</span>
-                  <span style={{ color: '#08060d', fontWeight: 800 }}>{Math.round(((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%</span>
+                  <span style={{ color: '#71717a' }}>Target Attainment ({selectedEmployee.salesClosed || 0} / {selectedEmployee.targetSales || 10} Deals)</span>
+                  <span style={{ color: '#09090b', fontWeight: 800 }}>{Math.round(((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%</span>
                 </div>
-                <div style={{ height: 8, backgroundColor: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+                <div style={{ height: 8, backgroundColor: '#f4f4f5', borderRadius: 10, overflow: 'hidden' }}>
                   <div
                     style={{
                       height: '100%',
                       borderRadius: 10,
                       width: `${Math.min(100, ((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%`,
-                      background: 'linear-gradient(90deg, #aa3bff, #6366f1)',
+                      background: '#09090b',
                       transition: 'width 0.5s ease'
                     }}
                   />
@@ -719,16 +703,16 @@ export default function TeamKPIs() {
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
-                  <span style={{ color: '#64748b' }}>Lead Conversion Velocity</span>
-                  <span style={{ color: '#08060d', fontWeight: 800 }}>{selectedEmployee.conversionRate || '34.5%'}</span>
+                  <span style={{ color: '#71717a' }}>Lead Conversion Velocity</span>
+                  <span style={{ color: '#09090b', fontWeight: 800 }}>{selectedEmployee.conversionRate || '34.5%'}</span>
                 </div>
-                <div style={{ height: 8, backgroundColor: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+                <div style={{ height: 8, backgroundColor: '#f4f4f5', borderRadius: 10, overflow: 'hidden' }}>
                   <div
                     style={{
                       height: '100%',
                       borderRadius: 10,
                       width: selectedEmployee.conversionRate || '34.5%',
-                      background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+                      background: '#27272a',
                       transition: 'width 0.5s ease'
                     }}
                   />
@@ -737,17 +721,17 @@ export default function TeamKPIs() {
 
               {/* Call & Response Speed Mini Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1.25rem' }}>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#3b82f6' }}>{selectedEmployee.callsHandled || 0}</div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Calls Handled ({selectedEmployee.avgCallDurationSec || 90}s avg)</div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.callsHandled || 0}</div>
+                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Calls Handled ({selectedEmployee.avgCallDurationSec || 90}s avg)</div>
                 </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#aa3bff' }}>{selectedEmployee.tasksCompleted || 0}</div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Tasks Completed</div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.tasksCompleted || 0}</div>
+                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Tasks Completed</div>
                 </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981' }}>{selectedEmployee.avgResponseTimeMin || 3.2}m</div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Avg Response SLA</div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.avgResponseTimeMin || 3.2}m</div>
+                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Avg Response SLA</div>
                 </div>
               </div>
             </div>
@@ -756,23 +740,23 @@ export default function TeamKPIs() {
             {selectedEmployee.weeklyKpiHistory && (
               <div style={s.modalSection}>
                 <h4 style={s.modalSectionTitle}>4-Week Performance Trajectory</h4>
-                <div style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: '1rem 1.25rem', border: '1px solid #e2e8f0' }}>
+                <div style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: '1rem 1.25rem', border: '1px solid #e4e4e7' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: 90, gap: '1.5rem' }}>
                     {selectedEmployee.weeklyKpiHistory.map((val, idx) => (
                       <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
-                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#aa3bff', marginBottom: 4 }}>{val}%</span>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#09090b', marginBottom: 4 }}>{val}%</span>
                         <div
                           style={{
                             width: '100%',
                             maxWidth: 36,
                             height: `${val * 0.7}px`,
-                            background: 'linear-gradient(180deg, #aa3bff 0%, #6366f1 100%)',
+                            background: '#09090b',
                             borderRadius: '6px 6px 0 0',
                             transition: 'height 0.4s ease'
                           }}
                           title={`Week ${idx + 1}: ${val}%`}
                         />
-                        <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 700, marginTop: 6 }}>Week {idx + 1}</span>
+                        <span style={{ fontSize: '0.68rem', color: '#71717a', fontWeight: 700, marginTop: 6 }}>Week {idx + 1}</span>
                       </div>
                     ))}
                   </div>
@@ -949,56 +933,57 @@ const s = {
       alignItems: 'center',
       gap: '1rem'
   },
-      spinner: {
-        width: 38,
-      height: 38,
-      border: '3px solid #e2e8f0',
-      borderTopColor: '#aa3bff',
-      borderRadius: '50%',
-      animation: 'spin 0.8s linear infinite'
+  spinner: {
+    width: 38,
+    height: 38,
+    border: '3px solid #e4e4e7',
+    borderTopColor: '#09090b',
+    borderRadius: '50%',
+    animation: 'spin 0.8s linear infinite'
   },
-      loadingText: {
-        color: '#64748b',
-      fontSize: '0.9rem',
-      fontWeight: 600
+  loadingText: {
+    color: '#71717a',
+    fontSize: '0.9rem',
+    fontWeight: 600
   },
-      toast: {
-        position: 'fixed',
-      bottom: 24,
-      right: 24,
-      backgroundColor: '#08060d',
-      color: '#fff',
-      padding: '12px 20px',
-      borderRadius: 12,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10,
-      boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-      zIndex: 1000,
-      fontSize: '0.85rem',
-      fontWeight: 600
+  toast: {
+    position: 'fixed',
+    bottom: 24,
+    right: 24,
+    backgroundColor: '#09090b',
+    color: '#fff',
+    padding: '12px 20px',
+    borderRadius: 12,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+    zIndex: 1000,
+    fontSize: '0.85rem',
+    fontWeight: 600
   },
-      pageHeader: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: '1.75rem',
-      flexWrap: 'wrap',
-      gap: '1rem'
+  pageHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '1.75rem',
+    flexWrap: 'wrap',
+    gap: '1rem'
   },
-      badgeModule: {
-        display: 'inline-block',
-      padding: '3px 9px',
-      backgroundColor: 'rgba(170,59,255,0.1)',
-      color: '#aa3bff',
-      borderRadius: 6,
-      fontSize: '0.68rem',
-      fontWeight: 800,
-      letterSpacing: '0.5px',
-      marginBottom: '0.4rem'
+  badgeModule: {
+    display: 'inline-block',
+    padding: '3px 9px',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    borderRadius: 6,
+    fontSize: '0.68rem',
+    fontWeight: 800,
+    letterSpacing: '0.5px',
+    marginBottom: '0.4rem',
+    border: '1px solid #e4e4e7'
   },
-      title: {
-        fontSize: '1.85rem',
+  title: {
+    fontSize: '1.85rem',
       fontWeight: 800,
       fontFamily: 'var(--font-heading)',
       color: '#08060d',
@@ -1098,23 +1083,23 @@ const s = {
       fontWeight: 700,
       padding: '2px 8px',
       borderRadius: 20,
-      backgroundColor: 'rgba(16,185,129,0.12)',
-      color: '#10b981'
+      backgroundColor: '#f4f4f5',
+      color: '#09090b'
   },
       kpiSubTag: {
         fontSize: '0.72rem',
       fontWeight: 600,
-      color: '#64748b'
+      color: '#71717a'
   },
       kpiSub: {
         fontSize: '0.7rem',
-      color: '#94a3b8'
+      color: '#71717a'
   },
       tabsContainer: {
         display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderBottom: '1px solid #e2e8f0',
+      borderBottom: '1px solid #e4e4e7',
       marginBottom: '1.75rem',
       gap: '1rem',
       flexWrap: 'wrap'
@@ -1129,8 +1114,8 @@ const s = {
       background: 'none',
       fontSize: '0.85rem',
       fontWeight: 800,
-      color: '#08060d',
-      borderBottom: '2.5px solid #aa3bff',
+      color: '#09090b',
+      borderBottom: '2.5px solid #09090b',
       cursor: 'pointer'
   },
       tabInactive: {
@@ -1139,7 +1124,7 @@ const s = {
       background: 'none',
       fontSize: '0.85rem',
       fontWeight: 600,
-      color: '#64748b',
+      color: '#71717a',
       borderBottom: '2.5px solid transparent',
       cursor: 'pointer'
   },
@@ -1151,19 +1136,20 @@ const s = {
       searchInput: {
         padding: '7px 14px',
       borderRadius: 8,
-      border: '1px solid #cbd5e1',
+      border: '1px solid #e4e4e7',
       fontSize: '0.78rem',
       width: 200,
       outline: 'none',
-      backgroundColor: '#fff'
+      backgroundColor: '#fff',
+      color: '#09090b'
   },
       selectFilter: {
         padding: '7px 12px',
       borderRadius: 8,
-      border: '1px solid #cbd5e1',
+      border: '1px solid #e4e4e7',
       fontSize: '0.78rem',
       backgroundColor: '#fff',
-      color: '#0f172a',
+      color: '#09090b',
       outline: 'none',
       cursor: 'pointer'
   },
@@ -1176,28 +1162,29 @@ const s = {
         backgroundColor: '#fff',
       borderRadius: 18,
       padding: '1.25rem 1.4rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+      border: '1px solid #e4e4e7',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column'
   },
       empCardTop: {
-        border: '1.5px solid #aa3bff',
-      boxShadow: '0 8px 25px rgba(170,59,255,0.08)'
+        border: '1.5px solid #09090b',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
   },
       topRibbon: {
         position: 'absolute',
-      top: -10,
-      right: 20,
-      backgroundColor: '#aa3bff',
-      color: '#fff',
-      fontSize: '0.62rem',
-      fontWeight: 800,
-      padding: '3px 10px',
-      borderRadius: 20,
-      boxShadow: '0 3px 8px rgba(170,59,255,0.4)'
-  },
+        top: -10,
+        left: 20,
+        backgroundColor: '#09090b',
+        color: '#fff',
+        fontSize: '0.72rem',
+        fontWeight: 800,
+        padding: '2px 10px',
+        borderRadius: 14,
+        boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+        letterSpacing: '0.5px'
+      },
       empCardHeader: {
     display: 'flex',
     alignItems: 'center',
@@ -1212,7 +1199,7 @@ const s = {
         width: 48,
       height: 48,
       borderRadius: 14,
-      background: 'linear-gradient(135deg, #aa3bff, #6366f1)',
+      backgroundColor: '#09090b',
       color: '#fff',
       fontWeight: 800,
       fontSize: '1.2rem',
@@ -1228,7 +1215,7 @@ const s = {
       width: 11,
       height: 11,
       borderRadius: '50%',
-      backgroundColor: '#10b981',
+      backgroundColor: '#09090b',
       border: '2px solid #fff'
   },
       empInfo: {
@@ -1244,44 +1231,44 @@ const s = {
         fontSize: '1.05rem',
       fontWeight: 800,
       fontFamily: 'var(--font-heading)',
-      color: '#08060d'
+      color: '#09090b'
   },
       empDept: {
         fontSize: '0.62rem',
       fontWeight: 700,
       padding: '1px 6px',
       borderRadius: 10,
-      backgroundColor: '#f1f5f9',
-      color: '#475569'
+      backgroundColor: '#f4f4f5',
+      color: '#09090b'
   },
       empRole: {
         fontSize: '0.74rem',
-      color: '#64748b',
+      color: '#52525b',
       fontWeight: 600,
       marginTop: 2
   },
       empContact: {
         fontSize: '0.66rem',
-      color: '#94a3b8',
+      color: '#71717a',
       marginTop: 2
   },
       kpiBadge: {
         textAlign: 'center',
-      backgroundColor: 'rgba(170,59,255,0.07)',
-      border: '1px solid rgba(170,59,255,0.2)',
+      backgroundColor: '#f4f4f5',
+      border: '1px solid #e4e4e7',
       padding: '6px 12px',
       borderRadius: 12
   },
       kpiBadgeVal: {
         fontSize: '1.3rem',
       fontWeight: 800,
-      color: '#aa3bff',
+      color: '#09090b',
       fontFamily: 'var(--font-heading)'
   },
       kpiBadgeLbl: {
         fontSize: '0.55rem',
       fontWeight: 800,
-      color: '#64748b',
+      color: '#71717a',
       letterSpacing: '0.5px'
   },
       deleteEmpBtn: {
@@ -1289,10 +1276,10 @@ const s = {
       alignItems: 'center',
       gap: 4,
       padding: '3px 8px',
-      backgroundColor: 'rgba(239, 68, 68, 0.08)',
-      border: '1px solid rgba(239, 68, 68, 0.25)',
+      backgroundColor: '#f4f4f5',
+      border: '1px solid #e4e4e7',
       borderRadius: 6,
-      color: '#ef4444',
+      color: '#71717a',
       fontSize: '0.66rem',
       fontWeight: 700,
       cursor: 'pointer',
@@ -1310,15 +1297,16 @@ const s = {
       borderRadius: 10,
       padding: '0.6rem 0.4rem',
       textAlign: 'center',
-      border: '1px solid #f1f5f9'
+      border: '1px solid #e4e4e7'
   },
       statBoxVal: {
         fontSize: '0.95rem',
-      fontWeight: 800
+      fontWeight: 800,
+      color: '#09090b'
   },
       statBoxLbl: {
         fontSize: '0.6rem',
-      color: '#64748b',
+      color: '#71717a',
       fontWeight: 600,
       marginTop: 2
   },
@@ -1333,21 +1321,22 @@ const s = {
       marginBottom: 4
   },
       progLabel: {
-        color: '#64748b'
+        color: '#71717a'
   },
       progVal: {
-        color: '#08060d',
+        color: '#09090b',
       fontWeight: 800
   },
       progressBarBg: {
         height: 6,
-      backgroundColor: '#f1f5f9',
+      backgroundColor: '#f4f4f5',
       borderRadius: 10,
       overflow: 'hidden'
   },
       progressBarFill: {
         height: '100%',
       borderRadius: 10,
+      backgroundColor: '#09090b',
       transition: 'width 0.5s ease'
   },
       trendBox: {
@@ -1356,12 +1345,12 @@ const s = {
       padding: '0.75rem 1rem',
       marginTop: '0.5rem',
       marginBottom: '1rem',
-      border: '1px solid #e2e8f0'
+      border: '1px solid #e4e4e7'
   },
       trendLabel: {
         fontSize: '0.65rem',
       fontWeight: 700,
-      color: '#64748b',
+      color: '#71717a',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',
       marginBottom: '0.5rem'
@@ -1382,26 +1371,26 @@ const s = {
         width: '100%',
       maxWidth: 24,
       borderRadius: '4px 4px 0 0',
-      backgroundColor: '#6366f1',
+      backgroundColor: '#09090b',
       transition: 'height 0.4s ease'
   },
       sparkBarLabel: {
         fontSize: '0.6rem',
-      color: '#94a3b8',
+      color: '#71717a',
       fontWeight: 600,
       marginTop: 3
   },
       empCardFooter: {
         marginTop: 'auto',
       paddingTop: '0.6rem',
-      borderTop: '1px solid #f1f5f9'
+      borderTop: '1px solid #f4f4f5'
   },
       viewDetailsBtn: {
     width: '100%',
     padding: '9px 0',
-    backgroundColor: '#faf7ff',
-    color: '#aa3bff',
-    border: '1px solid rgba(170,59,255,0.25)',
+    backgroundColor: '#ffffff',
+    color: '#09090b',
+    border: '1px solid #e4e4e7',
     borderRadius: 10,
     fontSize: '0.78rem',
     fontWeight: 700,
@@ -1416,22 +1405,22 @@ const s = {
   },
       alertBanner: {
         backgroundColor: '#ffffff',
-      border: '1px solid rgba(170, 59, 255, 0.25)',
-      borderLeft: '4px solid #aa3bff',
+      border: '1px solid #e4e4e7',
+      borderLeft: '4px solid #09090b',
       borderRadius: 16,
       padding: '1.25rem 1.5rem',
       display: 'flex',
       alignItems: 'center',
       gap: '1.25rem',
       flexWrap: 'wrap',
-      boxShadow: '0 4px 16px rgba(170, 59, 255, 0.06)',
-      background: 'linear-gradient(135deg, #ffffff 0%, #faf7ff 100%)'
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+      background: '#ffffff'
   },
       alertIconBox: {
         width: 44,
       height: 44,
       borderRadius: 12,
-      backgroundColor: 'rgba(170, 59, 255, 0.1)',
+      backgroundColor: '#f4f4f5',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -1451,8 +1440,8 @@ const s = {
       alertBadgeTag: {
         fontSize: '0.68rem',
       fontWeight: 800,
-      backgroundColor: 'rgba(239, 68, 68, 0.12)',
-      color: '#dc2626',
+      backgroundColor: '#f4f4f5',
+      color: '#09090b',
       padding: '2px 8px',
       borderRadius: 6,
       letterSpacing: '0.5px'
@@ -1460,32 +1449,32 @@ const s = {
       alertTitle: {
         fontSize: '0.95rem',
       fontWeight: 800,
-      color: '#0f172a',
+      color: '#09090b',
       fontFamily: 'var(--font-heading)'
   },
       alertDesc: {
         fontSize: '0.8rem',
-      color: '#64748b',
+      color: '#52525b',
       marginTop: 2,
       lineHeight: 1.45
   },
       dwellHighlight: {
-        color: '#dc2626',
+        color: '#09090b',
       fontWeight: 700,
-      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+      backgroundColor: '#f4f4f5',
       padding: '1px 6px',
       borderRadius: 4
   },
       alertActionBtn: {
     padding: '10px 18px',
-    background: 'linear-gradient(135deg, #aa3bff 0%, #7c3aed 100%)',
+    backgroundColor: '#09090b',
     color: '#fff',
     border: 'none',
     borderRadius: 10,
     fontSize: '0.82rem',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 14px rgba(170, 59, 255, 0.3)',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
@@ -1496,8 +1485,8 @@ const s = {
         backgroundColor: '#fff',
       borderRadius: 18,
       padding: '1.75rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+      border: '1px solid #e4e4e7',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
       sectionHeader: {
         display: 'flex',
@@ -1511,20 +1500,20 @@ const s = {
         fontSize: '1.15rem',
       fontWeight: 800,
       fontFamily: 'var(--font-heading)',
-      color: '#08060d',
+      color: '#09090b',
       margin: 0
   },
       sectionSub: {
         fontSize: '0.76rem',
-      color: '#64748b',
+      color: '#71717a',
       marginTop: 3
   },
       slaTargetChip: {
         fontSize: '0.72rem',
       fontWeight: 700,
       padding: '4px 12px',
-      backgroundColor: '#f1f5f9',
-      color: '#475569',
+      backgroundColor: '#f4f4f5',
+      color: '#09090b',
       borderRadius: 20
   },
       stagesTimeline: {
@@ -1536,7 +1525,7 @@ const s = {
         backgroundColor: '#f8fafc',
       borderRadius: 14,
       padding: '1.2rem',
-      border: '1px solid #e2e8f0'
+      border: '1px solid #e4e4e7'
   },
       stageItemHeader: {
         display: 'flex',
@@ -1548,7 +1537,7 @@ const s = {
         width: 22,
       height: 22,
       borderRadius: '50%',
-      backgroundColor: '#08060d',
+      backgroundColor: '#09090b',
       color: '#fff',
       fontSize: '0.7rem',
       fontWeight: 800,
@@ -1559,7 +1548,7 @@ const s = {
       stageName: {
         fontSize: '0.88rem',
       fontWeight: 800,
-      color: '#08060d',
+      color: '#09090b',
       flex: 1
   },
       stageStatusTag: {
@@ -1581,50 +1570,51 @@ const s = {
       stageMetricVal: {
         fontSize: '0.9rem',
       fontWeight: 800,
-      color: '#08060d'
+      color: '#09090b'
   },
       stageMetricLbl: {
         fontSize: '0.6rem',
-      color: '#94a3b8',
+      color: '#71717a',
       fontWeight: 600
   },
       stageBarContainer: {
         height: 6,
-      backgroundColor: '#e2e8f0',
+      backgroundColor: '#e4e4e7',
       borderRadius: 10,
       overflow: 'hidden'
   },
       stageBarFill: {
         height: '100%',
-      borderRadius: 10
+      borderRadius: 10,
+      backgroundColor: '#09090b'
   },
       stalledDealsCard: {
         backgroundColor: '#fff',
       borderRadius: 18,
       padding: '1.75rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+      border: '1px solid #e4e4e7',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
       comparisonCard: {
         backgroundColor: '#fff',
       borderRadius: 18,
       padding: '1.75rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+      border: '1px solid #e4e4e7',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
       auditCard: {
         backgroundColor: '#fff',
       borderRadius: 18,
       padding: '1.75rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+      border: '1px solid #e4e4e7',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
       liveChip: {
         fontSize: '0.68rem',
       fontWeight: 800,
       padding: '3px 10px',
-      backgroundColor: 'rgba(16,185,129,0.12)',
-      color: '#10b981',
+      backgroundColor: '#f4f4f5',
+      color: '#09090b',
       borderRadius: 20
   },
       table: {
@@ -1636,8 +1626,8 @@ const s = {
       th: {
         textAlign: 'left',
       padding: '10px 14px',
-      borderBottom: '1px solid #e2e8f0',
-      color: '#64748b',
+      borderBottom: '1px solid #e4e4e7',
+      color: '#71717a',
       fontWeight: 700,
       fontSize: '0.72rem',
       textTransform: 'uppercase',
@@ -1645,19 +1635,20 @@ const s = {
   },
       td: {
         padding: '12px 14px',
-      borderBottom: '1px solid #f1f5f9',
-      color: '#08060d'
+      borderBottom: '1px solid #f4f4f5',
+      color: '#09090b'
   },
       trHover: {
         transition: 'background 0.15s'
   },
       dealName: {
         fontWeight: 700,
-      fontSize: '0.85rem'
+      fontSize: '0.85rem',
+      color: '#09090b'
   },
       dealSub: {
         fontSize: '0.7rem',
-      color: '#64748b',
+      color: '#71717a',
       marginTop: 1
   },
       badge: {
@@ -1669,14 +1660,14 @@ const s = {
   },
       sendReminderBtn: {
         padding: '6px 12px',
-      backgroundColor: '#25D366',
+      backgroundColor: '#09090b',
       color: '#fff',
       border: 'none',
       borderRadius: 8,
       fontSize: '0.72rem',
       fontWeight: 700,
       cursor: 'pointer',
-      boxShadow: '0 2px 6px rgba(37,211,102,0.3)'
+      boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
   },
       tableUserRow: {
         display: 'flex',
@@ -1687,7 +1678,7 @@ const s = {
         width: 32,
       height: 32,
       borderRadius: '50%',
-      backgroundColor: '#aa3bff',
+      backgroundColor: '#09090b',
       color: '#fff',
       fontWeight: 800,
       fontSize: '0.85rem',
@@ -1697,25 +1688,27 @@ const s = {
   },
       tableUserName: {
         fontWeight: 800,
-      fontSize: '0.85rem'
+      fontSize: '0.85rem',
+      color: '#09090b'
   },
       tableUserEmail: {
         fontSize: '0.68rem',
-      color: '#64748b'
+      color: '#71717a'
   },
       roleText: {
         fontWeight: 600,
-      fontSize: '0.8rem'
+      fontSize: '0.8rem',
+      color: '#52525b'
   },
       deptText: {
         fontSize: '0.68rem',
-      color: '#94a3b8'
+      color: '#71717a'
   },
       kpiScoreChip: {
         display: 'inline-block',
       padding: '2px 8px',
-      backgroundColor: 'rgba(170,59,255,0.1)',
-      color: '#aa3bff',
+      backgroundColor: '#f4f4f5',
+      color: '#09090b',
       fontWeight: 800,
       borderRadius: 12,
       fontSize: '0.78rem'
@@ -1732,13 +1725,13 @@ const s = {
       padding: '0.85rem 1rem',
       backgroundColor: '#f8fafc',
       borderRadius: 12,
-      border: '1px solid #f1f5f9'
+      border: '1px solid #e4e4e7'
   },
       auditDot: {
         width: 10,
       height: 10,
       borderRadius: '50%',
-      backgroundColor: '#aa3bff',
+      backgroundColor: '#09090b',
       marginTop: 5,
       flexShrink: 0
   },
@@ -1829,7 +1822,7 @@ const s = {
         width: 46,
       height: 46,
       borderRadius: 14,
-      background: 'linear-gradient(135deg, #aa3bff, #6366f1)',
+      backgroundColor: '#09090b',
       color: '#fff',
       fontWeight: 800,
       fontSize: '1.2rem',
