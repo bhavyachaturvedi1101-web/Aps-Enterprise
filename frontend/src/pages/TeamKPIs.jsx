@@ -249,9 +249,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Team Average KPI Score</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M6 9a6 6 0 0 0 12 0V4H6v5z"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{summary.teamAvgKpiScore}</span>
@@ -263,9 +260,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Total Revenue Closed</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(16,185,129,0.12)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>₹{summary.totalRevenueClosed?.toLocaleString('en-IN')}</span>
@@ -277,9 +271,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Voice & Telecall Velocity</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{summary.totalCallsHandled} Calls</span>
@@ -291,9 +282,6 @@ export default function TeamKPIs() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Bottleneck Alert SLA</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={{ ...s.kpiMainValue, color: '#f59e0b' }}>{summary.bottleneckAlertCount} Stage Alert</span>
@@ -303,6 +291,7 @@ export default function TeamKPIs() {
           </div>
         </div>
       )}
+
 
       {/* Navigation Tabs */}
       <div style={s.tabsContainer}>
