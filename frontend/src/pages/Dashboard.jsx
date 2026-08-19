@@ -198,12 +198,13 @@ export default function Dashboard() {
       const inProd = leads.filter(l => l.stage === 'In Production').length;
       reply = `ERP Layer Status: ${booked} bookings created, ${inProd} released to manufacturing floor.`;
     } else if (input.includes('dialer') || input.includes('call') || input.includes('voice')) {
-      reply = "A1 Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
+      reply = "AI Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
     } else if (input.includes('employee') || input.includes('team') || input.includes('kpi')) {
-      reply = "Team KPIs: 3 active operators. Bhavya (A2 Admin) leading at 96% KPI score.";
+      reply = "Team KPIs: 5 active operators. Bhavya leading at 98% KPI score.";
     } else {
-      reply = `I have analyzed your query "${currentInput}". The A2 Operating System is fully synchronized with ${leads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
+      reply = `I have analyzed your query "${currentInput}". The APS Operating System is fully synchronized with ${leads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
     }
+
 
     setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
   };
@@ -297,11 +298,12 @@ export default function Dashboard() {
     alerts.push({
       id: 2,
       type: 'info',
-      title: 'A1 Voice Queue',
+      title: 'AI Voice Queue',
       message: '7 new enquiry callbacks queued for today',
       action: 'View Queue',
       route: '/dialer'
     });
+
 
     if (inProduction.length > 0) {
       alerts.push({
@@ -460,7 +462,7 @@ export default function Dashboard() {
               <div style={s.cardTop}>
                 <div>
                   <div style={s.cardTitle}>Call Channel Stats</div>
-                  <div style={s.cardSub}>CTR comparison for telecallers vs A1 AI agent</div>
+                  <div style={s.cardSub}>CTR comparison for telecallers vs Voice AI agent</div>
                 </div>
                 <span style={s.cardArrow}>↗</span>
               </div>
@@ -477,15 +479,16 @@ export default function Dashboard() {
                   <div style={s.ctrDivider}/>
                   <div>
                     <div style={s.ctrBig}>0.08%</div>
-                    <div style={s.ctrLbl}>CTR — A1 AI Agent</div>
+                    <div style={s.ctrLbl}>CTR — Voice AI Agent</div>
                   </div>
                 </div>
                 <div style={s.progBar}>
                   <div style={s.progA}/>
                   <div style={s.progB}/>
                 </div>
-                <div style={s.ctrNote}>A1 AI Agent converts 2× better than human telecallers</div>
+                <div style={s.ctrNote}>Voice AI Agent converts 2× better than human telecallers</div>
               </div>
+
             </div>
 
             {/* Card 3 — APS AI Assistant Dedicated Page Launcher */}
@@ -730,7 +733,7 @@ export default function Dashboard() {
         <div style={s.modalOverlay}>
           <div style={s.modalContent}>
             <div style={s.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Add New Lead to A2 Operating System</h3>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Add New Lead to System Pipeline</h3>
               <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
             </div>
             <form onSubmit={handleAddLeadSubmit} style={s.modalForm}>
@@ -769,7 +772,7 @@ export default function Dashboard() {
                 onChange={e => setNewLead({ ...newLead, source: e.target.value })}
               >
                 <option value="Meta Ads">Meta Ads</option>
-                <option value="A1 Voice Agent">A1 Voice Agent</option>
+                <option value="AI Voice Agent">AI Voice Agent</option>
                 <option value="Inbound Telecaller">Inbound Telecaller</option>
                 <option value="Direct Web">Direct Web</option>
               </select>
@@ -815,10 +818,11 @@ export default function Dashboard() {
                 <select style={s.modalInput} value={selCampaign} onChange={e => setSelCampaign(e.target.value)}>
                   <option value="All Campaigns">All Campaigns</option>
                   <option value="Meta Ads">Meta Ads</option>
-                  <option value="A1 Voice Telecaller">A1 Voice Telecaller</option>
+                  <option value="Voice Telecaller">Voice Telecaller</option>
                   <option value="Direct Web">Direct Web</option>
                 </select>
               </div>
+
               <div>
                 <label style={s.label}>Geography / Region</label>
                 <select style={s.modalInput} value={selGeo} onChange={e => setSelGeo(e.target.value)}>

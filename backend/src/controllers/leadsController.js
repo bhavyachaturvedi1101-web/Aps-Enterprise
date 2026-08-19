@@ -25,11 +25,11 @@ const createLead = async (req, res) => {
     interest: interest || 'CNC Machine Unit',
     budget: budget || '20000',
     stage: 'Enquiry',
-    notes: notes || 'Direct manual entry from A2 Cockpit.',
+    notes: notes || 'Direct manual entry from Admin Cockpit.',
     crmSynced: true,
     erpBookingCreated: false,
     tallyPaymentVerified: false,
-    source: source || 'A2 Admin Cockpit',
+    source: source || 'Admin Cockpit',
     assignedEmployeeId: 'e1',
     createdAt: new Date()
   };
@@ -40,7 +40,8 @@ const createLead = async (req, res) => {
     id: `log${Date.now()}`,
     leadId: lead.id,
     employeeId: req.user?.id || 'e2',
-    action: `New Lead "${lead.name}" created in A2 Admin Cockpit (Stage: Enquiry)`,
+    action: `New Lead "${lead.name}" created in Admin Cockpit (Stage: Enquiry)`,
+
     fromStage: 'None',
     toStage: 'Enquiry',
     createdAt: new Date()

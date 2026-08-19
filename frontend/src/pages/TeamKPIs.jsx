@@ -1,4 +1,4 @@
-// Team KPIs & Performance Dashboard (A4 Module)
+// Team KPIs & Performance Dashboard
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ export default function TeamKPIs() {
     name: '',
     email: '',
     phone: '',
-    role: 'A1 Voice Operations Spec',
+    role: 'Voice Operations Specialist',
     department: 'Voice Operations'
   });
 
@@ -94,7 +94,7 @@ export default function TeamKPIs() {
       if (data.success) {
         showToast(`Team member "${data.employee.name}" successfully added!`);
         setShowAddModal(false);
-        setFormData({ name: '', email: '', phone: '', role: 'A1 Voice Operations Spec', department: 'Voice Operations' });
+        setFormData({ name: '', email: '', phone: '', role: 'Voice Operations Specialist', department: 'Voice Operations' });
         loadData();
       }
     } catch (err) {
@@ -137,7 +137,8 @@ export default function TeamKPIs() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`A5 WhatsApp Payment Reminder sent to ${leadName}!`);
+        showToast(`WhatsApp Payment Reminder sent to ${leadName}!`);
+
         loadData();
       }
     } catch (err) {
@@ -162,7 +163,7 @@ export default function TeamKPIs() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `APS_Enterprise_A4_${activeTab}_Report.csv`);
+    link.setAttribute('download', `APS_Enterprise_${activeTab}_Report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -197,7 +198,7 @@ export default function TeamKPIs() {
     return (
       <div style={s.centerContainer}>
         <div style={s.spinner} />
-        <div style={s.loadingText}>Loading A4 Employee Performance Profiles & Time-in-Stage Analytics…</div>
+        <div style={s.loadingText}>Loading Employee Performance Profiles & Time-in-Stage Analytics…</div>
       </div>
     );
   }
@@ -217,10 +218,10 @@ export default function TeamKPIs() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>MODULE A4 • ENTERPRISE ANALYTICS</div>
+          <div style={s.badgeModule}>ENTERPRISE PERFORMANCE ANALYTICS</div>
           <h1 style={s.title}>Employee Performance & Time-in-Stage Profiles</h1>
           <p style={s.subtitle}>
-            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on A2 activity logs.
+            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on system activity logs.
           </p>
         </div>
         <div style={s.headerActions}>
@@ -249,7 +250,7 @@ export default function TeamKPIs() {
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Team Average KPI Score</span>
               <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M6 9a6 6 0 0 0 12 0V4H6v5z"/></svg>
               </span>
             </div>
             <div style={s.kpiValueRow}>
@@ -284,7 +285,7 @@ export default function TeamKPIs() {
               <span style={s.kpiMainValue}>{summary.totalCallsHandled} Calls</span>
               <span style={s.kpiSubTag}>Avg 112s</span>
             </div>
-            <div style={s.kpiSub}>A1 Voice Agent + human telecalling queue sync</div>
+            <div style={s.kpiSub}>AI Voice Agent + human telecalling queue sync</div>
           </div>
 
           <div style={s.kpiCard}>
@@ -298,7 +299,7 @@ export default function TeamKPIs() {
               <span style={{ ...s.kpiMainValue, color: '#f59e0b' }}>{summary.bottleneckAlertCount} Stage Alert</span>
               <span style={s.kpiSubTag}>48.5h Dwell</span>
             </div>
-            <div style={s.kpiSub}>Confirmed Lead dwell requires A5 payment reminder</div>
+            <div style={s.kpiSub}>Confirmed Lead dwell requires WhatsApp payment reminder</div>
           </div>
         </div>
       )}
@@ -310,7 +311,7 @@ export default function TeamKPIs() {
             { key: 'leaderboard', label: 'Employee Profiles & Leaderboard', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
             { key: 'timeInStage', label: 'Time-in-Stage & Bottleneck Funnel', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
             { key: 'comparison', label: 'Side-by-Side KPI Comparison', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-            { key: 'audit', label: 'Live A2 Audit Action Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> }
+            { key: 'audit', label: 'Live Activity Audit Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> }
           ].map(tab => (
             <button
               key={tab.key}
@@ -339,8 +340,8 @@ export default function TeamKPIs() {
             >
               <option value="ALL">All Roles</option>
               <option value="Voice">Voice / Telecaller</option>
-              <option value="Architect">A2 Architect</option>
-              <option value="Analytics">A4/A5 Specialist</option>
+              <option value="Architect">System Architect</option>
+              <option value="Analytics">Analytics & Automation Specialist</option>
               <option value="ERP">ERP / Dispatch</option>
             </select>
           </div>
@@ -361,7 +362,6 @@ export default function TeamKPIs() {
                   </div>
                 )}
 
-
                 <div style={s.empCardHeader}>
                   <div style={s.avatarWrap}>
                     <div style={s.avatar}>{emp.name.charAt(0)}</div>
@@ -381,76 +381,6 @@ export default function TeamKPIs() {
                   </div>
                 </div>
 
-
-
-                {/* Performance Stat Blocks */}
-                <div style={s.statBoxesRow}>
-                  <div style={s.statBox}>
-                    <div style={{ ...s.statBoxVal, color: '#aa3bff' }}>{emp.tasksCompleted}</div>
-                    <div style={s.statBoxLbl}>Tasks Done</div>
-                  </div>
-                  <div style={s.statBox}>
-                    <div style={{ ...s.statBoxVal, color: '#3b82f6' }}>{emp.callsHandled}</div>
-                    <div style={s.statBoxLbl}>Calls (Avg {emp.avgCallDurationSec}s)</div>
-                  </div>
-                  <div style={s.statBox}>
-                    <div style={{ ...s.statBoxVal, color: '#10b981' }}>{emp.salesClosed}</div>
-                    <div style={s.statBoxLbl}>Deals Closed</div>
-                  </div>
-                  <div style={s.statBox}>
-                    <div style={{ ...s.statBoxVal, color: '#0f172a' }}>₹{(emp.totalRevenue || 0).toLocaleString('en-IN')}</div>
-                    <div style={s.statBoxLbl}>Revenue</div>
-                  </div>
-                </div>
-
-                {/* Progress Indicators */}
-                <div style={s.progressSection}>
-                  <div style={s.progressRow}>
-                    <span style={s.progLabel}>Target Attainment ({emp.salesClosed} / {emp.targetSales || 10} Deals)</span>
-                    <span style={s.progVal}>{Math.round(((emp.salesClosed || 0) / (emp.targetSales || 10)) * 100)}%</span>
-                  </div>
-                  <div style={s.progressBarBg}>
-                    <div
-                      style={{
-                        ...s.progressBarFill,
-                        width: `${Math.min(100, ((emp.salesClosed || 0) / (emp.targetSales || 10)) * 100)}%`,
-                        background: 'linear-gradient(90deg, #aa3bff, #6366f1)'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div style={s.progressSection}>
-                  <div style={s.progressRow}>
-                    <span style={s.progLabel}>Lead Conversion Velocity</span>
-                    <span style={s.progVal}>{emp.conversionRate || '34.5%'}</span>
-                  </div>
-                  <div style={s.progressBarBg}>
-                    <div
-                      style={{
-                        ...s.progressBarFill,
-                        width: emp.conversionRate || '34.5%',
-                        background: 'linear-gradient(90deg, #10b981, #06b6d4)'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Weekly Trend Mini Graph Bars */}
-                {emp.weeklyKpiHistory && (
-                  <div style={s.trendBox}>
-                    <div style={s.trendLabel}>4-Week Performance Trajectory</div>
-                    <div style={s.sparkBars}>
-                      {emp.weeklyKpiHistory.map((val, idx) => (
-                        <div key={idx} style={s.sparkBarCol}>
-                          <div style={{ ...s.sparkBar, height: `${val * 0.4}px` }} title={`W${idx + 1}: ${val}%`} />
-                          <span style={s.sparkBarLabel}>W{idx + 1}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Footer Action */}
                 <div style={s.empCardFooter}>
                   <button
@@ -466,38 +396,50 @@ export default function TeamKPIs() {
         </div>
       )}
 
-      {/* ── TAB 2: TIME-IN-STAGE & BOTTLENECK FUNNEL (A4 CORE) ── */}
+
+      {/* ── TAB 2: TIME-IN-STAGE & BOTTLENECK FUNNEL ── */}
       {activeTab === 'timeInStage' && (
         <div style={s.tisSection}>
           {/* Critical Warning Alert Banner */}
           <div style={s.alertBanner}>
-            <div style={s.alertIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div style={s.alertIconBox}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
             </div>
             <div style={s.alertContent}>
-              <div style={s.alertTitle}>Pipeline Dwell Alert: Confirmed Lead Stage Dwell Time Exceeds SLA</div>
+              <div style={s.alertHeaderRow}>
+                <span style={s.alertBadgeTag}>CRITICAL SLA ALERT</span>
+                <span style={s.alertTitle}>Pipeline Dwell Time Exceeds SLA in Confirmed Lead</span>
+              </div>
               <div style={s.alertDesc}>
-                Average time in <strong>Confirmed Lead</strong> is <strong>48.5 hours</strong> against target SLA of <strong>24.0 hours</strong>. Deals are going cold while waiting for customer 10% advance deposit to clear Tally payment gate before factory release.
+                Average duration in <strong style={{ color: '#0f172a' }}>Confirmed Lead</strong> is <span style={s.dwellHighlight}>48.5 hours</span> against target SLA of <strong style={{ color: '#0f172a' }}>24.0 hours</strong>. High risk of lead decay awaiting customer 10% advance deposit.
               </div>
             </div>
             <button
               onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
-              style={{ ...s.alertActionBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              style={s.alertActionBtn}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Dispatch A5 Payment Reminder Sequence</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span>Dispatch Payment Reminder Sequence</span>
             </button>
           </div>
+
 
           {/* Dwell Funnel Grid */}
           <div style={s.funnelCard}>
             <div style={s.sectionHeader}>
               <div>
                 <h3 style={s.sectionTitle}>Pipeline Stage Dwell Time & SLA Adherence</h3>
-                <p style={s.sectionSub}>Real-time duration tracking calculated from state transitions in A2 activity logs</p>
+                <p style={s.sectionSub}>Real-time duration tracking calculated from state transitions in activity logs</p>
               </div>
               <span style={s.slaTargetChip}>Target Total Pipeline Dwell: &lt; 96h to Production</span>
             </div>
+
 
             <div style={s.stagesTimeline}>
               {timeInStage.map((st, i) => {
@@ -571,7 +513,7 @@ export default function TeamKPIs() {
           <th style={s.th}>10% Advance Required</th>
           <th style={s.th}>Assigned Rep</th>
           <th style={s.th}>Risk Level</th>
-          <th style={s.th}>A5 Action</th>
+          <th style={s.th}>Automation Action</th>
         </tr>
       </thead>
       <tbody>
@@ -588,7 +530,7 @@ export default function TeamKPIs() {
           <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
           <td style={s.td}>₹42,000</td>
           <td style={{ ...s.td, fontWeight: 700, color: '#aa3bff' }}>₹4,200</td>
-          <td style={s.td}>Aaditya (A4/A5)</td>
+          <td style={s.td}>Aaditya (Analytics)</td>
           <td style={s.td}>
             <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10"/></svg>
@@ -619,7 +561,7 @@ export default function TeamKPIs() {
       <div style={s.sectionHeader}>
         <div>
           <h3 style={s.sectionTitle}>Employee Metric Comparison & Conversion Matrix</h3>
-          <p style={s.sectionSub}>Cross-functional evaluation across Voice (A1), Admin Core (A2), and Automation (A4/A5)</p>
+          <p style={s.sectionSub}>Cross-functional evaluation across Voice AI, Admin Operations, and Lifecycle Automation</p>
         </div>
       </div>
 
@@ -676,7 +618,7 @@ export default function TeamKPIs() {
     <div style={s.auditCard}>
       <div style={s.sectionHeader}>
         <div>
-          <h3 style={s.sectionTitle}>A2 Control Cockpit Audit Action Stream</h3>
+          <h3 style={s.sectionTitle}>Central Control Cockpit Audit Action Stream</h3>
           <p style={s.sectionSub}>Complete chronological log of all operator actions, state transitions, and integration triggers</p>
         </div>
         <span style={s.liveChip}>● LIVE SYNC</span>
@@ -719,6 +661,7 @@ export default function TeamKPIs() {
             <div>
               <h2 style={s.modalTitle}>{selectedEmployee.name}</h2>
               <div style={s.modalSub}>{selectedEmployee.role} • {selectedEmployee.department}</div>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: 2 }}>{selectedEmployee.email} • {selectedEmployee.phone}</div>
             </div>
           </div>
           <button onClick={() => setSelectedEmployee(null)} style={s.closeModalBtn}>✕</button>
@@ -731,7 +674,7 @@ export default function TeamKPIs() {
             {/* Metric Strip */}
             <div style={s.drillStatGrid}>
               <div style={s.drillStat}>
-                <div style={s.drillVal}>{employeeDetails.metrics.kpiScore}</div>
+                <div style={{ ...s.drillVal, color: '#aa3bff' }}>{employeeDetails.metrics.kpiScore}</div>
                 <div style={s.drillLbl}>KPI Score</div>
               </div>
               <div style={s.drillStat}>
@@ -739,14 +682,103 @@ export default function TeamKPIs() {
                 <div style={s.drillLbl}>Assigned Pipeline</div>
               </div>
               <div style={s.drillStat}>
-                <div style={s.drillVal}>{employeeDetails.metrics.salesClosed}</div>
+                <div style={{ ...s.drillVal, color: '#10b981' }}>{employeeDetails.metrics.salesClosed}</div>
                 <div style={s.drillLbl}>Closed Deals</div>
               </div>
               <div style={s.drillStat}>
-                <div style={s.drillVal}>{employeeDetails.metrics.conversionRate}</div>
+                <div style={s.drillVal}>₹{(selectedEmployee.totalRevenue || 0).toLocaleString('en-IN')}</div>
+                <div style={s.drillLbl}>Total Revenue</div>
+              </div>
+              <div style={s.drillStat}>
+                <div style={{ ...s.drillVal, color: '#06b6d4' }}>{employeeDetails.metrics.conversionRate}</div>
                 <div style={s.drillLbl}>Conversion Velocity</div>
               </div>
             </div>
+
+            {/* Performance Indicators & Conversion Goals */}
+            <div style={s.modalSection}>
+              <h4 style={s.modalSectionTitle}>Target Attainment & Pipeline Goals</h4>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
+                  <span style={{ color: '#64748b' }}>Target Attainment ({selectedEmployee.salesClosed || 0} / {selectedEmployee.targetSales || 10} Deals)</span>
+                  <span style={{ color: '#08060d', fontWeight: 800 }}>{Math.round(((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%</span>
+                </div>
+                <div style={{ height: 8, backgroundColor: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      borderRadius: 10,
+                      width: `${Math.min(100, ((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%`,
+                      background: 'linear-gradient(90deg, #aa3bff, #6366f1)',
+                      transition: 'width 0.5s ease'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
+                  <span style={{ color: '#64748b' }}>Lead Conversion Velocity</span>
+                  <span style={{ color: '#08060d', fontWeight: 800 }}>{selectedEmployee.conversionRate || '34.5%'}</span>
+                </div>
+                <div style={{ height: 8, backgroundColor: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      borderRadius: 10,
+                      width: selectedEmployee.conversionRate || '34.5%',
+                      background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+                      transition: 'width 0.5s ease'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Call & Response Speed Mini Stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1.25rem' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#3b82f6' }}>{selectedEmployee.callsHandled || 0}</div>
+                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Calls Handled ({selectedEmployee.avgCallDurationSec || 90}s avg)</div>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#aa3bff' }}>{selectedEmployee.tasksCompleted || 0}</div>
+                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Tasks Completed</div>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #f1f5f9', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981' }}>{selectedEmployee.avgResponseTimeMin || 3.2}m</div>
+                  <div style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600, marginTop: 2 }}>Avg Response SLA</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4-Week Performance Trajectory Bar Chart */}
+            {selectedEmployee.weeklyKpiHistory && (
+              <div style={s.modalSection}>
+                <h4 style={s.modalSectionTitle}>4-Week Performance Trajectory</h4>
+                <div style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: '1rem 1.25rem', border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: 90, gap: '1.5rem' }}>
+                    {selectedEmployee.weeklyKpiHistory.map((val, idx) => (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#aa3bff', marginBottom: 4 }}>{val}%</span>
+                        <div
+                          style={{
+                            width: '100%',
+                            maxWidth: 36,
+                            height: `${val * 0.7}px`,
+                            background: 'linear-gradient(180deg, #aa3bff 0%, #6366f1 100%)',
+                            borderRadius: '6px 6px 0 0',
+                            transition: 'height 0.4s ease'
+                          }}
+                          title={`Week ${idx + 1}: ${val}%`}
+                        />
+                        <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 700, marginTop: 6 }}>Week {idx + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Assigned Pipeline Deals */}
             <div style={s.modalSection}>
@@ -772,7 +804,7 @@ export default function TeamKPIs() {
 
             {/* Recent Operator Actions */}
             <div style={s.modalSection}>
-              <h4 style={s.modalSectionTitle}>Recent Actions in A2 Operating Layer</h4>
+              <h4 style={s.modalSectionTitle}>Recent Actions in Operating Layer</h4>
               <div style={s.miniAuditList}>
                 {employeeDetails.activityLogs?.map(log => (
                   <div key={log.id} style={s.miniAuditItem}>
@@ -805,6 +837,7 @@ export default function TeamKPIs() {
             </div>
           </div>
         ) : null}
+
       </div>
     </div>
   )
@@ -817,7 +850,7 @@ export default function TeamKPIs() {
     <div style={s.modalOverlay} onClick={() => setShowAddModal(false)}>
       <div style={s.modalContentSmall} onClick={e => e.stopPropagation()}>
         <div style={s.modalHeader}>
-          <h3 style={s.modalTitle}>Provision New Team Member (A4)</h3>
+          <h3 style={s.modalTitle}>Provision New Team Member</h3>
           <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
         </div>
         <form onSubmit={handleCreateMember} style={s.form}>
@@ -857,16 +890,16 @@ export default function TeamKPIs() {
           </div>
 
           <div style={s.formGroup}>
-            <label style={s.formLabel}>Role & Module Assignment</label>
+            <label style={s.formLabel}>Role Assignment</label>
             <select
               value={formData.role}
               onChange={e => setFormData({ ...formData, role: e.target.value })}
               style={s.formSelect}
             >
-              <option value="A1 Voice Operations Spec">A1 Voice Operations Spec</option>
-              <option value="A2 Admin Cockpit Operator">A2 Admin Cockpit Operator</option>
-              <option value="A4 Analytics Specialist">A4 Analytics Specialist</option>
-              <option value="A5 WhatsApp Automation Lead">A5 WhatsApp Automation Lead</option>
+              <option value="Voice Operations Specialist">Voice Operations Specialist</option>
+              <option value="Admin Cockpit Operator">Admin Cockpit Operator</option>
+              <option value="Performance & Analytics Specialist">Performance & Analytics Specialist</option>
+              <option value="WhatsApp Automation Lead">WhatsApp Automation Lead</option>
               <option value="Inside Sales & Telecaller">Inside Sales & Telecaller</option>
               <option value="ERP & Factory Dispatch Officer">ERP & Factory Dispatch Officer</option>
             </select>
@@ -878,6 +911,7 @@ export default function TeamKPIs() {
               type="text"
               placeholder="e.g. Customer Success / Sales"
               value={formData.department}
+
               onChange={e => setFormData({ ...formData, department: e.target.value })}
               style={s.formInput}
             />
@@ -1141,7 +1175,7 @@ const s = {
       empCard: {
         backgroundColor: '#fff',
       borderRadius: 18,
-      padding: '1.5rem',
+      padding: '1.25rem 1.4rem',
       border: '1px solid #e2e8f0',
       boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
       position: 'relative',
@@ -1165,11 +1199,12 @@ const s = {
       boxShadow: '0 3px 8px rgba(170,59,255,0.4)'
   },
       empCardHeader: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '0.85rem',
-      marginBottom: '1.25rem'
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.85rem',
+    marginBottom: '0.85rem'
   },
+
       avatarWrap: {
         position: 'relative'
   },
@@ -1358,66 +1393,105 @@ const s = {
   },
       empCardFooter: {
         marginTop: 'auto',
-      paddingTop: '0.75rem',
+      paddingTop: '0.6rem',
       borderTop: '1px solid #f1f5f9'
   },
       viewDetailsBtn: {
-        width: '100%',
-      padding: '8px 0',
-      backgroundColor: 'transparent',
-      color: '#aa3bff',
-      border: '1px solid rgba(170,59,255,0.3)',
-      borderRadius: 8,
-      fontSize: '0.76rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      transition: 'all 0.15s'
+    width: '100%',
+    padding: '9px 0',
+    backgroundColor: '#faf7ff',
+    color: '#aa3bff',
+    border: '1px solid rgba(170,59,255,0.25)',
+    borderRadius: 10,
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.15s'
   },
+
       tisSection: {
         display: 'flex',
       flexDirection: 'column',
       gap: '1.75rem'
   },
       alertBanner: {
-        backgroundColor: '#fff7ed',
-      border: '1px solid #fed7aa',
+        backgroundColor: '#ffffff',
+      border: '1px solid rgba(170, 59, 255, 0.25)',
+      borderLeft: '4px solid #aa3bff',
       borderRadius: 16,
       padding: '1.25rem 1.5rem',
       display: 'flex',
       alignItems: 'center',
       gap: '1.25rem',
-      flexWrap: 'wrap'
+      flexWrap: 'wrap',
+      boxShadow: '0 4px 16px rgba(170, 59, 255, 0.06)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf7ff 100%)'
   },
-      alertIcon: {
-        fontSize: '1.75rem'
+      alertIconBox: {
+        width: 44,
+      height: 44,
+      borderRadius: 12,
+      backgroundColor: 'rgba(170, 59, 255, 0.1)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0
   },
       alertContent: {
         flex: 1,
       minWidth: 280
   },
+      alertHeaderRow: {
+        display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 4,
+      flexWrap: 'wrap'
+  },
+      alertBadgeTag: {
+        fontSize: '0.68rem',
+      fontWeight: 800,
+      backgroundColor: 'rgba(239, 68, 68, 0.12)',
+      color: '#dc2626',
+      padding: '2px 8px',
+      borderRadius: 6,
+      letterSpacing: '0.5px'
+  },
       alertTitle: {
         fontSize: '0.95rem',
       fontWeight: 800,
-      color: '#9a3412',
+      color: '#0f172a',
       fontFamily: 'var(--font-heading)'
   },
       alertDesc: {
-        fontSize: '0.78rem',
-      color: '#c2410c',
+        fontSize: '0.8rem',
+      color: '#64748b',
       marginTop: 2,
-      lineHeight: 1.4
+      lineHeight: 1.45
+  },
+      dwellHighlight: {
+        color: '#dc2626',
+      fontWeight: 700,
+      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+      padding: '1px 6px',
+      borderRadius: 4
   },
       alertActionBtn: {
-        padding: '9px 18px',
-      backgroundColor: '#ea580c',
-      color: '#fff',
-      border: 'none',
-      borderRadius: 10,
-      fontSize: '0.8rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      boxShadow: '0 2px 8px rgba(234,88,12,0.3)'
+    padding: '10px 18px',
+    background: 'linear-gradient(135deg, #aa3bff 0%, #7c3aed 100%)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 10,
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 4px 14px rgba(170, 59, 255, 0.3)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    transition: 'all 0.2s ease'
   },
+
       funnelCard: {
         backgroundColor: '#fff',
       borderRadius: 18,
@@ -1793,10 +1867,11 @@ const s = {
       gap: '1.5rem'
   },
       drillStatGrid: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '0.75rem'
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+    gap: '0.75rem'
   },
+
       drillStat: {
         backgroundColor: '#f8fafc',
       borderRadius: 12,
