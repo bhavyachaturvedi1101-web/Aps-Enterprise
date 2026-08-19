@@ -4,17 +4,17 @@ const API = 'http://localhost:5000/api';
 
 const s = {
   page: { padding: '2rem', fontFamily: 'var(--font-body)' },
-  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#08060d', margin: 0 },
-  sub: { fontSize: '0.78rem', color: '#64748b', marginTop: 4 },
+  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
+  sub: { fontSize: '0.78rem', color: '#71717a', marginTop: 4 },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' },
-  card: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', padding: '1.5rem', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' },
-  cardTitle: { fontSize: '1.1rem', fontWeight: 800, color: '#08060d', marginBottom: '1rem', fontFamily: 'var(--font-heading)' },
-  input: { width: '100%', padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', marginBottom: '0.85rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box' },
-  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginBottom: 4, display: 'block' },
-  btn: { padding: '0.65rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' },
-  logBox: { backgroundColor: '#f8fafc', borderRadius: 12, padding: '1rem', border: '1px solid #e2e8f0', maxHeight: 240, overflowY: 'auto' },
-  logRow: { padding: '0.5rem 0', borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' },
-  badge: { padding: '2px 8px', borderRadius: 12, fontSize: '0.7rem', fontWeight: 700, color: '#10b981', backgroundColor: '#ecfdf5' }
+  card: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', padding: '1.5rem', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' },
+  cardTitle: { fontSize: '1.1rem', fontWeight: 800, color: '#09090b', marginBottom: '1rem', fontFamily: 'var(--font-heading)' },
+  input: { width: '100%', padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', marginBottom: '0.85rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', color: '#09090b' },
+  label: { fontSize: '0.75rem', fontWeight: 700, color: '#3f3f46', marginBottom: 4, display: 'block' },
+  btn: { padding: '0.65rem 1.4rem', borderRadius: 20, border: 'none', background: '#09090b', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' },
+  logBox: { backgroundColor: '#f8fafc', borderRadius: 12, padding: '1rem', border: '1px solid #e4e4e7', maxHeight: 240, overflowY: 'auto' },
+  logRow: { padding: '0.5rem 0', borderBottom: '1px solid #f4f4f5', fontSize: '0.8rem' },
+  badge: { padding: '2px 8px', borderRadius: 12, fontSize: '0.7rem', fontWeight: 700, color: '#09090b', backgroundColor: '#f4f4f5', border: '1px solid #e4e4e7' }
 };
 
 export function VoiceAgent() {
@@ -39,9 +39,10 @@ export function VoiceAgent() {
           leadName,
           durationSeconds: 32,
           callOutcome: 'Qualified Lead',
-          transcript: `Spoke with ${leadName}. Confirmed interest in product catalog. Transferred to A2 CRM.`
+          transcript: `Spoke with ${leadName}. Confirmed interest in product catalog. Transferred to CRM Pipeline.`
         })
-      });      setLogs(prev => [{ id: Date.now(), phone, name: leadName, status: 'Completed', outcome: 'Qualified Lead' }, ...prev]);
+      });
+      setLogs(prev => [{ id: Date.now(), phone, name: leadName, status: 'Completed', outcome: 'Qualified Lead' }, ...prev]);
       alert(`Outbound AI Voice call placed to ${leadName} (${phone})!`);
       setPhone('');
       setLeadName('');
@@ -55,8 +56,6 @@ export function VoiceAgent() {
   return (
     <div style={s.page}>
       <h1 style={s.title}>AI Voice Agent Control Panel</h1>
-      <p style={s.sub}>AI-powered outbound & inbound calling engine — automated lead qualification and appointment setting</p>
-
 
       <div style={s.grid}>
         <div style={s.card}>
@@ -125,7 +124,6 @@ export function WhatsAppAgent() {
   return (
     <div style={s.page}>
       <h1 style={s.title}>WhatsApp Automation Control Panel</h1>
-      <p style={s.sub}>Automated WhatsApp follow-up sequences, payment reminders, and lead nurturing</p>
 
       <div style={s.grid}>
         <div style={s.card}>
@@ -140,7 +138,7 @@ export function WhatsAppAgent() {
               <option value="Dispatch Alert">Factory Dispatch Tracking Link</option>
             </select>
 
-            <button type="submit" disabled={sending} style={{ ...s.btn, background: '#10b981', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <button type="submit" disabled={sending} style={{ ...s.btn, background: '#09090b', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
               <span>{sending ? 'Sending WhatsApp…' : 'Send WhatsApp Message'}</span>
             </button>
@@ -154,9 +152,9 @@ export function WhatsAppAgent() {
               <div key={m.id} style={s.logRow}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
                   <span>{m.recipient} ({m.id})</span>
-                  <span style={{ ...s.badge, backgroundColor: '#eff6ff', color: '#2563eb' }}>{m.status}</span>
+                  <span style={{ ...s.badge, backgroundColor: '#f4f4f5', color: '#09090b', border: '1px solid #e4e4e7' }}>{m.status}</span>
                 </div>
-                <div style={{ color: '#64748b', marginTop: 2 }}>{m.template}</div>
+                <div style={{ color: '#71717a', marginTop: 2 }}>{m.template}</div>
               </div>
             ))}
           </div>

@@ -60,7 +60,7 @@ function MiniBarChart({ chart }) {
     const numSets = datasets.length;
     const barGap = 4, groupGap = 12;
     const barW = Math.max(12, (chartW - groupGap * (numGroups - 1)) / numGroups / numSets - barGap);
-    const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+    const COLORS = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8'];
 
     datasets.forEach((ds, si) => {
       ds.data.forEach((val, gi) => {
@@ -464,9 +464,6 @@ export default function APSAIPage() {
           </div>
           <div>
             <h1 style={s.headerTitle}>APS AI — Business Intelligence Agent</h1>
-            <p style={s.headerSubtitle}>
-              Natural language intelligence engine for leads, pipelines, revenue analytics, and team KPIs.
-            </p>
           </div>
         </div>
 
@@ -651,27 +648,27 @@ const s = {
     width: 44,
     height: 44,
     borderRadius: 12,
-    background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+    background: '#09090b',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     flexShrink: 0
   },
-  headerTitle: { fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.3px' },
-  headerSubtitle: { fontSize: '0.8rem', color: '#64748b', margin: '3px 0 0' },
+  headerTitle: { fontSize: '1.35rem', fontWeight: 800, color: '#09090b', margin: 0, letterSpacing: '-0.3px' },
+  headerSubtitle: { fontSize: '0.8rem', color: '#71717a', margin: '3px 0 0' },
   headerRight: { display: 'flex', alignItems: 'center', gap: 12 },
   statBadge: {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
-    background: '#eff6ff',
-    border: '1px solid #bfdbfe',
+    background: '#f4f4f5',
+    border: '1px solid #e4e4e7',
     padding: '6px 12px',
     borderRadius: 20
   },
-  statDot: { width: 7, height: 7, borderRadius: '50%', background: '#10b981' },
-  statText: { fontSize: '0.72rem', fontWeight: 700, color: '#1e40af' },
+  statDot: { width: 7, height: 7, borderRadius: '50%', background: '#09090b' },
+  statText: { fontSize: '0.72rem', fontWeight: 700, color: '#09090b' },
   actionBtn: {
     display: 'flex',
     alignItems: 'center',
@@ -679,8 +676,8 @@ const s = {
     padding: '7px 14px',
     borderRadius: 10,
     background: '#f8fafc',
-    border: '1px solid #cbd5e1',
-    color: '#475569',
+    border: '1px solid #e4e4e7',
+    color: '#3f3f46',
     fontSize: '0.75rem',
     fontWeight: 600,
     cursor: 'pointer',
@@ -701,11 +698,11 @@ const s = {
   sideCard: {
     background: '#fff',
     borderRadius: 16,
-    border: '1px solid #e2e8f0',
+    border: '1px solid #e4e4e7',
     padding: '1.1rem',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
   },
-  sideCardTitle: { fontSize: '0.82rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  sideCardTitle: { fontSize: '0.82rem', fontWeight: 800, color: '#09090b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' },
   quickList: { display: 'flex', flexDirection: 'column', gap: 6 },
   quickQueryBtn: {
     display: 'flex',
@@ -715,24 +712,24 @@ const s = {
     padding: '8px 10px',
     borderRadius: 8,
     background: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    color: '#334155',
+    border: '1px solid #e4e4e7',
+    color: '#3f3f46',
     fontSize: '0.74rem',
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'background 0.15s, color 0.15s'
   },
-  quickQueryDot: { color: '#2563eb', fontWeight: 800, fontSize: '0.9rem' },
-  knowledgeItem: { display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f1f5f9', fontSize: '0.74rem' },
-  kKey: { color: '#64748b' },
-  kVal: { color: '#0f172a', fontWeight: 700 },
+  quickQueryDot: { color: '#09090b', fontWeight: 800, fontSize: '0.9rem' },
+  knowledgeItem: { display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f4f4f5', fontSize: '0.74rem' },
+  kKey: { color: '#71717a' },
+  kVal: { color: '#09090b', fontWeight: 700 },
 
   // Chat Area Container
   chatContainer: {
     background: '#fff',
     borderRadius: 16,
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden'
@@ -749,29 +746,29 @@ const s = {
     width: 26,
     height: 26,
     borderRadius: 8,
-    background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+    background: '#09090b',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   },
-  aiNameBadge: { fontSize: '0.76rem', fontWeight: 800, color: '#1e40af' },
-  onlineBadge: { fontSize: '0.66rem', color: '#16a34a', fontWeight: 600 },
+  aiNameBadge: { fontSize: '0.76rem', fontWeight: 800, color: '#09090b' },
+  onlineBadge: { fontSize: '0.66rem', color: '#71717a', fontWeight: 600 },
 
   userBubble: {
     maxWidth: '75%',
     padding: '12px 16px',
     borderRadius: '20px 20px 4px 20px',
-    background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+    background: '#09090b',
     color: '#fff',
-    boxShadow: '0 4px 12px rgba(37,99,235,0.25)'
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
   },
   botBubble: {
     maxWidth: '88%',
     padding: '14px 18px',
     borderRadius: '4px 20px 20px 20px',
     background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
   },
 
   dotsContainer: { display: 'flex', gap: 6, padding: '4px 0', alignItems: 'center' },
@@ -779,7 +776,7 @@ const s = {
     width: 8,
     height: 8,
     borderRadius: '50%',
-    background: '#2563eb',
+    background: '#09090b',
     display: 'inline-block',
     animation: 'apsai-page-dot 1.2s infinite ease-in-out'
   },
@@ -791,16 +788,16 @@ const s = {
     gap: 6,
     padding: '8px 1.5rem',
     background: '#fff',
-    borderTop: '1px solid #f1f5f9',
+    borderTop: '1px solid #f4f4f5',
     overflowX: 'auto'
   },
-  suggestLabel: { fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', whiteSpace: 'nowrap' },
+  suggestLabel: { fontSize: '0.68rem', fontWeight: 700, color: '#71717a', textTransform: 'uppercase', whiteSpace: 'nowrap' },
   chipBtn: {
     padding: '5px 12px',
     borderRadius: 20,
-    background: '#eff6ff',
-    border: '1px solid #bfdbfe',
-    color: '#1d4ed8',
+    background: '#f4f4f5',
+    border: '1px solid #e4e4e7',
+    color: '#09090b',
     fontSize: '0.72rem',
     fontWeight: 600,
     cursor: 'pointer',
@@ -810,7 +807,7 @@ const s = {
   // Input wrapper
   inputWrapper: {
     padding: '1rem 1.4rem',
-    borderTop: '1px solid #e2e8f0',
+    borderTop: '1px solid #e4e4e7',
     background: '#fff'
   },
   inputField: {
@@ -818,11 +815,12 @@ const s = {
     padding: '10px 14px',
     borderRadius: 12,
     fontSize: '0.86rem',
-    color: '#0f172a',
+    color: '#09090b',
     outline: 'none',
     fontFamily: 'Inter, sans-serif',
     resize: 'none',
     boxSizing: 'border-box',
+    border: '1px solid #e4e4e7',
     transition: 'border-color 0.15s, background-color 0.15s'
   },
   inputActions: {
@@ -837,12 +835,14 @@ const s = {
     gap: 5,
     padding: '6px 12px',
     borderRadius: 8,
-    border: '1px solid #bfdbfe',
+    border: '1px solid #e4e4e7',
     fontSize: '0.74rem',
     fontWeight: 700,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    color: '#09090b',
+    background: '#f4f4f5'
   },
-  hintText: { fontSize: '0.7rem', color: '#94a3b8' },
+  hintText: { fontSize: '0.7rem', color: '#71717a' },
   sendButton: {
     display: 'flex',
     alignItems: 'center',
@@ -850,17 +850,17 @@ const s = {
     padding: '8px 18px',
     borderRadius: 10,
     border: 'none',
-    background: '#e2e8f0',
-    color: '#94a3b8',
+    background: '#f4f4f5',
+    color: '#71717a',
     fontSize: '0.8rem',
     fontWeight: 700,
     cursor: 'pointer',
     transition: 'all 0.15s'
   },
   sendButtonActive: {
-    background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+    background: '#09090b',
     color: '#fff',
-    boxShadow: '0 4px 12px rgba(37,99,235,0.35)'
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
   },
 
   // Charts

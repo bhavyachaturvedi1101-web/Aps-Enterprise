@@ -69,7 +69,7 @@ export default function WhatsAppAutomation() {
         }));
       }
     } catch (err) {
-      console.error('Error loading A5 WhatsApp data:', err);
+      console.error('Error loading WhatsApp automation data:', err);
     } finally {
       setLoading(false);
     }
@@ -187,17 +187,9 @@ export default function WhatsAppAutomation() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>CUSTOMER LIFECYCLE AUTOMATION</div>
           <h1 style={s.title}>WhatsApp AI Automation & Lifecycle Messaging</h1>
-          <p style={s.subtitle}>
-            Event-driven messaging synced directly to pipeline transitions: payment gate reminders, Tally order release, and production tracking.
-          </p>
         </div>
         <div style={s.headerActions}>
-          <div style={s.wabaBadge}>
-            <span style={s.wabaDot} />
-            <span style={s.wabaText}>Meta Cloud API v20.0 (WABA Live)</span>
-          </div>
           <button onClick={() => setActiveTab('broadcast')} style={s.newMsgBtn}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="22" y1="2" x2="11" y2="13" />
@@ -214,9 +206,6 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Total Messages Dispatched</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(37,211,102,0.12)', color: '#25D366' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.totalMessagesSent?.toLocaleString('en-IN')}</span>
@@ -225,13 +214,9 @@ export default function WhatsAppAutomation() {
             <div style={s.kpiSub}>Automated event triggers across lead state changes</div>
           </div>
 
-
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Handset Delivery Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.deliveryRate}</span>
@@ -243,13 +228,10 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Message Read & Open Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.readRate}</span>
-              <span style={{ ...s.kpiTrendBadge, background: 'rgba(170,59,255,0.1)', color: '#aa3bff' }}>92.4% Avg</span>
+              <span style={{ ...s.kpiTrendBadge, background: '#f4f4f5', color: '#09090b', border: '1px solid #e4e4e7' }}>92.4% Avg</span>
             </div>
             <div style={s.kpiSub}>Read receipts verified via Meta webhook callbacks</div>
           </div>
@@ -257,9 +239,6 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Active Lifecycle Sequences</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.activeSequencesCount} / {analytics.totalSequencesCount} Active</span>
@@ -369,7 +348,7 @@ export default function WhatsAppAutomation() {
                       <div style={s.prodName}>{msg.product || 'Machinery'}</div>
                       <div style={s.prodSub}>Total: ₹{msg.totalBudget || '—'}</div>
                     </td>
-                    <td style={{ ...s.td, fontWeight: 700, color: '#aa3bff' }}>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>
                       {msg.advanceAmount ? `₹${msg.advanceAmount}` : '—'}
                     </td>
                     <td style={s.td}>
@@ -462,7 +441,7 @@ export default function WhatsAppAutomation() {
                     <div style={s.seqStatLbl}>Read Rate</div>
                   </div>
                   <div style={s.seqStat}>
-                    <div style={{ ...s.seqStatVal, color: '#aa3bff' }}>{seq.conversionRate}</div>
+                    <div style={{ ...s.seqStatVal, color: '#09090b' }}>{seq.conversionRate}</div>
                     <div style={s.seqStatLbl}>Gate Pass Rate</div>
                   </div>
                 </div>
@@ -819,14 +798,14 @@ const s = {
     alignItems: 'center',
     gap: 6,
     padding: '8px 18px',
-    backgroundColor: '#25D366',
+    backgroundColor: '#09090b',
     color: '#fff',
     border: 'none',
     borderRadius: 10,
     fontSize: '0.82rem',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 12px rgba(37,211,102,0.3)'
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
   },
   kpiGrid: {
     display: 'grid',
@@ -838,8 +817,8 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: '1.35rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
   },
   kpiTop: {
     display: 'flex',
@@ -850,7 +829,7 @@ const s = {
   kpiLabel: {
     fontSize: '0.75rem',
     fontWeight: 700,
-    color: '#64748b',
+    color: '#71717a',
     textTransform: 'uppercase',
     letterSpacing: '0.5px'
   },
@@ -873,7 +852,7 @@ const s = {
     fontSize: '1.75rem',
     fontWeight: 800,
     fontFamily: 'var(--font-heading)',
-    color: '#08060d',
+    color: '#09090b',
     letterSpacing: '-0.5px'
   },
   kpiTrendBadge: {
@@ -881,23 +860,23 @@ const s = {
     fontWeight: 700,
     padding: '2px 8px',
     borderRadius: 20,
-    backgroundColor: 'rgba(37,211,102,0.12)',
-    color: '#16a34a'
+    backgroundColor: '#f4f4f5',
+    color: '#09090b'
   },
   kpiSubTag: {
     fontSize: '0.72rem',
     fontWeight: 600,
-    color: '#64748b'
+    color: '#71717a'
   },
   kpiSub: {
     fontSize: '0.7rem',
-    color: '#94a3b8'
+    color: '#71717a'
   },
   tabsContainer: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid #e2e8f0',
+    borderBottom: '1px solid #e4e4e7',
     marginBottom: '1.75rem',
     gap: '1rem',
     flexWrap: 'wrap'
@@ -913,8 +892,8 @@ const s = {
     background: 'none',
     fontSize: '0.85rem',
     fontWeight: 800,
-    color: '#08060d',
-    borderBottom: '2.5px solid #25D366',
+    color: '#09090b',
+    borderBottom: '2.5px solid #09090b',
     cursor: 'pointer'
   },
   tabInactive: {
@@ -923,7 +902,7 @@ const s = {
     background: 'none',
     fontSize: '0.85rem',
     fontWeight: 600,
-    color: '#64748b',
+    color: '#71717a',
     borderBottom: '2.5px solid transparent',
     cursor: 'pointer'
   },
@@ -935,19 +914,20 @@ const s = {
   searchInput: {
     padding: '7px 14px',
     borderRadius: 8,
-    border: '1px solid #cbd5e1',
+    border: '1px solid #e4e4e7',
     fontSize: '0.78rem',
     width: 200,
     outline: 'none',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    color: '#09090b'
   },
   selectFilter: {
     padding: '7px 12px',
     borderRadius: 8,
-    border: '1px solid #cbd5e1',
+    border: '1px solid #e4e4e7',
     fontSize: '0.78rem',
     backgroundColor: '#fff',
-    color: '#0f172a',
+    color: '#09090b',
     outline: 'none',
     cursor: 'pointer'
   },
@@ -955,8 +935,8 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 18,
     padding: '1.75rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
   sectionHeader: {
     display: 'flex',
@@ -968,12 +948,12 @@ const s = {
     fontSize: '1.15rem',
     fontWeight: 800,
     fontFamily: 'var(--font-heading)',
-    color: '#08060d',
+    color: '#09090b',
     margin: 0
   },
   sectionSub: {
     fontSize: '0.76rem',
-    color: '#64748b',
+    color: '#71717a',
     marginTop: 3
   },
   table: {
@@ -984,8 +964,8 @@ const s = {
   th: {
     textAlign: 'left',
     padding: '10px 14px',
-    borderBottom: '1px solid #e2e8f0',
-    color: '#64748b',
+    borderBottom: '1px solid #e4e4e7',
+    color: '#71717a',
     fontWeight: 700,
     fontSize: '0.72rem',
     textTransform: 'uppercase',
@@ -993,28 +973,30 @@ const s = {
   },
   td: {
     padding: '12px 14px',
-    borderBottom: '1px solid #f1f5f9',
-    color: '#08060d'
+    borderBottom: '1px solid #f4f4f5',
+    color: '#09090b'
   },
   trHover: {
     transition: 'background 0.15s'
   },
   recipientName: {
     fontWeight: 800,
-    fontSize: '0.84rem'
+    fontSize: '0.84rem',
+    color: '#09090b'
   },
   recipientPhone: {
     fontSize: '0.68rem',
-    color: '#64748b',
+    color: '#71717a',
     marginTop: 2
   },
   prodName: {
     fontWeight: 600,
-    fontSize: '0.8rem'
+    fontSize: '0.8rem',
+    color: '#09090b'
   },
   prodSub: {
     fontSize: '0.68rem',
-    color: '#94a3b8'
+    color: '#71717a'
   },
   badge: {
     fontSize: '0.65rem',
@@ -1035,9 +1017,9 @@ const s = {
   },
   viewBubbleBtn: {
     padding: '5px 10px',
-    backgroundColor: '#f1f5f9',
-    color: '#0f172a',
-    border: '1px solid #cbd5e1',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    border: '1px solid #e4e4e7',
     borderRadius: 6,
     fontSize: '0.72rem',
     fontWeight: 700,
@@ -1052,8 +1034,8 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: '1.5rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
     display: 'flex',
     flexDirection: 'column'
   },
@@ -1066,12 +1048,12 @@ const s = {
   seqId: {
     fontSize: '0.65rem',
     fontWeight: 800,
-    color: '#64748b'
+    color: '#71717a'
   },
   seqName: {
     fontSize: '0.95rem',
     fontWeight: 800,
-    color: '#08060d',
+    color: '#09090b',
     margin: '2px 0 0 0'
   },
   toggleBtn: {
@@ -1084,7 +1066,7 @@ const s = {
   },
   seqDesc: {
     fontSize: '0.76rem',
-    color: '#64748b',
+    color: '#52525b',
     lineHeight: 1.4,
     marginBottom: '1rem'
   },
@@ -1096,7 +1078,7 @@ const s = {
     flexDirection: 'column',
     gap: '0.4rem',
     marginBottom: '1rem',
-    border: '1px solid #f1f5f9'
+    border: '1px solid #e4e4e7'
   },
   seqDetailRow: {
     display: 'flex',
@@ -1104,16 +1086,16 @@ const s = {
     fontSize: '0.72rem'
   },
   seqDetailLbl: {
-    color: '#64748b',
+    color: '#71717a',
     fontWeight: 600
   },
   seqDetailVal: {
-    color: '#08060d',
+    color: '#09090b',
     fontWeight: 700
   },
   seqDetailCode: {
     fontFamily: 'monospace',
-    color: '#4f46e5',
+    color: '#09090b',
     fontWeight: 700,
     fontSize: '0.68rem'
   },
@@ -1145,9 +1127,9 @@ const s = {
   testSeqBtn: {
     width: '100%',
     padding: '8px 0',
-    backgroundColor: 'transparent',
-    color: '#25D366',
-    border: '1px solid rgba(37,211,102,0.4)',
+    backgroundColor: '#ffffff',
+    color: '#09090b',
+    border: '1px solid #e4e4e7',
     borderRadius: 8,
     fontSize: '0.76rem',
     fontWeight: 700,
@@ -1162,8 +1144,8 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 18,
     padding: '1.5rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
     display: 'flex',
     flexDirection: 'column'
   },
@@ -1176,32 +1158,30 @@ const s = {
   tplCategoryTag: {
     fontSize: '0.62rem',
     fontWeight: 700,
-    color: '#64748b',
+    color: '#71717a',
     textTransform: 'uppercase'
   },
   tplName: {
     fontSize: '0.95rem',
     fontWeight: 800,
-    color: '#08060d',
+    color: '#09090b',
     margin: '2px 0 0 0'
   },
   tplId: {
     fontSize: '0.66rem',
-    color: '#94a3b8',
+    color: '#71717a',
     fontFamily: 'monospace'
   },
   approvedBadge: {
     fontSize: '0.65rem',
     fontWeight: 700,
     padding: '2px 8px',
-    backgroundColor: 'rgba(37,211,102,0.12)',
-    color: '#16a34a',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
     borderRadius: 12
   },
   waBubbleWrapper: {
-    backgroundColor: '#e5ddd5',
-    backgroundImage: 'radial-gradient(#cfc5b8 1px, transparent 1px)',
-    backgroundSize: '16px 16px',
+    backgroundColor: '#f4f4f5',
     borderRadius: 12,
     padding: '1rem',
     marginBottom: '1rem',
@@ -1211,18 +1191,19 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: '8px 8px 8px 0',
     padding: '0.75rem',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
-    maxWidth: '92%'
+    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    maxWidth: '92%',
+    border: '1px solid #e4e4e7'
   },
   waHeader: {
     fontWeight: 800,
     fontSize: '0.78rem',
-    color: '#08060d',
+    color: '#09090b',
     marginBottom: 4
   },
   waBody: {
     fontSize: '0.74rem',
-    color: '#334155',
+    color: '#52525b',
     lineHeight: 1.45
   },
   waTimeRow: {
@@ -1231,7 +1212,7 @@ const s = {
     alignItems: 'center',
     gap: 4,
     fontSize: '0.6rem',
-    color: '#94a3b8',
+    color: '#71717a',
     marginTop: 4
   },
   waButtonsWrap: {
@@ -1245,22 +1226,23 @@ const s = {
     borderRadius: 6,
     padding: '6px 10px',
     fontSize: '0.72rem',
-    color: '#25D366',
+    color: '#09090b',
     fontWeight: 700,
     textAlign: 'center',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+    border: '1px solid #e4e4e7',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6
   },
   tplFooter: {
-    borderTop: '1px solid #f1f5f9',
+    borderTop: '1px solid #f4f4f5',
     paddingTop: '0.75rem'
   },
   tplTriggerInfo: {
     fontSize: '0.7rem',
-    color: '#64748b',
+    color: '#71717a',
     fontWeight: 600
   },
   broadcastContainer: {
@@ -1273,18 +1255,18 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 18,
     padding: '2rem',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
   previewCard: {
-    backgroundColor: '#128C7E',
+    backgroundColor: '#09090b',
     borderRadius: 20,
     overflow: 'hidden',
-    boxShadow: '0 10px 30px rgba(18,140,126,0.2)',
-    border: '1px solid #0d7367'
+    boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+    border: '1px solid #27272a'
   },
   previewHeader: {
-    backgroundColor: '#075E54',
+    backgroundColor: '#18181b',
     padding: '1rem 1.25rem',
     display: 'flex',
     alignItems: 'center',
@@ -1294,7 +1276,7 @@ const s = {
     width: 38,
     height: 38,
     borderRadius: '50%',
-    backgroundColor: '#25D366',
+    backgroundColor: '#27272a',
     color: '#fff',
     fontWeight: 800,
     fontSize: '0.85rem',
@@ -1308,13 +1290,11 @@ const s = {
     fontSize: '0.9rem'
   },
   waHeaderStatus: {
-    color: '#a7f3d0',
+    color: '#a1a1aa',
     fontSize: '0.68rem'
   },
   previewBody: {
-    backgroundColor: '#efeae2',
-    backgroundImage: 'radial-gradient(#cfc5b8 1px, transparent 1px)',
-    backgroundSize: '16px 16px',
+    backgroundColor: '#f8fafc',
     padding: '1.5rem 1.25rem',
     minHeight: 280,
     display: 'flex',
@@ -1322,22 +1302,23 @@ const s = {
     gap: '0.6rem'
   },
   waLiveBubble: {
-    backgroundColor: '#dcf8c6',
+    backgroundColor: '#ffffff',
     borderRadius: '10px 10px 0 10px',
     padding: '0.85rem 1rem',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    border: '1px solid #e4e4e7',
     marginLeft: 'auto',
     maxWidth: '88%'
   },
   waLiveHeader: {
     fontWeight: 800,
     fontSize: '0.82rem',
-    color: '#08060d',
+    color: '#09090b',
     marginBottom: 4
   },
   waLiveText: {
     fontSize: '0.78rem',
-    color: '#1f2937',
+    color: '#3f3f46',
     lineHeight: 1.5
   },
   waLiveTime: {
@@ -1346,14 +1327,14 @@ const s = {
     alignItems: 'center',
     gap: 4,
     fontSize: '0.62rem',
-    color: '#6b7280',
+    color: '#71717a',
     marginTop: 6
   },
   previewActionBtn: {
-    backgroundColor: '#fff',
+    backgroundColor: '#09090b',
     borderRadius: 8,
     padding: '8px 12px',
-    color: '#25D366',
+    color: '#ffffff',
     fontWeight: 700,
     fontSize: '0.76rem',
     textAlign: 'center',
@@ -1362,7 +1343,7 @@ const s = {
     width: '88%'
   },
   previewFooter: {
-    backgroundColor: '#075E54',
+    backgroundColor: '#18181b',
     padding: '0.65rem',
     textAlign: 'center',
     color: 'rgba(255,255,255,0.7)',

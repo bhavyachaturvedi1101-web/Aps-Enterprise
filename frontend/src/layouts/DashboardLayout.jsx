@@ -97,8 +97,8 @@ export default function DashboardLayout() {
   const path = location.pathname;
   const queryParams = new URLSearchParams(location.search);
   const activeTab =
-    queryParams.get('tab') ||
-    (path === '/ai'        ? 'ai'        :
+    (path === '/crm'       ? 'pipeline'  :
+     path === '/ai'        ? 'ai'        :
      path === '/chatbot'   ? 'ai'        :
      path === '/users'     ? 'users'     :
      path === '/bookings'  ? 'bookings'  :
@@ -110,13 +110,14 @@ export default function DashboardLayout() {
      path === '/invoices'  ? 'invoices'  :
      path === '/employees' ? 'build'     :
      path === '/activity'  ? 'activity'  :
-     path === '/settings'  ? 'settings'  : 'analytics');
+     path === '/settings'  ? 'settings'  :
+     queryParams.get('tab') || 'analytics');
 
 
   const handleTabChange = (key) => {
     const routes = {
-      analytics:  '/dashboard?tab=analytics',
-      pipeline:   '/dashboard?tab=pipeline',
+      analytics:  '/dashboard',
+      pipeline:   '/crm',
       ai:         '/ai',
       users:      '/users',
       bookings:   '/bookings',
@@ -130,7 +131,7 @@ export default function DashboardLayout() {
       activity:   '/activity',
       settings:   '/settings'
     };
-    navigate(routes[key] || '/dashboard?tab=analytics');
+    navigate(routes[key] || '/dashboard');
   };
 
   return (
@@ -176,24 +177,24 @@ export default function DashboardLayout() {
               <div style={s.dropdownHeader}>System Notifications</div>
               <div style={s.notifItem}>
                 <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <span>Payment Gate Pending</span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Acme Manufacturing 10% advance verification required.</div>
+                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>Acme Manufacturing 10% advance verification required.</div>
               </div>
               <div style={s.notifItem}>
                 <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
                   <span>AI Voice Calls Active</span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>12 automated calls processed this morning.</div>
+                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>12 automated calls processed this morning.</div>
               </div>
               <div style={s.notifItem}>
                 <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   <span>WhatsApp Automation</span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Sequence WA-003 delivered to Global Tech.</div>
+                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>3 sequences dispatched to pending leads.</div>
               </div>
             </div>
           )}
@@ -323,13 +324,13 @@ const s = {
   },
   logoIconWrap: {
     width: 34, height: 34, borderRadius: 9,
-    background: 'linear-gradient(135deg,#aa3bff,#7c3aed)',
+    background: '#09090b',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    boxShadow: '0 3px 10px rgba(170,59,255,0.35)'
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
   },
   logoText: {
     fontFamily: 'var(--font-heading)', fontSize: '1.1rem',
-    fontWeight: 800, color: '#08060d', letterSpacing: '-0.3px'
+    fontWeight: 800, color: '#09090b', letterSpacing: '-0.3px'
   },
   pillContainer: {
     display: 'flex', backgroundColor: '#f1f3f7',
@@ -340,35 +341,35 @@ const s = {
     fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
     transition: 'all 0.2s', fontFamily: 'var(--font-body)'
   },
-  pillActive: { backgroundColor: '#08060d', color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.12)' },
-  pillInactive: { backgroundColor: 'transparent', color: '#64748b' },
+  pillActive: { backgroundColor: '#09090b', color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.12)' },
+  pillInactive: { backgroundColor: 'transparent', color: '#52525b' },
   headerRight: { display: 'flex', alignItems: 'center', gap: '1rem' },
   notifWrap: {
     position: 'relative', width: 34, height: 34, borderRadius: 10,
-    backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+    backgroundColor: '#ffffff', border: '1px solid #e4e4e7',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
   },
   notifDot: {
     position: 'absolute', top: 7, right: 7,
     width: 7, height: 7, borderRadius: '50%',
-    backgroundColor: '#f43f5e', border: '1.5px solid #fff'
+    backgroundColor: '#09090b', border: '1.5px solid #fff'
   },
   userWidget: {
     display: 'flex', alignItems: 'center', gap: '0.65rem',
     cursor: 'pointer', padding: '5px 10px', borderRadius: 28,
-    border: '1px solid #e2e8f0', backgroundColor: '#f8fafc'
+    border: '1px solid #e4e4e7', backgroundColor: '#ffffff'
   },
   userAvatarInitial: {
     width: 32, height: 32, borderRadius: '50%',
-    background: 'linear-gradient(135deg, #aa3bff, #7c3aed)',
+    backgroundColor: '#09090b',
     color: '#fff', fontWeight: 800, fontSize: '0.85rem',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     flexShrink: 0, fontFamily: 'var(--font-heading)'
   },
   userInfo: { display: 'flex', flexDirection: 'column' },
-  userName: { fontSize: '0.8rem', fontWeight: 700, color: '#08060d', lineHeight: 1.2 },
-  userRole: { fontSize: '0.68rem', color: '#64748b', fontWeight: 500 },
-  dropdownIcon: { color: '#94a3b8' },
+  userName: { fontSize: '0.8rem', fontWeight: 700, color: '#09090b', lineHeight: 1.2 },
+  userRole: { fontSize: '0.68rem', color: '#71717a', fontWeight: 500 },
+  dropdownIcon: { color: '#71717a' },
 
   // ── Body
   bodyWrapper: { display: 'flex', flexGrow: 1, overflow: 'hidden' },
@@ -377,9 +378,9 @@ const s = {
   sidebar: {
     width: 220, flexShrink: 0,
     background: '#ffffff',
-    borderRight: '1px solid #e2e8f0',
+    borderRight: '1px solid #e4e4e7',
     display: 'flex', flexDirection: 'column',
-    boxShadow: '1px 0 8px rgba(0,0,0,0.03)',
+    boxShadow: '1px 0 8px rgba(0,0,0,0.02)',
     zIndex: 10
   },
   sidebarScroll: {
@@ -390,7 +391,7 @@ const s = {
   navGroup: { marginBottom: '0.65rem' },
   navGroupLabel: {
     fontSize: '0.62rem', fontWeight: 800, letterSpacing: '1px',
-    color: '#475569', textTransform: 'uppercase',
+    color: '#a1a1aa', textTransform: 'uppercase',
     padding: '0.65rem 0.75rem 0.35rem', userSelect: 'none'
   },
   navItem: {
@@ -402,25 +403,25 @@ const s = {
   navItemActive: {
     display: 'flex', alignItems: 'center', gap: '0.65rem',
     width: '100%', padding: '0.55rem 0.75rem', borderRadius: 10,
-    border: 'none', background: '#eff6ff',
+    border: 'none', background: '#09090b',
     cursor: 'pointer', position: 'relative', textAlign: 'left',
-    boxShadow: 'inset 0 0 0 1px #bfdbfe'
+    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
   },
   activePill: {
     position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
     width: 3.5, height: 20, borderRadius: '0 3px 3px 0',
-    background: '#2563eb',
-    boxShadow: '0 0 8px rgba(37,99,235,0.4)'
+    background: '#ffffff',
+    display: 'none'
   },
-  navIcon: { color: '#64748b', display: 'flex', flexShrink: 0 },
-  navIconActive: { color: '#2563eb', display: 'flex', flexShrink: 0 },
+  navIcon: { color: '#71717a', display: 'flex', flexShrink: 0 },
+  navIconActive: { color: '#ffffff', display: 'flex', flexShrink: 0 },
   navLabel: {
     fontSize: '0.82rem', fontWeight: 600,
-    color: '#334155', flex: 1, fontFamily: 'var(--font-body)'
+    color: '#3f3f46', flex: 1, fontFamily: 'var(--font-body)'
   },
   navLabelActive: {
     fontSize: '0.82rem', fontWeight: 700,
-    color: '#1d4ed8', flex: 1, fontFamily: 'var(--font-body)'
+    color: '#ffffff', flex: 1, fontFamily: 'var(--font-body)'
   },
   badge: {
     fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px',
@@ -429,27 +430,27 @@ const s = {
 
   // ── Sidebar Bottom
   sidebarBottom: { padding: '0 0.75rem 1rem', flexShrink: 0 },
-  sidebarDivider: { height: 1, backgroundColor: '#e2e8f0', marginBottom: '0.85rem' },
+  sidebarDivider: { height: 1, backgroundColor: '#e4e4e7', marginBottom: '0.85rem' },
   userCard: {
     display: 'flex', alignItems: 'center', gap: '0.6rem',
     padding: '0.65rem 0.75rem', borderRadius: 12,
-    background: '#f8fafc', border: '1px solid #e2e8f0'
+    background: '#f8fafc', border: '1px solid #e4e4e7'
   },
   sidebarInitial: {
     width: 32, height: 32, borderRadius: '50%',
-    background: 'linear-gradient(135deg,#1d4ed8,#2563eb)',
+    backgroundColor: '#09090b',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: '0.85rem', fontWeight: 800, color: '#fff', flexShrink: 0
   },
   userCardInfo: { flex: 1, minWidth: 0 },
   userCardName: {
-    fontSize: '0.8rem', fontWeight: 700, color: '#0f172a',
+    fontSize: '0.8rem', fontWeight: 700, color: '#09090b',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
   },
-  userCardEmail: { fontSize: '0.65rem', color: '#64748b', fontWeight: 500 },
+  userCardEmail: { fontSize: '0.65rem', color: '#71717a', fontWeight: 500 },
   logoutBtn: {
     background: 'transparent', border: 'none',
-    color: '#ef4444', cursor: 'pointer',
+    color: '#71717a', cursor: 'pointer',
     padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center'
   },
 
@@ -457,8 +458,8 @@ const s = {
   mainContent: { flexGrow: 1, overflowY: 'auto', position: 'relative', backgroundColor: 'var(--bg-primary)' },
 
   // ── Dropdowns
-  dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
-  dropdownHeader: { fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '4px 8px', borderBottom: '1px solid #f1f5f9', marginBottom: 4 },
-  notifItem: { padding: '8px', borderRadius: 8, backgroundColor: '#f8fafc', borderLeft: '3px solid #aa3bff', display: 'flex', flexDirection: 'column', gap: 2 },
-  menuItem: { padding: '8px 12px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 600, color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.15s' }
+  dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e4e4e7', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
+  dropdownHeader: { fontSize: '0.72rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '4px 8px', borderBottom: '1px solid #f4f4f5', marginBottom: 4 },
+  notifItem: { padding: '8px', borderRadius: 8, backgroundColor: '#f8fafc', borderLeft: '3px solid #09090b', display: 'flex', flexDirection: 'column', gap: 2 },
+  menuItem: { padding: '8px 12px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 600, color: '#3f3f46', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.15s' }
 };

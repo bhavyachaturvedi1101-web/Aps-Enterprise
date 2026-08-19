@@ -1,17 +1,15 @@
 import React from 'react';
 
 const MOCK_EMPLOYEES = [
-  { id: 'e1', name: 'Animesh', role: 'Voice AI & Sales Lead', tasksCompleted: 14, callsHandled: 124, salesClosed: 8, kpiScore: '92%' },
-  { id: 'e2', name: 'Bhavya', role: 'Systems Architect & Admin', tasksCompleted: 18, callsHandled: 0, salesClosed: 12, kpiScore: '96%' },
-  { id: 'e3', name: 'Aaditya', role: 'Analytics & Automation Specialist', tasksCompleted: 11, callsHandled: 15, salesClosed: 5, kpiScore: '89%' }
+  { id: 'e1', name: 'Animesh', role: 'System Architect', tasksCompleted: 14, callsHandled: 124, salesClosed: 8, kpiScore: '92%' },
+  { id: 'e2', name: 'Bhavya', role: 'Core Engineer', tasksCompleted: 18, callsHandled: 0, salesClosed: 12, kpiScore: '96%' },
+  { id: 'e3', name: 'Aaditya', role: 'Operations Specialist', tasksCompleted: 11, callsHandled: 15, salesClosed: 5, kpiScore: '89%' }
 ];
 
 export default function Employees() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Employee Performance Profiles</h1>
-
-      <p style={styles.subtitle}>Track activity, closed bookings, and system metrics by employee</p>
 
       <div style={styles.card}>
         <table style={styles.table}>
@@ -33,7 +31,7 @@ export default function Employees() {
                 <td style={styles.td}>{emp.tasksCompleted}</td>
                 <td style={styles.td}>{emp.callsHandled}</td>
                 <td style={styles.td}>{emp.salesClosed}</td>
-                <td style={{ ...styles.td, color: '#aa3bff', fontWeight: '800' }}>{emp.kpiScore}</td>
+                <td style={{ ...styles.td, color: '#09090b', fontWeight: '800' }}>{emp.kpiScore}</td>
               </tr>
             ))}
           </tbody>

@@ -16,20 +16,23 @@ const getLeadById = async (req, res) => {
 
 // POST /api/leads — Create new lead
 const createLead = async (req, res) => {
-  const { name, interest, budget, notes, source } = req.body;
+  const { name, phone, company, interest, budget, notes, source, stage, priority } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
 
   const lead = {
     id: `LEAD-${String(mockLeads.length + 1).padStart(3, '0')}`,
     name,
+    phone: phone || '+91 98765 43210',
+    company: company || `${name} Corp`,
     interest: interest || 'CNC Machine Unit',
     budget: budget || '20000',
-    stage: 'Enquiry',
-    notes: notes || 'Direct manual entry from Admin Cockpit.',
+    stage: stage || 'Enquiry',
+    priority: priority || 'Warm',
+    notes: notes || 'Direct manual entry from CRM Board.',
     crmSynced: true,
     erpBookingCreated: false,
     tallyPaymentVerified: false,
-    source: source || 'Admin Cockpit',
+    source: source || 'Direct Web',
     assignedEmployeeId: 'e1',
     createdAt: new Date()
   };
@@ -40,14 +43,48 @@ const createLead = async (req, res) => {
     id: `log${Date.now()}`,
     leadId: lead.id,
     employeeId: req.user?.id || 'e2',
-    action: `New Lead "${lead.name}" created in Admin Cockpit (Stage: Enquiry)`,
-
+    action: `New Lead "${lead.name}" created in CRM Board (Stage: ${lead.stage})`,
     fromStage: 'None',
-    toStage: 'Enquiry',
+    toStage: lead.stage,
     createdAt: new Date()
   });
 
   res.status(201).json({ success: true, lead });
+};
+
+// PUT /api/leads/:id — Update existing lead
+const updateLead = async (req, res) => {
+  const { id } = req.params;
+  const leadIndex = mockLeads.findIndex(l => l.id === id || l.id === `LEAD-${id.padStart(3, '0')}`);
+  if (leadIndex === -1) return res.status(404).json({ error: 'Lead not found' });
+
+  const current = mockLeads[leadIndex];
+  const { name, phone, company, interest, budget, notes, source, stage, priority } = req.body;
+
+  mockLeads[leadIndex] = {
+    ...current,
+    name: name !== undefined ? name : current.name,
+    phone: phone !== undefined ? phone : current.phone,
+    company: company !== undefined ? company : current.company,
+    interest: interest !== undefined ? interest : current.interest,
+    budget: budget !== undefined ? budget : current.budget,
+    notes: notes !== undefined ? notes : current.notes,
+    source: source !== undefined ? source : current.source,
+    stage: stage !== undefined ? stage : current.stage,
+    priority: priority !== undefined ? priority : current.priority
+  };
+
+  res.json({ success: true, lead: mockLeads[leadIndex] });
+};
+
+// DELETE /api/leads/:id — Delete lead
+const deleteLead = async (req, res) => {
+  const { id } = req.params;
+  const leadIndex = mockLeads.findIndex(l => l.id === id || l.id === `LEAD-${id.padStart(3, '0')}`);
+  if (leadIndex === -1) return res.status(404).json({ error: 'Lead not found' });
+
+  const deleted = mockLeads.splice(leadIndex, 1)[0];
+  res.json({ success: true, message: `Lead "${deleted.name}" deleted successfully`, lead: deleted });
 };
 
 // POST /api/leads/:id/transition — Submit status transition
@@ -126,5 +163,7 @@ module.exports = {
   getLeads,
   getLeadById,
   createLead,
+  updateLead,
+  deleteLead,
   transitionLead
 };
