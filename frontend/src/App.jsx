@@ -15,6 +15,7 @@ import UsersRoles from './pages/UsersRoles';
 import TallySync from './pages/TallySync';
 import Invoices from './pages/Invoices';
 import { WhatsAppAgent, VoiceAgent } from './pages/AgentPages';
+import APSAIPage from './pages/APSAIPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import './App.css';
 
@@ -39,6 +40,8 @@ function App() {
           <Route path="/payments" element={<PaymentGate />} />
 
           {/* AI Agents */}
+          <Route path="/ai" element={<APSAIPage />} />
+          <Route path="/chatbot" element={<Navigate to="/ai" replace />} />
           <Route path="/voice" element={<VoiceAgent />} />
           <Route path="/whatsapp" element={<WhatsAppAgent />} />
           <Route path="/dialer" element={<DialerQueue />} />

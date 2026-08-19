@@ -488,67 +488,141 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Card 3 — APS AI Assistant */}
-            <div style={s.card}>
-              <div style={s.cardTop}>
-                <div style={s.cardTitle}>APS AI Assistant</div>
-                <div style={{color:'#94a3b8',cursor:'pointer'}}>•••</div>
-              </div>
-              <div style={s.chatWrap}>
-                <div style={s.chatArea}>
-                  {chatMessages.map(msg => (
-                    <div key={msg.id} style={{...s.bubble, ...(msg.sender === 'ai' ? s.bubbleAi : s.bubbleUser)}}>
-                      {msg.sender === 'ai' && (
-                        <div style={s.aiAvatar}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="#aa3bff"><path d="M12 2L2 7v10l10 5 10-5V7z"/></svg>
-                        </div>
-                      )}
-                      <div>
-                        {msg.isHeader && <div style={s.aiLabel}>HOW CAN I <span style={{color:'#aa3bff'}}>ASSIST</span> YOU TODAY</div>}
-                        <div style={s.bubbleText}>{msg.text}</div>
+            {/* Card 3 — APS AI Assistant Dedicated Page Launcher */}
+            <div style={{ ...s.card, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
+              <div>
+                <div style={{ ...s.cardTop, borderBottom: '1px solid #f1f5f9', paddingBottom: '0.6rem', marginBottom: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/>
+                        <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ ...s.cardTitle, fontSize: '0.92rem' }}>APS AI Assistant</div>
+                      <div style={{ fontSize: '0.66rem', color: '#16a34a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981' }}/>
+                        Online
                       </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/ai')}
+                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', fontSize: '0.72rem', fontWeight: 700, padding: '4px 10px', borderRadius: 8, cursor: 'pointer' }}
+                  >
+                    Open Page ↗
+                  </button>
+                </div>
+
+                <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5, margin: '0 0 0.8rem 0' }}>
+                  Ask questions about pipeline stages, August revenue, team KPIs, or pending payment gates.
+                </p>
+
+                {/* Suggested Queries */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: '1rem' }}>
+                  {[
+                    { label: 'Show hot leads needing follow-up', q: 'Show me hot leads' },
+                    { label: 'Leads awaiting 10% Tally advance', q: 'Which leads are awaiting payment?' },
+                    { label: 'Complete lead pipeline distribution', q: 'Give me a pipeline breakdown' },
+                    { label: 'Top performing employee ranking', q: 'Who is the top performing employee?' }
+                  ].map((chip, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => navigate(`/ai?q=${encodeURIComponent(chip.q)}`)}
+                      style={{
+                        padding: '6px 10px',
+                        background: '#fff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 8,
+                        fontSize: '0.73rem',
+                        color: '#334155',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#93c5fd'; e.currentTarget.style.background = '#f0fdf4'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#fff'; }}
+                    >
+                      <span>{chip.label}</span>
+                      <span style={{ color: '#2563eb', fontWeight: 800 }}>›</span>
                     </div>
                   ))}
                 </div>
-                <form onSubmit={handleSendMessage} style={s.chatForm}>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                  />
-                  <input
-                    type="file"
-                    ref={imageInputRef}
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: 'none' }}
-                  />
+              </div>
+
+              {/* Quick Input & Launch Button */}
+              <div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const q = chatInput.trim();
+                    navigate(q ? `/ai?q=${encodeURIComponent(q)}` : '/ai');
+                  }}
+                  style={{ display: 'flex', gap: 6, marginBottom: 8 }}
+                >
                   <input
                     type="text"
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
-                    placeholder={isListening ? "Listening to your voice..." : "Ask me anything about leads, CRM, Tally..."}
-                    style={{ ...s.chatInput, backgroundColor: isListening ? '#fef3c7' : 'transparent' }}
+                    placeholder="Type query to open in AI page…"
+                    style={{
+                      flex: 1,
+                      padding: '7px 10px',
+                      borderRadius: 8,
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.78rem',
+                      outline: 'none',
+                      background: '#fff',
+                      fontFamily: 'Inter, sans-serif'
+                    }}
                   />
-                  <div style={s.chatFoot}>
-                    <span onClick={handleFileAttachClick} style={{ ...s.chatAttach, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                      <span>Attach File</span>
-                    </span>
-                    <div style={{display:'flex',gap:4}}>
-                      <button type="button" onClick={handleClearChat} style={s.chatCircle} title="Reset Chat">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      </button>
-                      <button type="button" onClick={handleImageAttachClick} style={s.chatCircle} title="Attach Image">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                      </button>
-                      <button type="button" onClick={handleVoiceToggle} style={{ ...s.chatSend, backgroundColor: isListening ? '#ef4444' : '#aa3bff' }} title="Voice Input">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                      </button>
-                    </div>
-                  </div>
+                  <button
+                    type="submit"
+                    style={{
+                      background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      padding: '0 12px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    <span>Ask</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </button>
                 </form>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/ai')}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    borderRadius: 10,
+                    border: '1px solid #bfdbfe',
+                    background: '#eff6ff',
+                    color: '#1d4ed8',
+                    fontWeight: 700,
+                    fontSize: '0.76rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6
+                  }}
+                >
+                  <span>Launch Full APS AI Workspace</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </button>
               </div>
             </div>
           </div>

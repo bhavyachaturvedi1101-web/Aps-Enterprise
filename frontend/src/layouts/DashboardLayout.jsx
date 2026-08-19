@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import APSAIChatPanel from '../components/A3ChatPanel';
 
 // ─── Nav Structure (APS Enterprise specific) ────────────────────────────────
 const NAV_GROUPS = [
@@ -20,7 +21,7 @@ const NAV_GROUPS = [
     group: 'OPERATIONS',
     items: [
       {
-        key: 'pipeline', label: 'CRM / Leads', badge: '7',
+        key: 'pipeline', label: 'CRM / Leads', badge: null,
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
       },
       {
@@ -28,7 +29,7 @@ const NAV_GROUPS = [
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       },
       {
-        key: 'payments', label: 'Payment Gate', badge: '1',
+        key: 'payments', label: 'Payment Gate', badge: null,
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       }
     ]
@@ -37,7 +38,11 @@ const NAV_GROUPS = [
     group: 'AI AGENTS',
     items: [
       {
-        key: 'voice', label: 'A1 Voice Agent', badge: 'Live',
+        key: 'ai', label: 'APS AI Assistant', badge: null,
+        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/><path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/></svg>
+      },
+      {
+        key: 'voice', label: 'A1 Voice Agent', badge: null,
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
       },
       {
@@ -45,7 +50,7 @@ const NAV_GROUPS = [
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       },
       {
-        key: 'dialer', label: 'Dialer Queue', badge: '12',
+        key: 'dialer', label: 'Dialer Queue', badge: null,
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       }
     ]
@@ -93,7 +98,9 @@ export default function DashboardLayout() {
   const queryParams = new URLSearchParams(location.search);
   const activeTab =
     queryParams.get('tab') ||
-    (path === '/users'     ? 'users'     :
+    (path === '/ai'        ? 'ai'        :
+     path === '/chatbot'   ? 'ai'        :
+     path === '/users'     ? 'users'     :
      path === '/bookings'  ? 'bookings'  :
      path === '/payments'  ? 'payments'  :
      path === '/voice'     ? 'voice'     :
@@ -110,6 +117,7 @@ export default function DashboardLayout() {
     const routes = {
       analytics:  '/dashboard?tab=analytics',
       pipeline:   '/dashboard?tab=pipeline',
+      ai:         '/ai',
       users:      '/users',
       bookings:   '/bookings',
       payments:   '/payments',
@@ -132,14 +140,7 @@ export default function DashboardLayout() {
       <header style={s.header}>
         {/* Logo */}
         <div style={s.logoSection} onClick={() => navigate('/dashboard')}>
-          <div style={s.logoIconWrap}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-              <path d="M12 2L2 7v10l10 5 10-5V7z" fill="rgba(255,255,255,0.2)"/>
-              <polyline points="12 22 12 12 22 7"/>
-              <polyline points="12 12 2 7"/>
-            </svg>
-          </div>
-          <span style={s.logoText}>APS Enterprise</span>
+          <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
         </div>
 
         {/* Center Pills */}
@@ -293,6 +294,10 @@ export default function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* ─── APS AI CHATBOT (Floating quick widget when not on /ai page) ── */}
+      {path !== '/ai' && <APSAIChatPanel />}
+
     </div>
   );
 }
@@ -371,10 +376,10 @@ const s = {
   // ── Sidebar
   sidebar: {
     width: 220, flexShrink: 0,
-    background: 'linear-gradient(180deg,#0d0b1a 0%,#131026 50%,#0a0e1a 100%)',
-    borderRight: '1px solid rgba(255,255,255,0.05)',
+    background: '#ffffff',
+    borderRight: '1px solid #e2e8f0',
     display: 'flex', flexDirection: 'column',
-    boxShadow: '3px 0 20px rgba(0,0,0,0.2)',
+    boxShadow: '1px 0 8px rgba(0,0,0,0.03)',
     zIndex: 10
   },
   sidebarScroll: {
@@ -382,40 +387,40 @@ const s = {
     display: 'flex', flexDirection: 'column', gap: '0.25rem',
     scrollbarWidth: 'none'
   },
-  navGroup: { marginBottom: '0.5rem' },
+  navGroup: { marginBottom: '0.65rem' },
   navGroupLabel: {
-    fontSize: '0.58rem', fontWeight: 700, letterSpacing: '1.2px',
-    color: 'rgba(255,255,255,0.22)', textTransform: 'uppercase',
+    fontSize: '0.62rem', fontWeight: 800, letterSpacing: '1px',
+    color: '#475569', textTransform: 'uppercase',
     padding: '0.65rem 0.75rem 0.35rem', userSelect: 'none'
   },
   navItem: {
     display: 'flex', alignItems: 'center', gap: '0.65rem',
     width: '100%', padding: '0.55rem 0.75rem', borderRadius: 10,
     border: 'none', background: 'transparent', cursor: 'pointer',
-    position: 'relative', transition: 'background 0.15s', textAlign: 'left'
+    position: 'relative', transition: 'background 0.15s, color 0.15s', textAlign: 'left'
   },
   navItemActive: {
     display: 'flex', alignItems: 'center', gap: '0.65rem',
     width: '100%', padding: '0.55rem 0.75rem', borderRadius: 10,
-    border: 'none', background: 'rgba(99,102,241,0.14)',
+    border: 'none', background: '#eff6ff',
     cursor: 'pointer', position: 'relative', textAlign: 'left',
-    boxShadow: 'inset 0 0 0 1px rgba(99,102,241,0.2)'
+    boxShadow: 'inset 0 0 0 1px #bfdbfe'
   },
   activePill: {
     position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
-    width: 3, height: 20, borderRadius: '0 3px 3px 0',
-    background: 'linear-gradient(180deg,#818cf8,#6366f1)',
-    boxShadow: '0 0 8px rgba(99,102,241,0.8)'
+    width: 3.5, height: 20, borderRadius: '0 3px 3px 0',
+    background: '#2563eb',
+    boxShadow: '0 0 8px rgba(37,99,235,0.4)'
   },
-  navIcon: { color: 'rgba(255,255,255,0.65)', display: 'flex', flexShrink: 0 },
-  navIconActive: { color: '#a5b4fc', display: 'flex', flexShrink: 0 },
+  navIcon: { color: '#64748b', display: 'flex', flexShrink: 0 },
+  navIconActive: { color: '#2563eb', display: 'flex', flexShrink: 0 },
   navLabel: {
-    fontSize: '0.82rem', fontWeight: 500,
-    color: 'rgba(255,255,255,0.75)', flex: 1, fontFamily: 'var(--font-body)'
+    fontSize: '0.82rem', fontWeight: 600,
+    color: '#334155', flex: 1, fontFamily: 'var(--font-body)'
   },
   navLabelActive: {
-    fontSize: '0.82rem', fontWeight: 600,
-    color: '#e2e8f0', flex: 1, fontFamily: 'var(--font-body)'
+    fontSize: '0.82rem', fontWeight: 700,
+    color: '#1d4ed8', flex: 1, fontFamily: 'var(--font-body)'
   },
   badge: {
     fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px',
@@ -424,27 +429,27 @@ const s = {
 
   // ── Sidebar Bottom
   sidebarBottom: { padding: '0 0.75rem 1rem', flexShrink: 0 },
-  sidebarDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginBottom: '0.85rem' },
+  sidebarDivider: { height: 1, backgroundColor: '#e2e8f0', marginBottom: '0.85rem' },
   userCard: {
     display: 'flex', alignItems: 'center', gap: '0.6rem',
     padding: '0.65rem 0.75rem', borderRadius: 12,
-    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)'
+    background: '#f8fafc', border: '1px solid #e2e8f0'
   },
   sidebarInitial: {
     width: 32, height: 32, borderRadius: '50%',
-    background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+    background: 'linear-gradient(135deg,#1d4ed8,#2563eb)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: '0.85rem', fontWeight: 800, color: '#fff', flexShrink: 0
   },
   userCardInfo: { flex: 1, minWidth: 0 },
   userCardName: {
-    fontSize: '0.8rem', fontWeight: 700, color: '#fff',
+    fontSize: '0.8rem', fontWeight: 700, color: '#0f172a',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
   },
-  userCardEmail: { fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', fontWeight: 500 },
+  userCardEmail: { fontSize: '0.65rem', color: '#64748b', fontWeight: 500 },
   logoutBtn: {
     background: 'transparent', border: 'none',
-    color: 'rgba(248,113,113,0.65)', cursor: 'pointer',
+    color: '#ef4444', cursor: 'pointer',
     padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center'
   },
 
