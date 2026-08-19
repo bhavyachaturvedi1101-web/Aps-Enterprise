@@ -214,7 +214,6 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Total Messages Dispatched</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(37,211,102,0.12)', color: '#25D366' }}>💬</span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.totalMessagesSent?.toLocaleString('en-IN')}</span>
@@ -223,11 +222,9 @@ export default function WhatsAppAutomation() {
             <div style={s.kpiSub}>Automated event triggers across lead state changes</div>
           </div>
 
-
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Handset Delivery Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>✓✓</span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.deliveryRate}</span>
@@ -239,7 +236,6 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Message Read & Open Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff' }}>👁️</span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.readRate}</span>
@@ -251,7 +247,6 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Active Lifecycle Sequences</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>⚡</span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.activeSequencesCount} / {analytics.totalSequencesCount} Active</span>
@@ -261,6 +256,7 @@ export default function WhatsAppAutomation() {
           </div>
         </div>
       )}
+
 
       {/* Navigation Tabs */}
       <div style={s.tabsContainer}>
