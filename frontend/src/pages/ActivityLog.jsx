@@ -35,7 +35,12 @@ export default function ActivityLog() {
         </div>
         {logs.map(log => (
           <div key={log.id} style={s.tableRow}>
-            <div style={s.td}>{new Date(log.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
+            <div style={{ ...s.td, fontSize: '0.74rem', color: '#475569' }}>
+              {new Date(log.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} {' '}
+              <span style={{ fontWeight: 600, color: '#0f172a' }}>
+                {new Date(log.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
             <div style={{...s.td, fontWeight:700, color:'#09090b', display:'flex', alignItems:'center', gap:5}}>
               {ICONS[log.employeeId] || <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
               <span>{log.employeeId}</span>

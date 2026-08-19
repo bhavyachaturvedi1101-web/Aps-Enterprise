@@ -400,33 +400,6 @@ export default function Dashboard() {
           {/* Overview Header */}
           <div style={s.secHead}>
             <h2 style={s.secTitle}>Overview</h2>
-            <div style={s.filterRow}>
-              {activeFilters.map(f => (
-                <div key={f} style={s.filterPill}>
-                  {f}
-                  <span
-                    onClick={() => setActiveFilters(prev => prev.filter(x => x !== f))}
-                    style={{ color: '#94a3b8', marginLeft: 6, cursor: 'pointer', fontWeight: 800 }}
-                    title="Remove filter"
-                  >
-                    ✕
-                  </span>
-                </div>
-              ))}
-              {activeFilters.length === 0 && (
-                <button
-                  onClick={() => setActiveFilters(['Last Month', 'All Campaigns', 'Global'])}
-                  style={{ ...s.filterPill, backgroundColor: '#f1f5f9', color: '#64748b', cursor: 'pointer' }}
-                >
-                  + Reset Default Filters
-                </button>
-              )}
-              <button onClick={() => setFilterModalOpen(true)} style={s.filterIcon} title="Filter Settings">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                </svg>
-              </button>
-            </div>
           </div>
 
           {/* Three Card Grid */}

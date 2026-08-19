@@ -91,6 +91,66 @@ const TALLY_VOUCHER_MASTER = [
     reconStatus: 'Discrepancy Flagged',
     syncTimestamp: '15-Aug-2026',
     narration: 'Amount mismatched by ₹500 against proforma invoice estimate'
+  },
+  {
+    voucherNo: 'VCH-2026-0097',
+    tallyMasterId: 'MST-88216',
+    date: '2026-08-14',
+    partyName: 'Siemens Energy India',
+    particulars: 'HDFC Bank Main A/c (#5020)',
+    voucherType: 'Advance Receipt (10%)',
+    debitAmount: 0,
+    creditAmount: 22000,
+    gstOutput: 3960,
+    utrNo: 'UTR-HDFC9910234',
+    reconStatus: 'Reconciled',
+    syncTimestamp: '14-Aug-2026',
+    narration: '10% advance deposit cleared for 5-Axis VMC Machining Unit'
+  },
+  {
+    voucherNo: 'VCH-2026-0098',
+    tallyMasterId: 'MST-88217',
+    date: '2026-08-13',
+    partyName: 'Bharat Forge Systems',
+    particulars: 'ICICI Current A/c (#2291)',
+    voucherType: 'Advance Receipt (10%)',
+    debitAmount: 0,
+    creditAmount: 9500,
+    gstOutput: 1710,
+    utrNo: 'UTR-ICICI8840192',
+    reconStatus: 'Reconciled',
+    syncTimestamp: '13-Aug-2026',
+    narration: '10% advance deposit for Robotic Welding Cell #LEAD-014'
+  },
+  {
+    voucherNo: 'VCH-2026-0099',
+    tallyMasterId: 'MST-88218',
+    date: '2026-08-12',
+    partyName: 'Eicher Motors Foundry',
+    particulars: 'Advance Receipts (10% Gate)',
+    voucherType: 'Advance Receipt (10%)',
+    debitAmount: 0,
+    creditAmount: 5200,
+    gstOutput: 936,
+    utrNo: 'UTR-SBI33019284',
+    reconStatus: 'Reconciled',
+    syncTimestamp: '12-Aug-2026',
+    narration: '10% advance deposit cleared for Core Shooter Machine'
+  },
+  {
+    voucherNo: 'VCH-2026-0100',
+    tallyMasterId: 'MST-88219',
+    date: '2026-08-11',
+    partyName: 'Thermax Boilers & Piping',
+    particulars: 'Factory Allocation Ledger (#4010)',
+    voucherType: 'Journal Voucher',
+    debitAmount: 78000,
+    creditAmount: 0,
+    gstOutput: 14040,
+    utrNo: 'INTERNAL-JNL-14',
+    reconStatus: 'Reconciled',
+    syncTimestamp: '11-Aug-2026',
+    narration: 'Factory Job Card #APS-MFG-9204 final clearance entry'
   }
 ];
 
@@ -100,6 +160,7 @@ export default function TallySync() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedXmlPayload, setSelectedXmlPayload] = useState(null);
+  const [xmlTab, setXmlTab] = useState('human');
   const [isSyncing, setIsSyncing] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [newVoucher, setNewVoucher] = useState({
@@ -308,7 +369,7 @@ export default function TallySync() {
                   </button>
                 ) : (
                   <button onClick={() => setSelectedXmlPayload(v)} style={s.xmlPayloadBtn}>
-                    XML Payload
+                    View Details
                   </button>
                 )}
               </div>
@@ -317,57 +378,82 @@ export default function TallySync() {
         })}
       </div>
 
-      {/* XML Payload Viewer Modal */}
+      {/* Tally Voucher Details Modal (Clean Human-Readable View) */}
       {selectedXmlPayload && (
         <div style={s.modalOverlay}>
-          <div style={{ ...s.modalContent, maxWidth: 580 }}>
+          <div style={{ ...s.modalContent, maxWidth: 620, borderRadius: '16px', padding: '24px' }}>
             <div style={s.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>Tally XML Payload — {selectedXmlPayload.voucherNo}</h3>
-              <button onClick={() => setSelectedXmlPayload(null)} style={s.closeModalBtn}>✕</button>
-            </div>
-            <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '1rem' }}>
-              Raw Tally ERP 9 HTTP POST XML Payload generated for <strong>{selectedXmlPayload.partyName}</strong>
-            </div>
-
-            <pre style={s.xmlBox}>
-{`<ENVELOP>
-  <HEADER>
-    <TALLYREQUEST>Import Data</TALLYREQUEST>
-  </HEADER>
-  <BODY>
-    <IMPORTDATA>
-      <REQUESTDESC>
-        <REPORTNAME>Vouchers</REPORTNAME>
-      </REQUESTDESC>
-      <REQUESTDATA>
-        <TALLYMESSAGE xmlns:UDF="TallyUDF">
-          <VOUCHER VCHTYPE="${selectedXmlPayload.voucherType}" ACTION="Create">
-            <DATE>${selectedXmlPayload.date.replace(/-/g, '')}</DATE>
-            <VOUCHERTYPENAME>${selectedXmlPayload.voucherType}</VOUCHERTYPENAME>
-            <VOUCHERNUMBER>${selectedXmlPayload.voucherNo}</VOUCHERNUMBER>
-            <PARTYLEDGERNAME>${selectedXmlPayload.partyName}</PARTYLEDGERNAME>
-            <NARRATION>${selectedXmlPayload.narration}</NARRATION>
-            <ALLLEDGERENTRIES.LIST>
-              <LEDGERNAME>${selectedXmlPayload.particulars}</LEDGERNAME>
-              <ISDEEMEDPOSITIVE>${selectedXmlPayload.creditAmount > 0 ? 'Yes' : 'No'}</ISDEEMEDPOSITIVE>
-              <AMOUNT>${selectedXmlPayload.creditAmount > 0 ? -selectedXmlPayload.creditAmount : selectedXmlPayload.debitAmount}</AMOUNT>
-              <BANKALLOCATIONS.LIST>
-                <BANKTRANSACTIONTYPE>e-Fund Transfer</BANKTRANSACTIONTYPE>
-                <TRANSACTIONREF>${selectedXmlPayload.utrNo}</TRANSACTIONREF>
-              </BANKALLOCATIONS.LIST>
-            </ALLLEDGERENTRIES.LIST>
-          </VOUCHER>
-        </TALLYMESSAGE>
-      </REQUESTDATA>
-    </IMPORTDATA>
-  </BODY>
-</ENVELOP>`}
-            </pre>
-
-            <div style={s.modalActions}>
-              <button onClick={() => { navigator.clipboard.writeText(selectedXmlPayload.voucherNo); showToast('XML snippet copied to clipboard!'); }} style={s.cancelBtn}>
-                Copy XML
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>
+                  Voucher Details — {selectedXmlPayload.voucherNo}
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
+                  Tally ERP 9 Ledger Entry for <strong>{selectedXmlPayload.partyName}</strong>
+                </div>
+              </div>
+              <button onClick={() => setSelectedXmlPayload(null)} style={s.closeModalBtn}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
+            </div>
+
+            {/* Human-Readable Summary View */}
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '18px', margin: '16px 0 12px 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '0.88rem' }}>
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Voucher Number</span>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{selectedXmlPayload.voucherNo}</strong>
+                </div>
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Tally Master ID</span>
+                  <span style={{ fontFamily: 'monospace', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px', fontSize: '0.82rem' }}>{selectedXmlPayload.tallyMasterId}</span>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Party / Client Name</span>
+                  <span style={{ color: '#1e293b', fontWeight: 600 }}>{selectedXmlPayload.partyName}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Voucher Type</span>
+                  <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600 }}>{selectedXmlPayload.voucherType}</span>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Voucher Date</span>
+                  <span style={{ color: '#334155' }}>{selectedXmlPayload.date}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Bank UTR / Reference</span>
+                  <span style={{ color: '#0f172a', fontFamily: 'monospace', fontWeight: 600 }}>{selectedXmlPayload.utrNo}</span>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Total Amount</span>
+                  <strong style={{ color: '#059669', fontSize: '1.1rem' }}>
+                    ₹{(selectedXmlPayload.creditAmount || selectedXmlPayload.debitAmount).toLocaleString('en-IN')}
+                  </strong>
+                </div>
+                <div>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>GST Output (18%)</span>
+                  <span style={{ color: '#475569', fontWeight: 600 }}>₹{selectedXmlPayload.gstOutput.toLocaleString('en-IN')}</span>
+                </div>
+
+                <div style={{ gridColumn: 'span 2' }}>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Ledger Allocation</span>
+                  <span style={{ color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', padding: '6px 10px', borderRadius: '6px', display: 'block', marginTop: '4px', fontSize: '0.84rem' }}>
+                    {selectedXmlPayload.particulars}
+                  </span>
+                </div>
+
+                <div style={{ gridColumn: 'span 2' }}>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Tally Narration</span>
+                  <div style={{ color: '#334155', fontStyle: 'italic', background: '#ffffff', border: '1px solid #cbd5e1', padding: '8px 10px', borderRadius: '6px', marginTop: '4px', fontSize: '0.84rem' }}>
+                    "{selectedXmlPayload.narration}"
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ ...s.modalActions, marginTop: '16px' }}>
               <button onClick={() => setSelectedXmlPayload(null)} style={s.submitBtn}>
                 Close
               </button>
@@ -382,7 +468,9 @@ export default function TallySync() {
           <div style={s.modalContent}>
             <div style={s.modalHeader}>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Post New Tally Voucher Entry</h3>
-              <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
+              <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
             <form onSubmit={handlePostVoucher} style={s.modalForm}>
               <label style={s.label}>Party / Client Name</label>

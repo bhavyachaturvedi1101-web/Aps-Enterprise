@@ -129,7 +129,9 @@ export default function Invoices() {
           <div style={s.modalContent}>
             <div style={s.modalHeader}>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Create New Customer Invoice</h3>
-              <button onClick={() => setShowModal(false)} style={s.closeModalBtn}>✕</button>
+              <button onClick={() => setShowModal(false)} style={s.closeModalBtn}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
             <form onSubmit={handleCreateInvoice} style={s.modalForm}>
               <label style={s.label}>Client Name</label>
