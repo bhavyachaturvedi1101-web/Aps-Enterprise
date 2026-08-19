@@ -187,17 +187,9 @@ export default function WhatsAppAutomation() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>CUSTOMER LIFECYCLE AUTOMATION</div>
           <h1 style={s.title}>WhatsApp AI Automation & Lifecycle Messaging</h1>
-          <p style={s.subtitle}>
-            Event-driven messaging synced directly to pipeline transitions: payment gate reminders, Tally order release, and production tracking.
-          </p>
         </div>
         <div style={s.headerActions}>
-          <div style={s.wabaBadge}>
-            <span style={s.wabaDot} />
-            <span style={s.wabaText}>Meta Cloud API v20.0 (WABA Live)</span>
-          </div>
           <button onClick={() => setActiveTab('broadcast')} style={s.newMsgBtn}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="22" y1="2" x2="11" y2="13" />
@@ -207,6 +199,7 @@ export default function WhatsAppAutomation() {
           </button>
         </div>
       </div>
+
 
       {/* Top Overview Metric KPI Cards */}
       {analytics && (
@@ -307,10 +300,9 @@ export default function WhatsAppAutomation() {
           <div style={s.sectionHeader}>
             <div>
               <h3 style={s.sectionTitle}>Live WhatsApp Audit & Dispatch Log</h3>
-              <p style={s.sectionSub}>Automated notifications dispatched by WhatsApp Automation based on pipeline state machine events</p>
             </div>
-
           </div>
+
 
           <table style={s.table}>
             <thead>
@@ -525,11 +517,11 @@ export default function WhatsAppAutomation() {
         <div style={s.broadcastContainer}>
           <div style={s.broadcastFormCard}>
             <h3 style={s.sectionTitle}>Manual WhatsApp Dispatch & Live Sandbox</h3>
-            <p style={s.sectionSub}>Select a lead from the CRM database or enter custom parameters to fire live WhatsApp notifications</p>
 
             <form onSubmit={handleSendCustomBroadcast} style={s.form}>
               <div style={s.formGroup}>
                 <label style={s.formLabel}>Select Lead Record (CRM Database)</label>
+
 
                 <select
                   value={broadcastData.leadId}
