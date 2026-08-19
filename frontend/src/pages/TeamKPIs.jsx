@@ -218,13 +218,10 @@ export default function TeamKPIs() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>ENTERPRISE PERFORMANCE ANALYTICS</div>
           <h1 style={s.title}>Employee Performance & Time-in-Stage Profiles</h1>
-          <p style={s.subtitle}>
-            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on system activity logs.
-          </p>
         </div>
         <div style={s.headerActions}>
+
           <button onClick={exportCSV} style={s.exportBtn}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -346,8 +343,8 @@ export default function TeamKPIs() {
             return (
               <div key={emp.id} style={{ ...s.empCard, ...(isTop ? s.empCardTop : {}) }}>
                 {isTop && (
-                  <div style={s.topRibbon}>
-                    <span>⭐ TOP PERFORMER</span>
+                  <div style={s.rankCornerBadge}>
+                    #1 RANK
                   </div>
                 )}
 
@@ -369,6 +366,8 @@ export default function TeamKPIs() {
                     <div style={s.kpiBadgeLbl}>KPI SCORE</div>
                   </div>
                 </div>
+
+
 
                 {/* Footer Action */}
                 <div style={s.empCardFooter}>
@@ -424,7 +423,6 @@ export default function TeamKPIs() {
             <div style={s.sectionHeader}>
               <div>
                 <h3 style={s.sectionTitle}>Pipeline Stage Dwell Time & SLA Adherence</h3>
-                <p style={s.sectionSub}>Real-time duration tracking calculated from state transitions in activity logs</p>
               </div>
               <span style={s.slaTargetChip}>Target Total Pipeline Dwell: &lt; 96h to Production</span>
             </div>
@@ -490,7 +488,6 @@ export default function TeamKPIs() {
           {/* Stalled Deals Table */ }
   <div style={s.stalledDealsCard}>
     <h3 style={s.sectionTitle}>High-Risk / Cold Deals Exceeding Stage Thresholds</h3>
-    <p style={s.sectionSub}>Deals at risk of cold-off requiring immediate telecaller outreach or automated WhatsApp sequences</p>
 
     <table style={s.table}>
       <thead>
@@ -550,7 +547,6 @@ export default function TeamKPIs() {
       <div style={s.sectionHeader}>
         <div>
           <h3 style={s.sectionTitle}>Employee Metric Comparison & Conversion Matrix</h3>
-          <p style={s.sectionSub}>Cross-functional evaluation across Voice AI, Admin Operations, and Lifecycle Automation</p>
         </div>
       </div>
 
@@ -608,10 +604,10 @@ export default function TeamKPIs() {
       <div style={s.sectionHeader}>
         <div>
           <h3 style={s.sectionTitle}>Central Control Cockpit Audit Action Stream</h3>
-          <p style={s.sectionSub}>Complete chronological log of all operator actions, state transitions, and integration triggers</p>
         </div>
         <span style={s.liveChip}>● LIVE SYNC</span>
       </div>
+
 
       <div style={s.auditTimeline}>
         {activityLogs.map(log => (
@@ -1172,22 +1168,25 @@ const s = {
       flexDirection: 'column'
   },
       empCardTop: {
-        border: '1.5px solid #aa3bff',
-      boxShadow: '0 8px 25px rgba(170,59,255,0.08)'
+    border: '1.5px solid rgba(170, 59, 255, 0.35)',
+    boxShadow: '0 4px 18px rgba(170, 59, 255, 0.07)'
   },
-      topRibbon: {
-        position: 'absolute',
-      top: -10,
-      right: 20,
-      backgroundColor: '#aa3bff',
-      color: '#fff',
-      fontSize: '0.62rem',
-      fontWeight: 800,
-      padding: '3px 10px',
-      borderRadius: 20,
-      boxShadow: '0 3px 8px rgba(170,59,255,0.4)'
+  rankCornerBadge: {
+    position: 'absolute',
+    top: -10,
+    left: 20,
+    background: 'linear-gradient(135deg, #aa3bff, #7c3aed)',
+    color: '#fff',
+    fontSize: '0.62rem',
+    fontWeight: 800,
+    padding: '2px 10px',
+    borderRadius: 12,
+    boxShadow: '0 2px 8px rgba(170, 59, 255, 0.35)',
+    letterSpacing: '0.5px'
   },
-      empCardHeader: {
+  empCardHeader: {
+
+
     display: 'flex',
     alignItems: 'center',
     gap: '0.85rem',
@@ -1236,13 +1235,24 @@ const s = {
       color: '#08060d'
   },
       empDept: {
-        fontSize: '0.62rem',
-      fontWeight: 700,
-      padding: '1px 6px',
-      borderRadius: 10,
-      backgroundColor: '#f1f5f9',
-      color: '#475569'
+    fontSize: '0.62rem',
+    fontWeight: 700,
+    padding: '1px 6px',
+    borderRadius: 10,
+    backgroundColor: '#f1f5f9',
+    color: '#475569'
   },
+  rankPill: {
+    fontSize: '0.6rem',
+    fontWeight: 800,
+    padding: '1px 7px',
+    borderRadius: 10,
+    backgroundColor: 'rgba(170, 59, 255, 0.1)',
+    color: '#aa3bff',
+    border: '1px solid rgba(170, 59, 255, 0.25)',
+    letterSpacing: '0.3px'
+  },
+
       empRole: {
         fontSize: '0.74rem',
       color: '#64748b',
