@@ -23,10 +23,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// A2 Admin API Routes (Week 1 Contract)
+// A2 Admin API Routes
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/employees', require('./routes/employees'));
 app.use('/api/activity', require('./routes/activity'));
+
+// A3 AI Chatbot — Internal NL Query Engine
+app.use('/api/a3', require('./routes/a3'));
 app.use('/api/calls', require('./routes/calls'));
 app.use('/api/dialer', require('./routes/dialer'));
 app.use('/api/whatsapp', require('./routes/whatsapp'));
@@ -51,13 +54,21 @@ if (require.main === module) {
   ║          APS Enterprise — A2 Admin Backend System               ║
   ║               Week 1 Parallel Development Complete             ║
   ╠═════════════════════════════════════════════════════════════════╣
-  ║  Server running on port ${PORT}                                  ║
-  ║                                                                 ║
-  ║  Module Endpoints (Week 1 API Contract):                        ║
-  ║   [A1 Voice Agent]   POST /api/calls/outcome                   ║
-  ║   [A1 Dialer]        GET  /api/dialer/queue                     ║
-  ║   [A2 State Machine] POST /api/leads/:id/transition             ║
-  ║   [A2 System Config] GET  /api/config                           ║
+  ║  Integration Layer (Mock Mode):                      ║
+║   ✓ CRM   — Lead sync                               ║
+║   ✓ ERP   — Booking & Factory release               ║
+║   ✓ Dialer — Call queue status                      ║
+║   ✓ Tally  — Payment verification (Hard Gate)       ║
+║                                                      ║
+║  API Routes:                                         ║
+║   GET    /api/health                                ║
+║   GET    /api/leads                                 ║
+║   GET    /api/leads/:id                             ║
+║   POST   /api/leads/:id/transition                  ║
+║   GET    /api/employees                             ║
+║   GET    /api/activity                              ║
+║   POST   /api/a3/query     (A3 AI Chatbot)          ║
+║   GET    /api/a3/suggestions                        ║
   ║   [A4 Performance]   GET  /api/employees/:id/performance        ║
   ║   [A4 Time-in-stage] GET  /api/activity/time-in-stage           ║
   ║   [A5 WhatsApp]      POST /api/whatsapp/send-reminder           ║

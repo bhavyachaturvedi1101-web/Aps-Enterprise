@@ -28,15 +28,8 @@ export default function Login() {
       <div style={styles.blob2}></div>
       
       <div style={styles.card}>
-        <div style={styles.logoSection}>
-          <div style={styles.logoIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7v10l10 5 10-5V7z" fill="rgba(170, 59, 255, 0.1)"/>
-              <polyline points="12 22 12 12 22 7"/>
-              <polyline points="12 12 2 7"/>
-            </svg>
-          </div>
-          <span style={styles.logoText}>APS Enterprise</span>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 72, width: 'auto', display: 'block', objectFit: 'contain' }} />
         </div>
         
         <h2 style={styles.title}>Welcome Back</h2>
