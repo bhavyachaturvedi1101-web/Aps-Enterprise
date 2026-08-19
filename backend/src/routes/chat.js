@@ -39,12 +39,13 @@ router.post('/query', (req, res) => {
     const inProd = mockLeads.filter(l => l.stage === 'In Production').length;
     answer = `ERP Layer Status: ${booked} bookings created, ${inProd} released to manufacturing floor.`;
   } else if (input.includes('dialer') || input.includes('call') || input.includes('voice')) {
-    answer = "A1 Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
+    answer = "AI Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
   } else if (input.includes('employee') || input.includes('team') || input.includes('kpi')) {
-    answer = `Team KPIs: ${mockEmployees.length} active operators. Bhavya (A2 Admin) leading at 96% KPI score.`;
+    answer = `Team KPIs: ${mockEmployees.length} active team members. Bhavya leading at 98% KPI score.`;
   } else {
-    answer = `I have analyzed your query "${query}". The A2 Operating System is fully synchronized with ${mockLeads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
+    answer = `I have analyzed your query "${query}". The APS Operating System is fully synchronized with ${mockLeads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
   }
+
 
   res.json({
     answer,

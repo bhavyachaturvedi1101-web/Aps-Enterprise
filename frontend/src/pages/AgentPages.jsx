@@ -55,8 +55,9 @@ export function VoiceAgent() {
 
   return (
     <div style={s.page}>
-      <h1 style={s.title}>A1 Voice Agent Control Panel</h1>
+      <h1 style={s.title}>AI Voice Agent Control Panel</h1>
       <p style={s.sub}>AI-powered outbound & inbound calling engine — automated lead qualification and appointment setting</p>
+
 
       <div style={s.grid}>
         <div style={s.card}>
@@ -124,7 +125,7 @@ export function WhatsAppAgent() {
 
   return (
     <div style={s.page}>
-      <h1 style={s.title}>WhatsApp Automation (A5 / A3)</h1>
+      <h1 style={s.title}>WhatsApp Automation Control Panel</h1>
       <p style={s.sub}>Automated WhatsApp follow-up sequences, payment reminders, and lead nurturing</p>
 
       <div style={s.grid}>
@@ -136,9 +137,10 @@ export function WhatsAppAgent() {
             <label style={s.label}>Template Sequence</label>
             <select style={s.input} value={template} onChange={e => setTemplate(e.target.value)}>
               <option value="Payment Reminder">Tally 10% Advance Payment Gate</option>
-              <option value="Lead Qualification">A1 Follow-up & Product Brochure</option>
+              <option value="Lead Qualification">Voice Follow-up & Product Brochure</option>
               <option value="Dispatch Alert">Factory Dispatch Tracking Link</option>
             </select>
+
             <button type="submit" disabled={sending} style={{ ...s.btn, background: '#10b981', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
               <span>{sending ? 'Sending WhatsApp…' : 'Send WhatsApp Message'}</span>
