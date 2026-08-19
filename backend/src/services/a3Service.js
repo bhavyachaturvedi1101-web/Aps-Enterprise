@@ -41,17 +41,23 @@ function addToHistory(conversationId, userMsg, botMsg) {
 
 // ─── Intent Recognition ────────────────────────────────────────────────────────
 const INTENTS = [
+  { name: 'action_create_lead',     patterns: [/add.*lead/i, /create.*lead/i, /new lead/i, /register lead/i, /naya lead/i, /lead add/i, /nayi entry/i, /lead banao/i] },
+  { name: 'action_transition_lead', patterns: [/move.*lead/i, /transition.*lead/i, /change.*stage/i, /update.*stage/i, /set.*stage/i, /mark.*as/i, /promote.*lead/i, /stage badlo/i, /stage change/i, /move karo/i, /paid mark/i] },
+  { name: 'action_post_tally',      patterns: [/post.*tally/i, /add.*tally/i, /create.*voucher/i, /post.*voucher/i, /reconcile.*tally/i, /verify.*payment/i, /tally voucher/i, /tally entry/i, /paisa receive/i] },
+  { name: 'action_erp_booking',     patterns: [/create.*erp/i, /erp.*booking/i, /release.*factory/i, /release.*production/i, /start.*production/i, /factory release/i, /job card/i, /production queue/i] },
+  { name: 'action_queue_dialer',    patterns: [/queue.*call/i, /add.*dialer/i, /trigger.*call/i, /call.*lead/i, /dialer me daalo/i, /call karo/i, /voice call/i] },
+  { name: 'action_send_whatsapp',   patterns: [/send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i] },
   { name: 'leads_by_stage',   patterns: [/confirmed lead/i, /qualified lead/i, /enquir/i, /in production/i, /dispatched/i, /booked lead/i, /client.*paid/i, /paid.*client/i] },
-  { name: 'lead_count',       patterns: [/how many lead/i, /total lead/i, /count.*lead/i, /lead.*count/i, /number of lead/i] },
-  { name: 'pending_payment',  patterns: [/pending payment/i, /awaiting payment/i, /payment.*pending/i, /not.*paid/i, /unpaid/i, /due payment/i, /advance.*due/i] },
-  { name: 'top_performer',    patterns: [/top performer/i, /best.*employee/i, /highest.*sales/i, /most.*lead/i, /who.*sold/i, /best.*agent/i, /who.*best/i, /highest.*kpi/i] },
+  { name: 'lead_count',       patterns: [/how many lead/i, /total lead/i, /count.*lead/i, /lead.*count/i, /number of lead/i, /kitne lead/i, /total kitne/i] },
+  { name: 'pending_payment',  patterns: [/pending payment/i, /awaiting payment/i, /payment.*pending/i, /not.*paid/i, /unpaid/i, /due payment/i, /advance.*due/i, /kiska payment/i, /paise baki/i, /advance baaki/i] },
+  { name: 'top_performer',    patterns: [/top perform/i, /top employee/i, /best.*employee/i, /highest.*sales/i, /most.*lead/i, /who.*sold/i, /best.*agent/i, /who.*best/i, /highest.*kpi/i, /sabse achha/i, /kaun top/i, /best seller/i] },
   { name: 'compare_period',   patterns: [/this month.*last month/i, /compare.*month/i, /vs last month/i, /month.*comparison/i, /trend/i, /month.*month/i, /growth/i] },
-  { name: 'recent_activity',  patterns: [/recent activity/i, /latest.*activity/i, /what happened/i, /activity log/i, /last.*action/i, /recent.*update/i] },
-  { name: 'pipeline_summary', patterns: [/pipeline/i, /overview/i, /summary/i, /all stage/i, /breakdown/i, /distribution/i, /status.*lead/i, /lead.*status/i] },
-  { name: 'revenue_summary',  patterns: [/revenue/i, /total.*payment/i, /payment.*total/i, /money.*collect/i, /collect.*money/i, /saved/i, /earned/i, /sales of/i, /sale.*month/i, /income/i, /earning/i, /how much.*made/i, /how much.*earn/i, /what.*sales/i, /total.*sale/i, /sale.*august/i, /august.*sale/i, /this month.*sale/i] },
-  { name: 'employee_list',    patterns: [/list.*employee/i, /all employee/i, /\bteam\b/i, /\bstaff\b/i, /who.*work/i, /show.*employee/i, /our.*team/i] },
-  { name: 'hot_leads',        patterns: [/hot lead/i, /priority lead/i, /urgent/i, /follow.*up.*today/i, /today.*lead/i, /needs.*attention/i, /important.*lead/i] },
-  { name: 'kpi_stats',        patterns: [/kpi/i, /\bperformance\b/i, /\bscore\b/i, /\btarget\b/i, /conversion rate/i, /calls handled/i, /how.*doing/i, /team.*perform/i] },
+  { name: 'recent_activity',  patterns: [/recent activity/i, /latest.*activity/i, /what happened/i, /activity log/i, /last.*action/i, /recent.*update/i, /kya hua/i, /recent audit/i] },
+  { name: 'pipeline_summary', patterns: [/pipeline/i, /overview/i, /summary/i, /all stage/i, /breakdown/i, /distribution/i, /status.*lead/i, /lead.*status/i, /pipeline summary/i] },
+  { name: 'revenue_summary',  patterns: [/revenue/i, /total.*payment/i, /payment.*total/i, /money.*collect/i, /collect.*money/i, /saved/i, /earned/i, /sales of/i, /sale.*month/i, /income/i, /earning/i, /how much.*made/i, /how much.*earn/i, /what.*sales/i, /total.*sale/i, /sale.*august/i, /august.*sale/i, /this month.*sale/i, /kitna revenue/i, /kitni sale/i, /kitna kamaya/i, /paisa kitna/i] },
+  { name: 'employee_list',    patterns: [/list.*employee/i, /all employee/i, /\bteam\b/i, /\bstaff\b/i, /who.*work/i, /show.*employee/i, /our.*team/i, /kaun kaun kaam/i, /saare employee/i] },
+  { name: 'hot_leads',        patterns: [/hot lead/i, /priority lead/i, /urgent/i, /follow.*up.*today/i, /today.*lead/i, /needs.*attention/i, /important.*lead/i, /kaunsa lead/i, /urgent lead/i] },
+  { name: 'kpi_stats',        patterns: [/kpi/i, /\bperformance\b/i, /\bscore\b/i, /\btarget\b/i, /conversion rate/i, /calls handled/i, /how.*doing/i, /team.*perform/i, /kpi score/i] },
   { name: 'invoices',         patterns: [/invoice/i, /billing/i, /tally/i, /\bsync\b/i, /ledger/i] },
   { name: 'dialer',           patterns: [/dialer/i, /call queue/i, /voice agent/i, /\ba1\b/i, /calls made/i, /call log/i] },
   { name: 'whatsapp',         patterns: [/whatsapp/i, /reminder/i, /message sent/i, /\ba5\b/i, /automation/i, /template/i] },
@@ -302,6 +308,244 @@ async function handleWhatsApp() {
   };
 }
 
+// ─── ADMIN ACTION HANDLERS (CRM, TALLY, ERP, DIALER, WHATSAPP) ────────────────
+
+async function handleActionCreateLead(query) {
+  const store = getStore();
+  const leads = store.mockLeads || [];
+  const activityLogs = store.mockActivityLogs || [];
+
+  let nameMatch = query.match(/(?:add|create|new)\s+lead\s+(?:for\s+)?([a-zA-Z0-9\s]+?)(?=\s+budget|\s+stage|\s+source|$)/i);
+  let name = nameMatch ? nameMatch[1].trim() : `New Lead ${leads.length + 1}`;
+  
+  let budgetMatch = query.match(/budget\s+([0-9kK,]+)/i) || query.match(/₹?\s*([0-9]+000)/);
+  let budget = budgetMatch ? budgetMatch[1].replace(/,/g, '') : '50000';
+  if (budget.toLowerCase().endsWith('k')) budget = String(parseFloat(budget) * 1000);
+
+  let stage = detectStage(query) || 'Enquiry';
+
+  const newLeadObj = {
+    id: `LEAD-${String(leads.length + 1).padStart(3, '0')}`,
+    name,
+    company: `${name} Industrial Ltd`,
+    phone: `+9198${Math.floor(10000000 + Math.random() * 90000000)}`,
+    email: `${name.toLowerCase().replace(/\s+/g, '.')}@enterprise.com`,
+    interest: 'CNC Machine System',
+    budget,
+    stage,
+    notes: `Created directly via A3 Admin AI Assistant. Command: "${query}"`,
+    crmSynced: true,
+    erpBookingCreated: ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(stage),
+    tallyPaymentVerified: ['Client (Paid)', 'In Production', 'Dispatched'].includes(stage),
+    source: 'A3 AI Assistant',
+    assignedEmployeeId: 'e2',
+    createdAt: new Date()
+  };
+
+  leads.unshift(newLeadObj);
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e2',
+    employeeName: 'Bhavya (Admin AI)',
+    leadId: newLeadObj.id,
+    leadName: newLeadObj.name,
+    action: `Created new lead "${newLeadObj.name}" via A3 AI Assistant (Stage: ${stage})`,
+    fromStage: 'None',
+    toStage: stage,
+    details: `Budget: ₹${Number(budget).toLocaleString('en-IN')}`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `✅ **Action Executed**: Successfully created new lead **"${newLeadObj.name}"** in **${stage}** stage.\n\n• **ID**: ${newLeadObj.id}\n• **Budget**: ₹${Number(budget).toLocaleString('en-IN')}\n• **Source**: A3 AI Assistant\n• **Assigned**: Bhavya (Admin)`,
+    table: [{ ID: newLeadObj.id, Name: newLeadObj.name, Stage: newLeadObj.stage, Budget: `₹${Number(budget).toLocaleString('en-IN')}`, Action: 'Created via AI' }],
+    chart: null
+  };
+}
+
+async function handleActionTransitionLead(query) {
+  const store = getStore();
+  const leads = store.mockLeads || [];
+  const activityLogs = store.mockActivityLogs || [];
+
+  const targetStage = detectStage(query);
+  if (!targetStage) {
+    return {
+      text: `⚠️ Please specify a valid target stage to transition the lead to. Available stages: **Enquiry, Qualified, Booked, Confirmed Lead, Client (Paid), In Production, Dispatched**.`,
+      table: null, chart: null
+    };
+  }
+
+  let lead = leads.find(l => query.toLowerCase().includes(l.id.toLowerCase()) || query.toLowerCase().includes(l.name.toLowerCase()));
+  if (!lead) {
+    lead = leads.find(l => l.stage !== targetStage) || leads[0];
+  }
+
+  const oldStage = lead.stage;
+  lead.stage = targetStage;
+  if (targetStage === 'Client (Paid)') lead.tallyPaymentVerified = true;
+  if (targetStage === 'In Production') lead.erpBookingCreated = true;
+
+  const activityEntry = {
+    id: `log-${Date.now()}`,
+    employeeId: 'e2',
+    employeeName: 'Bhavya (Admin AI)',
+    leadId: lead.id,
+    leadName: lead.name,
+    action: `Lead status transitioned from "${oldStage}" to "${targetStage}" via A3 AI Assistant`,
+    fromStage: oldStage,
+    toStage: targetStage,
+    details: `Executed via AI command: "${query}"`,
+    createdAt: new Date()
+  };
+  activityLogs.unshift(activityEntry);
+
+  return {
+    text: `⚡ **Action Executed**: Lead **"${lead.name}"** (${lead.id}) transitioned from **"${oldStage}"** ➔ **"${targetStage}"**.\n\n• **Tally Payment Gate**: ${lead.tallyPaymentVerified ? 'Verified ✅' : 'Pending'}\n• **ERP Booking**: ${lead.erpBookingCreated ? 'Created ✅' : 'Pending'}`,
+    table: [{ ID: lead.id, Name: lead.name, 'Previous Stage': oldStage, 'New Stage': targetStage, Status: 'Updated in DB' }],
+    chart: null
+  };
+}
+
+async function handleActionPostTally(query) {
+  const store = getStore();
+  const activityLogs = store.mockActivityLogs || [];
+
+  let amountMatch = query.match(/₹?\s*([0-9,]+)/);
+  let amount = amountMatch ? Number(amountMatch[1].replace(/,/g, '')) : 28000;
+  let partyMatch = query.match(/(?:for|party|client)\s+([a-zA-Z0-9\s]+?)(?=\s+amount|\s+rs|\s+₹|$)/i);
+  let partyName = partyMatch ? partyMatch[1].trim() : 'Kirloskar Forge & Stampings';
+
+  const vchNo = `VCH-2026-0${Math.floor(100 + Math.random() * 900)}`;
+
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e2',
+    employeeName: 'Bhavya (Admin AI)',
+    leadId: 'TALLY-SYNC',
+    leadName: partyName,
+    action: `Posted Tally ERP 9 Voucher ${vchNo} for ₹${amount.toLocaleString('en-IN')}`,
+    fromStage: 'Tally',
+    toStage: 'Reconciled',
+    details: `Voucher Type: Advance Receipt (10% Gate)`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `🧾 **Action Executed**: Posted Tally ERP 9 Voucher **${vchNo}** for **${partyName}**.\n\n• **Amount**: ₹${amount.toLocaleString('en-IN')}\n• **Voucher Type**: Advance Receipt (10% Gate)\n• **Status**: Synchronized with Tally Ledger`,
+    table: [{ 'Voucher No': vchNo, 'Party Name': partyName, Type: 'Advance Receipt (10%)', Amount: `₹${amount.toLocaleString('en-IN')}`, Status: 'Posted to Tally' }],
+    chart: null
+  };
+}
+
+async function handleActionErpBooking(query) {
+  const store = getStore();
+  const leads = store.mockLeads || [];
+  const activityLogs = store.mockActivityLogs || [];
+
+  let lead = leads.find(l => query.toLowerCase().includes(l.id.toLowerCase()) || query.toLowerCase().includes(l.name.toLowerCase())) || leads[0];
+  lead.erpBookingCreated = true;
+  if (lead.stage === 'Enquiry' || lead.stage === 'Qualified') lead.stage = 'Booked';
+
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e5',
+    employeeName: 'Rohan Mehta (ERP)',
+    leadId: lead.id,
+    leadName: lead.name,
+    action: `Created ERP Manufacturing Booking & Job Card for "${lead.name}"`,
+    fromStage: lead.stage,
+    toStage: 'Booked',
+    details: `Triggered shopfloor ERP booking webhook`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `🏭 **Action Executed**: Created ERP Machine Booking & Shopfloor Job Card for **"${lead.name}"** (${lead.id}).\n\n• **ERP Status**: Booking Active ✅\n• **Pipeline Stage**: ${lead.stage}`,
+    table: [{ ID: lead.id, Name: lead.name, Product: lead.interest || 'CNC Machine', 'ERP Status': 'Booking Created' }],
+    chart: null
+  };
+}
+
+async function handleActionQueueDialer(query) {
+  const store = getStore();
+  const callLogs = store.mockCallLogs || [];
+  const activityLogs = store.mockActivityLogs || [];
+
+  const callId = `CALL-0${Math.floor(100 + Math.random() * 900)}`;
+  callLogs.unshift({
+    callId,
+    leadId: 'DIALER-QUEUE',
+    phone: '+919823456789',
+    agent: 'A1 Voice Agent',
+    durationSeconds: 120,
+    callOutcome: 'Queued for Outbound Call',
+    transcript: 'Automated outbound call queued via A3 AI Command.',
+    timestamp: new Date()
+  });
+
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e1',
+    employeeName: 'Animesh (Voice Lead)',
+    leadId: 'A1-DIALER',
+    leadName: 'Outbound Queue',
+    action: `Queued automated A1 Voice Agent batch call ${callId}`,
+    fromStage: 'Dialer',
+    toStage: 'Active Call',
+    details: `Command: "${query}"`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `📞 **Action Executed**: Queued A1 Voice Agent outbound call **${callId}** into active dialer queue.\n\n• **Voice Agent**: A1 Telecaller Bot\n• **Queue Status**: Active Outbound Call`,
+    table: [{ 'Call ID': callId, Agent: 'A1 Voice Agent', Target: 'Lead Queue', Status: 'Queued' }],
+    chart: null
+  };
+}
+
+async function handleActionSendWhatsApp(query) {
+  const store = getStore();
+  const waMsgs = store.mockWhatsAppMessages || [];
+  const activityLogs = store.mockActivityLogs || [];
+
+  const waId = `WA-0${Math.floor(100 + Math.random() * 900)}`;
+  waMsgs.unshift({
+    messageId: waId,
+    leadId: 'LEAD-004',
+    leadName: 'Global Tech',
+    phone: '+91 99887 76655',
+    template: 'payment_reminder_advance_10pct',
+    sequenceType: 'PAYMENT_REMINDER',
+    product: 'Hydraulic Press 200T',
+    advanceAmount: '4,200',
+    totalBudget: '42,000',
+    status: 'Sent',
+    sentAt: new Date(),
+    preview: 'Hello Global Tech, your booking for Hydraulic Press 200T is approved! Please confirm 10% advance.',
+    lastEvent: 'Sent via WABA Cloud API'
+  });
+
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e3',
+    employeeName: 'Aaditya (WhatsApp Lead)',
+    leadId: 'A5-WHATSAPP',
+    leadName: 'Global Tech',
+    action: `Dispatched automated WhatsApp template message ${waId}`,
+    fromStage: 'A5 Automation',
+    toStage: 'Delivered',
+    details: `Triggered payment_reminder_advance_10pct`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `💬 **Action Executed**: Dispatched automated WhatsApp notification **${waId}** via WABA Cloud API.\n\n• **Recipient**: Global Tech (+91 99887 76655)\n• **Template**: Payment Reminder (10% Advance Gate)\n• **Delivery Status**: Sent (✓)`,
+    table: [{ 'Message ID': waId, Recipient: 'Global Tech', Template: 'Payment Reminder (10%)', Status: 'Sent' }],
+    chart: null
+  };
+}
+
 // ─── Full context builder for LLM (Compact & High Density) ───────────────────
 function buildFullContext() {
   const store = getStore();
@@ -480,6 +724,12 @@ async function processQuery(query, conversationId) {
   // But if provider is not mock, ALWAYS also send to LLM for richer context-aware answers
   if (intent !== 'unknown' && provider === 'mock') {
     switch (intent) {
+      case 'action_create_lead':     result = await handleActionCreateLead(query); break;
+      case 'action_transition_lead': result = await handleActionTransitionLead(query); break;
+      case 'action_post_tally':      result = await handleActionPostTally(query); break;
+      case 'action_erp_booking':     result = await handleActionErpBooking(query); break;
+      case 'action_queue_dialer':    result = await handleActionQueueDialer(query); break;
+      case 'action_send_whatsapp':   result = await handleActionSendWhatsApp(query); break;
       case 'leads_by_stage':   result = await handleLeadsByStage(query); break;
       case 'lead_count':       result = await handleLeadCount(); break;
       case 'pending_payment':  result = await handlePendingPayment(); break;
@@ -499,6 +749,12 @@ async function processQuery(query, conversationId) {
     result = await processWithLLM(query, history);
     if (!result) {
       switch (intent) {
+        case 'action_create_lead':     result = await handleActionCreateLead(query); break;
+        case 'action_transition_lead': result = await handleActionTransitionLead(query); break;
+        case 'action_post_tally':      result = await handleActionPostTally(query); break;
+        case 'action_erp_booking':     result = await handleActionErpBooking(query); break;
+        case 'action_queue_dialer':    result = await handleActionQueueDialer(query); break;
+        case 'action_send_whatsapp':   result = await handleActionSendWhatsApp(query); break;
         case 'leads_by_stage':   result = await handleLeadsByStage(query); break;
         case 'lead_count':       result = await handleLeadCount(); break;
         case 'pending_payment':  result = await handlePendingPayment(); break;

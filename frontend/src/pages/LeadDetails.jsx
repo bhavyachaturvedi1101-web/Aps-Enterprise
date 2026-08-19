@@ -173,6 +173,12 @@ export default function LeadDetails() {
               <span style={styles.infoValue}>{lead.assignedEmployeeId || 'Bhavya (Admin)'}</span>
             </div>
             <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>Created Date & Time:</span>
+              <span style={{ ...styles.infoValue, fontWeight: 700 }}>
+                {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + new Date(lead.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '19 Aug 2026, 02:40 PM'}
+              </span>
+            </div>
+            <div style={styles.infoRow}>
               <span style={styles.infoLabel}>Notes:</span>
               <span style={styles.infoValue}>{lead.notes || 'No notes available.'}</span>
             </div>

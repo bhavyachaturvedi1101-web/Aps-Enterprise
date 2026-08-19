@@ -114,6 +114,95 @@ export default function CRMLeads() {
   const [targetLead, setTargetLead] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
 
+  // Bulk Import state
+  const [showBulkImportModal, setShowBulkImportModal] = useState(false);
+  const [parsedRecords, setParsedRecords] = useState([]);
+  const [importing, setImporting] = useState(false);
+  const [importSuccessMsg, setImportSuccessMsg] = useState('');
+
+  const handleDownloadSampleCSV = () => {
+    const csvContent = "name,company,phone,email,interest,budget,stage,source,notes\n" +
+      "Rajesh Sharma,Apex Engineering Ltd,+919876543210,rajesh@apexeng.com,CNC Milling Machine 5-Axis,85000,Enquiry,Meta Ads,Inquired via Meta Ads for Pune manufacturing unit.\n" +
+      "Sunil Verma,Precision Tooling Ltd,+919823456789,sunil@precisiontool.in,Laser Cutting System Pro,120000,Qualified,A1 Voice Agent,Called by A1 voice agent confirmed budget & timeline.\n" +
+      "Meera Nair,Southern Industrial Corp,+919811223344,meera@southernind.co.in,Hydraulic Press 200T,45000,Confirmed Lead,WhatsApp,Booking approved. Awaiting 10% advance deposit.";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'sample_leads_import.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      if (file.name.endsWith('.json')) {
+        try {
+          const json = JSON.parse(text);
+          setParsedRecords(Array.isArray(json) ? json : [json]);
+        } catch {
+          alert('Invalid JSON file format.');
+        }
+      } else {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        if (lines.length <= 1) {
+          alert('CSV file is empty or missing data lines.');
+          return;
+        }
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const records = lines.slice(1).map((line, idx) => {
+          const vals = line.split(',').map(v => v.trim());
+          const obj = {};
+          headers.forEach((h, i) => {
+            obj[h] = vals[i] || '';
+          });
+          return {
+            name: obj.name || obj.company || `Imported Lead ${idx + 1}`,
+            company: obj.company || 'Enterprise Client',
+            phone: obj.phone || '+919900000000',
+            email: obj.email || 'client@import.com',
+            interest: obj.interest || 'CNC Machinery',
+            budget: obj.budget || '50000',
+            stage: STAGES.includes(obj.stage) ? obj.stage : 'Enquiry',
+            source: obj.source || 'Bulk CSV Import',
+            notes: obj.notes || 'Imported via CSV Data Import Center'
+          };
+        });
+        setParsedRecords(records);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleConfirmBulkImport = async () => {
+    if (parsedRecords.length === 0) return;
+    setImporting(true);
+    try {
+      for (const rec of parsedRecords) {
+        await fetch(`${API}/leads`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rec)
+        });
+      }
+      setImporting(false);
+      setShowBulkImportModal(false);
+      setImportSuccessMsg(`Successfully imported ${parsedRecords.length} records into pipeline!`);
+      setParsedRecords([]);
+      await fetchLeads();
+      setTimeout(() => setImportSuccessMsg(''), 5000);
+    } catch (err) {
+      console.error(err);
+      setImporting(false);
+      alert('Error importing records.');
+    }
+  };
+
   // Form states
   const [approvalPolicy, setApprovalPolicy] = useState('single-action');
   const [countersignedBy, setCountersignedBy] = useState('e3');
@@ -340,14 +429,14 @@ export default function CRMLeads() {
     return map;
   }, [filteredLeads]);
 
-  // Format date helper
+  // Format date & time helper
   const formatDate = (d) => {
-    if (!d) return '17 Aug 2026';
+    if (!d) return '19 Aug 2026, 02:30 PM';
     try {
       const dt = new Date(d);
-      return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     } catch {
-      return '17 Aug 2026';
+      return '19 Aug 2026, 02:30 PM';
     }
   };
 
@@ -447,6 +536,32 @@ export default function CRMLeads() {
             </button>
           </div>
 
+          {/* Bulk Import CSV / JSON Button */}
+          <button
+            onClick={() => setShowBulkImportModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              backgroundColor: '#ffffff',
+              color: '#0f172a',
+              border: '1px solid #cbd5e1',
+              borderRadius: '10px',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>Bulk Import CSV</span>
+          </button>
+
           {/* Add New Lead Button */}
           <button onClick={() => setShowAddModal(true)} style={s.addLeadBtn}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -457,6 +572,16 @@ export default function CRMLeads() {
           </button>
         </div>
       </div>
+
+      {importSuccessMsg && (
+        <div style={{ backgroundColor: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', padding: '10px 16px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          {importSuccessMsg}
+        </div>
+      )}
 
       {/* ── Main Kanban Swimlane Columns (Horizontally Scrollable) ─── */}
       <div ref={boardRef} style={s.kanbanBoard}>
@@ -909,6 +1034,166 @@ export default function CRMLeads() {
                 style={{ ...s.modalSubmitBtn, backgroundColor: '#f59e0b' }}
               >
                 Sign & Transition
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bulk Data Import Modal (CSV & JSON) ────────────────── */}
+      {showBulkImportModal && (
+        <div style={s.modalOverlay}>
+          <div style={{ ...s.modalBox, maxWidth: 680, backgroundColor: '#ffffff', borderRadius: '18px', padding: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+            <div style={s.modalHead}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Bulk Import Leads & CRM Data
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px' }}>
+                  Upload CSV or JSON dataset to populate historical leads across all pipeline stages.
+                </div>
+              </div>
+              <button onClick={() => { setShowBulkImportModal(false); setParsedRecords([]); }} style={s.modalCloseBtn}>
+                ✕
+              </button>
+            </div>
+
+            {/* Template Download & File Select Row */}
+            <div style={{ display: 'flex', gap: '12px', margin: '16px 0', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={handleDownloadSampleCSV}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '10px',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#334155',
+                  fontSize: '0.82rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                Download Sample CSV Template
+              </button>
+
+              <label
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  background: '#09090b',
+                  color: '#ffffff',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                  <line x1="12" y1="11" x2="12" y2="17" />
+                  <polyline points="9 14 12 11 15 14" />
+                </svg>
+                Select CSV / JSON File
+                <input
+                  type="file"
+                  accept=".csv,.json"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
+
+            {/* Live Parsing Preview */}
+            {parsedRecords.length > 0 ? (
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', margin: '12px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {parsedRecords.length} Records Parsed & Validated
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Ready to Import</span>
+                </div>
+
+                <div style={{ maxHeight: '220px', overflowY: 'auto', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textIndent: '8px' }}>
+                    <thead>
+                      <tr style={{ background: '#e2e8f0', color: '#334155', height: '30px', textAlign: 'left' }}>
+                        <th>Name</th>
+                        <th>Company</th>
+                        <th>Interest</th>
+                        <th>Budget</th>
+                        <th>Stage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {parsedRecords.slice(0, 10).map((r, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #f1f5f9', height: '28px', background: i % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
+                          <td style={{ fontWeight: 600 }}>{r.name}</td>
+                          <td>{r.company}</td>
+                          <td>{r.interest}</td>
+                          <td style={{ color: '#059669', fontWeight: 600 }}>₹{Number(r.budget || 0).toLocaleString('en-IN')}</td>
+                          <td><span style={{ background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{r.stage}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {parsedRecords.length > 10 && (
+                  <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '6px', textAlign: 'center' }}>
+                    + {parsedRecords.length - 10} more records in batch queue...
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ border: '2px dashed #cbd5e1', borderRadius: '12px', padding: '24px', textAlign: 'center', color: '#64748b', margin: '14px 0', background: '#fafafa' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#09090b' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                      <path d="M12 12v9" />
+                      <path d="m16 16-4-4-4 4" />
+                    </svg>
+                  </div>
+                </div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#334155' }}>Drag & Drop or Select CSV / JSON File</div>
+                <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '4px' }}>Supports name, company, phone, email, interest, budget, stage, source, notes fields</div>
+              </div>
+            )}
+
+            {/* Modal Actions */}
+            <div style={s.modalActions}>
+              <button onClick={() => { setShowBulkImportModal(false); setParsedRecords([]); }} style={s.modalCancelBtn}>
+                Cancel
+              </button>
+              <button
+                disabled={parsedRecords.length === 0 || importing}
+                onClick={handleConfirmBulkImport}
+                style={{
+                  ...s.modalSubmitBtn,
+                  opacity: parsedRecords.length === 0 || importing ? 0.5 : 1,
+                  cursor: parsedRecords.length === 0 || importing ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {importing ? 'Importing Batch Records...' : `Confirm & Import ${parsedRecords.length} Records`}
               </button>
             </div>
           </div>

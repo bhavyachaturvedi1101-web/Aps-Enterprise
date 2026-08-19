@@ -56,10 +56,10 @@ export default function PaymentGate() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('✅ Payment verified against Tally ledger. Lead can now advance to Client (Paid).');
+        alert('Payment verified against Tally ledger. Lead can now advance to Client (Paid).');
         await fetchPayments();
       } else {
-        alert(`❌ Verification failed: ${data.error || 'Unknown error'}\n${data.reason || ''}`);
+        alert(`Verification failed: ${data.error || 'Unknown error'}\n${data.reason || ''}`);
       }
     } catch (err) {
       console.error(err);
@@ -82,9 +82,9 @@ export default function PaymentGate() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`✅ WhatsApp payment reminder sequence triggered for "${pending.lead}"! Message ID: ${data.message.messageId}`);
+        alert(`WhatsApp payment reminder sequence triggered for "${pending.lead}"! Message ID: ${data.message.messageId}`);
       } else {
-        alert(`❌ Reminder trigger failed: ${data.error || 'Unknown error'}`);
+        alert(`Reminder trigger failed: ${data.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
