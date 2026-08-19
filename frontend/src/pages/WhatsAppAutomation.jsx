@@ -214,7 +214,9 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Total Messages Dispatched</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(37,211,102,0.12)', color: '#25D366' }}>💬</span>
+              <span style={{ ...s.kpiIconWrap, background: 'rgba(37,211,102,0.12)', color: '#25D366' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.totalMessagesSent?.toLocaleString('en-IN')}</span>
@@ -227,7 +229,9 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Handset Delivery Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>✓✓</span>
+              <span style={{ ...s.kpiIconWrap, background: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.deliveryRate}</span>
@@ -239,7 +243,9 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Message Read & Open Rate</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff' }}>👁️</span>
+              <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.readRate}</span>
@@ -251,7 +257,9 @@ export default function WhatsAppAutomation() {
           <div style={s.kpiCard}>
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Active Lifecycle Sequences</span>
-              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>⚡</span>
+              <span style={{ ...s.kpiIconWrap, background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
             </div>
             <div style={s.kpiValueRow}>
               <span style={s.kpiMainValue}>{analytics.activeSequencesCount} / {analytics.totalSequencesCount} Active</span>
@@ -296,10 +304,10 @@ export default function WhatsAppAutomation() {
               style={s.selectFilter}
             >
               <option value="ALL">All Delivery States</option>
-              <option value="Delivered">Delivered (✓✓)</option>
-              <option value="Read">Read (✓✓ Blue)</option>
-              <option value="Sent">Sent (✓)</option>
-              <option value="Failed">Failed (✕)</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Read">Read</option>
+              <option value="Sent">Sent</option>
+              <option value="Failed">Failed</option>
             </select>
           </div>
         )}
@@ -385,7 +393,7 @@ export default function WhatsAppAutomation() {
                         onClick={() => setSelectedMessage(msg)}
                         style={s.viewBubbleBtn}
                       >
-                        View Chat Bubble 💬
+                        View Chat Bubble
                       </button>
                     </td>
                   </tr>
@@ -434,7 +442,7 @@ export default function WhatsAppAutomation() {
                   <div style={s.seqDetailRow}>
                     <span style={s.seqDetailLbl}>Delay Schedule:</span>
                     <span style={s.seqDetailVal}>
-                      {seq.delayHours === 0 ? '⚡ Instantaneous (0h)' : `⏱️ After ${seq.delayHours} Hours dwell`}
+                      {seq.delayHours === 0 ? 'Instantaneous (0h)' : `After ${seq.delayHours} Hours dwell`}
                     </span>
                   </div>
                   <div style={s.seqDetailRow}>
@@ -517,7 +525,7 @@ export default function WhatsAppAutomation() {
               </div>
 
               <div style={s.tplFooter}>
-                <span style={s.tplTriggerInfo}>⚡ {tpl.delayDescription}</span>
+                <span style={s.tplTriggerInfo}>{tpl.delayDescription}</span>
               </div>
             </div>
           ))}
@@ -610,7 +618,7 @@ export default function WhatsAppAutomation() {
               </div>
 
               <button type="submit" disabled={sending} style={s.sendSubmitBtn}>
-                {sending ? 'Delivering via Meta WABA Cloud…' : ' Send WhatsApp Notification Now'}
+                {sending ? 'Delivering via Meta WABA Cloud…' : 'Send WhatsApp Notification Now'}
               </button>
             </form>
           </div>
@@ -621,7 +629,7 @@ export default function WhatsAppAutomation() {
               <div style={s.waHeaderAvatar}>APS</div>
               <div>
                 <div style={s.waHeaderName}>APS Enterprise Verified</div>
-                <div style={s.waHeaderStatus}>Official Business Account ✓</div>
+                <div style={s.waHeaderStatus}>Official Business Account</div>
               </div>
             </div>
 
@@ -650,7 +658,9 @@ export default function WhatsAppAutomation() {
             </div>
 
             <div style={s.previewFooter}>
-              <span style={s.lockIcon}>🔒</span> End-to-end encrypted via Meta Business Cloud API
+              <span style={s.lockIcon}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span> End-to-end encrypted via Meta Business Cloud API
             </div>
           </div>
         </div>

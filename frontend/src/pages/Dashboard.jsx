@@ -222,7 +222,7 @@ export default function Dashboard() {
     if (!file) return;
     setChatMessages(prev => [
       ...prev,
-      { id: Date.now(), text: `📎 Attached file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, sender: 'user' },
+      { id: Date.now(), text: `Attached file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, sender: 'user' },
       { id: Date.now() + 1, text: `Received file "${file.name}". Processing attachment with APS Document AI...`, sender: 'ai' }
     ]);
   };
@@ -232,7 +232,7 @@ export default function Dashboard() {
     if (!file) return;
     setChatMessages(prev => [
       ...prev,
-      { id: Date.now(), text: `🖼️ Attached image: ${file.name}`, sender: 'user' },
+      { id: Date.now(), text: `Attached image: ${file.name}`, sender: 'user' },
       { id: Date.now() + 1, text: `Analyzing image "${file.name}" for equipment specifications and invoice data...`, sender: 'ai' }
     ]);
   };
