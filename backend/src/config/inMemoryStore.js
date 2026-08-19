@@ -261,7 +261,7 @@ const mockEmployees = [
     name: 'Animesh', 
     email: 'animesh@aps-enterprise.com',
     phone: '+91 98201 11223',
-    role: 'A1 Voice Agent & Sales Lead', 
+    role: 'Voice AI & Sales Lead', 
     department: 'Voice Operations & Telecalling',
     kpiScore: '94%',
     kpiScoreNum: 94,
@@ -282,7 +282,7 @@ const mockEmployees = [
     name: 'Bhavya', 
     email: 'bhavya@aps-enterprise.com',
     phone: '+91 98302 22334',
-    role: 'A2 Core Architect & Admin', 
+    role: 'System Architect & Admin', 
     department: 'Operations & Systems',
     kpiScore: '98%',
     kpiScoreNum: 98,
@@ -303,7 +303,7 @@ const mockEmployees = [
     name: 'Aaditya', 
     email: 'aaditya@aps-enterprise.com',
     phone: '+91 98403 33445',
-    role: 'A4 Analytics & A5 WhatsApp Lead', 
+    role: 'Analytics & Automation Lead', 
     department: 'Customer Success & Automation',
     kpiScore: '91%',
     kpiScoreNum: 91,
@@ -319,6 +319,7 @@ const mockEmployees = [
     weeklyKpiHistory: [82, 85, 88, 91],
     stageConversions: { enquiryToQualified: 29, qualifiedToBooked: 22, bookedToConfirmed: 16, confirmedToPaid: 5 }
   },
+
   { 
     id: 'e4', 
     name: 'Pooja Sharma', 

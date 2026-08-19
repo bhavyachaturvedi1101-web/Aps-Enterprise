@@ -1,4 +1,4 @@
-// Team KPIs & Performance Dashboard (A4 Module)
+// Team KPIs & Performance Dashboard
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ export default function TeamKPIs() {
     name: '',
     email: '',
     phone: '',
-    role: 'A1 Voice Operations Spec',
+    role: 'Voice Operations Specialist',
     department: 'Voice Operations'
   });
 
@@ -94,7 +94,7 @@ export default function TeamKPIs() {
       if (data.success) {
         showToast(`Team member "${data.employee.name}" successfully added!`);
         setShowAddModal(false);
-        setFormData({ name: '', email: '', phone: '', role: 'A1 Voice Operations Spec', department: 'Voice Operations' });
+        setFormData({ name: '', email: '', phone: '', role: 'Voice Operations Specialist', department: 'Voice Operations' });
         loadData();
       }
     } catch (err) {
@@ -137,7 +137,8 @@ export default function TeamKPIs() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`A5 WhatsApp Payment Reminder sent to ${leadName}!`);
+        showToast(`WhatsApp Payment Reminder sent to ${leadName}!`);
+
         loadData();
       }
     } catch (err) {
@@ -162,7 +163,7 @@ export default function TeamKPIs() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `APS_Enterprise_A4_${activeTab}_Report.csv`);
+    link.setAttribute('download', `APS_Enterprise_${activeTab}_Report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -197,7 +198,7 @@ export default function TeamKPIs() {
     return (
       <div style={s.centerContainer}>
         <div style={s.spinner} />
-        <div style={s.loadingText}>Loading A4 Employee Performance Profiles & Time-in-Stage Analytics…</div>
+        <div style={s.loadingText}>Loading Employee Performance Profiles & Time-in-Stage Analytics…</div>
       </div>
     );
   }
@@ -217,10 +218,10 @@ export default function TeamKPIs() {
       {/* Header Banner */}
       <div style={s.pageHeader}>
         <div>
-          <div style={s.badgeModule}>MODULE A4 • ENTERPRISE ANALYTICS</div>
+          <div style={s.badgeModule}>ENTERPRISE PERFORMANCE ANALYTICS</div>
           <h1 style={s.title}>Employee Performance & Time-in-Stage Profiles</h1>
           <p style={s.subtitle}>
-            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on A2 activity logs.
+            Data-driven performance tracking, pipeline dwell velocity, and bottleneck mitigation built on system activity logs.
           </p>
         </div>
         <div style={s.headerActions}>
@@ -249,7 +250,7 @@ export default function TeamKPIs() {
             <div style={s.kpiTop}>
               <span style={s.kpiLabel}>Team Average KPI Score</span>
               <span style={{ ...s.kpiIconWrap, background: 'rgba(170,59,255,0.12)', color: '#aa3bff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M6 9a6 6 0 0 0 12 0V4H6v5z"/></svg>
               </span>
             </div>
             <div style={s.kpiValueRow}>
@@ -284,7 +285,7 @@ export default function TeamKPIs() {
               <span style={s.kpiMainValue}>{summary.totalCallsHandled} Calls</span>
               <span style={s.kpiSubTag}>Avg 112s</span>
             </div>
-            <div style={s.kpiSub}>A1 Voice Agent + human telecalling queue sync</div>
+            <div style={s.kpiSub}>AI Voice Agent + human telecalling queue sync</div>
           </div>
 
           <div style={s.kpiCard}>
@@ -298,7 +299,7 @@ export default function TeamKPIs() {
               <span style={{ ...s.kpiMainValue, color: '#f59e0b' }}>{summary.bottleneckAlertCount} Stage Alert</span>
               <span style={s.kpiSubTag}>48.5h Dwell</span>
             </div>
-            <div style={s.kpiSub}>Confirmed Lead dwell requires A5 payment reminder</div>
+            <div style={s.kpiSub}>Confirmed Lead dwell requires WhatsApp payment reminder</div>
           </div>
         </div>
       )}
@@ -310,7 +311,7 @@ export default function TeamKPIs() {
             { key: 'leaderboard', label: 'Employee Profiles & Leaderboard', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
             { key: 'timeInStage', label: 'Time-in-Stage & Bottleneck Funnel', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
             { key: 'comparison', label: 'Side-by-Side KPI Comparison', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-            { key: 'audit', label: 'Live A2 Audit Action Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> }
+            { key: 'audit', label: 'Live Activity Audit Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> }
           ].map(tab => (
             <button
               key={tab.key}
@@ -339,8 +340,8 @@ export default function TeamKPIs() {
             >
               <option value="ALL">All Roles</option>
               <option value="Voice">Voice / Telecaller</option>
-              <option value="Architect">A2 Architect</option>
-              <option value="Analytics">A4/A5 Specialist</option>
+              <option value="Architect">System Architect</option>
+              <option value="Analytics">Analytics & Automation Specialist</option>
               <option value="ERP">ERP / Dispatch</option>
             </select>
           </div>
@@ -485,7 +486,7 @@ export default function TeamKPIs() {
               style={{ ...s.alertActionBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Dispatch A5 Payment Reminder Sequence</span>
+              <span>Dispatch Payment Reminder Sequence</span>
             </button>
           </div>
 
@@ -494,10 +495,11 @@ export default function TeamKPIs() {
             <div style={s.sectionHeader}>
               <div>
                 <h3 style={s.sectionTitle}>Pipeline Stage Dwell Time & SLA Adherence</h3>
-                <p style={s.sectionSub}>Real-time duration tracking calculated from state transitions in A2 activity logs</p>
+                <p style={s.sectionSub}>Real-time duration tracking calculated from state transitions in activity logs</p>
               </div>
               <span style={s.slaTargetChip}>Target Total Pipeline Dwell: &lt; 96h to Production</span>
             </div>
+
 
             <div style={s.stagesTimeline}>
               {timeInStage.map((st, i) => {
@@ -571,7 +573,7 @@ export default function TeamKPIs() {
           <th style={s.th}>10% Advance Required</th>
           <th style={s.th}>Assigned Rep</th>
           <th style={s.th}>Risk Level</th>
-          <th style={s.th}>A5 Action</th>
+          <th style={s.th}>Automation Action</th>
         </tr>
       </thead>
       <tbody>
@@ -588,7 +590,7 @@ export default function TeamKPIs() {
           <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
           <td style={s.td}>₹42,000</td>
           <td style={{ ...s.td, fontWeight: 700, color: '#aa3bff' }}>₹4,200</td>
-          <td style={s.td}>Aaditya (A4/A5)</td>
+          <td style={s.td}>Aaditya (Analytics)</td>
           <td style={s.td}>
             <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10"/></svg>
@@ -619,7 +621,7 @@ export default function TeamKPIs() {
       <div style={s.sectionHeader}>
         <div>
           <h3 style={s.sectionTitle}>Employee Metric Comparison & Conversion Matrix</h3>
-          <p style={s.sectionSub}>Cross-functional evaluation across Voice (A1), Admin Core (A2), and Automation (A4/A5)</p>
+          <p style={s.sectionSub}>Cross-functional evaluation across Voice AI, Admin Operations, and Lifecycle Automation</p>
         </div>
       </div>
 
@@ -676,7 +678,7 @@ export default function TeamKPIs() {
     <div style={s.auditCard}>
       <div style={s.sectionHeader}>
         <div>
-          <h3 style={s.sectionTitle}>A2 Control Cockpit Audit Action Stream</h3>
+          <h3 style={s.sectionTitle}>Central Control Cockpit Audit Action Stream</h3>
           <p style={s.sectionSub}>Complete chronological log of all operator actions, state transitions, and integration triggers</p>
         </div>
         <span style={s.liveChip}>● LIVE SYNC</span>
@@ -772,7 +774,7 @@ export default function TeamKPIs() {
 
             {/* Recent Operator Actions */}
             <div style={s.modalSection}>
-              <h4 style={s.modalSectionTitle}>Recent Actions in A2 Operating Layer</h4>
+              <h4 style={s.modalSectionTitle}>Recent Actions in Operating Layer</h4>
               <div style={s.miniAuditList}>
                 {employeeDetails.activityLogs?.map(log => (
                   <div key={log.id} style={s.miniAuditItem}>
@@ -817,7 +819,7 @@ export default function TeamKPIs() {
     <div style={s.modalOverlay} onClick={() => setShowAddModal(false)}>
       <div style={s.modalContentSmall} onClick={e => e.stopPropagation()}>
         <div style={s.modalHeader}>
-          <h3 style={s.modalTitle}>Provision New Team Member (A4)</h3>
+          <h3 style={s.modalTitle}>Provision New Team Member</h3>
           <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
         </div>
         <form onSubmit={handleCreateMember} style={s.form}>
@@ -857,16 +859,16 @@ export default function TeamKPIs() {
           </div>
 
           <div style={s.formGroup}>
-            <label style={s.formLabel}>Role & Module Assignment</label>
+            <label style={s.formLabel}>Role Assignment</label>
             <select
               value={formData.role}
               onChange={e => setFormData({ ...formData, role: e.target.value })}
               style={s.formSelect}
             >
-              <option value="A1 Voice Operations Spec">A1 Voice Operations Spec</option>
-              <option value="A2 Admin Cockpit Operator">A2 Admin Cockpit Operator</option>
-              <option value="A4 Analytics Specialist">A4 Analytics Specialist</option>
-              <option value="A5 WhatsApp Automation Lead">A5 WhatsApp Automation Lead</option>
+              <option value="Voice Operations Specialist">Voice Operations Specialist</option>
+              <option value="Admin Cockpit Operator">Admin Cockpit Operator</option>
+              <option value="Performance & Analytics Specialist">Performance & Analytics Specialist</option>
+              <option value="WhatsApp Automation Lead">WhatsApp Automation Lead</option>
               <option value="Inside Sales & Telecaller">Inside Sales & Telecaller</option>
               <option value="ERP & Factory Dispatch Officer">ERP & Factory Dispatch Officer</option>
             </select>
@@ -878,6 +880,7 @@ export default function TeamKPIs() {
               type="text"
               placeholder="e.g. Customer Success / Sales"
               value={formData.department}
+
               onChange={e => setFormData({ ...formData, department: e.target.value })}
               style={s.formInput}
             />

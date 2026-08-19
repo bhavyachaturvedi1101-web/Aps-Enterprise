@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 const MOCK_CALLS = [
-  { id: 'C001', name: 'Horizon Industries', phone: '+91 98765 43210', product: 'CNC Machine', status: 'Queued', priority: 'High', agent: 'A1 AI' },
-  { id: 'C002', name: 'BlueStar Fab', phone: '+91 87654 32109', product: 'Laser Cutter', status: 'In Progress', priority: 'Normal', agent: 'A1 AI' },
-  { id: 'C003', name: 'RiverTech', phone: '+91 76543 21098', product: 'Plasma Cutter', status: 'Queued', priority: 'Normal', agent: 'A1 AI' },
+  { id: 'C001', name: 'Horizon Industries', phone: '+91 98765 43210', product: 'CNC Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
+  { id: 'C002', name: 'BlueStar Fab', phone: '+91 87654 32109', product: 'Laser Cutter', status: 'In Progress', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C003', name: 'RiverTech', phone: '+91 76543 21098', product: 'Plasma Cutter', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
   { id: 'C004', name: 'Apex Steel', phone: '+91 65432 10987', product: 'Sheet Bender', status: 'Completed', priority: 'Low', agent: 'Telecaller' },
-  { id: 'C005', name: 'PrimeMake', phone: '+91 54321 09876', product: 'Hydraulic Press', status: 'Failed', priority: 'High', agent: 'A1 AI' }
+  { id: 'C005', name: 'PrimeMake', phone: '+91 54321 09876', product: 'Hydraulic Press', status: 'Failed', priority: 'High', agent: 'Voice AI' }
 ];
 
 const STATUS_CLR = { Queued:'#3b82f6', 'In Progress':'#a855f7', Completed:'#10b981', Failed:'#f43f5e' };
@@ -25,7 +25,7 @@ export default function DialerQueue() {
       product: newCall.product,
       status: 'Queued',
       priority: newCall.priority,
-      agent: 'A1 AI'
+      agent: 'Voice AI'
     };
     setCalls(prev => [callObj, ...prev]);
     setShowModal(false);
@@ -44,8 +44,9 @@ export default function DialerQueue() {
       <div style={s.pageHead}>
         <div>
           <h1 style={s.title}>Dialer Queue</h1>
-          <p style={s.sub}>A1 Voice Agent call queue — real-time call status from Dialer integration</p>
+          <p style={s.sub}>AI Voice Agent call queue — real-time call status from Dialer integration</p>
         </div>
+
         <button onClick={() => setShowModal(true)} style={s.addBtn}>+ Add Outbound Call</button>
       </div>
 
