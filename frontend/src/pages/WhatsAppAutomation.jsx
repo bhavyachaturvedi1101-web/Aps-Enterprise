@@ -798,14 +798,14 @@ const s = {
     alignItems: 'center',
     gap: 6,
     padding: '8px 18px',
-    backgroundColor: '#09090b',
+    backgroundColor: '#2563eb',
     color: '#fff',
     border: 'none',
-    borderRadius: 10,
+    borderRadius: 8,
     fontSize: '0.82rem',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)'
   },
   kpiGrid: {
     display: 'grid',

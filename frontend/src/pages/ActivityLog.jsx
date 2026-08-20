@@ -34,15 +34,25 @@ export default function ActivityLog() {
           ))}
         </div>
         {logs.map(log => (
-          <div key={log.id} style={s.tableRow}>
+          <div key={log.id} className="table-row-hover" style={s.tableRow}>
             <div style={s.td}>{new Date(log.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
             <div style={{...s.td, fontWeight:700, color:'#09090b', display:'flex', alignItems:'center', gap:5}}>
               {ICONS[log.employeeId] || <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
               <span>{log.employeeId}</span>
             </div>
             <div style={{...s.td, flex:2, fontSize:'0.75rem', color:'#52525b'}}>{log.action}</div>
-            <div style={s.td}><span style={{...s.stagePill, backgroundColor:'#f4f4f5', color:'#09090b', border: '1px solid #e4e4e7'}}>{log.fromStage}</span></div>
-            <div style={s.td}><span style={{...s.stagePill, backgroundColor:'#09090b', color:'#ffffff'}}>{log.toStage}</span></div>
+            <div style={s.td}>
+              <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: '#94a3b8' }}/>
+                {log.fromStage}
+              </span>
+            </div>
+            <div style={s.td}>
+              <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#2563eb', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: '#3b82f6' }}/>
+                {log.toStage}
+              </span>
+            </div>
           </div>
         ))}
         {logs.length === 0 && <div style={s.empty}>No activity recorded yet.</div>}

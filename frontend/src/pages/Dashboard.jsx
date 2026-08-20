@@ -366,8 +366,18 @@ export default function Dashboard() {
                 </div>
                 {/* Location Card */}
                 <div style={s.locCard}>
-                  <div style={s.locHead}><span>Top Region</span><span style={{color:'#09090b'}}>↗</span></div>
-                  {[['#09090b','Maharashtra','47%'],['#52525b','Gujarat','33%'],['#a1a1aa','Delhi NCR','20%']].map(([clr,nm,pct])=>(
+                  <div style={s.locHead}>
+                    <span>Top Region</span>
+                    <span
+                      className="card-arrow-btn"
+                      onClick={() => navigate('/crm')}
+                      style={{ color: '#09090b', cursor: 'pointer', padding: '0 4px', borderRadius: 4, transition: 'all 0.15s ease' }}
+                      title="Open Regional Leads in CRM"
+                    >
+                      ↗
+                    </span>
+                  </div>
+                  {[['#a855f7','Maharashtra','47%'],['#c084fc','Gujarat','33%'],['#c084fc','Delhi NCR','20%']].map(([clr,nm,pct])=>(
                     <div key={nm} style={s.locRow}>
                       <span style={{...s.locDot,background:clr}}/>
                       <span style={s.locName}>{nm}</span>
@@ -381,20 +391,28 @@ export default function Dashboard() {
 
           {/* Integration Status Bar */}
           <div style={s.intBar}>
-            {INTEGRATIONS.map(int => (
-              <div key={int.name} style={s.intCard}>
-                <div style={s.intLeft}>
-                  <div style={{ ...s.intIcon, backgroundColor: '#f4f4f5', color: '#09090b' }}>{int.svg}</div>
-                  <div>
-                    <div style={s.intName}>{int.name}</div>
-                    <div style={s.intRole}>{int.role}</div>
+            {INTEGRATIONS.map(int => {
+              const routeMap = { CRM: '/crm', ERP: '/bookings', Dialer: '/dialer', Tally: '/tally' };
+              return (
+                <div
+                  key={int.name}
+                  style={{ ...s.intCard, cursor: 'pointer' }}
+                  onClick={() => navigate(routeMap[int.name] || '/dashboard')}
+                  title={`Open ${int.name} Module`}
+                >
+                  <div style={s.intLeft}>
+                    <div style={{ ...s.intIcon, backgroundColor: int.iconBg, color: int.color }}>{int.svg}</div>
+                    <div>
+                      <div style={s.intName}>{int.name}</div>
+                      <div style={s.intRole}>{int.role}</div>
+                    </div>
+                  </div>
+                  <div style={{...s.intBadge, color: int.color, borderColor: `${int.color}35`, background: int.iconBg }}>
+                    {int.status}
                   </div>
                 </div>
-                <div style={{...s.intBadge, color: '#09090b', borderColor: '#e4e4e7', background: '#f4f4f5'}}>
-                  {int.status}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Overview Header */}
@@ -438,21 +456,28 @@ export default function Dashboard() {
                   <div style={s.cardTitle}>Lead Status Performance</div>
                   <div style={s.cardSub}>Number of leads by stage, highlighting conversion</div>
                 </div>
-                <span style={s.cardArrow}>↗</span>
+                <span
+                  className="card-arrow-btn"
+                  style={s.cardArrow}
+                  onClick={() => navigate('/crm')}
+                  title="Open Lead Pipeline in CRM"
+                >
+                  ↗
+                </span>
               </div>
               <div style={s.barChart}>
                 {[
-                  [stageCounts['Enquiry'] || 0, 'Enquiry'],
-                  [stageCounts['Qualified'] || 0, 'Qualified'],
-                  [stageCounts['Booked'] || 0, 'Booked'],
-                  [stageCounts['Confirmed Lead'] || 0, 'Confirmed']
-                ].map(([val,lbl]) => {
+                  [stageCounts['Enquiry'] || 0, 'Enquiry', 'linear-gradient(180deg, #64748b 0%, #334155 100%)', 'rgba(100,116,139,0.2)'],
+                  [stageCounts['Qualified'] || 0, 'Qualified', 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)', 'rgba(59,130,246,0.25)'],
+                  [stageCounts['Booked'] || 0, 'Booked', 'linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)', 'rgba(168,85,247,0.25)'],
+                  [stageCounts['Confirmed Lead'] || 0, 'Confirmed', 'linear-gradient(180deg, #10b981 0%, #047857 100%)', 'rgba(16,185,129,0.25)']
+                ].map(([val, lbl, bg, shd]) => {
                   const maxCount = Math.max(...Object.values(stageCounts), 1);
-                  const h = Math.max(30, (val / maxCount) * 130);
+                  const h = Math.max(40, (val / maxCount) * 150);
                   return (
                     <div key={lbl} style={s.barCol}>
                       <div style={s.barVal}>{val}</div>
-                      <div style={{...s.bar, height: h}}>
+                      <div style={{...s.bar, height: h, background: bg, boxShadow: `0 4px 12px ${shd}`}}>
                         <div style={s.barSheen}/>
                       </div>
                       <div style={s.barLbl}>{lbl}</div>
@@ -469,29 +494,40 @@ export default function Dashboard() {
                   <div style={s.cardTitle}>Call Channel Stats</div>
                   <div style={s.cardSub}>CTR comparison for telecallers vs Voice AI agent</div>
                 </div>
-                <span style={s.cardArrow}>↗</span>
+                <span
+                  className="card-arrow-btn"
+                  style={s.cardArrow}
+                  onClick={() => navigate('/voice')}
+                  title="Open Voice AI Agent & Dialer"
+                >
+                  ↗
+                </span>
               </div>
               <div style={s.ctrBody}>
-                <div style={{...s.aiPrompt, display: 'flex', alignItems: 'center', gap: 6}}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  <span>What would you like to explore next?</span>
-                </div>
                 <div style={s.ctrRow}>
                   <div>
-                    <div style={s.ctrBig}>0.04%</div>
+                    <div style={{ ...s.ctrBig, color: '#475569' }}>0.04%</div>
                     <div style={s.ctrLbl}>CTR — Telecaller</div>
                   </div>
                   <div style={s.ctrDivider}/>
                   <div>
-                    <div style={s.ctrBig}>0.08%</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ ...s.ctrBig, color: '#059669' }}>0.08%</div>
+                      <span style={{ fontSize: '0.62rem', fontWeight: 800, padding: '2px 6px', borderRadius: 10, background: '#ecfdf5', color: '#10b981', border: '1px solid #a7f3d0' }}>+100%</span>
+                    </div>
                     <div style={s.ctrLbl}>CTR — Voice AI Agent</div>
                   </div>
                 </div>
-                <div style={s.progBar}>
-                  <div style={s.progA}/>
-                  <div style={s.progB}/>
+                <div>
+                  <div style={s.progBar}>
+                    <div style={{ ...s.progA, background: '#64748b' }}/>
+                    <div style={{ ...s.progB, background: 'linear-gradient(90deg, #34d399, #10b981)' }}/>
+                  </div>
                 </div>
-                <div style={s.ctrNote}>Voice AI Agent converts 2× better than human telecallers</div>
+                <div style={{ ...s.ctrNote, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#047857' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  <span>Voice AI Agent converts 2× better than human telecallers</span>
+                </div>
               </div>
 
             </div>
@@ -644,18 +680,28 @@ export default function Dashboard() {
                 <div style={{...s.filterPill, fontSize:'0.7rem', cursor: 'pointer'}} onClick={() => navigate('/activity')}>View All →</div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
-                {activityLogs.slice(0, 5).map(act => (
-                  <div key={act.id} style={s.actRow}>
-                    <div style={{ ...s.actIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                {activityLogs.slice(0, 5).map(act => {
+                  const empName = act.employeeId === 'e1' ? 'Animesh' : act.employeeId === 'e2' ? 'Bhavya' : act.employeeId === 'e3' ? 'Aaditya' : 'System';
+                  const empColor = empName === 'Animesh' ? '#3b82f6' : empName === 'Bhavya' ? '#a855f7' : empName === 'Aaditya' ? '#10b981' : '#f59e0b';
+                  const empBg = empName === 'Animesh' ? '#eff6ff' : empName === 'Bhavya' ? '#f3e8ff' : empName === 'Aaditya' ? '#ecfdf5' : '#fffbeb';
+                  return (
+                    <div key={act.id} style={s.actRow}>
+                      <div style={{ ...s.actIcon, backgroundColor: empBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={empColor} strokeWidth="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{ ...s.actName, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>{empName}</span>
+                          <span style={{ fontSize: '0.6rem', fontWeight: 700, padding: '1px 6px', borderRadius: 8, background: empBg, color: empColor }}>
+                            {empName === 'System' ? 'Automation' : 'Operator'}
+                          </span>
+                        </div>
+                        <div style={s.actDesc}>{act.action}</div>
+                      </div>
+                      <div style={s.actTime}>{new Date(act.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
                     </div>
-                    <div style={{flex:1}}>
-                      <div style={s.actName}>{act.employeeId === 'e1' ? 'Animesh' : act.employeeId === 'e2' ? 'Bhavya' : act.employeeId === 'e3' ? 'Aaditya' : 'System'}</div>
-                      <div style={s.actDesc}>{act.action}</div>
-                    </div>
-                    <div style={s.actTime}>{new Date(act.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</div>
-                  </div>
-                ))}
+                  );
+                })}
                 {activityLogs.length === 0 && (
                   <div style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>No recent activities.</div>
                 )}
@@ -669,18 +715,27 @@ export default function Dashboard() {
                 <div style={{...s.intBadge, color:'#a855f7',borderColor:'#a855f7',background:'#a855f715',fontSize:'0.7rem'}}>AI Powered</div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
-                {getDynamicAlerts().map(alert => (
-                  <div key={alert.id} style={{...s.alertCard, borderLeftColor: alert.type==='warning'?'#f59e0b':alert.type==='success'?'#10b981':'#3b82f6'}}>
-                    <div style={s.alertTitle}>{alert.title}</div>
-                    <div style={s.alertMsg}>{alert.message}</div>
-                    <button 
-                      onClick={() => navigate(alert.route)} 
-                      style={{...s.alertBtn, color: alert.type==='warning'?'#f59e0b':alert.type==='success'?'#10b981':'#3b82f6'}}
-                    >
-                      {alert.action} →
-                    </button>
-                  </div>
-                ))}
+                {getDynamicAlerts().map(alert => {
+                  const bg = alert.type === 'warning' ? '#fffbeb' : alert.type === 'success' ? '#ecfdf5' : '#eff6ff';
+                  const borderClr = alert.type === 'warning' ? '#fde68a' : alert.type === 'success' ? '#a7f3d0' : '#bfdbfe';
+                  const leftClr = alert.type === 'warning' ? '#f59e0b' : alert.type === 'success' ? '#10b981' : '#2563eb';
+                  const titleClr = alert.type === 'warning' ? '#78350f' : alert.type === 'success' ? '#047857' : '#1e3a8a';
+                  const msgClr = alert.type === 'warning' ? '#92400e' : alert.type === 'success' ? '#065f46' : '#1e40af';
+                  const btnClr = alert.type === 'warning' ? '#d97706' : alert.type === 'success' ? '#059669' : '#2563eb';
+
+                  return (
+                    <div key={alert.id} style={{ ...s.alertCard, backgroundColor: bg, borderColor: borderClr, borderLeftColor: leftClr }}>
+                      <div style={{ ...s.alertTitle, color: titleClr }}>{alert.title}</div>
+                      <div style={{ ...s.alertMsg, color: msgClr }}>{alert.message}</div>
+                      <button 
+                        onClick={() => navigate(alert.route)} 
+                        style={{ ...s.alertBtn, color: btnClr, fontWeight: 700 }}
+                      >
+                        {alert.action} →
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -836,8 +891,8 @@ const s = {
 
   // Circles
   circleWrap: { position:'relative', width:300, height:220 },
-  circleBig: { position:'absolute', width:180, height:180, borderRadius:'50%', background:'rgba(0,0,0,0.04)', top:10, right:20 },
-  circleSmall: { position:'absolute', width:120, height:120, borderRadius:'50%', backgroundColor:'rgba(255,255,255,0.95)', border:'1px solid #e4e4e7', top:60, right:120, boxShadow:'0 4px 6px rgba(0,0,0,0.02)' },
+  circleBig: { position:'absolute', width:190, height:190, borderRadius:'50%', background:'linear-gradient(135deg, rgba(168,85,247,0.18) 0%, rgba(147,51,234,0.08) 100%)', boxShadow:'0 0 45px rgba(168,85,247,0.15)', top:5, right:15 },
+  circleSmall: { position:'absolute', width:130, height:130, borderRadius:'50%', background:'linear-gradient(135deg, rgba(243,232,255,0.75) 0%, rgba(216,180,254,0.35) 100%)', border:'1px solid rgba(168,85,247,0.3)', top:55, right:115, boxShadow:'0 8px 24px rgba(168,85,247,0.12)', backdropFilter:'blur(4px)' },
   metricFloat: { position:'absolute' },
   mVal: { fontSize:'0.95rem', fontWeight:800, color:'#09090b' },
   mLbl: { fontSize:'0.65rem', color:'#71717a', fontWeight:600 },
@@ -874,24 +929,24 @@ const s = {
   cardArrow: { color:'#09090b', fontWeight:800, fontSize:'1.1rem' },
 
   // Bar Chart
-  barChart: { display:'flex', justifyContent:'space-between', alignItems:'flex-end', height:175, paddingTop:'0.75rem' },
+  barChart: { display:'flex', justifyContent:'space-between', alignItems:'flex-end', height:200, paddingTop:'0.5rem' },
   barCol: { display:'flex', flexDirection:'column', alignItems:'center', flexGrow:1 },
-  barVal: { fontSize:'0.72rem', fontWeight:700, color:'#09090b', marginBottom:4 },
-  bar: { width:42, background:'#09090b', borderRadius:'8px 8px 0 0', position:'relative', overflow:'hidden' },
-  barSheen: { position:'absolute', inset:0, backgroundImage:'linear-gradient(45deg,rgba(255,255,255,0.1) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.1) 75%,transparent 75%,transparent)', backgroundSize:'10px 10px' },
-  barLbl: { fontSize:'0.68rem', color:'#71717a', fontWeight:600, marginTop:6, textAlign:'center' },
+  barVal: { fontSize:'0.75rem', fontWeight:800, color:'#09090b', marginBottom:6 },
+  bar: { width:44, background:'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)', borderRadius:'8px 8px 0 0', position:'relative', overflow:'hidden', boxShadow:'0 4px 12px rgba(37,99,235,0.2)' },
+  barSheen: { position:'absolute', inset:0, backgroundImage:'linear-gradient(45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent)', backgroundSize:'10px 10px' },
+  barLbl: { fontSize:'0.72rem', color:'#52525b', fontWeight:700, marginTop:8, textAlign:'center' },
 
   // CTR
-  ctrBody: { display:'flex', flexDirection:'column', gap:'1rem', flex:1 },
+  ctrBody: { display:'flex', flexDirection:'column', justifyContent:'space-between', flex:1, paddingTop:'0.25rem' },
   aiPrompt: { fontSize:'0.78rem', fontWeight:600, color:'#52525b', backgroundColor:'#f4f4f5', padding:'6px 12px', borderRadius:20, width:'fit-content' },
-  ctrRow: { display:'flex', justifyContent:'space-between', alignItems:'center' },
-  ctrBig: { fontSize:'1.8rem', fontWeight:800, color:'#09090b' },
-  ctrLbl: { fontSize:'0.68rem', color:'#71717a', fontWeight:600 },
-  ctrDivider: { width:1, height:40, backgroundColor:'#e4e4e7' },
-  progBar: { display:'flex', height:20, borderRadius:10, overflow:'hidden', backgroundColor:'#f4f4f5' },
-  progA: { width:'40%', background:'#09090b' },
-  progB: { width:'60%', background:'#d4d4d8' },
-  ctrNote: { fontSize:'0.72rem', color:'#71717a', fontStyle:'italic' },
+  ctrRow: { display:'flex', justifyContent:'space-around', alignItems:'center', backgroundColor:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:16, padding:'1rem 0.8rem' },
+  ctrBig: { fontSize:'1.85rem', fontWeight:800, color:'#09090b', fontFamily:'var(--font-heading)' },
+  ctrLbl: { fontSize:'0.68rem', color:'#64748b', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.4px', marginTop:2 },
+  ctrDivider: { width:1, height:42, backgroundColor:'#e2e8f0' },
+  progBar: { display:'flex', height:20, borderRadius:10, overflow:'hidden', backgroundColor:'#f1f5f9', border:'1px solid #e2e8f0' },
+  progA: { width:'40%', background:'linear-gradient(90deg, #3b82f6, #1d4ed8)' },
+  progB: { width:'60%', background:'#dbeafe' },
+  ctrNote: { fontSize:'0.75rem', color:'#1d4ed8', fontWeight:700, backgroundColor:'#eff6ff', border:'1px solid #bfdbfe', borderRadius:12, padding:'8px 12px', display:'flex', alignItems:'center', gap:8 },
 
   // Chatbot
   chatWrap: { display:'flex', flexDirection:'column', flex:1, minHeight:200 },

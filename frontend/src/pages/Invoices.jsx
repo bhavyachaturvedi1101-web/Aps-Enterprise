@@ -60,7 +60,7 @@ export default function Invoices() {
         <div>
           <h1 style={s.title}>Customer Billing & PDF Tax Invoices</h1>
         </div>
-        <button onClick={() => setShowModal(true)} style={s.addBtn}>
+        <button onClick={() => setShowModal(true)} className="btn-blue-primary" style={s.addBtn}>
           + Create Tax Invoice
         </button>
       </div>
@@ -249,9 +249,9 @@ const s = {
   pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
   title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
   sub: { fontSize: '0.8rem', color: '#71717a', marginTop: 4 },
-  addBtn: { backgroundColor: '#09090b', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' },
+  addBtn: { backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.25)', transition: 'all 0.15s ease' },
   cardsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
-  invoiceCard: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' },
+  invoiceCard: { backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e4e4e7', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' },
   cardHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' },
   invBadge: { fontSize: '0.75rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' },
   clientTitle: { fontSize: '1rem', fontWeight: 800, color: '#09090b', marginTop: 2 },
@@ -264,16 +264,16 @@ const s = {
   subVal: { fontSize: '0.8rem', fontWeight: 700, color: '#52525b' },
   totalVal: { fontSize: '0.95rem', fontWeight: 800, color: '#09090b' },
   cardFooter: { display: 'flex', gap: 8, marginTop: '0.5rem' },
-  previewBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#09090b', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
-  waBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#ffffff', color: '#09090b', border: '1px solid #e4e4e7', borderRadius: 12, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
+  previewBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(37,99,235,0.2)' },
+  waBtn: { flex: 1, padding: '6px 12px', backgroundColor: '#ffffff', color: '#09090b', border: '1px solid #e4e4e7', borderRadius: 8, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(9,9,11,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
   modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e4e4e7' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
   closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#71717a' },
   modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
   label: { fontSize: '0.75rem', fontWeight: 700, color: '#3f3f46', marginTop: 4 },
-  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', color: '#09090b' },
+  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 8, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', color: '#09090b' },
   modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
-  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#09090b', color: '#fff', cursor: 'pointer', fontWeight: 700 }
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 8, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 8, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px rgba(37,99,235,0.25)' }
 };
