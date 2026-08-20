@@ -28,15 +28,8 @@ export default function Login() {
       <div style={styles.blob2}></div>
       
       <div style={styles.card}>
-        <div style={styles.logoSection}>
-          <div style={styles.logoIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aa3bff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7v10l10 5 10-5V7z" fill="rgba(170, 59, 255, 0.1)"/>
-              <polyline points="12 22 12 12 22 7"/>
-              <polyline points="12 12 2 7"/>
-            </svg>
-          </div>
-          <span style={styles.logoText}>APS Enterprise</span>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 72, width: 'auto', display: 'block', objectFit: 'contain' }} />
         </div>
         
         <h2 style={styles.title}>Welcome Back</h2>
@@ -125,7 +118,7 @@ const styles = {
     width: '400px',
     height: '400px',
     borderRadius: '50%',
-    background: 'linear-gradient(135deg, rgba(170, 59, 255, 0.25) 0%, rgba(192, 132, 252, 0.1) 100%)',
+    background: 'radial-gradient(circle, rgba(9, 9, 11, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
     top: '-10%',
     right: '10%',
     zIndex: 1,
@@ -136,7 +129,7 @@ const styles = {
     width: '500px',
     height: '500px',
     borderRadius: '50%',
-    background: 'linear-gradient(135deg, rgba(170, 59, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%)',
+    background: 'radial-gradient(circle, rgba(9, 9, 11, 0.04) 0%, rgba(255, 255, 255, 0) 70%)',
     bottom: '-15%',
     left: '-5%',
     zIndex: 1,
@@ -146,11 +139,11 @@ const styles = {
     backgroundColor: '#ffffff',
     padding: '3rem 2.5rem',
     borderRadius: '24px',
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02)',
     width: '90%',
     maxWidth: '420px',
     textAlign: 'center',
-    border: '1px solid #e2e8f0',
+    border: '1px solid #e4e4e7',
     zIndex: 2,
     backdropFilter: 'blur(10px)'
   },
@@ -161,7 +154,7 @@ const styles = {
     marginBottom: '1.5rem'
   },
   logoIcon: {
-    color: '#aa3bff',
+    color: '#09090b',
     display: 'flex',
     alignItems: 'center'
   },
@@ -169,7 +162,7 @@ const styles = {
     fontFamily: 'var(--font-heading)',
     fontSize: '1.3rem',
     fontWeight: '800',
-    color: '#08060d',
+    color: '#09090b',
     letterSpacing: '-0.5px'
   },
   title: {
@@ -177,11 +170,11 @@ const styles = {
     fontWeight: '700',
     fontFamily: 'var(--font-heading)',
     marginBottom: '0.25rem',
-    color: '#08060d'
+    color: '#09090b'
   },
   subtitle: {
     fontSize: '0.85rem',
-    color: '#64748b',
+    color: '#71717a',
     marginBottom: '2rem'
   },
   form: {
@@ -195,31 +188,27 @@ const styles = {
     fontSize: '0.8rem',
     fontWeight: '600',
     marginBottom: '0.5rem',
-    color: '#475569'
+    color: '#3f3f46'
   },
   input: {
     width: '100%',
     padding: '0.8rem 1rem',
     borderRadius: '12px',
-    border: '1px solid #cbd5e1',
+    border: '1px solid #e4e4e7',
     backgroundColor: '#f8fafc',
-    color: '#0f172a',
+    color: '#09090b',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'var(--font-body)',
     fontSize: '0.9rem',
-    transition: 'all 0.2s',
-    ':focus': {
-      borderColor: '#aa3bff',
-      backgroundColor: '#ffffff'
-    }
+    transition: 'all 0.2s'
   },
   button: {
     width: '100%',
     padding: '0.8rem',
     borderRadius: '12px',
     border: 'none',
-    backgroundColor: '#08060d',
+    backgroundColor: '#09090b',
     color: '#ffffff',
     fontSize: '0.95rem',
     fontWeight: '600',
@@ -233,9 +222,9 @@ const styles = {
     width: '100%',
     padding: '0.8rem',
     borderRadius: '12px',
-    border: '1.5px solid #aa3bff',
+    border: '1.5px solid #09090b',
     backgroundColor: 'transparent',
-    color: '#aa3bff',
+    color: '#09090b',
     fontSize: '0.95rem',
     fontWeight: '600',
     cursor: 'pointer',

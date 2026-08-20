@@ -184,16 +184,11 @@ export default function TallySync() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <h1 style={s.title}>Tally ERP 9 / Prime Accounting Sync</h1>
-            <span style={s.badgeConnected}>
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="#10b981"><circle cx="12" cy="12" r="10"/></svg>
-              <span>ODBC Driver v18.2 Connected</span>
-            </span>
           </div>
-          <p style={s.sub}>Automated Tally bank voucher reconciliation, UTR tracking & 10% advance deposit gate</p>
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => setShowAddModal(true)} style={s.addVoucherBtn}>
+          <button onClick={() => setShowAddModal(true)} className="btn-blue-primary" style={s.addVoucherBtn}>
             + Post Tally Voucher
           </button>
           <button onClick={handleSyncTallyODBC} disabled={isSyncing} style={s.syncOdbcBtn}>
@@ -205,28 +200,28 @@ export default function TallySync() {
 
       {/* Tally Summary KPI Cards */}
       <div style={s.statsRow}>
-        <div style={{ ...s.statCard, borderTopColor: '#10b981' }}>
-          <div style={{ ...s.statNum, color: '#10b981' }}>{reconciledCount} / {vouchers.length}</div>
+        <div style={{ ...s.statCard, background: 'linear-gradient(180deg, #ffffff 0%, #eff6ff 100%)' }}>
+          <div style={{ ...s.statNum, color: '#1d4ed8' }}>{reconciledCount} / {vouchers.length}</div>
           <div style={s.statLbl}>Reconciled Vouchers</div>
           <div style={s.statSub}>100% matched with Bank UTR feeds</div>
         </div>
 
-        <div style={{ ...s.statCard, borderTopColor: '#f59e0b' }}>
-          <div style={{ ...s.statNum, color: '#f59e0b' }}>{pendingCount}</div>
+        <div style={{ ...s.statCard, background: 'linear-gradient(180deg, #ffffff 0%, #fffbeb 100%)' }}>
+          <div style={{ ...s.statNum, color: '#b45309' }}>{pendingCount}</div>
           <div style={s.statLbl}>Pending Bank Feeds</div>
           <div style={s.statSub}>Awaiting UTR clearance</div>
         </div>
 
-        <div style={{ ...s.statCard, borderTopColor: '#ef4444' }}>
+        <div style={{ ...s.statCard, background: 'linear-gradient(180deg, #ffffff 0%, #fef2f2 100%)' }}>
           <div style={{ ...s.statNum, color: '#ef4444' }}>{discrepancyCount}</div>
           <div style={s.statLbl}>Discrepancy Flagged</div>
           <div style={s.statSub}>Amount mismatch alert</div>
         </div>
 
-        <div style={{ ...s.statCard, borderTopColor: '#aa3bff' }}>
-          <div style={{ ...s.statNum, color: '#aa3bff' }}>₹{totalCreditVolume.toLocaleString('en-IN')}</div>
-          <div style={s.statLbl}>Total Credit Volume (Receipts)</div>
-          <div style={s.statSub}>Debits: ₹{totalDebitVolume.toLocaleString('en-IN')}</div>
+        <div style={{ ...s.statCard, background: 'linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%)' }}>
+          <div style={{ ...s.statNum, color: '#047857' }}>₹{(totalCreditVolume / 1000).toFixed(1)}k</div>
+          <div style={s.statLbl}>Total Advance Collected</div>
+          <div style={s.statSub}>Tally Receipt Vouchers Total</div>
         </div>
       </div>
 
@@ -270,13 +265,12 @@ export default function TallySync() {
         {filteredVouchers.map(v => {
           const isReconciled = v.reconStatus === 'Reconciled';
           const isPending = v.reconStatus === 'Pending Bank Feed';
-          const isDiscrepancy = v.reconStatus === 'Discrepancy Flagged';
 
           return (
-            <div key={v.voucherNo} style={s.row}>
-              <div style={{ ...s.td, fontWeight: 800, color: '#aa3bff', fontFamily: 'monospace', flex: 1.1 }}>
+            <div key={v.voucherNo} className="table-row-hover" style={s.row}>
+              <div style={{ ...s.td, fontWeight: 800, color: '#09090b', fontFamily: 'monospace', flex: 1.1 }}>
                 {v.voucherNo}
-                <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600 }}>{v.tallyMasterId}</div>
+                <div style={{ fontSize: '0.65rem', color: '#71717a', fontWeight: 600 }}>{v.tallyMasterId}</div>
               </div>
               <div style={{ ...s.td, color: '#64748b', fontSize: '0.78rem', flex: 1.2 }}>{v.date}</div>
               <div style={{ ...s.td, fontWeight: 700, color: '#08060d', flex: 1.8 }}>
@@ -285,30 +279,32 @@ export default function TallySync() {
               </div>
               <div style={{ ...s.td, color: '#334155', fontWeight: 600, flex: 1.8 }}>{v.particulars}</div>
               <div style={{ ...s.td, flex: 1.4, fontSize: '0.78rem', color: '#475569' }}>{v.voucherType}</div>
-              <div style={{ ...s.td, fontWeight: 800, color: v.creditAmount > 0 ? '#10b981' : '#08060d', flex: 1.2 }}>
+              <div style={{ ...s.td, fontWeight: 800, color: v.creditAmount > 0 ? '#047857' : '#08060d', flex: 1.2 }}>
                 {v.creditAmount > 0 ? `+₹${v.creditAmount.toLocaleString('en-IN')}` : `-₹${v.debitAmount.toLocaleString('en-IN')}`}
                 <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 500 }}>GST: ₹{v.gstOutput.toLocaleString('en-IN')}</div>
               </div>
               <div style={{ ...s.td, fontFamily: 'monospace', fontSize: '0.75rem', color: '#475569', flex: 1.4 }}>{v.utrNo}</div>
               <div style={{ ...s.td, flex: 1.3 }}>
                 <span style={{
-                  ...s.pill,
-                  backgroundColor: isReconciled ? '#f0fdf4' : isPending ? '#fffbeb' : '#fef2f2',
-                  color: isReconciled ? '#16a34a' : isPending ? '#d97706' : '#ef4444'
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: isReconciled ? '#047857' : isPending ? '#b45309' : '#ef4444',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6
                 }}>
-                  {isReconciled ? (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  ) : isPending ? (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  ) : (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  )}
+                  <span style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: isReconciled ? '#10b981' : isPending ? '#f59e0b' : '#ef4444'
+                  }}/>
                   <span>{v.reconStatus}</span>
                 </span>
               </div>
               <div style={{ ...s.td, flex: 1.2, display: 'flex', gap: 6 }}>
                 {isPending ? (
-                  <button onClick={() => handleReconcileSingle(v.voucherNo)} style={s.reconActionBtn}>
+                  <button onClick={() => handleReconcileSingle(v.voucherNo)} className="btn-blue-primary" style={s.reconActionBtn}>
                     Reconcile
                   </button>
                 ) : (
@@ -457,39 +453,39 @@ export default function TallySync() {
 
 const s = {
   page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto' },
-  toast: { position: 'fixed', bottom: 24, right: 24, backgroundColor: '#0f172a', color: '#fff', padding: '0.8rem 1.4rem', borderRadius: 14, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2000, fontSize: '0.85rem', fontWeight: 600 },
+  toast: { position: 'fixed', bottom: 24, right: 24, backgroundColor: '#09090b', color: '#fff', padding: '0.8rem 1.4rem', borderRadius: 14, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2000, fontSize: '0.85rem', fontWeight: 600 },
   pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
-  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#08060d', margin: 0 },
-  sub: { fontSize: '0.8rem', color: '#64748b', marginTop: 4 },
-  badgeConnected: { display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 },
-  addVoucherBtn: { backgroundColor: '#08060d', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' },
-  syncOdbcBtn: { backgroundColor: '#aa3bff', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
+  title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
+  sub: { fontSize: '0.8rem', color: '#71717a', marginTop: 4 },
+  badgeConnected: { display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#f4f4f5', color: '#09090b', border: '1px solid #e4e4e7', padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 },
+  addVoucherBtn: { backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(37,99,235,0.25)' },
+  syncOdbcBtn: { backgroundColor: '#ffffff', color: '#09090b', border: '1px solid #e4e4e7', borderRadius: 8, padding: '8px 18px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
   statsRow: { display: 'flex', gap: '1.25rem', marginBottom: '1.5rem' },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 18, padding: '1.25rem 1.5rem', border: '1px solid #e2e8f0', borderTop: '4px solid', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: '1.25rem 1.5rem', border: '1px solid #e4e4e7', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' },
   statNum: { fontSize: '1.7rem', fontWeight: 800 },
-  statLbl: { fontSize: '0.78rem', color: '#08060d', fontWeight: 700, marginTop: 2 },
-  statSub: { fontSize: '0.7rem', color: '#94a3b8', marginTop: 2 },
+  statLbl: { fontSize: '0.78rem', color: '#09090b', fontWeight: 700, marginTop: 2 },
+  statSub: { fontSize: '0.7rem', color: '#71717a', marginTop: 2 },
   filterBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  filterBtnActive: { padding: '6px 14px', backgroundColor: '#aa3bff', color: '#fff', border: 'none', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' },
-  filterBtnInactive: { padding: '6px 14px', backgroundColor: '#fff', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' },
-  searchInput: { padding: '6px 14px', borderRadius: 20, border: '1px solid #cbd5e1', fontSize: '0.8rem', outline: 'none', width: 280, fontFamily: 'var(--font-body)' },
-  card: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
-  tableHead: { display: 'flex', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '0.75rem 1.25rem' },
-  th: { fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  row: { display: 'flex', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: '1px solid #f1f5f9' },
-  td: { fontSize: '0.82rem', color: '#475569' },
-  pill: { padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 },
-  reconActionBtn: { padding: '4px 10px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: 12, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' },
-  xmlPayloadBtn: { padding: '4px 10px', backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', borderRadius: 12, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' },
-  xmlBox: { backgroundColor: '#0f172a', color: '#34d399', padding: '1.25rem', borderRadius: 12, fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: 1.5, maxHeight: 320, overflowY: 'auto' },
-  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+  filterBtnActive: { padding: '6px 14px', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' },
+  filterBtnInactive: { padding: '6px 14px', backgroundColor: '#fff', color: '#71717a', border: '1px solid #e4e4e7', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' },
+  searchInput: { padding: '6px 14px', borderRadius: 8, border: '1px solid #e4e4e7', fontSize: '0.8rem', outline: 'none', width: 280, fontFamily: 'var(--font-body)', color: '#09090b' },
+  card: { backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' },
+  tableHead: { display: 'flex', backgroundColor: '#f8fafc', borderBottom: '1px solid #e4e4e7', padding: '0.75rem 1.25rem' },
+  th: { fontSize: '0.68rem', fontWeight: 700, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  row: { display: 'flex', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: '1px solid #f4f4f5' },
+  td: { fontSize: '0.82rem', color: '#3f3f46' },
+  pill: { padding: '4px 10px', borderRadius: 6, fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 },
+  reconActionBtn: { padding: '4px 10px', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' },
+  xmlPayloadBtn: { padding: '4px 10px', backgroundColor: '#f4f4f5', color: '#09090b', border: '1px solid #e4e4e7', borderRadius: 6, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' },
+  xmlBox: { backgroundColor: '#09090b', color: '#e4e4e7', padding: '1.25rem', borderRadius: 12, fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: 1.5, maxHeight: 320, overflowY: 'auto' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(9,9,11,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modalContent: { backgroundColor: '#fff', borderRadius: 20, width: '90%', maxWidth: 450, padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e4e4e7' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' },
+  closeModalBtn: { border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#71717a' },
   modalForm: { display: 'flex', flexDirection: 'column', gap: '0.85rem' },
-  label: { fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginTop: 4 },
-  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)' },
+  label: { fontSize: '0.75rem', fontWeight: 700, color: '#3f3f46', marginTop: 4 },
+  modalInput: { padding: '0.6rem 0.9rem', borderRadius: 8, border: '1px solid #e4e4e7', fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', color: '#09090b' },
   modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
-  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 20, border: 'none', background: '#aa3bff', color: '#fff', cursor: 'pointer', fontWeight: 700 }
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 8, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
+  submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 8, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 6px rgba(37,99,235,0.25)' }
 };

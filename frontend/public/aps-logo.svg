@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 165" width="100%" height="100%">
+  <defs>
+    <!-- Vibrant Orange Gradient -->
+    <linearGradient id="apsOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A00" />
+      <stop offset="60%" stop-color="#FF5400" />
+      <stop offset="100%" stop-color="#E03E00" />
+    </linearGradient>
+
+    <!-- Dark Charcoal Gradient for P and S -->
+    <linearGradient id="apsCharcoal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Drop Shadow for Enhanced Depth -->
+    <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <g filter="url(#subtleGlow)">
+    <!-- ═══════════════════ LETTER 'A' ═══════════════════ -->
+    <!-- Left Leg of A -->
+    <polygon points="40,118 64,118 142,10 116,10" fill="url(#apsOrange)" />
+    
+    <!-- Right Leg of A (behind P) -->
+    <polygon points="122,10 144,10 148,118 126,118" fill="url(#apsOrange)" />
+
+    <!-- Sharp Needle & Curved Swoosh of A extending across -->
+    <path d="M 22 74 Q 85 70 178 116 L 164 124 Q 78 82 22 74 Z" fill="url(#apsOrange)" />
+
+    <!-- ═══════════════════ LETTER 'P' ═══════════════════ -->
+    <!-- P Vertical Stem -->
+    <rect x="148" y="10" width="22" height="108" rx="2" fill="url(#apsCharcoal)" />
+    
+    <!-- P Outer Bowl -->
+    <path d="M 168 10 H 202 C 224 10 236 24 236 44 C 236 64 224 76 202 76 H 168 Z" fill="url(#apsCharcoal)" />
+    <!-- P Inner Cutout -->
+    <path d="M 170 28 H 198 C 208 28 214 34 214 43 C 214 52 208 58 198 58 H 170 Z" fill="#ffffff" />
+
+    <!-- ═══════════════════ LETTER 'S' ═══════════════════ -->
+    <!-- S Path -->
+    <path d="M 268 28 C 256 28 244 32 238 40 C 232 47 236 57 248 62 L 264 68 C 278 74 286 82 286 94 C 286 109 271 120 250 120 C 235 120 223 114 218 106 L 232 94 C 236 100 242 104 250 104 C 258 104 266 100 266 94 C 266 88 261 84 251 80 L 236 74 C 221 68 215 57 215 45 C 215 31 228 14 252 14 C 265 14 274 19 280 26 Z" fill="url(#apsCharcoal)" />
+
+    <!-- ═══════════════════ REGISTERED TRADEMARK (R) ═══════════════════ -->
+    <circle cx="288" cy="22" r="7.5" fill="none" stroke="url(#apsCharcoal)" stroke-width="1.6" />
+    <text x="288" y="25.5" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="7.5" font-weight="800" text-anchor="middle" fill="url(#apsCharcoal)">R</text>
+
+    <!-- ═══════════════════ 4 ORANGE CONNECTION NODES ═══════════════════ -->
+    <!-- Connecting grid lines -->
+    <line x1="184" y1="112" x2="200" y2="120" stroke="#FF5400" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="184" y1="112" x2="176" y2="128" stroke="#FF5400" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="200" y1="120" x2="192" y2="136" stroke="#FF5400" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="176" y1="128" x2="192" y2="136" stroke="#FF5400" stroke-width="1.8" stroke-linecap="round" />
+
+    <!-- 4 Nodes -->
+    <circle cx="184" cy="112" r="4.8" fill="url(#apsOrange)" />
+    <circle cx="200" cy="120" r="4.8" fill="url(#apsOrange)" />
+    <circle cx="176" cy="128" r="4.8" fill="url(#apsOrange)" />
+    <circle cx="192" cy="136" r="4.8" fill="url(#apsOrange)" />
+
+    <!-- ═══════════════════ 'ENTERPRISES' SUBTITLE ═══════════════════ -->
+    <text x="165" y="156" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-size="14.5" font-weight="700" letter-spacing="8.5" text-anchor="middle" fill="#0F172A">
+      ENTERPRISES
+    </text>
+  </g>
+</svg>

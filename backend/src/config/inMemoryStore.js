@@ -99,7 +99,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e1',
     createdAt: new Date(Date.now() - 86400000 * 1)
   },
@@ -116,7 +116,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'WhatsApp A5', 
+    source: 'WhatsApp', 
     assignedEmployeeId: 'e3',
     createdAt: new Date(Date.now() - 86400000 * 1)
   },
@@ -140,11 +140,11 @@ const mockLeads = [
     interest: 'VMC Machining Center', 
     budget: '120000', 
     stage: 'Qualified', 
-    notes: 'A1 Voice Agent qualified lead intent. Scheduled demo.', 
+    notes: 'Voice Agent qualified lead intent. Scheduled demo.', 
     crmSynced: true, 
     erpBookingCreated: false, 
     tallyPaymentVerified: false, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e2',
     createdAt: new Date(Date.now() - 86400000)
   },
@@ -158,7 +158,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: false, 
-    source: 'A1 Voice Agent', 
+    source: 'Voice Agent', 
     assignedEmployeeId: 'e3',
     createdAt: new Date(Date.now() - 172800000)
   },
@@ -186,7 +186,7 @@ const mockLeads = [
     crmSynced: true, 
     erpBookingCreated: true, 
     tallyPaymentVerified: true, 
-    source: 'WhatsApp A5', 
+    source: 'WhatsApp', 
     assignedEmployeeId: 'e2',
     createdAt: new Date(Date.now() - 345600000)
   }
@@ -202,7 +202,7 @@ const mockActivityLogs = [
     action: 'Lead status transitioned from "Booked" to "Confirmed Lead"', 
     fromStage: 'Booked', 
     toStage: 'Confirmed Lead', 
-    details: 'Booking configuration validated and approved in A2',
+    details: 'Booking configuration validated and approved',
     createdAt: new Date(Date.now() - 300000) 
   },
   { 
@@ -214,7 +214,7 @@ const mockActivityLogs = [
     action: 'Lead status transitioned from "Enquiry" to "Qualified"', 
     fromStage: 'Enquiry', 
     toStage: 'Qualified', 
-    details: 'A1 Voice Agent completed call qualification and captured $25k budget',
+    details: 'Voice Agent completed call qualification and captured $25k budget',
     createdAt: new Date(Date.now() - 720000) 
   },
   { 
@@ -247,7 +247,7 @@ const mockActivityLogs = [
     employeeName: 'Aaditya',
     leadId: 'LEAD-004', 
     leadName: 'Global Tech',
-    action: 'Dispatched automated WhatsApp payment reminder (A5 Module)', 
+    action: 'Dispatched automated WhatsApp payment reminder', 
     fromStage: 'Confirmed Lead', 
     toStage: 'Confirmed Lead', 
     details: 'Sent template payment_reminder_advance_10pct for $4,200 advance',
@@ -261,11 +261,12 @@ const mockEmployees = [
     name: 'Animesh', 
     email: 'animesh@aps-enterprise.com',
     phone: '+91 98201 11223',
-    role: 'Voice AI & Sales Lead', 
+    role: 'Voice Operations & Sales Lead', 
     department: 'Voice Operations & Telecalling',
     kpiScore: '94%',
     kpiScoreNum: 94,
     status: 'Active',
+    currentActivity: 'Qualifying Inbound Voice Lead (Reliance Automation)',
     tasksCompleted: 48, 
     callsHandled: 124, 
     salesClosed: 8,
@@ -275,18 +276,50 @@ const mockEmployees = [
     avgCallDurationSec: 135,
     avgResponseTimeMin: 4.2,
     weeklyKpiHistory: [86, 89, 91, 94],
-    stageConversions: { enquiryToQualified: 42, qualifiedToBooked: 28, bookedToConfirmed: 18, confirmedToPaid: 8 }
+    stageConversions: { enquiryToQualified: 42, qualifiedToBooked: 28, bookedToConfirmed: 18, confirmedToPaid: 8 },
+    activeTask: {
+      id: 'task-e1-1',
+      title: 'Outbound telecall follow-up for LEAD-008 (Reliance Automation)',
+      leadId: 'LEAD-008',
+      leadName: 'Reliance Automation',
+      priority: 'High',
+      type: 'Sales Qualification',
+      stage: 'Enquiry',
+      dueIn: '20 mins',
+      assignedAt: new Date(Date.now() - 1800000)
+    },
+    taskQueue: [
+      {
+        id: 'task-e1-2',
+        title: 'Voice Agent call analysis & qualification review for LEAD-002 (Jane Smith)',
+        leadId: 'LEAD-002',
+        leadName: 'Jane Smith',
+        priority: 'Normal',
+        type: 'Voice Review',
+        stage: 'Qualified'
+      },
+      {
+        id: 'task-e1-3',
+        title: 'Conduct secondary telecaller qualification for LEAD-009 (Tata Heavy Tools)',
+        leadId: 'LEAD-009',
+        leadName: 'Tata Heavy Tools',
+        priority: 'Normal',
+        type: 'Telecalling',
+        stage: 'Enquiry'
+      }
+    ]
   },
   { 
     id: 'e2', 
     name: 'Bhavya', 
     email: 'bhavya@aps-enterprise.com',
     phone: '+91 98302 22334',
-    role: 'System Architect & Admin', 
+    role: 'Core Systems Architect & Admin', 
     department: 'Operations & Systems',
     kpiScore: '98%',
     kpiScoreNum: 98,
     status: 'Active',
+    currentActivity: 'Approving Machine Booking Specs & Countersigning Order',
     tasksCompleted: 64, 
     callsHandled: 22, 
     salesClosed: 12,
@@ -296,18 +329,50 @@ const mockEmployees = [
     avgCallDurationSec: 95,
     avgResponseTimeMin: 2.1,
     weeklyKpiHistory: [92, 94, 96, 98],
-    stageConversions: { enquiryToQualified: 38, qualifiedToBooked: 35, bookedToConfirmed: 31, confirmedToPaid: 12 }
+    stageConversions: { enquiryToQualified: 38, qualifiedToBooked: 35, bookedToConfirmed: 31, confirmedToPaid: 12 },
+    activeTask: {
+      id: 'task-e2-1',
+      title: 'Review Booking Specs & Dual-Approval Countersign for LEAD-004 (Global Tech)',
+      leadId: 'LEAD-004',
+      leadName: 'Global Tech',
+      priority: 'Urgent',
+      type: 'Admin Dual-Approval',
+      stage: 'Booked',
+      dueIn: '15 mins',
+      assignedAt: new Date(Date.now() - 2400000)
+    },
+    taskQueue: [
+      {
+        id: 'task-e2-2',
+        title: 'Verify Tally Ledger payment sync for LEAD-005 (Elite Builders)',
+        leadId: 'LEAD-005',
+        leadName: 'Elite Builders',
+        priority: 'High',
+        type: 'Payment Gate Verification',
+        stage: 'Confirmed Lead'
+      },
+      {
+        id: 'task-e2-3',
+        title: 'Factory Release authorization webhook verification for LEAD-006 (Precision Works)',
+        leadId: 'LEAD-006',
+        leadName: 'Precision Works',
+        priority: 'Normal',
+        type: 'Factory Release Authorization',
+        stage: 'Client (Paid)'
+      }
+    ]
   },
   { 
     id: 'e3', 
     name: 'Aaditya', 
     email: 'aaditya@aps-enterprise.com',
     phone: '+91 98403 33445',
-    role: 'Analytics & Automation Lead', 
+    role: 'Analytics & WhatsApp Lead', 
     department: 'Customer Success & Automation',
     kpiScore: '91%',
     kpiScoreNum: 91,
     status: 'Active',
+    currentActivity: 'Monitoring 10% Advance WhatsApp Payment Reminder Stream',
     tasksCompleted: 39, 
     callsHandled: 45, 
     salesClosed: 5,
@@ -317,9 +382,39 @@ const mockEmployees = [
     avgCallDurationSec: 110,
     avgResponseTimeMin: 5.8,
     weeklyKpiHistory: [82, 85, 88, 91],
-    stageConversions: { enquiryToQualified: 29, qualifiedToBooked: 22, bookedToConfirmed: 16, confirmedToPaid: 5 }
+    stageConversions: { enquiryToQualified: 29, qualifiedToBooked: 22, bookedToConfirmed: 16, confirmedToPaid: 5 },
+    activeTask: {
+      id: 'task-e3-1',
+      title: 'Dispatch automated WhatsApp payment reminder for LEAD-004 (58h dwell alert)',
+      leadId: 'LEAD-004',
+      leadName: 'Global Tech',
+      priority: 'Urgent',
+      type: 'Lifecycle Automation',
+      stage: 'Confirmed Lead',
+      dueIn: '10 mins',
+      assignedAt: new Date(Date.now() - 1200000)
+    },
+    taskQueue: [
+      {
+        id: 'task-e3-2',
+        title: 'Inspect Meta WABA webhook read receipts & delivery callbacks',
+        leadId: 'LEAD-007',
+        leadName: 'ModernFab',
+        priority: 'Normal',
+        type: 'WABA Verification',
+        stage: 'Dispatched'
+      },
+      {
+        id: 'task-e3-3',
+        title: 'Re-engage stalled pipeline leads (>48h dwell) with payment reminders',
+        leadId: 'LEAD-010',
+        leadName: 'Apex Metalcraft',
+        priority: 'High',
+        type: 'Lifecycle Campaign',
+        stage: 'Confirmed Lead'
+      }
+    ]
   },
-
   { 
     id: 'e4', 
     name: 'Pooja Sharma', 
@@ -330,6 +425,7 @@ const mockEmployees = [
     kpiScore: '89%',
     kpiScoreNum: 89,
     status: 'Active',
+    currentActivity: 'Live Outbound Telecall on Machinery Queue',
     tasksCompleted: 52, 
     callsHandled: 168, 
     salesClosed: 7,
@@ -339,7 +435,29 @@ const mockEmployees = [
     avgCallDurationSec: 142,
     avgResponseTimeMin: 3.5,
     weeklyKpiHistory: [80, 84, 87, 89],
-    stageConversions: { enquiryToQualified: 58, qualifiedToBooked: 32, bookedToConfirmed: 20, confirmedToPaid: 7 }
+    stageConversions: { enquiryToQualified: 58, qualifiedToBooked: 32, bookedToConfirmed: 20, confirmedToPaid: 7 },
+    activeTask: {
+      id: 'task-e4-1',
+      title: 'Follow-up telecall for machinery budget confirmation for LEAD-010 (Apex Metalcraft)',
+      leadId: 'LEAD-010',
+      leadName: 'Apex Metalcraft',
+      priority: 'High',
+      type: 'Telecall Follow-up',
+      stage: 'Confirmed Lead',
+      dueIn: '30 mins',
+      assignedAt: new Date(Date.now() - 900000)
+    },
+    taskQueue: [
+      {
+        id: 'task-e4-2',
+        title: 'Capture machine requirements & budget timeline for LEAD-003 (Mark Johnson)',
+        leadId: 'LEAD-003',
+        leadName: 'Mark Johnson',
+        priority: 'Normal',
+        type: 'Sales Qualification',
+        stage: 'Enquiry'
+      }
+    ]
   },
   { 
     id: 'e5', 
@@ -351,6 +469,7 @@ const mockEmployees = [
     kpiScore: '93%',
     kpiScoreNum: 93,
     status: 'Active',
+    currentActivity: 'Processing Factory Shop Floor Dispatch Tracking',
     tasksCompleted: 44, 
     callsHandled: 12, 
     salesClosed: 9,
@@ -360,16 +479,48 @@ const mockEmployees = [
     avgCallDurationSec: 80,
     avgResponseTimeMin: 4.0,
     weeklyKpiHistory: [88, 90, 91, 93],
-    stageConversions: { enquiryToQualified: 20, qualifiedToBooked: 19, bookedToConfirmed: 18, confirmedToPaid: 9 }
+    stageConversions: { enquiryToQualified: 20, qualifiedToBooked: 19, bookedToConfirmed: 18, confirmedToPaid: 9 },
+    activeTask: {
+      id: 'task-e5-1',
+      title: 'Factory dispatch job card verification #TRK-99210 for LEAD-007 (ModernFab)',
+      leadId: 'LEAD-007',
+      leadName: 'ModernFab',
+      priority: 'High',
+      type: 'Factory Dispatch',
+      stage: 'Dispatched',
+      dueIn: '40 mins',
+      assignedAt: new Date(Date.now() - 3600000)
+    },
+    taskQueue: [
+      {
+        id: 'task-e5-2',
+        title: 'Validate assembly milestone 2 for LEAD-006 (Precision Works)',
+        leadId: 'LEAD-006',
+        leadName: 'Precision Works',
+        priority: 'Normal',
+        type: 'Assembly Check',
+        stage: 'In Production'
+      },
+      {
+        id: 'task-e5-3',
+        title: 'Queue machine production order for LEAD-011 (Kirloskar Forge)',
+        leadId: 'LEAD-011',
+        leadName: 'Kirloskar Forge',
+        priority: 'Normal',
+        type: 'Production Queue',
+        stage: 'Client (Paid)'
+      }
+    ]
   }
 ];
+
 
 const mockCallLogs = [
   {
     callId: 'CALL-001',
     leadId: 'LEAD-002',
     phone: '+919823456789',
-    agent: 'A1 Voice Agent',
+    agent: 'Voice Agent',
     durationSeconds: 145,
     callOutcome: 'Interested - Qualified',
     transcript: 'Customer expressed strong interest in Laser Cutter Pro for immediate purchase.',
@@ -379,7 +530,7 @@ const mockCallLogs = [
     callId: 'CALL-002',
     leadId: 'LEAD-006',
     phone: '+919833445566',
-    agent: 'A1 Voice Agent',
+    agent: 'Voice Agent',
     durationSeconds: 210,
     callOutcome: 'Interested - High Intent',
     transcript: 'Inquired about Plasma Cutter specifications and 10% advance payment details.',
@@ -446,7 +597,7 @@ const mockWhatsAppTemplates = [
     bodyText: 'Hi {{1}}, thank you for speaking with our AI specialist about the {{2}}. Attached is the full technical datasheet, tooling matrix, and ROI calculator.',
     buttons: ['Open PDF Specs', 'Book Video Demo'],
     triggerStage: 'Qualified',
-    delayDescription: 'Triggered 1 hour after A1 voice agent qualifies lead'
+    delayDescription: 'Triggered 1 hour after voice agent qualifies lead'
   }
 ];
 
@@ -507,7 +658,7 @@ const mockWhatsAppSequences = [
     id: 'SEQ-05',
     name: 'Qualified Lead Brochure & Specs Deck',
     triggerStage: 'Qualified',
-    targetAudience: 'Newly qualified leads from A1 voice agent',
+    targetAudience: 'Newly qualified leads from voice agent',
     delayHours: 1,
     templateId: 'qualified_lead_brochure_pack',
     status: 'Paused',
