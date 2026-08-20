@@ -25,13 +25,17 @@ export default function Employees() {
           </thead>
           <tbody>
             {MOCK_EMPLOYEES.map((emp) => (
-              <tr key={emp.id} style={styles.tr}>
+              <tr key={emp.id} className="table-row-hover" style={styles.tr}>
                 <td style={styles.td}><strong>{emp.name}</strong></td>
                 <td style={styles.td}>{emp.role}</td>
                 <td style={styles.td}>{emp.tasksCompleted}</td>
                 <td style={styles.td}>{emp.callsHandled}</td>
                 <td style={styles.td}>{emp.salesClosed}</td>
-                <td style={{ ...styles.td, color: '#09090b', fontWeight: '800' }}>{emp.kpiScore}</td>
+                <td style={styles.td}>
+                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, padding: '3px 10px', borderRadius: 12, fontSize: '0.78rem', display: 'inline-block' }}>
+                    {emp.kpiScore}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>

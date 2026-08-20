@@ -24,78 +24,195 @@ const VALID_NEXT = {
 
 const STAGE_META = {
   Enquiry: {
-    color: '#09090b',
-    borderTop: '#09090b',
+    color: '#475569',
+    borderTop: '#64748b',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#f1f5f9',
+    pillClr: '#475569',
     idx: 0
   },
   Qualified: {
-    color: '#27272a',
-    borderTop: '#27272a',
+    color: '#1d4ed8',
+    borderTop: '#3b82f6',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#eff6ff',
+    pillClr: '#1d4ed8',
     idx: 1
   },
   Booked: {
-    color: '#3f3f46',
-    borderTop: '#3f3f46',
+    color: '#7c3aed',
+    borderTop: '#a855f7',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#f3e8ff',
+    pillClr: '#7c3aed',
     idx: 2
   },
   'Confirmed Lead': {
-    color: '#52525b',
-    borderTop: '#52525b',
+    color: '#047857',
+    borderTop: '#10b981',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#ecfdf5',
+    pillClr: '#047857',
     idx: 3
   },
   'Client (Paid)': {
-    color: '#09090b',
-    borderTop: '#09090b',
+    color: '#0f766e',
+    borderTop: '#0d9488',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#ccfbf1',
+    pillClr: '#0f766e',
     idx: 4
   },
   'In Production': {
-    color: '#27272a',
-    borderTop: '#27272a',
+    color: '#4338ca',
+    borderTop: '#6366f1',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#e0e7ff',
+    pillClr: '#4338ca',
     idx: 5
   },
   Dispatched: {
-    color: '#3f3f46',
-    borderTop: '#3f3f46',
+    color: '#b45309',
+    borderTop: '#f59e0b',
     bg: '#ffffff',
-    pillBg: '#f4f4f5',
-    pillClr: '#09090b',
+    pillBg: '#fffbeb',
+    pillClr: '#b45309',
     idx: 6
   }
 };
 
 const PRIORITY_THEMES = {
-  Hot:  { bg: '#09090b', color: '#ffffff', border: '#09090b' },
-  Warm: { bg: '#f4f4f5', color: '#09090b', border: '#e4e4e7' },
-  Cold: { bg: '#ffffff', color: '#71717a', border: '#e4e4e7' }
+  Hot:  { bg: '#fef2f2', color: '#ef4444', border: '#fca5a5' },
+  Warm: { bg: '#fffbeb', color: '#b45309', border: '#fde68a' },
+  Cold: { bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' }
 };
 
 const SOURCE_THEMES = {
-  WhatsApp:         { bg: '#f4f4f5', color: '#09090b' },
-  'Meta Ads':       { bg: '#f4f4f5', color: '#09090b' },
-  'Facebook Ad':    { bg: '#f4f4f5', color: '#09090b' },
-  'Voice Agent':    { bg: '#f4f4f5', color: '#09090b' },
-  'Inbound Call':   { bg: '#f4f4f5', color: '#09090b' },
-  'Direct Web':     { bg: '#f4f4f5', color: '#09090b' },
-  Default:          { bg: '#f4f4f5', color: '#09090b' }
+  WhatsApp:         { bg: '#ecfdf5', color: '#047857' },
+  'Meta Ads':       { bg: '#eff6ff', color: '#1d4ed8' },
+  'Facebook Ad':    { bg: '#eff6ff', color: '#1d4ed8' },
+  'Voice Agent':    { bg: '#f3e8ff', color: '#7c3aed' },
+  'Inbound Call':   { bg: '#e0e7ff', color: '#4338ca' },
+  'Direct Web':     { bg: '#f1f5f9', color: '#475569' },
+  Default:          { bg: '#f1f5f9', color: '#475569' }
 };
+
+// Custom Enterprise Select Component for CRM
+function CustomSelect({ value, options, onChange, minWidth = 140, fullWidth = false, dropUp = false }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block', width: fullWidth ? '100%' : 'auto' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="custom-select-trigger"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '0.45rem 0.85rem',
+          borderRadius: 8,
+          border: '1px solid #e4e4e7',
+          backgroundColor: '#ffffff',
+          fontSize: '0.8rem',
+          fontWeight: 600,
+          color: '#09090b',
+          cursor: 'pointer',
+          fontFamily: 'var(--font-body)',
+          minWidth: fullWidth ? '100%' : minWidth,
+          width: fullWidth ? '100%' : 'auto',
+          justifyContent: 'space-between',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <span>{value}</span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#71717a"
+          strokeWidth="2.5"
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: dropUp ? 'calc(100% + 4px)' : undefined,
+            top: dropUp ? undefined : 'calc(100% + 4px)',
+            left: 0,
+            width: '100%',
+            minWidth: '100%',
+            backgroundColor: '#ffffff',
+            borderRadius: 10,
+            border: '1px solid #e4e4e7',
+            boxShadow: dropUp ? '0 -10px 25px -5px rgba(0,0,0,0.12)' : '0 10px 25px -5px rgba(0,0,0,0.12)',
+            zIndex: 1050,
+            padding: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            maxHeight: 200,
+            overflowY: 'auto'
+          }}
+        >
+          {options.map((opt) => {
+            const isSelected = opt === value;
+            return (
+              <div
+                key={opt}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`custom-select-option ${isSelected ? 'selected' : ''}`}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? '#ffffff' : '#09090b',
+                  backgroundColor: isSelected ? '#2563eb' : 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.12s ease'
+                }}
+              >
+                <span>{opt}</span>
+                {isSelected && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function CRMLeads() {
   const navigate = useNavigate();
@@ -417,19 +534,12 @@ export default function CRMLeads() {
           </div>
 
           {/* Source Filter */}
-          <select
-            value={selectedSource}
-            onChange={e => setSelectedSource(e.target.value)}
-            style={s.sourceSelect}
-          >
-            <option value="All">All Sources</option>
-            <option value="WhatsApp">WhatsApp</option>
-            <option value="Meta Ads">Meta Ads</option>
-            <option value="Facebook Ad">Facebook Ad</option>
-            <option value="Voice Agent">Voice Agent</option>
-            <option value="Inbound Call">Inbound Call</option>
-            <option value="Direct Web">Direct Web</option>
-          </select>
+          <CustomSelect
+            value={selectedSource === 'All' ? 'All Sources' : selectedSource}
+            options={['All Sources', 'WhatsApp', 'Meta Ads', 'Facebook Ad', 'Voice Agent', 'Inbound Call', 'Direct Web']}
+            onChange={val => setSelectedSource(val === 'All Sources' ? 'All' : val)}
+            minWidth={135}
+          />
 
           {/* Policy Toggle */}
           <div style={s.policyToggle}>
@@ -448,7 +558,7 @@ export default function CRMLeads() {
           </div>
 
           {/* Add New Lead Button */}
-          <button onClick={() => setShowAddModal(true)} style={s.addLeadBtn}>
+          <button onClick={() => setShowAddModal(true)} className="btn-blue-primary" style={s.addLeadBtn}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -468,7 +578,7 @@ export default function CRMLeads() {
           return (
             <div key={stage} style={s.kanbanColumn}>
               {/* Column Top Header */}
-              <div style={{ ...s.columnHeader, borderTopColor: meta.borderTop }}>
+              <div style={s.columnHeader}>
                 <div style={s.columnTitleRow}>
                   <div style={s.columnTitleLeft}>
                     <span style={s.columnTitle}>{stage}</span>
@@ -540,20 +650,12 @@ export default function CRMLeads() {
                       </div>
 
                       {/* Tags Row: Priority (Warm) + Source (WhatsApp / Facebook Ad) */}
-                      <div style={s.tagsRow}>
-                        <span style={{
-                          ...s.tagPill,
-                          backgroundColor: priorityStyle.bg,
-                          color: priorityStyle.color,
-                          borderColor: priorityStyle.border
-                        }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '4px 0' }}>
+                        <span style={{ color: priorityStyle.color, fontWeight: 700, fontSize: '0.78rem' }}>
                           {lead.priority || 'Warm'}
                         </span>
-                        <span style={{
-                          ...s.tagPill,
-                          backgroundColor: sourceStyle.bg,
-                          color: sourceStyle.color
-                        }}>
+                        <span style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>•</span>
+                        <span style={{ color: sourceStyle.color, fontWeight: 700, fontSize: '0.78rem' }}>
                           {lead.source || 'WhatsApp'}
                         </span>
                       </div>
@@ -648,44 +750,32 @@ export default function CRMLeads() {
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Initial Pipeline Stage</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={newLead.stage}
-                    onChange={e => setNewLead({ ...newLead, stage: e.target.value })}
-                  >
-                    {STAGES.map(st => (
-                      <option key={st} value={st}>{st}</option>
-                    ))}
-                  </select>
+                    options={STAGES}
+                    onChange={st => setNewLead({ ...newLead, stage: st })}
+                    fullWidth={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Priority / Warmth</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={newLead.priority}
-                    onChange={e => setNewLead({ ...newLead, priority: e.target.value })}
-                  >
-                    <option value="Warm">Warm</option>
-                    <option value="Hot">Hot</option>
-                    <option value="Cold">Cold</option>
-                  </select>
+                    options={['Warm', 'Hot', 'Cold']}
+                    onChange={pr => setNewLead({ ...newLead, priority: pr })}
+                    fullWidth={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Lead Source</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={newLead.source}
-                    onChange={e => setNewLead({ ...newLead, source: e.target.value })}
-                  >
-                    <option value="WhatsApp">WhatsApp</option>
-                    <option value="Facebook Ad">Facebook Ad</option>
-                    <option value="Meta Ads">Meta Ads</option>
-                    <option value="Voice Agent">Voice Agent</option>
-                    <option value="Inbound Call">Inbound Call</option>
-                    <option value="Direct Web">Direct Web</option>
-                  </select>
+                    options={['WhatsApp', 'Facebook Ad', 'Meta Ads', 'Voice Agent', 'Inbound Call', 'Direct Web']}
+                    onChange={src => setNewLead({ ...newLead, source: src })}
+                    fullWidth={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
@@ -774,44 +864,35 @@ export default function CRMLeads() {
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Pipeline Stage</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={editingLead.stage}
-                    onChange={e => setEditingLead({ ...editingLead, stage: e.target.value })}
-                  >
-                    {STAGES.map(st => (
-                      <option key={st} value={st}>{st}</option>
-                    ))}
-                  </select>
+                    options={STAGES}
+                    onChange={st => setEditingLead({ ...editingLead, stage: st })}
+                    fullWidth={true}
+                    dropUp={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Priority / Warmth</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={editingLead.priority || 'Warm'}
-                    onChange={e => setEditingLead({ ...editingLead, priority: e.target.value })}
-                  >
-                    <option value="Warm">Warm</option>
-                    <option value="Hot">Hot</option>
-                    <option value="Cold">Cold</option>
-                  </select>
+                    options={['Warm', 'Hot', 'Cold']}
+                    onChange={pr => setEditingLead({ ...editingLead, priority: pr })}
+                    fullWidth={true}
+                    dropUp={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
                   <label style={s.formLabel}>Lead Source</label>
-                  <select
-                    style={s.formSelect}
+                  <CustomSelect
                     value={editingLead.source || 'WhatsApp'}
-                    onChange={e => setEditingLead({ ...editingLead, source: e.target.value })}
-                  >
-                    <option value="WhatsApp">WhatsApp</option>
-                    <option value="Facebook Ad">Facebook Ad</option>
-                    <option value="Meta Ads">Meta Ads</option>
-                    <option value="Voice Agent">Voice Agent</option>
-                    <option value="Inbound Call">Inbound Call</option>
-                    <option value="Direct Web">Direct Web</option>
-                  </select>
+                    options={['WhatsApp', 'Facebook Ad', 'Meta Ads', 'Voice Agent', 'Inbound Call', 'Direct Web']}
+                    onChange={src => setEditingLead({ ...editingLead, source: src })}
+                    fullWidth={true}
+                    dropUp={true}
+                  />
                 </div>
 
                 <div style={s.formGroup}>
@@ -1081,15 +1162,15 @@ const s = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#09090b',
+    backgroundColor: '#2563eb',
     color: '#ffffff',
     border: 'none',
     padding: '8px 16px',
-    borderRadius: 10,
+    borderRadius: 8,
     fontWeight: 700,
     fontSize: '0.82rem',
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
     transition: 'all 0.15s ease'
   },
 
@@ -1122,8 +1203,6 @@ const s = {
     backgroundColor: '#ffffff',
     borderTopLeftRadius: 13,
     borderTopRightRadius: 13,
-    borderTopWidth: 3,
-    borderTopStyle: 'solid',
     borderBottom: '1px solid #e4e4e7'
   },
   columnTitleRow: {
