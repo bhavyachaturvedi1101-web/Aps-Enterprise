@@ -87,12 +87,86 @@ const NAV_GROUPS = [
   }
 ];
 
+const INITIAL_NOTIFICATIONS = [
+  {
+    id: 'n1',
+    title: 'New Meta Ads Lead',
+    message: 'Acme Metalworks registered interest for CNC Router Pro.',
+    time: '2 mins ago',
+    read: false,
+    route: '/crm',
+    color: '#2563eb',
+    bg: '#eff6ff',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+  },
+  {
+    id: 'n2',
+    title: 'Payment Gate Verification',
+    message: 'Global Tech 10% advance (₹4,200) requires verification.',
+    time: '15 mins ago',
+    read: false,
+    route: '/payments',
+    color: '#d97706',
+    bg: '#fffbeb',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2"><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+  },
+  {
+    id: 'n3',
+    title: 'WhatsApp Sequence Delivered',
+    message: 'Payment reminder sequence dispatched to 3 pending leads.',
+    time: '45 mins ago',
+    read: false,
+    route: '/whatsapp',
+    color: '#10b981',
+    bg: '#ecfdf5',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+  },
+  {
+    id: 'n4',
+    title: 'AI Voice Call Outcome',
+    message: 'Outbound call to Rahul Sharma completed — Demo Scheduled.',
+    time: '1 hour ago',
+    read: false,
+    route: '/voice',
+    color: '#7c3aed',
+    bg: '#f3e8ff',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" /></svg>
+  }
+];
+
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleToggleRead = (id, e) => {
+    if (e) e.stopPropagation();
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+  };
+
+  const handleMarkAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const handleDeleteNotif = (id, e) => {
+    if (e) e.stopPropagation();
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const handleDeleteAllNotifs = () => {
+    setNotifications([]);
+  };
+
+  const handleNotifClick = (notif) => {
+    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    setNotifOpen(false);
+    navigate(notif.route);
+  };
 
   const path = location.pathname;
   const queryParams = new URLSearchParams(location.search);
@@ -154,6 +228,7 @@ export default function DashboardLayout() {
             <button
               key={key}
               onClick={() => handleTabChange(key)}
+              className={`header-pill-btn ${activeTab === key ? 'active' : ''}`}
               style={{ ...s.pillButton, ...(activeTab === key ? s.pillActive : s.pillInactive) }}
             >
               {label}
@@ -187,7 +262,6 @@ export default function DashboardLayout() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" /></svg>
                   <span>AI Voice Calls Active</span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>12 automated calls processed this morning.</div>
               </div>
               <div style={s.notifItem}>
                 <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -200,7 +274,7 @@ export default function DashboardLayout() {
           )}
 
           {/* User Widget */}
-          <div style={s.userWidget} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}>
+          <div className="header-user-card" style={s.userWidget} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}>
             <div style={s.userAvatarInitial}>A</div>
             <div style={s.userInfo}>
               <div style={s.userName}>Admin</div>
@@ -249,6 +323,7 @@ export default function DashboardLayout() {
                     <button
                       key={item.key}
                       onClick={() => handleTabChange(item.key)}
+                      className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
                       style={isActive ? s.navItemActive : s.navItem}
                     >
                       {isActive && <div style={s.activePill} />}
@@ -279,7 +354,7 @@ export default function DashboardLayout() {
                 <div style={s.userCardName}>admin</div>
                 <div style={s.userCardEmail}>admin@aps.enterprise</div>
               </div>
-              <button onClick={() => navigate('/login')} style={s.logoutBtn} title="Logout">
+              <button onClick={() => navigate('/login')} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -458,8 +533,16 @@ const s = {
   mainContent: { flexGrow: 1, overflowY: 'auto', position: 'relative', backgroundColor: 'var(--bg-primary)' },
 
   // ── Dropdowns
-  dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e4e4e7', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
+  dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e4e4e7', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.12)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
   dropdownHeader: { fontSize: '0.72rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '4px 8px', borderBottom: '1px solid #f4f4f5', marginBottom: 4 },
-  notifItem: { padding: '8px', borderRadius: 8, backgroundColor: '#f8fafc', borderLeft: '3px solid #09090b', display: 'flex', flexDirection: 'column', gap: 2 },
+  notifHeaderRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.5rem', marginBottom: '0.4rem', borderBottom: '1px solid #f1f5f9' },
+  dropdownHeaderTitle: { fontSize: '0.82rem', fontWeight: 800, color: '#09090b', fontFamily: 'var(--font-heading)' },
+  unreadPill: { fontSize: '0.65rem', fontWeight: 800, backgroundColor: '#eff6ff', color: '#2563eb', padding: '2px 7px', borderRadius: 10, border: '1px solid #bfdbfe' },
+  markAllBtn: { background: 'none', border: 'none', color: '#2563eb', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: 0 },
+  deleteAllBtn: { background: 'none', border: 'none', color: '#ef4444', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: 0 },
+  notifList: { display: 'flex', flexDirection: 'column', gap: '0.55rem', maxHeight: 320, overflowY: 'auto' },
+  notifItem: { padding: '10px 12px', borderRadius: 10, cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'all 0.15s ease' },
+  notifBadgeCount: { position: 'absolute', top: -5, right: -5, minWidth: 18, height: 18, borderRadius: 10, backgroundColor: '#2563eb', color: '#ffffff', fontSize: '0.68rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', boxShadow: '0 2px 6px rgba(37,99,235,0.4)', border: '2px solid #ffffff' },
+  notifDotRead: { position: 'absolute', top: 7, right: 7, width: 7, height: 7, borderRadius: '50%', backgroundColor: '#94a3b8', border: '1.5px solid #fff' },
   menuItem: { padding: '8px 12px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 600, color: '#3f3f46', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.15s' }
 };

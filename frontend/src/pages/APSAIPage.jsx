@@ -648,11 +648,11 @@ const s = {
     width: 44,
     height: 44,
     borderRadius: 12,
-    background: '#09090b',
+    background: '#2563eb',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
     flexShrink: 0
   },
   headerTitle: { fontSize: '1.35rem', fontWeight: 800, color: '#09090b', margin: 0, letterSpacing: '-0.3px' },
@@ -746,7 +746,7 @@ const s = {
     width: 26,
     height: 26,
     borderRadius: 8,
-    background: '#09090b',
+    background: '#2563eb',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
@@ -758,7 +758,7 @@ const s = {
     maxWidth: '75%',
     padding: '12px 16px',
     borderRadius: '20px 20px 4px 20px',
-    background: '#09090b',
+    background: '#2563eb',
     color: '#fff',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
   },

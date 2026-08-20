@@ -78,7 +78,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <button type="submit" style={styles.saveButton}>
+        <button type="submit" className="btn-blue-primary" style={styles.saveButton}>
           Save Settings
         </button>
       </form>
@@ -94,60 +94,56 @@ const styles = {
     boxSizing: 'border-box'
   },
   title: {
-    fontSize: '2rem',
+    fontSize: '1.8rem',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
-    margin: 0
-  },
-  subtitle: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)',
-    marginTop: '0.25rem',
-    marginBottom: '2rem'
+    color: '#09090b',
+    margin: 0,
+    marginBottom: '1.5rem'
   },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: '24px',
-    border: '1px solid #e2e8f0',
-    boxShadow: 'var(--shadow-md)',
-    padding: '2.5rem',
+    borderRadius: '16px',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+    padding: '2rem',
     maxWidth: '640px'
   },
   section: {
-    marginBottom: '2rem',
-    borderBottom: '1px solid #f1f3f7',
+    marginBottom: '1.75rem',
+    borderBottom: '1px solid #f4f4f5',
     paddingBottom: '1.5rem'
   },
   sectionTitle: {
-    fontSize: '1.25rem',
+    fontSize: '1.1rem',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
     color: '#09090b',
     marginTop: 0,
-    marginBottom: '1.25rem'
+    marginBottom: '1rem'
   },
   formGroup: {
     marginBottom: '1.25rem'
   },
   label: {
     display: 'block',
-    fontSize: '0.85rem',
+    fontSize: '0.78rem',
     fontWeight: '700',
     color: '#3f3f46',
-    marginBottom: '0.5rem'
+    marginBottom: '0.4rem'
   },
   input: {
     width: '100%',
-    padding: '0.8rem 1rem',
-    borderRadius: '12px',
+    padding: '0.65rem 0.9rem',
+    borderRadius: '8px',
     border: '1px solid #e4e4e7',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
     color: '#09090b',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'var(--font-body)',
-    fontSize: '0.9rem',
-    transition: 'all 0.2s'
+    fontSize: '0.85rem',
+    transition: 'all 0.15s ease'
   },
   radioGroup: {
     display: 'flex',
@@ -158,26 +154,29 @@ const styles = {
   radioLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.5rem',
-    fontSize: '0.9rem',
+    gap: '0.6rem',
+    fontSize: '0.85rem',
     fontWeight: '600',
     color: '#3f3f46',
     cursor: 'pointer'
   },
   radioInput: {
-    accentColor: '#09090b'
+    accentColor: '#2563eb',
+    width: 16,
+    height: 16,
+    cursor: 'pointer'
   },
   saveButton: {
-    padding: '0.8rem 1.75rem',
-    backgroundColor: '#09090b',
+    padding: '0.65rem 1.6rem',
+    backgroundColor: '#2563eb',
     color: '#ffffff',
     border: 'none',
-    borderRadius: '12px',
-    fontSize: '0.9rem',
+    borderRadius: '8px',
+    fontSize: '0.85rem',
     fontWeight: '700',
     cursor: 'pointer',
     fontFamily: 'var(--font-body)',
-    transition: 'all 0.2s',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
+    transition: 'all 0.15s ease',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)'
   }
 };
