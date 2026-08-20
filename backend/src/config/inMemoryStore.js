@@ -1271,11 +1271,54 @@ const mockDocuments = [
 ];
 
 const mockInventory = [
-  { id: 'INV-101', name: 'CNC Machine 500T Dual-Spindle', category: 'Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, warehouse: 'Pune Unit 1', unitPrice: 150000 },
-  { id: 'INV-102', name: 'Fiber Laser Cutter 6kW', category: 'Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, warehouse: 'Chakan Unit 2', unitPrice: 180000 },
-  { id: 'INV-103', name: 'Hydraulic Press 200T', category: 'Machinery', stockUnits: 5, reservedUnits: 3, availableUnits: 2, warehouse: 'Pune Unit 1', unitPrice: 42000 },
-  { id: 'INV-104', name: 'Heavy Sheet Metal Bender 120T', category: 'Machinery', stockUnits: 2, reservedUnits: 1, availableUnits: 1, warehouse: 'Chakan Unit 2', unitPrice: 28000 },
-  { id: 'INV-105', name: 'High-Grade Steel Plates (ISO 9001)', category: 'Raw Material', stockUnits: 450, reservedUnits: 120, availableUnits: 330, warehouse: 'Raw Material Yard', unitPrice: 850 }
+  // ─── Dona & Paper Plate Machinery (Indore Main Plant) ─────────────────────────
+  { id: 'INV-101', sku: 'APS-DP-200', name: 'Fully Automatic Double Die Dona Pattal Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 14, reservedUnits: 5, availableUnits: 9, minThreshold: 3, warehouse: 'Indore Main Plant', unitPrice: 85000, status: 'In Stock', lastRestocked: '2026-08-15' },
+  { id: 'INV-102', sku: 'APS-HP-500', name: 'Heavy-Duty Hydraulic 2-Cylinder Paper Plate & Thali Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 9, reservedUnits: 3, availableUnits: 6, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 125000, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-103', sku: 'APS-CUP-80', name: 'Automatic High-Speed Paper Cup Making Machine (80 CPM)', category: 'Dona & Paper Plate Machinery', stockUnits: 7, reservedUnits: 2, availableUnits: 5, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 350000, status: 'In Stock', lastRestocked: '2026-08-12' },
+  { id: 'INV-104', sku: 'APS-CUT-90', name: 'Semi-Automatic Heavy Paper Cutter Machine (32 Inch Blade)', category: 'Dona & Paper Plate Machinery', stockUnits: 6, reservedUnits: 1, availableUnits: 5, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 65000, status: 'In Stock', lastRestocked: '2026-08-10' },
+  { id: 'INV-105', sku: 'APS-SD-100', name: 'Single Die High-Speed Crank Dona Making Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 18, reservedUnits: 6, availableUnits: 12, minThreshold: 4, warehouse: 'Indore Main Plant', unitPrice: 48000, status: 'In Stock', lastRestocked: '2026-08-18' },
+  { id: 'INV-106', sku: 'APS-THL-4C', name: 'Automatic 4-Cavity Hydraulic Buffet Thali Machine (15T)', category: 'Dona & Paper Plate Machinery', stockUnits: 5, reservedUnits: 2, availableUnits: 3, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 165000, status: 'In Stock', lastRestocked: '2026-08-09' },
+  { id: 'INV-107', sku: 'APS-LAM-ROLL', name: 'Automatic Thermal Lamination Machine for Paper Rolls', category: 'Dona & Paper Plate Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 195000, status: 'In Stock', lastRestocked: '2026-08-07' },
+  { id: 'INV-108', sku: 'APS-BWL-70', name: 'Automatic Paper Bowl & Ripple Cup Forming Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 3, reservedUnits: 2, availableUnits: 1, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 280000, status: 'Low Stock', lastRestocked: '2026-08-04' },
+
+  // ─── Heavy Industrial Machinery & CNC (Pune Unit 1 & Chakan Unit 2) ───────────
+  { id: 'INV-109', sku: 'APS-CNC-500T', name: 'CNC Machine 500T Dual-Spindle Heavy Industrial Unit', category: 'Heavy Industrial Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, minThreshold: 2, warehouse: 'Pune Unit 1', unitPrice: 150000, status: 'In Stock', lastRestocked: '2026-08-11' },
+  { id: 'INV-110', sku: 'APS-FLC-6KW', name: 'Fiber Laser Cutter 6kW with Raycus Laser Source', category: 'Heavy Industrial Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 180000, status: 'In Stock', lastRestocked: '2026-08-08' },
+  { id: 'INV-111', sku: 'APS-HYD-200T', name: 'Heavy Hydraulic Press 200T Industrial Frame', category: 'Heavy Industrial Machinery', stockUnits: 5, reservedUnits: 3, availableUnits: 2, minThreshold: 2, warehouse: 'Pune Unit 1', unitPrice: 42000, status: 'In Stock', lastRestocked: '2026-08-09' },
+  { id: 'INV-112', sku: 'APS-VMC-5AX', name: 'Industrial 5-Axis VMC Milling Center (24 Tool ATC)', category: 'Heavy Industrial Machinery', stockUnits: 2, reservedUnits: 1, availableUnits: 1, minThreshold: 1, warehouse: 'Pune Unit 1', unitPrice: 420000, status: 'In Stock', lastRestocked: '2026-08-02' },
+  { id: 'INV-113', sku: 'APS-BRK-120T', name: 'Heavy Sheet Metal CNC Press Brake (120 Ton / 3.2m)', category: 'Heavy Industrial Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 220000, status: 'In Stock', lastRestocked: '2026-08-06' },
+  { id: 'INV-114', sku: 'APS-PLS-3000', name: 'Industrial CNC Plasma Cutting Table (3000x1500mm)', category: 'Heavy Industrial Machinery', stockUnits: 2, reservedUnits: 2, availableUnits: 0, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 110000, status: 'Out of Stock', lastRestocked: '2026-07-28' },
+
+  // ─── Components & Precision Spares ────────────────────────────────────────────
+  { id: 'INV-115', sku: 'APS-SPN-24K', name: 'Water-Cooled High-Speed Spindle Motor 24,000 RPM', category: 'Components & Spares', stockUnits: 16, reservedUnits: 5, availableUnits: 11, minThreshold: 5, warehouse: 'Pune Unit 1', unitPrice: 22000, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-116', sku: 'APS-DIE-7IN', name: 'Hardened Steel 7-inch Wrinkle Dona Dies (Set of 4)', category: 'Components & Spares', stockUnits: 32, reservedUnits: 8, availableUnits: 24, minThreshold: 8, warehouse: 'Indore Main Plant', unitPrice: 3800, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-117', sku: 'APS-DIE-12TH', name: 'Precision Diamond-Polished 12-inch Buffet Thali Dies', category: 'Components & Spares', stockUnits: 20, reservedUnits: 6, availableUnits: 14, minThreshold: 6, warehouse: 'Indore Main Plant', unitPrice: 6500, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-118', sku: 'APS-PWR-5HP', name: 'Hydraulic Power Pack 5HP 200 Bar with Solenoid Valve', category: 'Components & Spares', stockUnits: 12, reservedUnits: 4, availableUnits: 8, minThreshold: 3, warehouse: 'Indore Main Plant', unitPrice: 28500, status: 'In Stock', lastRestocked: '2026-08-13' },
+  { id: 'INV-119', sku: 'APS-CAST-FRAME', name: 'Heavy Vibration Dampening Cast-Iron Bed Base Frame', category: 'Components & Spares', stockUnits: 4, reservedUnits: 3, availableUnits: 1, minThreshold: 2, warehouse: 'Chakan Unit 2', unitPrice: 34000, status: 'Low Stock', lastRestocked: '2026-08-05' },
+  { id: 'INV-120', sku: 'APS-RAY-6KW', name: 'Raycus 6kW Fiber Laser Source Module (Optical Ready)', category: 'Components & Spares', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 2, warehouse: 'Chakan Unit 2', unitPrice: 85000, status: 'In Stock', lastRestocked: '2026-08-10' },
+  { id: 'INV-121', sku: 'APS-PLC-7IN', name: 'Digital Delta PLC Controller with 7" Color Touchscreen HMI', category: 'Components & Spares', stockUnits: 22, reservedUnits: 6, availableUnits: 16, minThreshold: 5, warehouse: 'Indore Main Plant', unitPrice: 14500, status: 'In Stock', lastRestocked: '2026-08-17' },
+  { id: 'INV-122', sku: 'APS-BLD-36TC', name: 'Tungsten Carbide Precision Paper Cutting Blades 36"', category: 'Components & Spares', stockUnits: 15, reservedUnits: 3, availableUnits: 12, minThreshold: 4, warehouse: 'Indore Main Plant', unitPrice: 4200, status: 'In Stock', lastRestocked: '2026-08-12' },
+
+  // ─── Raw Materials & Consumables (Raw Material Yard) ──────────────────────────
+  { id: 'INV-123', sku: 'APS-ROLL-80G', name: 'Raw Material PE Coated Paper Roll (80 GSM / 400kg Reel)', category: 'Raw Materials', stockUnits: 140, reservedUnits: 35, availableUnits: 105, minThreshold: 30, warehouse: 'Raw Material Yard', unitPrice: 4500, status: 'In Stock', lastRestocked: '2026-08-17' },
+  { id: 'INV-124', sku: 'APS-ROLL-SLV', name: 'Silver Craft Film Laminated Rolls (120 GSM / 500kg Reel)', category: 'Raw Materials', stockUnits: 95, reservedUnits: 30, availableUnits: 65, minThreshold: 25, warehouse: 'Raw Material Yard', unitPrice: 5200, status: 'In Stock', lastRestocked: '2026-08-18' },
+  { id: 'INV-125', sku: 'APS-ROLL-PRN', name: 'Multi-Color Custom Printed Dona Paper Rolls (100 GSM)', category: 'Raw Materials', stockUnits: 60, reservedUnits: 20, availableUnits: 40, minThreshold: 15, warehouse: 'Raw Material Yard', unitPrice: 5800, status: 'In Stock', lastRestocked: '2026-08-15' },
+  { id: 'INV-126', sku: 'APS-PLA-ECO', name: 'Biodegradable PLA Coated Food-Grade Paper Reel (110 GSM)', category: 'Raw Materials', stockUnits: 45, reservedUnits: 15, availableUnits: 30, minThreshold: 10, warehouse: 'Raw Material Yard', unitPrice: 6800, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-127', sku: 'APS-OIL-VG68', name: 'Industrial Anti-Wear Hydraulic Oil ISO VG 68 (210L Drum)', category: 'Raw Materials', stockUnits: 18, reservedUnits: 4, availableUnits: 14, minThreshold: 5, warehouse: 'Raw Material Yard', unitPrice: 18500, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-128', sku: 'APS-PLT-25MM', name: 'Heavy Mild Steel Structural Plates 25mm (ISO 9001 Graded)', category: 'Raw Materials', stockUnits: 55, reservedUnits: 20, availableUnits: 35, minThreshold: 15, warehouse: 'Raw Material Yard', unitPrice: 12500, status: 'In Stock', lastRestocked: '2026-08-12' }
+];
+
+const mockInventoryLogs = [
+  { id: 'LOG-01', itemId: 'INV-101', itemName: 'Fully Automatic Double Die Dona Pattal Machine', change: +4, type: 'Stock In', reason: 'Assembly Completed at Indore Plant (Unit 1)', user: 'Bhavya (Ops Lead)', date: '2026-08-15 14:30' },
+  { id: 'LOG-02', itemId: 'INV-103', itemName: 'Automatic High-Speed Paper Cup Making Machine', change: -1, type: 'Reserved', reason: 'Allocated to LEAD-002 (Acme Corp Order #APS-882)', user: 'Animesh (Admin)', date: '2026-08-14 11:15' },
+  { id: 'LOG-03', itemId: 'INV-123', itemName: 'Raw Material PE Coated Paper Roll (80 GSM)', change: +50, type: 'Restock', reason: 'Supplier Bulk Delivery from MP Paper Mills (Lot #4419)', user: 'Warehouse Yard Team', date: '2026-08-17 09:45' },
+  { id: 'LOG-04', itemId: 'INV-109', itemName: 'CNC Machine 500T Dual-Spindle Heavy Unit', change: -1, type: 'Dispatched', reason: 'Dispatched to Global Tech (Invoice #INV-2026-088)', user: 'Bhavya (Ops Lead)', date: '2026-08-16 16:20' },
+  { id: 'LOG-05', itemId: 'INV-115', itemName: 'Water-Cooled High-Speed Spindle Motor 24,000 RPM', change: +6, type: 'Restock', reason: 'Precision Imports Batch Received at Pune Facility', user: 'QC Inspection Team', date: '2026-08-16 10:10' },
+  { id: 'LOG-06', itemId: 'INV-102', itemName: 'Heavy-Duty Hydraulic 2-Cylinder Paper Plate Machine', change: +2, type: 'Stock In', reason: 'Factory Testing & Calibration Pass (Indore Plant)', user: 'Production Supervisor', date: '2026-08-14 15:40' },
+  { id: 'LOG-07', itemId: 'INV-124', itemName: 'Silver Craft Film Laminated Rolls (120 GSM)', change: +30, type: 'Restock', reason: 'Raw Material Stock Replenishment (Yard A3)', user: 'Warehouse Supervisor', date: '2026-08-18 08:30' },
+  { id: 'LOG-08', itemId: 'INV-114', itemName: 'Industrial CNC Plasma Cutting Table (3000x1500mm)', change: -1, type: 'Reserved', reason: 'Factory Release to Eicher Motors Assembly Line', user: 'Animesh (Admin)', date: '2026-08-13 13:50' },
+  { id: 'LOG-09', itemId: 'INV-121', itemName: 'Digital Delta PLC Controller with 7" Touchscreen HMI', change: +10, type: 'Restock', reason: 'Component Procurement from Delta Automation', user: 'Procurement Officer', date: '2026-08-17 11:25' },
+  { id: 'LOG-10', itemId: 'INV-105', itemName: 'Single Die High-Speed Crank Dona Making Machine', change: +6, type: 'Stock In', reason: 'Batch 4 Manufacturing Complete (Indore Shopfloor)', user: 'Indore Shopfloor Team', date: '2026-08-18 12:00' }
 ];
 
 const systemConfig = {
@@ -1299,6 +1342,7 @@ module.exports = {
   mockTimeInStage,
   mockDocuments,
   mockInventory,
+  mockInventoryLogs,
   companyProfile,
   systemConfig
 };

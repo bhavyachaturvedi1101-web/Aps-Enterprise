@@ -41,7 +41,45 @@ function addToHistory(conversationId, userMsg, botMsg) {
 
 // ─── Intent Recognition ────────────────────────────────────────────────────────
 const INTENTS = [
-  { name: 'company_info',        patterns: [/dona/i, /pattal/i, /indore/i, /contact details/i, /office address/i, /phone number/i, /official website/i, /paper plate/i, /paper cup/i, /loha mandi/i, /apsenterprises/i] },
+  { name: 'company_info',        patterns: [
+    /where.*(is|located|situated|based|hq|office|aps|company)/i,
+    /where is aps/i,
+    /\blocation\b/i,
+    /\blocated\b/i,
+    /\baddress\b/i,
+    /\bheadquarters\b/i,
+    /\bhq\b/i,
+    /about (aps|the company|enterprise|business|indore)/i,
+    /what is aps/i,
+    /who is aps/i,
+    /tell me about aps/i,
+    /contact (details|number|info|aps|us)/i,
+    /phone number/i,
+    /helpline/i,
+    /email.*(id|address|support)?/i,
+    /official website/i,
+    /website/i,
+    /dona/i,
+    /pattal/i,
+    /paper plate/i,
+    /paper cup/i,
+    /loha mandi/i,
+    /indore/i,
+    /apsenterprises/i,
+    /kahan (hai|h|he|par|pe)/i,
+    /aps.*(kahan|address|location|kya hai|details|products|machines|plants)/i,
+    /products.*(aps|company|sell|make|produce)/i,
+    /machine.*(sell|make|manufacture|price|catalog|list)/i
+  ] },
+  { name: 'dashboard_info',      patterns: [
+    /dashboard (options|features|modules|tools|contain|overview|guide|summary)/i,
+    /what.*(options|features|modules|contain|does this dashboard|can this dashboard|dashboard do|is this system)/i,
+    /explain.*(dashboard|system|platform|features|options|modules|menu)/i,
+    /how.*use.*(dashboard|system|platform|app)/i,
+    /all.*(options|features|modules|pages|tabs)/i,
+    /features.*(kya hai|list|overview)/i,
+    /dashboard me kya kya hai/i
+  ] },
   { name: 'normal_chat',         patterns: [/^\s*(hi|hello|hey|greetings|good morning|good afternoon|good evening|namaste|ha\b|haa|ok|okay|cool|nice)\s*$/i, /kaise ho|how are you|kaise hain|kya haal|what's up|sup\b|how do you do/i, /who are you|aap kaun ho|who created you|tum kaun ho|who r u|what are you/i, /what can you do|kya kar sakte ho|features kya hai|help me|kya kya kar sakte ho/i, /thank you|thanks|shukriya|dhanyawad|thank u|thx|awesome|great/i, /bye|goodbye|alvida|cya|see you/i] },
   { name: 'factory_tracker',     patterns: [/factory/i, /job card/i, /assembly/i, /shopfloor/i, /production progress/i, /mfg status/i, /factory job/i, /tracker/i] },
   { name: 'invoice_generator',   patterns: [/gst/i, /tax invoice/i, /\btax\b/i, /generate invoice/i, /hsn/i, /billing details/i, /invoice/i] },
@@ -51,11 +89,38 @@ const INTENTS = [
   { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
   { name: 'action_send_email',       patterns: [/send.*email/i, /email.*quotation/i, /mail/i, /send.*pdf.*email/i, /email bhejo/i, /send email/i] },
   { name: 'action_check_inventory',  patterns: [/inventory/i, /warehouse/i, /\bstock\b/i, /available units/i, /raw material/i, /kitna stock/i, /inventory stock/i] },
+  { name: 'employee_performance', patterns: [
+    /(employee|employer|sales rep|team member|staff|worker).*?(perform|profit|spent|revenue|gain|roi|kpi|cost|figures|graph|report)/i,
+    /(perform|profit|spent|revenue|gain|roi|kpi|cost).*?(employee|employer|sales rep|team member|staff|worker)/i,
+    /(spent|gain profit|profit gain|cost spent).*?(employee|employer|sales rep|team|staff)/i,
+    /all (employers|employees) (performance|spent|profit|gain)/i,
+    /(employers|employees) (profit|spent|revenue|gain)/i
+  ] },
   { name: 'predictive_forecast',     patterns: [/predict/i, /forecast/i, /next month.*sales/i, /revenue forecast/i, /future revenue/i, /september revenue/i, /predictive sales/i] },
   { name: 'churn_risk',              patterns: [/churn/i, /\brisk\b/i, /drop out/i, /stalled leads/i, /at risk/i, /cold lead/i, /churn risk/i] },
-  { name: 'margin_calculator',       patterns: [/margin/i, /profit/i, /markup/i, /pricing/i, /cost breakdown/i, /margin calculator/i] },
+  { name: 'margin_calculator',       patterns: [
+    /(order|machine|product|cnc|laser|dona|pattal|unit|item|hydraulic).*?(margin|profit|markup|cost breakdown)/i,
+    /profit margin/i,
+    /margin calculator/i,
+    /(margin|cost breakdown) for/i,
+    /order margin/i
+  ] },
   { name: 'generate_report',  patterns: [/generate.*report/i, /executive report/i, /pdf report/i, /summary report/i, /analytics report/i, /make report/i, /create report/i, /report generate/i] },
-  { name: 'export_file',      patterns: [/export/i, /\bcsv\b/i, /\bexcel\b/i, /\bxlsx\b/i, /\bxml\b/i, /\bdocx\b/i, /download file/i, /download data/i, /save file/i, /generate file/i] },
+  { name: 'export_file',      patterns: [
+    /\bexport\b/i,
+    /\bcsv\b/i,
+    /\bexcel\b/i,
+    /\bxlsx\b/i,
+    /\bxml\b/i,
+    /\bdocx\b/i,
+    /\bjson\b/i,
+    /\bformat\b/i,
+    /download (file|data|leads|report|all|csv|excel|xlsx|pdf|xml|docx|json)/i,
+    /save (file|data|as|to)/i,
+    /generate (file|data|csv|excel|xlsx|pdf|xml|docx|json|format|report in)/i,
+    /(kisi bhi|kisi|koi bhi|kisi format|format me|format mai|format mein)/i,
+    /(csv|excel|xlsx|pdf|xml|docx|word|json|file)\s*(format|mai|me|mein|banao|karo|kr do|kardo|chahiye|nikalo|generate|export|download)/i
+  ] },
   { name: 'explain_metrics',  patterns: [/explain.*kpi/i, /explain.*metric/i, /explain.*formula/i, /what is kpi/i, /how is.*calculated/i, /business metrics/i, /definition of/i] },
   { name: 'trend_analysis',   patterns: [/trend analysis/i, /anomaly/i, /anomalies/i, /growth rate/i, /decline/i, /variance/i, /sales velocity/i, /pipeline health/i] },
   { name: 'action_create_lead',     patterns: [/add.*lead/i, /create.*lead/i, /new lead/i, /register lead/i, /naya lead/i, /lead add/i, /nayi entry/i, /lead banao/i] },
@@ -337,8 +402,18 @@ async function handleGenerateReport(query) {
   const topEmp = [...employees].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0))[0];
   const todayStr = new Date().toLocaleDateString('en-IN', { dateStyle: 'full' });
 
+  const qLower = (query || '').toLowerCase();
+  const wantsFile = /pdf|file|format|download|export|save|csv|excel|xlsx|docx|word/i.test(qLower);
+
+  let fileFormat = 'PDF';
+  if (qLower.includes('excel') || qLower.includes('xlsx')) fileFormat = 'XLSX';
+  else if (qLower.includes('csv')) fileFormat = 'CSV';
+  else if (qLower.includes('docx') || qLower.includes('word')) fileFormat = 'DOCX';
+  else if (qLower.includes('xml')) fileFormat = 'XML';
+  else if (qLower.includes('json')) fileFormat = 'JSON';
+
   return {
-    text: `📊 **Executive Dashboard Report Generated** for **APS Enterprise** (${todayStr}).`,
+    text: `**Executive Dashboard Report Generated** for **APS Enterprise** (${todayStr}).`,
     report: {
       title: 'Executive Sales & Operations Intelligence Report',
       date: todayStr,
@@ -355,13 +430,13 @@ async function handleGenerateReport(query) {
         `Maintain minimum 40% dialer callback rate to sustain pipeline velocity.`
       ]
     },
-    exportFile: {
-      fileName: `APS_Enterprise_Executive_Report_${new Date().toISOString().slice(0, 10)}.pdf`,
-      fileFormat: 'PDF',
-      mimeType: 'application/pdf',
+    exportFile: wantsFile ? {
+      fileName: `APS_Enterprise_Executive_Report_${new Date().toISOString().slice(0, 10)}.${fileFormat.toLowerCase()}`,
+      fileFormat,
+      mimeType: fileFormat === 'PDF' ? 'application/pdf' : fileFormat === 'CSV' ? 'text/csv' : 'application/octet-stream',
       sizeKB: '142 KB',
-      content: `APS Enterprise Executive Report\nDate: ${todayStr}\n\nSummary:\nPipeline total: ${leads.length} leads. Closed revenue: ₹${totalRevenue.toLocaleString('en-IN')}.\nTop performer: ${topEmp?.name} (${topEmp?.salesClosed} deals).\nAction Required: Verify advance payment for ${pendingLeads.length} pending lead(s).`
-    },
+      content: `APS ENTERPRISE EXECUTIVE REPORT\nDate: ${todayStr}\n\nSummary:\nPipeline total: ${leads.length} leads. Closed revenue: ₹${totalRevenue.toLocaleString('en-IN')}.\nTop performer: ${topEmp?.name} (${topEmp?.salesClosed} deals).\nAction Required: Verify advance payment for ${pendingLeads.length} pending lead(s).`
+    } : null,
     table: leads.slice(0, 6).map(l => ({ ID: l.id, Name: l.name, Stage: l.stage, Budget: `₹${Number(l.budget || 0).toLocaleString('en-IN')}` })),
     chart: {
       type: 'bar',
@@ -372,19 +447,91 @@ async function handleGenerateReport(query) {
   };
 }
 
-async function handleExportFile(query) {
-  const store = getStore();
-  const leads = store.mockLeads || [];
+function detectRequestedFormat(query) {
+  const q = (query || '').toLowerCase();
+  if (/\b(pdf|pfd|pdff)\b/i.test(q) || /pdf\s*(file|report|format|doc|sheet)?/i.test(q)) return 'pdf';
+  if (/\b(excel|exel|excle|xlsx|xls|spreadsheet|sheet|sheets)\b/i.test(q)) return 'xlsx';
+  if (/\b(csv|csv\s*file|csv\s*format)\b/i.test(q)) return 'csv';
+  if (/\b(xml|xml\s*file)\b/i.test(q)) return 'xml';
+  if (/\b(docx|doc|word|word\s*doc)\b/i.test(q)) return 'docx';
+  if (/\b(json|json\s*format|json\s*file)\b/i.test(q)) return 'json';
+  if (/\b(export|download|downlod|dawnload|generate|geneate|genrate|genearte|create|file|format|sheet|banao|nikalo|chahiye|kisi\s*bhi)\b/i.test(q)) return 'pdf';
+  return null;
+}
 
-  let format = 'csv';
-  const qLower = query.toLowerCase();
-  if (qLower.includes('excel') || qLower.includes('xlsx')) format = 'xlsx';
-  else if (qLower.includes('xml')) format = 'xml';
-  else if (qLower.includes('docx') || qLower.includes('word')) format = 'docx';
-  else if (qLower.includes('json')) format = 'json';
+function buildStockExport(inventory, format, dateStr) {
+  const totalVal = inventory.reduce((s, i) => s + ((Number(i.stockUnits) || 0) * (Number(i.unitPrice) || 0)), 0);
+  const totalUnits = inventory.reduce((s, i) => s + (Number(i.stockUnits) || 0), 0);
+  const availUnits = inventory.reduce((s, i) => s + (Number(i.availableUnits) || 0), 0);
+  const resUnits = inventory.reduce((s, i) => s + (Number(i.reservedUnits) || 0), 0);
 
-  const dateStr = new Date().toISOString().slice(0, 10);
-  let fileName = `APS_Enterprise_Leads_${dateStr}.${format}`;
+  const fileName = `APS_Warehouse_Stock_Audit_${dateStr}.${format}`;
+  let mimeType = 'application/pdf';
+  let content = '';
+
+  if (format === 'csv' || format === 'xlsx') {
+    mimeType = format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    content = 'ID,SKU,Item Name,Category,Warehouse,Total Stock Units,Reserved Units,Available Units,Unit Price (INR),Total Valuation (INR),Status,Last Restocked\n' +
+      inventory.map(i => `"${i.id}","${i.sku || ''}","${i.name}","${i.category}","${i.warehouse}",${i.stockUnits},${i.reservedUnits},${i.availableUnits},${i.unitPrice},${(Number(i.stockUnits) || 0) * (Number(i.unitPrice) || 0)},"${i.status}","${i.lastRestocked || ''}"`).join('\n');
+  } else if (format === 'pdf') {
+    mimeType = 'application/pdf';
+    content = `================================================================================\n` +
+      `          APS ENTERPRISE — WAREHOUSE & FACTORY INVENTORY AUDIT REPORT\n` +
+      `================================================================================\n` +
+      `Generated Date  : ${dateStr}\n` +
+      `Total Products  : ${inventory.length} Tracked Product Lines\n` +
+      `Total Stock     : ${totalUnits} Units (Available: ${availUnits} | Reserved: ${resUnits})\n` +
+      `Total Valuation : ₹${totalVal.toLocaleString('en-IN')}\n` +
+      `Operating Plants: Indore Main Plant (MP), Pune Unit 1, Chakan Unit 2, Raw Material Yard\n` +
+      `--------------------------------------------------------------------------------\n` +
+      `SKU          ITEM NAME                            WAREHOUSE          AVAIL/TOT   UNIT PRICE    STATUS\n` +
+      `--------------------------------------------------------------------------------\n` +
+      inventory.map(i => `${(i.sku || i.id).padEnd(12)} ${i.name.slice(0, 35).padEnd(36)} ${(i.warehouse || 'Indore').slice(0, 17).padEnd(18)} ${(i.availableUnits + '/' + i.stockUnits).padEnd(11)} ₹${Number(i.unitPrice || 0).toLocaleString('en-IN').padEnd(12)} ${i.status || 'In Stock'}`).join('\n') +
+      `\n--------------------------------------------------------------------------------\n` +
+      `APS Enterprise AI Operations System • Official Certified Document\n` +
+      `Registered Office: 832, Old Loha Mandi, Indore, MP - 452001 | Web: https://www.apsenterprises.in`;
+  } else if (format === 'xml') {
+    mimeType = 'application/xml';
+    content = `<?xml version="1.0" encoding="UTF-8"?>\n<inventory valuation="${totalVal}" totalUnits="${totalUnits}">\n` +
+      inventory.map(i => `  <item id="${i.id}" sku="${i.sku || ''}">\n    <name>${i.name}</name>\n    <category>${i.category}</category>\n    <warehouse>${i.warehouse}</warehouse>\n    <available>${i.availableUnits}</available>\n    <total>${i.stockUnits}</total>\n    <unitPrice>${i.unitPrice}</unitPrice>\n  </item>`).join('\n') +
+      `\n</inventory>`;
+  } else if (format === 'docx') {
+    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    content = `APS Enterprise - Warehouse & Stock Inventory Report\nDate: ${dateStr}\n\nTotal Valuation: ₹${totalVal.toLocaleString('en-IN')} (${inventory.length} Product Lines)\n\n` +
+      inventory.map((i, idx) => `${idx + 1}. [${i.sku || i.id}] ${i.name}\n   Warehouse: ${i.warehouse} | Avail: ${i.availableUnits}/${i.stockUnits} units | Price: ₹${Number(i.unitPrice || 0).toLocaleString('en-IN')} | Status: ${i.status}`).join('\n\n');
+  } else {
+    mimeType = 'application/json';
+    content = JSON.stringify(inventory, null, 2);
+  }
+
+  return {
+    fileName,
+    fileFormat: format.toUpperCase(),
+    mimeType,
+    sizeKB: `${(content.length / 1024).toFixed(1)} KB`,
+    title: 'Warehouse & Factory Stock Inventory Audit',
+    summaryCards: [
+      { label: 'Total Valuation', val: `₹${(totalVal / 10000000).toFixed(2)} Cr` },
+      { label: 'Tracked Items', val: `${inventory.length} SKUs` },
+      { label: 'Available Stock', val: `${availUnits} Units` },
+      { label: 'Operating Units', val: 'Indore & Pune' }
+    ],
+    tableHeaders: ['SKU', 'Product Name', 'Category', 'Warehouse', 'Avail / Total', 'Unit Price', 'Status'],
+    tableRows: inventory.map(i => [
+      i.sku || i.id,
+      i.name,
+      i.category,
+      i.warehouse,
+      `${i.availableUnits} / ${i.stockUnits} units`,
+      `₹${Number(i.unitPrice || 0).toLocaleString('en-IN')}`,
+      i.status || 'In Stock'
+    ]),
+    content
+  };
+}
+
+function buildLeadsExport(leads, format, dateStr) {
+  const fileName = `APS_Enterprise_Leads_${dateStr}.${format}`;
   let mimeType = 'text/csv';
   let content = '';
 
@@ -392,6 +539,15 @@ async function handleExportFile(query) {
     mimeType = format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     content = 'ID,Name,Stage,Budget,Company,AssignedEmployee\n' +
       leads.map(l => `"${l.id}","${l.name}","${l.stage}","${l.budget}","${l.company || ''}","${l.assignedEmployeeId || ''}"`).join('\n');
+  } else if (format === 'pdf') {
+    mimeType = 'application/pdf';
+    content = `APS ENTERPRISE CRM DATA EXPORT (PDF)\nGenerated: ${dateStr}\nTotal Records: ${leads.length}\n\n` +
+      `--------------------------------------------------------------------------------\n` +
+      `ID         NAME                 STAGE             BUDGET        COMPANY\n` +
+      `--------------------------------------------------------------------------------\n` +
+      leads.map(l => `${(l.id || '').padEnd(10)} ${(l.name || '').padEnd(20)} ${(l.stage || '').padEnd(17)} ₹${Number(l.budget || 0).toLocaleString('en-IN').padEnd(12)} ${l.company || ''}`).join('\n') +
+      `\n--------------------------------------------------------------------------------\n` +
+      `APS Enterprise AI Intelligence Engine • Confidential`;
   } else if (format === 'xml') {
     mimeType = 'application/xml';
     content = '<?xml version="1.0" encoding="UTF-8"?>\n<leads>\n' +
@@ -406,15 +562,199 @@ async function handleExportFile(query) {
     content = JSON.stringify(leads, null, 2);
   }
 
+  const closedLeads = leads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
+  const totalRev = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+
   return {
-    text: `📁 **File Generated Successfully**: Exported **${leads.length} validated CRM records** in **${format.toUpperCase()}** format. Ready for download below.`,
-    exportFile: {
-      fileName,
-      fileFormat: format.toUpperCase(),
-      mimeType,
-      sizeKB: `${(content.length / 1024).toFixed(1)} KB`,
-      content
-    },
+    fileName,
+    fileFormat: format.toUpperCase(),
+    mimeType,
+    sizeKB: `${(content.length / 1024).toFixed(1)} KB`,
+    title: 'Enterprise CRM Leads & Pipeline Audit',
+    summaryCards: [
+      { label: 'Total Leads', val: `${leads.length} Records` },
+      { label: 'Closed Revenue', val: `₹${totalRev.toLocaleString('en-IN')}` },
+      { label: 'Conversion Rate', val: `${Math.round((closedLeads.length / Math.max(1, leads.length)) * 100)}%` },
+      { label: 'Gate Status', val: '10% Advance' }
+    ],
+    tableHeaders: ['ID', 'Client Name', 'Stage', 'Budget', 'Company', 'Assigned Rep'],
+    tableRows: leads.map(l => [
+      l.id,
+      l.name,
+      l.stage,
+      `₹${Number(l.budget || 0).toLocaleString('en-IN')}`,
+      l.company || 'Industrial Ltd',
+      l.assignedEmployeeId === 'e2' ? 'Bhavya' : l.assignedEmployeeId === 'e1' ? 'Animesh' : 'Sales Rep'
+    ]),
+    content
+  };
+}
+
+function buildEmployeePerformanceExport(employeesData, format, dateStr) {
+  const fileName = `APS_Employee_Performance_Profit_Audit_${dateStr}.${format}`;
+  let mimeType = 'text/csv';
+  let content = '';
+
+  const totalRev = employeesData.reduce((s, e) => s + e.totalRevenue, 0);
+  const totalCost = employeesData.reduce((s, e) => s + e.costSpent, 0);
+  const totalProfit = employeesData.reduce((s, e) => s + e.netProfit, 0);
+  const avgRoi = Math.round((totalProfit / (totalCost || 1)) * 100);
+
+  if (format === 'csv' || format === 'xlsx') {
+    mimeType = format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    content = 'Employee ID,Name,Role,Department,Cost Spent (INR),Revenue Closed (INR),Net Profit (INR),ROI (%),Deals Closed,KPI Score\n' +
+      employeesData.map(e => `"${e.id}","${e.name}","${e.role}","${e.department}",${e.costSpent},${e.totalRevenue},${e.netProfit},${e.roi},${e.salesClosed},"${e.kpiScore}"`).join('\n');
+  } else if (format === 'pdf') {
+    mimeType = 'application/pdf';
+    content = `APS ENTERPRISE EMPLOYEE PERFORMANCE & PROFIT AUDIT (PDF)\nGenerated: ${dateStr}\nTotal Team Members: ${employeesData.length}\n` +
+      `Total Revenue: ₹${totalRev.toLocaleString('en-IN')} | Total Cost Spent: ₹${totalCost.toLocaleString('en-IN')} | Net Profit: ₹${totalProfit.toLocaleString('en-IN')} | Avg ROI: ${avgRoi}%\n\n` +
+      `--------------------------------------------------------------------------------\n` +
+      `NAME            ROLE                     SPENT       REVENUE     NET PROFIT   ROI    KPI\n` +
+      `--------------------------------------------------------------------------------\n` +
+      employeesData.map(e => `${e.name.padEnd(15)} ${e.role.slice(0, 23).padEnd(24)} ₹${Number(e.costSpent).toLocaleString('en-IN').padEnd(10)} ₹${Number(e.totalRevenue).toLocaleString('en-IN').padEnd(11)} ₹${Number(e.netProfit).toLocaleString('en-IN').padEnd(11)} ${(e.roi + '%').padEnd(6)} ${e.kpiScore}`).join('\n') +
+      `\n--------------------------------------------------------------------------------\n` +
+      `APS Enterprise AI Operations System • Official Certified Document`;
+  } else if (format === 'xml') {
+    mimeType = 'application/xml';
+    content = `<?xml version="1.0" encoding="UTF-8"?>\n<employeesPerformance totalRevenue="${totalRev}" totalSpent="${totalCost}" netProfit="${totalProfit}">\n` +
+      employeesData.map(e => `  <employee id="${e.id}">\n    <name>${e.name}</name>\n    <role>${e.role}</role>\n    <spent>${e.costSpent}</spent>\n    <revenue>${e.totalRevenue}</revenue>\n    <netProfit>${e.netProfit}</netProfit>\n    <roi>${e.roi}%</roi>\n    <kpi>${e.kpiScore}</kpi>\n  </employee>`).join('\n') +
+      `\n</employeesPerformance>`;
+  } else if (format === 'docx') {
+    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    content = `APS Enterprise - Employee Performance, Cost & Profit Audit Report\nDate: ${dateStr}\n\nTeam Revenue: ₹${totalRev.toLocaleString('en-IN')} | Total Spent: ₹${totalCost.toLocaleString('en-IN')} | Net Profit: ₹${totalProfit.toLocaleString('en-IN')}\n\n` +
+      employeesData.map((e, i) => `${i + 1}. ${e.name} (${e.role})\n   Cost Spent: ₹${Number(e.costSpent).toLocaleString('en-IN')} | Revenue Closed: ₹${Number(e.totalRevenue).toLocaleString('en-IN')} | Net Profit Gained: ₹${Number(e.netProfit).toLocaleString('en-IN')} (ROI: ${e.roi}%) | Deals: ${e.salesClosed} | KPI: ${e.kpiScore}`).join('\n\n');
+  } else {
+    mimeType = 'application/json';
+    content = JSON.stringify(employeesData, null, 2);
+  }
+
+  return {
+    fileName,
+    fileFormat: format.toUpperCase(),
+    mimeType,
+    sizeKB: `${(content.length / 1024).toFixed(1)} KB`,
+    title: 'Employee Performance, Operational Cost & Net Profit Audit',
+    summaryCards: [
+      { label: 'Total Revenue', val: `₹${(totalRev / 100000).toFixed(2)} Lakhs` },
+      { label: 'Total Cost Spent', val: `₹${(totalCost / 100000).toFixed(2)} Lakhs` },
+      { label: 'Net Profit Gain', val: `₹${(totalProfit / 100000).toFixed(2)} Lakhs` },
+      { label: 'Team Avg ROI', val: `${avgRoi}%` }
+    ],
+    tableHeaders: ['ID', 'Employee Name', 'Role', 'Cost Spent (₹)', 'Revenue Closed (₹)', 'Net Profit (₹)', 'ROI (%)', 'Deals', 'KPI Score'],
+    tableRows: employeesData.map(e => [
+      e.id,
+      e.name,
+      e.role,
+      `₹${Number(e.costSpent).toLocaleString('en-IN')}`,
+      `₹${Number(e.totalRevenue).toLocaleString('en-IN')}`,
+      `₹${Number(e.netProfit).toLocaleString('en-IN')}`,
+      `${e.roi}%`,
+      String(e.salesClosed),
+      e.kpiScore
+    ]),
+    content
+  };
+}
+
+async function handleEmployeePerformance(query) {
+  const store = getStore();
+  const rawEmployees = store.mockEmployees || [];
+  const format = detectRequestedFormat(query);
+  const dateStr = new Date().toISOString().slice(0, 10);
+
+  // Operational base costs per employee (monthly salary + dialer + compute + travel overhead)
+  const costMap = {
+    e1: 38000, // Animesh
+    e2: 45000, // Bhavya
+    e3: 32000, // Aaditya
+    e4: 35000, // Pooja
+    e5: 40000  // Rohan
+  };
+
+  const employeesData = rawEmployees.map(e => {
+    const costSpent = costMap[e.id] || 35000;
+    const totalRevenue = Number(e.totalRevenue || 0);
+    // Estimated machine COGS & manufacturing cost ~ 50% of revenue
+    const cogs = totalRevenue * 0.50;
+    const netProfit = Math.max(0, Math.round(totalRevenue - cogs - costSpent));
+    const roi = Math.round((netProfit / (costSpent || 1)) * 100);
+    return {
+      ...e,
+      costSpent,
+      totalRevenue,
+      netProfit,
+      roi
+    };
+  });
+
+  const totalRev = employeesData.reduce((s, e) => s + e.totalRevenue, 0);
+  const totalCost = employeesData.reduce((s, e) => s + e.costSpent, 0);
+  const totalProfit = employeesData.reduce((s, e) => s + e.netProfit, 0);
+  const totalDeals = employeesData.reduce((s, e) => s + (e.salesClosed || 0), 0);
+  const avgRoi = Math.round((totalProfit / (totalCost || 1)) * 100);
+
+  const exportObj = format ? buildEmployeePerformanceExport(employeesData, format, dateStr) : null;
+
+  return {
+    text: `**APS Employee Performance, Operational Cost & Net Profit Analysis**:\n\n` +
+      `• **Total Team Closed Revenue**: **₹${totalRev.toLocaleString('en-IN')}** across **${totalDeals} closed deals**\n` +
+      `• **Total Operational Cost Spent**: **₹${totalCost.toLocaleString('en-IN')}** (Salaries, Dialer & Travel)\n` +
+      `• **Net Profit Gained for APS**: **₹${totalProfit.toLocaleString('en-IN')}** (Average Team ROI: **${avgRoi}%**)\n\n` +
+      employeesData.map(e => `• **${e.name}** (${e.role}): Spent **₹${e.costSpent.toLocaleString('en-IN')}** | Closed **₹${e.totalRevenue.toLocaleString('en-IN')}** (${e.salesClosed} deals) | Net Profit: **₹${e.netProfit.toLocaleString('en-IN')}** | ROI: **${e.roi}%** | KPI: **${e.kpiScore}**`).join('\n') +
+      (exportObj ? `\n\n**${exportObj.fileFormat} File Ready**: Complete employee performance breakdown document generated below.` : ''),
+    exportFile: exportObj,
+    table: employeesData.map(e => ({
+      Employee: e.name,
+      Role: e.role,
+      'Cost Spent': `₹${Number(e.costSpent).toLocaleString('en-IN')}`,
+      'Revenue Closed': `₹${Number(e.totalRevenue).toLocaleString('en-IN')}`,
+      'Net Profit': `₹${Number(e.netProfit).toLocaleString('en-IN')}`,
+      'ROI (%)': `${e.roi}%`,
+      Deals: e.salesClosed,
+      'KPI Score': e.kpiScore
+    })),
+    chart: {
+      type: 'bar',
+      title: 'Employee Performance: Cost Spent vs Net Profit Gained vs Revenue Closed',
+      labels: employeesData.map(e => e.name.split(' ')[0]),
+      datasets: [
+        { label: 'Cost Spent (₹)', data: employeesData.map(e => e.costSpent), color: '#ef4444' },
+        { label: 'Net Profit Gained (₹)', data: employeesData.map(e => e.netProfit), color: '#10b981' },
+        { label: 'Revenue Closed (₹)', data: employeesData.map(e => e.totalRevenue), color: '#2563eb' }
+      ]
+    }
+  };
+}
+
+async function handleExportFile(query) {
+  const store = getStore();
+  const leads = store.mockLeads || [];
+  const inventory = store.mockInventory || [];
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const format = detectRequestedFormat(query) || 'pdf';
+  const qLower = (query || '').toLowerCase();
+
+  // If query asks for employee / staff / performance
+  if (qLower.includes('employee') || qLower.includes('employer') || qLower.includes('staff') || qLower.includes('performance') || qLower.includes('spent') || qLower.includes('profit') || qLower.includes('rep') || qLower.includes('team')) {
+    return handleEmployeePerformance(query);
+  }
+
+  // If query asks for inventory/stock/warehouse
+  if (qLower.includes('stock') || qLower.includes('inventory') || qLower.includes('warehouse') || qLower.includes('machine') || qLower.includes('product') || qLower.includes('dona') || qLower.includes('paper') || qLower.includes('material')) {
+    const exportObj = buildStockExport(inventory, format, dateStr);
+    return {
+      text: `**Warehouse Stock Export Generated**: Exported **${inventory.length} product lines** across all facilities in **${format.toUpperCase()}** format. Ready for download below.`,
+      exportFile: exportObj,
+      table: inventory.slice(0, 10).map(i => ({ SKU: i.sku || i.id, Item: i.name, Warehouse: i.warehouse, 'Available Stock': `${i.availableUnits} units`, 'Unit Price': `₹${Number(i.unitPrice || 0).toLocaleString('en-IN')}` })),
+      chart: null
+    };
+  }
+
+  // Otherwise export CRM Leads
+  const exportObj = buildLeadsExport(leads, format, dateStr);
+  return {
+    text: `**File Generated Successfully**: Exported **${leads.length} validated CRM records** in **${format.toUpperCase()}** format. Ready for download below.`,
+    exportFile: exportObj,
     table: leads.slice(0, 8).map(l => ({ ID: l.id, Name: l.name, Stage: l.stage, Budget: `₹${Number(l.budget || 0).toLocaleString('en-IN')}` })),
     chart: null
   };
@@ -422,16 +762,16 @@ async function handleExportFile(query) {
 
 async function handleExplainMetrics(query) {
   return {
-    text: `🧠 **APS Enterprise Key Business Metrics & KPI Definitions**\n\n` +
+    text: `**APS Enterprise Key Business Metrics & KPI Definitions**\n\n` +
       `1. **Pipeline Conversion Rate**: % of total leads transitioning to *Client (Paid)*. Currently **25.0%** (3 of 12 leads).\n` +
       `2. **Tally 10% Advance Payment Gate**: Mandates 10% deposit before releasing job cards to shopfloor manufacturing.\n` +
       `3. **Sales Velocity**: Average days taken to close a lead (currently **4.2 days**).\n` +
       `4. **Employee KPI Score**: Weighted rating based on sales closed (40%), calls handled (30%), WhatsApp response speed (20%), and Tally reconciliation accuracy (10%).`,
     table: [
-      { Metric: 'Pipeline Conversion Rate', Value: '25.0%', Target: '20.0%', Status: 'Exceeding Target ✅' },
-      { Metric: 'Tally 10% Advance Gate Compliance', Value: '100.0%', Target: '100.0%', Status: 'Enforced ✅' },
-      { Metric: 'Average Deal Size', Value: '₹1,25,000', Target: '₹1,00,000', Status: 'Above Average ✅' },
-      { Metric: 'Outbound Call Conversion', Value: '42.0%', Target: '35.0%', Status: 'Healthy ✅' }
+      { Metric: 'Pipeline Conversion Rate', Value: '25.0%', Target: '20.0%', Status: 'Exceeding Target' },
+      { Metric: 'Tally 10% Advance Gate Compliance', Value: '100.0%', Target: '100.0%', Status: 'Enforced' },
+      { Metric: 'Average Deal Size', Value: '₹1,25,000', Target: '₹1,00,000', Status: 'Above Average' },
+      { Metric: 'Outbound Call Conversion', Value: '42.0%', Target: '35.0%', Status: 'Healthy' }
     ],
     chart: {
       type: 'bar',
@@ -451,10 +791,10 @@ async function handleTrendAnalysis(query) {
   const pending = leads.filter(l => l.stage === 'Confirmed Lead');
 
   return {
-    text: `📈 **Trend Analysis & Anomaly Detection Report**\n\n` +
+    text: `**Trend Analysis & Anomaly Detection Report**\n\n` +
       `• **Growth Trend**: +15.4% growth in lead inflow this month (12 leads) compared to last month (10 leads).\n` +
       `• **Revenue Variance**: Revenue increased by **+20.0%** driven by higher average deal size (₹1.25L vs ₹1.04L).\n` +
-      `• ⚠️ **Anomaly Detected**: Lead **"Global Tech" (LEAD-004)** has been residing in *Confirmed Lead* stage for 5 days without advance payment verification. Recommended action: Trigger automated A5 WhatsApp reminder.`,
+      `• **Anomaly Detected**: Lead **"Global Tech" (LEAD-004)** has been residing in *Confirmed Lead* stage for 5 days without advance payment verification. Recommended action: Trigger automated A5 WhatsApp reminder.`,
     report: {
       title: 'Trend Analysis & Anomaly Audit',
       date: new Date().toLocaleDateString('en-IN', { dateStyle: 'full' }),
@@ -470,9 +810,9 @@ async function handleTrendAnalysis(query) {
       ]
     },
     table: [
-      { Metric: 'Lead Inflow', 'Last Month': 10, 'This Month': 12, Change: '+15.4% 📈' },
-      { Metric: 'Closed Revenue', 'Last Month': '₹3,10,000', 'This Month': '₹3,75,000', Change: '+20.9% 📈' },
-      { Metric: 'Avg Close Time', 'Last Month': '5.1 days', 'This Month': '4.2 days', Change: '-17.6% (Faster) ⚡' }
+      { Metric: 'Lead Inflow', 'Last Month': 10, 'This Month': 12, Change: '+15.4%' },
+      { Metric: 'Closed Revenue', 'Last Month': '₹3,10,000', 'This Month': '₹3,75,000', Change: '+20.9%' },
+      { Metric: 'Avg Close Time', 'Last Month': '5.1 days', 'This Month': '4.2 days', Change: '-17.6% (Faster)' }
     ],
     chart: {
       type: 'bar',
@@ -497,7 +837,7 @@ async function handleDocSearch(query) {
   if (matched.length === 0) matched = docs.slice(0, 2);
 
   return {
-    text: `📚 **Document Catalog Search Results** (${matched.length} match${matched.length !== 1 ? 'es' : ''} found):\n\n` +
+    text: `**Document Catalog Search Results** (${matched.length} match${matched.length !== 1 ? 'es' : ''} found):\n\n` +
       matched.map(d => `• **${d.title}** (${d.category})\n  *Ref: ${d.pageRef}*\n  > "${d.excerpt}"`).join('\n\n'),
     table: matched.map(d => ({ Document: d.title, Category: d.category, Reference: d.pageRef, Downloads: d.downloads })),
     chart: null
@@ -525,8 +865,8 @@ async function handleActionSendEmail(query) {
   });
 
   return {
-    text: `✉️ **Email Dispatched Successfully**: Official PDF Quotation & Commercial Specs sent to **${lead.name}** (${lead.email || 'customer@enterprise.com'}).\n\n• **Attachment**: APS_Quotation_${lead.id}.pdf\n• **Delivery Status**: Delivered (200 OK)`,
-    table: [{ Lead: lead.name, Email: lead.email || 'customer@enterprise.com', Attachment: `Quotation_${lead.id}.pdf`, Status: 'Sent ✅' }],
+    text: `**Email Dispatched Successfully**: Official PDF Quotation & Commercial Specs sent to **${lead.name}** (${lead.email || 'customer@enterprise.com'}).\n\n• **Attachment**: APS_Quotation_${lead.id}.pdf\n• **Delivery Status**: Delivered (200 OK)`,
+    table: [{ Lead: lead.name, Email: lead.email || 'customer@enterprise.com', Attachment: `Quotation_${lead.id}.pdf`, Status: 'Sent' }],
     chart: null
   };
 }
@@ -534,15 +874,28 @@ async function handleActionSendEmail(query) {
 async function handleActionCheckInventory(query) {
   const store = getStore();
   const inventory = store.mockInventory || [];
+  const format = detectRequestedFormat(query);
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const exportFile = format ? buildStockExport(inventory, format, dateStr) : null;
 
   return {
-    text: `🏭 **Warehouse & Factory Inventory Snapshot** (${inventory.length} product lines tracked across Pune & Chakan units):`,
-    table: inventory.map(i => ({ Item: i.name, Category: i.category, 'Total Stock': `${i.stockUnits} units`, 'Reserved': `${i.reservedUnits} units`, 'Available Stock': `${i.availableUnits} units`, Warehouse: i.warehouse })),
+    text: `**Warehouse & Factory Inventory Snapshot** (${inventory.length} product lines tracked across Indore, Pune & Chakan facilities):` +
+      (format ? `\n\n**${format.toUpperCase()} Export Generated**: Complete inventory audit report is ready for download below.` : ''),
+    exportFile,
+    table: inventory.slice(0, 10).map(i => ({
+      SKU: i.sku || i.id,
+      Item: i.name,
+      Warehouse: i.warehouse,
+      'Total Stock': `${i.stockUnits} units`,
+      'Available': `${i.availableUnits} units`,
+      'Unit Price': `₹${Number(i.unitPrice || 0).toLocaleString('en-IN')}`,
+      Status: i.status || 'In Stock'
+    })),
     chart: {
       type: 'bar',
       title: 'Warehouse Available Machine Stock',
-      labels: inventory.slice(0, 4).map(i => i.name.split(' ')[0] + ' ' + (i.name.split(' ')[1] || '')),
-      datasets: [{ label: 'Available Stock', data: inventory.slice(0, 4).map(i => i.availableUnits), color: '#10b981' }]
+      labels: inventory.slice(0, 5).map(i => (i.sku || i.name).slice(0, 14)),
+      datasets: [{ label: 'Available Stock', data: inventory.slice(0, 5).map(i => i.availableUnits), color: '#10b981' }]
     }
   };
 }
@@ -565,10 +918,10 @@ async function handlePredictiveForecast(query) {
   const nextMonthForecast = Math.round(pipelineWeighted * 1.15);
 
   return {
-    text: `🔮 **AI Revenue Forecast & Pipeline Prediction**\n\n` +
+    text: `**AI Revenue Forecast & Pipeline Prediction**\n\n` +
       `• **Current Month Closed Revenue**: ₹${totalRevenue.toLocaleString('en-IN')}\n` +
       `• **Weighted Pipeline Value**: ₹${Math.round(pipelineWeighted).toLocaleString('en-IN')}\n` +
-      `• 🎯 **Projected September 2026 Revenue**: **₹${nextMonthForecast.toLocaleString('en-IN')}** (+18.2% forecast growth rate based on 4.2-day sales velocity).`,
+      `• **Projected September 2026 Revenue**: **₹${nextMonthForecast.toLocaleString('en-IN')}** (+18.2% forecast growth rate based on 4.2-day sales velocity).`,
     report: {
       title: 'Predictive Sales & Revenue Forecast (Q3 2026)',
       date: new Date().toLocaleDateString('en-IN', { dateStyle: 'full' }),
@@ -607,13 +960,13 @@ async function handleChurnRisk(query) {
     id: l.id,
     stage: l.stage,
     budget: `₹${Number(l.budget || 0).toLocaleString('en-IN')}`,
-    riskScore: '78% High Risk ⚠️',
+    riskScore: '78% High Risk',
     reason: 'Residing in Confirmed Lead >4 days without 10% advance deposit',
     recommendedAction: 'Trigger A5 WhatsApp payment reminder or sales call'
   }));
 
   return {
-    text: `⚠️ **Lead Churn Risk & Drop-Out Audit**\n\nIdentified **${riskLeads.length} leads at high risk of dropping out** due to payment gate SLA delays:`,
+    text: `**Lead Churn Risk & Drop-Out Audit**\n\nIdentified **${riskLeads.length} leads at high risk of dropping out** due to payment gate SLA delays:`,
     table: riskLeads.map(r => ({ Lead: r.name, ID: r.id, Stage: r.stage, Budget: r.budget, Risk: r.riskScore, Action: r.recommendedAction })),
     chart: null
   };
@@ -629,10 +982,10 @@ async function handleMarginCalculator(query) {
   const marginPct = ((netProfit / basePrice) * 100).toFixed(1);
 
   return {
-    text: `🧮 **CNC Machine Order Profit Margin Analysis** for base price **₹${basePrice.toLocaleString('en-IN')}**:\n\n` +
+    text: `**CNC Machine Order Profit Margin Analysis** for base price **₹${basePrice.toLocaleString('en-IN')}**:\n\n` +
       `• **Manufacturing & Component Cost (58%)**: ₹${mfgCost.toLocaleString('en-IN')}\n` +
       `• **Factory Overhead & Freight (12%)**: ₹${overhead.toLocaleString('en-IN')}\n` +
-      `• 💰 **Net Profit**: **₹${netProfit.toLocaleString('en-IN')}** (**${marginPct}% Margin**)`,
+      `• **Net Profit**: **₹${netProfit.toLocaleString('en-IN')}** (**${marginPct}% Margin**)`,
     table: [
       { Component: 'Base Sale Price', Amount: `₹${basePrice.toLocaleString('en-IN')}`, Share: '100.0%' },
       { Component: 'Raw Material & Components', Amount: `₹${mfgCost.toLocaleString('en-IN')}`, Share: '58.0%' },
@@ -650,7 +1003,7 @@ async function handleMarginCalculator(query) {
 
 async function handleFactoryTracker(query) {
   return {
-    text: `🏭 **Factory Shopfloor & Job Card Assembly Tracker**\n\n` +
+    text: `**Factory Shopfloor & Job Card Assembly Tracker**\n\n` +
       `• **Active Job Cards**: 3 machines currently in assembly at Pune Unit 1.\n` +
       `• **Job Card #APS-MFG-8821**: *Precision Works* (High-Def Plasma Cutter) — Milestone 2: CNC Frame & Spindle Alignment (75% Complete). Est. Dispatch: 3 Days.\n` +
       `• **Job Card #APS-MFG-9102**: *Bosch Chassis* (Hydraulic Press 500T) — Milestone 1: Heavy Hydraulic Piping (40% Complete).\n` +
@@ -677,20 +1030,23 @@ async function handleInvoiceGenerator(query) {
   const sgst = taxable * 0.09;
   const total = taxable + cgst + sgst;
 
+  const qLower = (query || '').toLowerCase();
+  const wantsFile = /pdf|file|format|download|export|save|docx|word|banao|chahiye/i.test(qLower);
+
   return {
-    text: `🧾 **GST Tax Invoice Breakdown Generated** for Taxable Value **₹${taxable.toLocaleString('en-IN')}**:\n\n` +
+    text: `**GST Tax Invoice Breakdown Generated** for Taxable Value **₹${taxable.toLocaleString('en-IN')}**:\n\n` +
       `• **HSN Code**: 8458.11 (CNC Turning & Milling Machines)\n` +
       `• **Taxable Amount**: ₹${taxable.toLocaleString('en-IN')}\n` +
       `• **CGST (9%)**: ₹${cgst.toLocaleString('en-IN')}\n` +
       `• **SGST (9%)**: ₹${sgst.toLocaleString('en-IN')}\n` +
-      `• 💰 **Total Invoice Amount**: **₹${total.toLocaleString('en-IN')}**`,
-    exportFile: {
+      `• **Total Invoice Amount**: **₹${total.toLocaleString('en-IN')}**`,
+    exportFile: wantsFile ? {
       fileName: `APS_Tax_Invoice_${new Date().toISOString().slice(0, 10)}.pdf`,
       fileFormat: 'PDF',
       mimeType: 'application/pdf',
       sizeKB: '110 KB',
       content: `APS ENTERPRISE GST TAX INVOICE\nHSN Code: 8458.11\nTaxable Amount: ₹${taxable.toLocaleString('en-IN')}\nCGST (9%): ₹${cgst.toLocaleString('en-IN')}\nSGST (9%): ₹${sgst.toLocaleString('en-IN')}\nTotal Payable: ₹${total.toLocaleString('en-IN')}`
-    },
+    } : null,
     table: [
       { Description: 'CNC Industrial Machine System (HSN 8458)', Qty: 1, Rate: `₹${taxable.toLocaleString('en-IN')}`, Amount: `₹${taxable.toLocaleString('en-IN')}` },
       { Description: 'Central GST (CGST @ 9%)', Qty: 1, Rate: '9%', Amount: `₹${cgst.toLocaleString('en-IN')}` },
@@ -706,15 +1062,15 @@ async function handleCallSentiment(query) {
   const calls = store.mockCallLogs || [];
 
   return {
-    text: `🎙️ **A1 Voice Agent Speech Transcript & Sentiment Audit**\n\n` +
+    text: `**A1 Voice Agent Speech Transcript & Sentiment Audit**\n\n` +
       `• **Total Calls Analyzed**: ${calls.length} recent inbound/outbound calls.\n` +
       `• **Positive Intent Rate**: **82.4%** (Customers confirmed purchase budget & machine delivery timelines).\n` +
       `• **Key Demand Keywords**: *"Dual Spindle"*, *"10% Tally Advance"*, *"Raycus Laser Source"*, *"3-Year Warranty"*.\n` +
       `• **Top Transcript Insight**: *Jane Smith (LEAD-002)* requested custom spindle speed specs for precision die cutting. High conversion probability.`,
     table: [
-      { CallID: 'CALL-001', Lead: 'Jane Smith', Duration: '120s', Sentiment: 'Positive (88% Intent) 😊', Requirement: 'Laser Cutter 24k RPM' },
-      { CallID: 'CALL-002', Lead: 'Acme Corp', Duration: '95s', Sentiment: 'Urgent (92% Intent) 🔥', Requirement: 'Industrial Mill 50T' },
-      { CallID: 'CALL-003', Lead: 'Global Tech', Duration: '150s', Sentiment: 'Payment Query 💳', Requirement: '10% Advance Bank Details' }
+      { CallID: 'CALL-001', Lead: 'Jane Smith', Duration: '120s', Sentiment: 'Positive (88% Intent)', Requirement: 'Laser Cutter 24k RPM' },
+      { CallID: 'CALL-002', Lead: 'Acme Corp', Duration: '95s', Sentiment: 'Urgent (92% Intent)', Requirement: 'Industrial Mill 50T' },
+      { CallID: 'CALL-003', Lead: 'Global Tech', Duration: '150s', Sentiment: 'Payment Query', Requirement: '10% Advance Bank Details' }
     ],
     chart: {
       type: 'donut',
@@ -727,7 +1083,7 @@ async function handleCallSentiment(query) {
 
 async function handleWhatsAppAnalytics(query) {
   return {
-    text: `💬 **A5 WhatsApp Cloud API Automation Performance**\n\n` +
+    text: `**A5 WhatsApp Cloud API Automation Performance**\n\n` +
       `• **Delivery Rate**: **99.2%** (Dispatched via Meta WABA Live API).\n` +
       `• **Open / Read Rate**: **88.6%** (Average read time: 3.4 minutes).\n` +
       `• **Advance Payment Conversion**: **74.0%** of leads click payment link within 24h.\n` +
@@ -752,11 +1108,11 @@ async function handleSalesLeaderboard(query) {
   const sorted = [...employees].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0));
 
   return {
-    text: `🏆 **Sales Representative Leaderboard & Gamification Badges** (August 2026):\n\n` +
-      `1. 🥇 **${sorted[0]?.name || 'Bhavya'}** — ${sorted[0]?.salesClosed || 3} Deals Closed (₹${(sorted[0]?.totalRevenue || 180000).toLocaleString('en-IN')}) | 🎖️ *Badge: "Sales Champion & Tally Gate Master"*\n` +
-      `2. 🥈 **${sorted[1]?.name || 'Animesh'}** — ${sorted[1]?.salesClosed || 2} Deals Closed (₹${(sorted[1]?.totalRevenue || 120000).toLocaleString('en-IN')}) | 🎖️ *Badge: "Voice Agent Specialist"*\n` +
-      `3. 🥉 **${sorted[2]?.name || 'Aaditya'}** — ${sorted[2]?.salesClosed || 1} Deals Closed (₹${(sorted[2]?.totalRevenue || 75000).toLocaleString('en-IN')}) | 🎖️ *Badge: "WhatsApp Automation Ninja"*\n`,
-    table: sorted.map((e, i) => ({ Rank: `#${i + 1}`, Name: e.name, Role: e.role, 'Deals Closed': e.salesClosed || 0, Revenue: `₹${(e.totalRevenue || 0).toLocaleString('en-IN')}`, 'KPI Score': e.kpiScore || '—', Badge: i === 0 ? '🏆 Champion' : i === 1 ? '⚡ Speed Demon' : '🎖️ Specialist' })),
+    text: `**Sales Representative Leaderboard** (August 2026):\n\n` +
+      `1. **${sorted[0]?.name || 'Bhavya'}** — ${sorted[0]?.salesClosed || 3} Deals Closed (₹${(sorted[0]?.totalRevenue || 180000).toLocaleString('en-IN')}) | *Role: Sales Champion & Tally Gate Master*\n` +
+      `2. **${sorted[1]?.name || 'Animesh'}** — ${sorted[1]?.salesClosed || 2} Deals Closed (₹${(sorted[1]?.totalRevenue || 120000).toLocaleString('en-IN')}) | *Role: Voice Agent Specialist*\n` +
+      `3. **${sorted[2]?.name || 'Aaditya'}** — ${sorted[2]?.salesClosed || 1} Deals Closed (₹${(sorted[2]?.totalRevenue || 75000).toLocaleString('en-IN')}) | *Role: WhatsApp Automation Ninja*\n`,
+    table: sorted.map((e, i) => ({ Rank: `#${i + 1}`, Name: e.name, Role: e.role, 'Deals Closed': e.salesClosed || 0, Revenue: `₹${(e.totalRevenue || 0).toLocaleString('en-IN')}`, 'KPI Score': e.kpiScore || '—', Badge: i === 0 ? 'Champion' : i === 1 ? 'Speed Specialist' : 'Specialist' })),
     chart: {
       type: 'bar',
       title: 'Leaderboard Revenue by Representative (₹)',
@@ -771,82 +1127,145 @@ async function handleNormalChat(query) {
 
   if (/hi|hello|hey|greetings|namaste|good morning|good afternoon|good evening/i.test(qLower)) {
     return {
-      text: "👋 **Namaste! Hello!** Welcome to **APS Enterprise Dashboard AI Assistant**.\n\nMain aapki sales, reports, factory progress, GST invoices, aur analytics me kaise help kar sakta hoon?\n\n*Aap niche diye gaye quick options me se select kar sakte hain ya apna question type kar sakte hain!*",
+      text: "**Namaste! Hello!** Welcome to **APS Enterprise Dashboard AI Assistant**.\n\nMain aapki sales, reports, factory progress, GST invoices, aur analytics me kaise help kar sakta hoon?\n\n*Aap options me se select kar sakte hain ya apna question type kar sakte hain.*",
       table: null, chart: null
     };
   }
 
   if (/kaise ho|how are you|kaise hain|kya haal|what's up/i.test(qLower)) {
     return {
-      text: "😊 **Main bilkul badhiya hoon!** System 100% active hai aur aapke data analysis ke liye ready hai.\n\nAaj aapko kis report ya data me help chahiye?\n• Executive PDF Reports\n• GST Tax Invoices\n• Factory Assembly Progress\n• Revenue Forecast",
+      text: "**Main bilkul badhiya hoon!** System active hai aur aapke data analysis ke liye ready hai.\n\nAaj aapko kis report ya data me help chahiye?\n• Executive PDF Reports\n• GST Tax Invoices\n• Factory Assembly Progress\n• Revenue Forecast",
       table: null, chart: null
     };
   }
 
   if (/who are you|aap kaun ho|who r u|what are you/i.test(qLower)) {
     return {
-      text: "🤖 Main **APS Enterprise Business Intelligence AI Assistant** hoon.\n\nMera primary job aapke enterprise dashboard data ko analyze karna, PDF/Excel reports generate karna, GST Invoices banana, aur factory manufacturing progress track karna hai.",
+      text: "Main **APS Enterprise Business Intelligence AI Assistant** hoon.\n\nMera primary job aapke enterprise dashboard data ko analyze karna, PDF/Excel reports generate karna, GST Invoices banana, aur factory manufacturing progress track karna hai.",
       table: null, chart: null
     };
   }
 
   if (/what can you do|kya kar sakte ho|features kya hai|help me/i.test(qLower)) {
     return {
-      text: "🌟 **Main in sabhi tasks me aapki madad kar sakta hoon**:\n\n" +
-        "1. 📊 **Executive PDF Reports**: Executive summaries & downloads\n" +
-        "2. 🧾 **GST Tax Invoices**: Itemized tax breakdown & PDF invoice\n" +
-        "3. 🏭 **Factory Job Cards**: Live shopfloor assembly tracking\n" +
-        "4. 🔮 **Predictive Forecast**: Q3 Monte Carlo revenue predictions\n" +
-        "5. ⚠️ **Lead Churn Audit**: Stalled leads & risk scores\n" +
-        "6. 📚 **Document RAG Search**: Machine specs & datasheets\n" +
-        "7. 📁 **File Exports**: PDF, Excel (.xlsx), CSV, XML, DOCX\n" +
-        "8. 🏆 **Sales Leaderboard**: Employee rankings & badges",
+      text: "**Main in sabhi tasks me aapki madad kar sakta hoon**:\n\n" +
+        "1. **Executive PDF Reports**: Executive summaries & downloads\n" +
+        "2. **GST Tax Invoices**: Itemized tax breakdown & PDF invoice\n" +
+        "3. **Factory Job Cards**: Live shopfloor assembly tracking\n" +
+        "4. **Predictive Forecast**: Q3 Monte Carlo revenue predictions\n" +
+        "5. **Lead Churn Audit**: Stalled leads & risk scores\n" +
+        "6. **Document RAG Search**: Machine specs & datasheets\n" +
+        "7. **File Exports**: PDF, Excel (.xlsx), CSV, XML, DOCX\n" +
+        "8. **Sales Leaderboard**: Employee rankings & performance",
       table: null, chart: null
     };
   }
 
   if (/thank|shukriya|dhanyawad|thx|awesome|great/i.test(qLower)) {
     return {
-      text: "🙌 **Aapka bohot bohot dhanyawad!** Main aapki service ke liye hamesha ready hoon. Koi aur report ya query ho toh zaroor batayein!",
+      text: "**Aapka bohot bohot dhanyawad!** Main aapki service ke liye hamesha ready hoon. Koi aur report ya query ho toh zaroor batayein.",
       table: null, chart: null
     };
   }
 
   if (/bye|goodbye|alvida|see you/i.test(qLower)) {
     return {
-      text: "👋 **Goodbye! Have a great day ahead!** Jab bhi zaroorat ho, bas ek message kar dijiye.",
+      text: "**Goodbye! Have a great day ahead!** Jab bhi zaroorat ho, bas ek message kar dijiye.",
       table: null, chart: null
     };
   }
 
   return {
-    text: "😊 Main aapki kaise madad kar sakta hoon? Aap mujhse dashboard metrics, sales reports, GST invoices, ya factory status ke bare me kuch bhi pooch sakte hain!",
+    text: "Main aapki kaise madad kar sakta hoon? Aap mujhse dashboard metrics, sales reports, GST invoices, ya factory status ke bare me kuch bhi pooch sakte hain.",
     table: null, chart: null
   };
 }
 
 async function handleCompanyInfo(query) {
-  const store = getStore();
-  const cp = store.companyProfile || {};
+  const qLower = (query || '').toLowerCase();
+  const isLocationQuery = /where|location|located|address|situated|place|city|state|kahan|loha mandi|indore|kaha/i.test(qLower);
+  const isContactQuery = /contact|phone|mobile|call|number|email|mail|website|site|reach|help/i.test(qLower);
+  const isProductQuery = /product|machine|dona|pattal|cup|plate|cnc|laser|make|sell|manufacture|price|catalog/i.test(qLower);
 
-  return {
-    text: `🏢 **APS Enterprises — Official Profile & Machinery Catalog**\n\n` +
-      `🌐 **Official Website**: [www.apsenterprises.in](https://www.apsenterprises.in)\n` +
-      `📍 **Registered Office**: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001\n` +
-      `📞 **Helpline Numbers**: +91-7869755871 | +91-8827848099\n` +
-      `✉️ **Email Support**: support.apsenterprises@gmail.com | apsenterprisesdp.229@gmail.com\n\n` +
-      `⚙️ **Primary Machine Offerings**:\n` +
+  let introText = '';
+
+  if (isLocationQuery) {
+    introText = `**APS Enterprises Location & Address Details**:\n\n` +
+      `• **Registered & Head Office**: **832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India**.\n` +
+      `• **Machinery Manufacturing & Assembly Plants**:\n` +
+      `   1. **Indore Main Plant (MP)**: High-speed Double Die Dona Pattal, Hydraulic Paper Plate & Cup Making Machine assembly.\n` +
+      `   2. **Pune Unit 1 (Maharashtra)**: Heavy Industrial CNC Milling, Fiber Laser Cutters, and Hydraulic Presses.\n\n` +
+      `• **Official Website**: [www.apsenterprises.in](https://www.apsenterprises.in)\n` +
+      `• **Helpline Numbers**: +91-7869755871 | +91-8827848099\n` +
+      `• **Email Support**: support.apsenterprises@gmail.com | apsenterprisesdp.229@gmail.com`;
+  } else if (isProductQuery) {
+    introText = `**APS Enterprises — Machinery & Product Catalog**\n\n` +
+      `APS Enterprises is Central India's leading manufacturer of high-speed industrial packaging and precision machines:\n\n` +
+      `1. **Fully Automatic Double Die Dona Pattal Machine** (Heavy cast-iron frame, low power consumption, high output)\n` +
+      `2. **Heavy-Duty Hydraulic Paper Plate & Thali Making Machine** (5T to 15T hydraulic pressure)\n` +
+      `3. **Automatic High-Speed Paper Cup Making Machine** (60-80 cups/minute with ultrasonic sealing)\n` +
+      `4. **Semi-Automatic Heavy Paper Cutter Machine** (Precision hydraulic clamping & blade)\n` +
+      `5. **Raw Material Paper Roll & Lamination Machine** (PE & silver film lamination)\n` +
+      `6. **Industrial Heavy CNC & Fiber Laser Systems** (Dual-spindle 24k RPM & 6kW Raycus sources)\n\n` +
+      `• **Location**: 832, Old Loha Mandi, Indore, MP - 452001\n` +
+      `• **Order Inquiry**: +91-7869755871 | +91-8827848099`;
+  } else {
+    introText = `**About APS Enterprises — Leading Machinery Manufacturer**\n\n` +
+      `**APS Enterprises** is a premier manufacturing enterprise based in **Indore, Madhya Pradesh**, specializing in industrial Dona Pattal machines, paper plate/cup automation, and heavy precision machinery.\n\n` +
+      `• **Registered Office**: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001\n` +
+      `• **Official Website**: [www.apsenterprises.in](https://www.apsenterprises.in)\n` +
+      `• **Helpline Numbers**: +91-7869755871 | +91-8827848099\n` +
+      `• **Email Support**: support.apsenterprises@gmail.com | apsenterprisesdp.229@gmail.com\n\n` +
+      `**Primary Machine Offerings**:\n` +
       `• Fully Automatic Double Die Dona Pattal Machine\n` +
       `• Heavy-Duty Hydraulic Paper Plate & Thali Making Machine\n` +
       `• Automatic High-Speed Paper Cup Making Machine\n` +
-      `• Semi-Automatic Heavy Paper Cutter & Lamination Roll Machine`,
+      `• Semi-Automatic Heavy Paper Cutter & Lamination Roll Machine`;
+  }
+
+  return {
+    text: introText,
     table: [
-      { Category: 'Company Name', Details: 'APS Enterprises' },
-      { Category: 'Official Website', Details: 'https://www.apsenterprises.in' },
-      { Category: 'Registered Address', Details: '832 Old Loha Mandi, Indore, MP - 452001' },
-      { Category: 'Phone Contact', Details: '+91-7869755871 / +91-8827848099' },
-      { Category: 'Support Email', Details: 'support.apsenterprises@gmail.com' },
-      { Category: 'Main Specialty', Details: 'Dona Pattal & Paper Plate Machine Manufacturing' }
+      { Parameter: 'Company Name', Value: 'APS Enterprises' },
+      { Parameter: 'Registered Location', Value: '832 Old Loha Mandi, Indore, MP - 452001' },
+      { Parameter: 'Landmarks', Value: 'In front of Devshree Cinema, Near Khambati Pipes' },
+      { Parameter: 'Manufacturing Plants', Value: 'Indore (MP) & Pune Unit 1 (Maharashtra)' },
+      { Parameter: 'Phone Contacts', Value: '+91-7869755871 / +91-8827848099' },
+      { Parameter: 'Support Emails', Value: 'support.apsenterprises@gmail.com / apsenterprisesdp.229@gmail.com' },
+      { Parameter: 'Official Website', Value: 'https://www.apsenterprises.in' },
+      { Parameter: 'Core Business', Value: 'Dona Pattal, Paper Plate & Industrial Machine Manufacturing' }
+    ],
+    chart: null
+  };
+}
+
+async function handleDashboardInfo(query) {
+  return {
+    text: `**APS Enterprise — Fullstack AI Admin System Architecture & Modules**\n\n` +
+      `The APS Enterprise Dashboard provides complete end-to-end automation across 11 integrated modules:\n\n` +
+      `1. **Executive Dashboard** (\`/\`): Real-time KPI summaries, active revenue tracking (₹3.75L closed), 10% advance tally gate metrics, and pipeline velocity.\n` +
+      `2. **CRM Leads & Pipeline** (\`/leads\`): 7-stage sales funnel (*Enquiry -> Qualified -> Booked -> Confirmed Lead -> Client (Paid) -> In Production -> Dispatched*) with drag-and-drop lead stage updates.\n` +
+      `3. **Dialer Queue / A1 Voice Agent** (\`/dialer\`): Automated voice call queuing, call recording transcripts, customer sentiment scoring (82.4% positive intent rate).\n` +
+      `4. **WhatsApp Automation / A5 Agent** (\`/whatsapp\`): Official WhatsApp Business Cloud API sequences for automated payment reminders, quotation PDFs, and broadcast campaigns.\n` +
+      `5. **Tally 10% Advance Reconciliation** (\`/tally\`): Strict 10% deposit verification gate that mandates advance payment verification before unblocking factory job card releases.\n` +
+      `6. **Invoices & GST Billing** (\`/invoices\`): Automated GST Tax Invoice generation (HSN 8458.11 / 8422), 18% GST (CGST 9% + SGST 9%) breakdowns, and instant PDF downloads.\n` +
+      `7. **Factory Shopfloor & Job Card Tracker** (\`/factory\`): ERP milestone tracking for machine assembly across Indore and Pune plants.\n` +
+      `8. **Team KPIs & Sales Leaderboard** (\`/kpis\` / \`/employees\`): Performance tracking across team members (Bhavya, Animesh, etc.) with gamified badges and KPI score formulas.\n` +
+      `9. **Warehouse Inventory & Stock** (\`/inventory\`): Real-time stock audit for machine frames, spindles, laser sources, and raw material paper rolls.\n` +
+      `10. **Document Search & RAG Knowledge Base** (\`/documents\`): Instant vector search across technical machine manuals, specification datasheets, and brochures.\n` +
+      `11. **A3 Natural Language AI Assistant** (\`/ai\`): AI copilot capable of answering questions, running live CRM/ERP actions, generating executive reports, and exporting data in CSV/XLSX/PDF/DOCX/XML/JSON formats.`,
+    table: [
+      { Module: '1. Executive Dashboard', Route: '/', Description: 'Live KPIs, Revenue, Pipeline Velocity' },
+      { Module: '2. CRM Pipeline', Route: '/leads', Description: '7-Stage Lead Management & Actions' },
+      { Module: '3. A1 Voice Dialer', Route: '/dialer', Description: 'Call Queue, Transcripts & Sentiment' },
+      { Module: '4. A5 WhatsApp Auto', Route: '/whatsapp', Description: 'Payment Reminders & Sequence Templates' },
+      { Module: '5. Tally Reconciliation', Route: '/tally', Description: '10% Advance Payment Gate Verification' },
+      { Module: '6. Invoices & Billing', Route: '/invoices', Description: 'GST Tax Invoices & PDF Generation' },
+      { Module: '7. Factory Shopfloor', Route: '/factory', Description: 'ERP Job Cards & Assembly Progress' },
+      { Module: '8. Team KPIs', Route: '/kpis', Description: 'Sales Leaderboard & Performance Badges' },
+      { Module: '9. Warehouse Inventory', Route: '/inventory', Description: 'Stock Levels & Component Tracking' },
+      { Module: '10. RAG Document Search', Route: '/documents', Description: 'Technical Manuals & Catalog Search' },
+      { Module: '11. A3 AI Assistant', Route: '/ai', Description: 'Natural Language Engine & File Exports' }
     ],
     chart: null
   };
@@ -901,7 +1320,7 @@ async function handleActionCreateLead(query) {
   });
 
   return {
-    text: `✅ **Action Executed**: Successfully created new lead **"${newLeadObj.name}"** in **${stage}** stage.\n\n• **ID**: ${newLeadObj.id}\n• **Budget**: ₹${Number(budget).toLocaleString('en-IN')}\n• **Source**: A3 AI Assistant\n• **Assigned**: Bhavya (Admin)`,
+    text: `**Action Executed**: Successfully created new lead **"${newLeadObj.name}"** in **${stage}** stage.\n\n• **ID**: ${newLeadObj.id}\n• **Budget**: ₹${Number(budget).toLocaleString('en-IN')}\n• **Source**: A3 AI Assistant\n• **Assigned**: Bhavya (Admin)`,
     table: [{ ID: newLeadObj.id, Name: newLeadObj.name, Stage: newLeadObj.stage, Budget: `₹${Number(budget).toLocaleString('en-IN')}`, Action: 'Created via AI' }],
     chart: null
   };
@@ -915,7 +1334,7 @@ async function handleActionTransitionLead(query) {
   const targetStage = detectStage(query);
   if (!targetStage) {
     return {
-      text: `⚠️ Please specify a valid target stage to transition the lead to. Available stages: **Enquiry, Qualified, Booked, Confirmed Lead, Client (Paid), In Production, Dispatched**.`,
+      text: `Please specify a valid target stage to transition the lead to. Available stages: **Enquiry, Qualified, Booked, Confirmed Lead, Client (Paid), In Production, Dispatched**.`,
       table: null, chart: null
     };
   }
@@ -945,7 +1364,7 @@ async function handleActionTransitionLead(query) {
   activityLogs.unshift(activityEntry);
 
   return {
-    text: `⚡ **Action Executed**: Lead **"${lead.name}"** (${lead.id}) transitioned from **"${oldStage}"** ➔ **"${targetStage}"**.\n\n• **Tally Payment Gate**: ${lead.tallyPaymentVerified ? 'Verified ✅' : 'Pending'}\n• **ERP Booking**: ${lead.erpBookingCreated ? 'Created ✅' : 'Pending'}`,
+    text: `**Action Executed**: Lead **"${lead.name}"** (${lead.id}) transitioned from **"${oldStage}"** -> **"${targetStage}"**.\n\n• **Tally Payment Gate**: ${lead.tallyPaymentVerified ? 'Verified' : 'Pending'}\n• **ERP Booking**: ${lead.erpBookingCreated ? 'Created' : 'Pending'}`,
     table: [{ ID: lead.id, Name: lead.name, 'Previous Stage': oldStage, 'New Stage': targetStage, Status: 'Updated in DB' }],
     chart: null
   };
@@ -976,7 +1395,7 @@ async function handleActionPostTally(query) {
   });
 
   return {
-    text: `🧾 **Action Executed**: Posted Tally ERP 9 Voucher **${vchNo}** for **${partyName}**.\n\n• **Amount**: ₹${amount.toLocaleString('en-IN')}\n• **Voucher Type**: Advance Receipt (10% Gate)\n• **Status**: Synchronized with Tally Ledger`,
+    text: `**Action Executed**: Posted Tally ERP 9 Voucher **${vchNo}** for **${partyName}**.\n\n• **Amount**: ₹${amount.toLocaleString('en-IN')}\n• **Voucher Type**: Advance Receipt (10% Gate)\n• **Status**: Synchronized with Tally Ledger`,
     table: [{ 'Voucher No': vchNo, 'Party Name': partyName, Type: 'Advance Receipt (10%)', Amount: `₹${amount.toLocaleString('en-IN')}`, Status: 'Posted to Tally' }],
     chart: null
   };
@@ -1005,7 +1424,7 @@ async function handleActionErpBooking(query) {
   });
 
   return {
-    text: `🏭 **Action Executed**: Created ERP Machine Booking & Shopfloor Job Card for **"${lead.name}"** (${lead.id}).\n\n• **ERP Status**: Booking Active ✅\n• **Pipeline Stage**: ${lead.stage}`,
+    text: `**Action Executed**: Created ERP Machine Booking & Shopfloor Job Card for **"${lead.name}"** (${lead.id}).\n\n• **ERP Status**: Booking Active\n• **Pipeline Stage**: ${lead.stage}`,
     table: [{ ID: lead.id, Name: lead.name, Product: lead.interest || 'CNC Machine', 'ERP Status': 'Booking Created' }],
     chart: null
   };
@@ -1042,7 +1461,7 @@ async function handleActionQueueDialer(query) {
   });
 
   return {
-    text: `📞 **Action Executed**: Queued A1 Voice Agent outbound call **${callId}** into active dialer queue.\n\n• **Voice Agent**: A1 Telecaller Bot\n• **Queue Status**: Active Outbound Call`,
+    text: `**Action Executed**: Queued A1 Voice Agent outbound call **${callId}** into active dialer queue.\n\n• **Voice Agent**: A1 Telecaller Bot\n• **Queue Status**: Active Outbound Call`,
     table: [{ 'Call ID': callId, Agent: 'A1 Voice Agent', Target: 'Lead Queue', Status: 'Queued' }],
     chart: null
   };
@@ -1084,7 +1503,7 @@ async function handleActionSendWhatsApp(query) {
   });
 
   return {
-    text: `💬 **Action Executed**: Dispatched automated WhatsApp notification **${waId}** via WABA Cloud API.\n\n• **Recipient**: Global Tech (+91 99887 76655)\n• **Template**: Payment Reminder (10% Advance Gate)\n• **Delivery Status**: Sent (✓)`,
+    text: `**Action Executed**: Dispatched automated WhatsApp notification **${waId}** via WABA Cloud API.\n\n• **Recipient**: Global Tech (+91 99887 76655)\n• **Template**: Payment Reminder (10% Advance Gate)\n• **Delivery Status**: Sent`,
     table: [{ 'Message ID': waId, Recipient: 'Global Tech', Template: 'Payment Reminder (10%)', Status: 'Sent' }],
     chart: null
   };
@@ -1111,10 +1530,25 @@ function buildFullContext() {
   const docSum = docs.map(d => `${d.title} (${d.category}): ${d.excerpt}`).join('; ');
   const invSum = inventory.map(i => `${i.name}: ${i.availableUnits} available (${i.warehouse})`).join('; ');
 
-  return `APS Enterprise CRM & Operations Snapshot:
-- Total Leads: ${leads.length} | Pipeline Breakdown: ${stageCounts}
+  return `APS Enterprise Comprehensive System & Knowledge Base:
+- Company Profile & Location: APS Enterprises, 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India. Phones: +91-7869755871, +91-8827848099. Emails: support.apsenterprises@gmail.com, apsenterprisesdp.229@gmail.com. Website: https://www.apsenterprises.in.
+- Manufacturing Units: Indore Main Plant (Madhya Pradesh) & Pune Unit 1 (Maharashtra).
+- Machinery Products: Fully Automatic Double Die Dona Pattal Machine, Heavy Hydraulic Paper Plate & Thali Machine, High-Speed Paper Cup Making Machine, Semi-Automatic Paper Cutter & Lamination Machine, Industrial CNC Milling & 6kW Fiber Laser Cutters.
+- Platform Architecture & Dashboard Modules:
+  1. Executive Dashboard (/) - Revenue, KPI stats, 10% Advance collected, conversion rate.
+  2. CRM Leads & Pipeline (/leads) - 7 Stages: Enquiry -> Qualified -> Booked -> Confirmed Lead -> Client (Paid) -> In Production -> Dispatched.
+  3. A1 Voice Dialer (/dialer) - Automated outbound call queue, call transcripts, sentiment scoring (82.4% positive).
+  4. A5 WhatsApp Automation (/whatsapp) - WhatsApp Business API sequences & payment reminder templates.
+  5. Tally 10% Advance Reconciliation (/tally) - Mandates 10% advance payment verification before manufacturing release.
+  6. GST Invoices & Billing (/invoices) - HSN 8458.11, 18% GST (CGST 9% + SGST 9%) calculations & PDF export.
+  7. Factory Shopfloor & Job Card Tracker (/factory) - Assembly milestone tracking at Pune Unit 1 & Indore.
+  8. Team KPIs & Sales Leaderboard (/kpis, /employees) - Gamified badges & weighted KPI scoring.
+  9. Warehouse Inventory (/inventory) - Component stocks (spindles, laser sources, raw paper rolls).
+  10. Document Search & RAG (/documents) - Technical catalog & PDF specification search.
+  11. A3 AI Assistant (/ai) - Natural language assistant for dashboard analysis, reports, and file generation.
+- Live CRM Snapshot: Total Leads: ${leads.length} | Pipeline: ${stageCounts}
 - Closed Sales: ${closedLeads.length} deals totaling ₹${totalRevenue.toLocaleString('en-IN')} | 10% Advance Collected: ₹${(totalRevenue * 0.1).toLocaleString('en-IN')}
-- Pending Tally Payment Gate: ${pendingLeads.length} leads (Advance Due: ₹${pendingRevenue.toLocaleString('en-IN')})
+- Pending Tally Gate: ${pendingLeads.length} leads (Advance Due: ₹${pendingRevenue.toLocaleString('en-IN')})
 - Employees & Performance: ${empSum}
 - Document Knowledge Base: ${docSum}
 - Warehouse Inventory Stock: ${invSum}`;
@@ -1222,55 +1656,27 @@ async function processWithLLM(query, history) {
 
   const systemPrompt = `Dashboard AI Assistant System Prompt
 
-You are an advanced AI Dashboard Assistant for APS Enterprise (manufacturing sales: CNC machines, laser cutters, industrial equipment).
+You are an advanced AI Dashboard Assistant for APS Enterprise (manufacturing sales: Dona Pattal machines, paper plate machines, paper cup makers, CNC machines, laser cutters, industrial equipment).
 
-Your primary objective is to help users analyze data, generate reports, create files, and perform dashboard-related actions accurately.
+Your primary objective is to help users with:
+1. All inquiries regarding APS Enterprises (Location: 832, Old Loha Mandi, Indore, MP - 452001; Plants in Indore & Pune; Products; Contacts; Website).
+2. All dashboard modules, features, navigation, and options (CRM Pipeline, A1 Voice Dialer, A5 WhatsApp, Tally 10% Gate, Invoices, Factory Tracker, Team KPIs, Inventory, Document Search).
+3. Analyzing data, generating executive reports, creating downloadable format files (only when requested), and answering questions in English, Hindi, or Hinglish accurately.
 
 Rules:
 - Always understand the user's intent before responding.
-- If dashboard data is required, use available tools and data sources.
-- Never make up data when real data is unavailable.
-- Ask follow-up questions when information is missing.
+- When asked about company location, address, products, contacts, or dashboard features, answer thoroughly with exact details.
 - Provide concise answers for simple questions and detailed answers for analytics requests.
+- Only generate "exportFile" if the user explicitly requested a file generation/download in a format (e.g. CSV, Excel/XLSX, PDF, JSON, DOCX). Otherwise set "exportFile": null.
 
-Capabilities:
-- Analyze dashboard data
-- Generate PDF reports
-- Generate Excel, CSV, XML and DOCX files
-- Search uploaded documents
-- Summarize reports
-- Generate charts and insights
-- Explain business metrics and KPIs
-
-Report Generation Rules:
-- Include title, date and summary.
-- Highlight key findings.
-- Present actionable insights.
-
-Data Analysis Rules:
-- Compare trends.
-- Identify anomalies.
-- Highlight growth and decline.
-- Explain findings in simple language.
-
-File Generation Rules:
-- Create the requested file format.
-- Validate data before exporting.
-- Use professional formatting.
-
-Behavior:
-- Be professional and accurate.
-- Think step-by-step before taking actions.
-- Prioritize user goals and business outcomes.
-
-APS Enterprise CRM Snapshot Data:
+APS Enterprise CRM & Knowledge Snapshot Data:
 ${context}
 
 RESPONSE FORMAT — respond ONLY with valid JSON (no markdown fences, no leading/trailing text):
 {
-  "text": "Your clear response text with **bold** for key numbers/names",
+  "text": "Your clear response text with **bold** for key numbers/names/addresses",
   "report": null or {"title":"...","date":"...","summary":"...","keyFindings":["..."],"actionableInsights":["..."]},
-  "exportFile": null or {"fileName":"...","fileFormat":"CSV/XLSX/PDF/DOCX/XML","mimeType":"...","content":"..."},
+  "exportFile": null or {"fileName":"...","fileFormat":"CSV/XLSX/PDF/DOCX/XML/JSON","mimeType":"...","content":"..."},
   "table": null or [{"Col":"val"}],
   "chart": null or {"type":"bar|donut","title":"...","labels":["..."],"datasets":[{"label":"...","data":[0],"color":"#6366f1"}]}
 }`;
@@ -1313,6 +1719,7 @@ async function processQuery(query, conversationId) {
   if (intent !== 'unknown' && provider === 'mock') {
     switch (intent) {
       case 'company_info':           result = await handleCompanyInfo(query); break;
+      case 'dashboard_info':         result = await handleDashboardInfo(query); break;
       case 'normal_chat':            result = await handleNormalChat(query); break;
       case 'factory_tracker':        result = await handleFactoryTracker(query); break;
       case 'invoice_generator':      result = await handleInvoiceGenerator(query); break;
@@ -1322,6 +1729,7 @@ async function processQuery(query, conversationId) {
       case 'doc_search':             result = await handleDocSearch(query); break;
       case 'action_send_email':      result = await handleActionSendEmail(query); break;
       case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
+      case 'employee_performance':   result = await handleEmployeePerformance(query); break;
       case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
       case 'churn_risk':             result = await handleChurnRisk(query); break;
       case 'margin_calculator':      result = await handleMarginCalculator(query); break;
@@ -1364,6 +1772,7 @@ async function processQuery(query, conversationId) {
         case 'doc_search':             result = await handleDocSearch(query); break;
         case 'action_send_email':      result = await handleActionSendEmail(query); break;
         case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
+        case 'employee_performance':   result = await handleEmployeePerformance(query); break;
         case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
         case 'churn_risk':             result = await handleChurnRisk(query); break;
         case 'margin_calculator':      result = await handleMarginCalculator(query); break;
