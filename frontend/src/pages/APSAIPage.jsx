@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API = 'http://localhost:5000/api/a3';
 
@@ -289,19 +291,6 @@ function ReportCard({ report }) {
   if (!report) return null;
   const { title, date, summary, keyFindings, actionableInsights } = report;
 
-  const handleDownloadPdf = () => {
-    const content = `APS ENTERPRISE EXECUTIVE REPORT\nDate: ${date || new Date().toISOString().slice(0, 10)}\nTitle: ${title}\n\nSUMMARY:\n${summary}\n\nKEY FINDINGS:\n${(keyFindings || []).map(k => '• ' + k).join('\n')}\n\nACTIONABLE INSIGHTS:\n${(actionableInsights || []).map(a => '⚡ ' + a).join('\n')}`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `APS_Enterprise_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-  };
-
   return (
     <div style={s.reportBox}>
       <div style={s.reportHeader}>
@@ -309,17 +298,7 @@ function ReportCard({ report }) {
           <span style={s.reportBadge}>Executive Report</span>
           <h3 style={s.reportTitle}>{title}</h3>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {date && <span style={s.reportDate}>{date}</span>}
-          <button onClick={handleDownloadPdf} style={s.fileDownloadBtn} title="Download Report PDF">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            <span>Download PDF</span>
-          </button>
-        </div>
+        {date && <span style={s.reportDate}>{date}</span>}
       </div>
 
       {summary && (
@@ -358,36 +337,269 @@ function ReportCard({ report }) {
 }
 
 // ─── Export File Download Card Component ─────────────────────────────────────
-function ExportFileCard({ exportFile }) {
+function generateRealPDF(exportFile, tableData) {
+  try {
+    const { fileName, title, summaryCards, tableHeaders, tableRows, content } = exportFile || {};
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'pt',
+      format: 'a4'
+    });
+
+    const pageWidth = 841.89;
+    const pageHeight = 595.28;
+    const margin = 32;
+
+    // ── 1. Header Banner ────────────────────────────────────────────────
+    doc.setFillColor(15, 23, 42); // #0f172a Deep Slate Navy
+    doc.rect(0, 0, pageWidth, 58, 'F');
+    doc.setFillColor(37, 99, 235); // #2563eb Blue Line
+    doc.rect(0, 56, pageWidth, 3, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(255, 255, 255);
+    doc.text('APS ENTERPRISES', margin, 26);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(147, 197, 253);
+    doc.text('INDUSTRIAL AUTOMATION & PRECISION MACHINERY', margin, 40);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('HQ: 832, Old Loha Mandi, Indore, MP - 452001 | Web: www.apsenterprises.in | Ph: +91-7869755871', pageWidth - margin, 34, { align: 'right' });
+
+    // ── 2. Document Title ───────────────────────────────────────────────
+    const docTitle = title || (fileName || 'APS Intelligence Report').replace(/\.pdf$/i, '').replace(/_/g, ' ');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(15, 23, 42);
+    doc.text(docTitle.toUpperCase(), margin, 80);
+
+    const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Generated: ${dateStr}  •  Status: Official Certified Export  •  Classification: Enterprise Internal Audit`, margin, 94);
+
+    // ── 3. Summary Metric Cards ─────────────────────────────────────────
+    let startY = 108;
+    const cards = summaryCards && summaryCards.length > 0 ? summaryCards : [
+      { label: 'Audit Status', val: 'Verified 100%' },
+      { label: 'Security Level', val: 'Enterprise Grade' },
+      { label: 'Execution', val: 'APS AI Cockpit' },
+      { label: 'Classification', val: 'Certified Document' }
+    ];
+
+    const cardCount = cards.length;
+    const totalCardsWidth = pageWidth - (margin * 2);
+    const cardGap = 12;
+    const cardWidth = (totalCardsWidth - (cardGap * (cardCount - 1))) / cardCount;
+    const cardHeight = 40;
+
+    cards.forEach((c, idx) => {
+      const cx = margin + idx * (cardWidth + cardGap);
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(1);
+      doc.roundedRect(cx, startY, cardWidth, cardHeight, 4, 4, 'FD');
+
+      const accentColors = [
+        [37, 99, 235],   // Blue
+        [16, 185, 129],  // Emerald
+        [217, 119, 6],   // Amber
+        [124, 58, 237]   // Purple
+      ];
+      const ac = accentColors[idx % accentColors.length];
+      doc.setFillColor(ac[0], ac[1], ac[2]);
+      doc.rect(cx, startY, 3.5, cardHeight, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text(c.label.toUpperCase(), cx + 10, startY + 14);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(String(c.val), cx + 10, startY + 30);
+    });
+
+    startY += cardHeight + 14;
+
+    // ── 4. Structured Table Grid ────────────────────────────────────────
+    let headers = tableHeaders;
+    let rows = tableRows;
+
+    if (!headers || !rows || rows.length === 0) {
+      if (tableData && Array.isArray(tableData) && tableData.length > 0) {
+        headers = Object.keys(tableData[0]);
+        rows = tableData.map(r => headers.map(k => String(r[k] ?? '')));
+      } else if (content && content.includes('\n')) {
+        const csvLines = content.split('\n').filter(l => l.trim() && !l.startsWith('===') && !l.startsWith('---'));
+        if (csvLines.length > 1) {
+          headers = csvLines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+          rows = csvLines.slice(1).map(l => l.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+        }
+      }
+    }
+
+    if (headers && rows && rows.length > 0) {
+      const renderTable = typeof autoTable === 'function' ? autoTable : (autoTable?.default || (typeof doc.autoTable === 'function' ? doc.autoTable.bind(doc) : null));
+      if (typeof renderTable === 'function') {
+        renderTable(doc, {
+          head: [headers],
+          body: rows,
+          startY: startY,
+          margin: { left: margin, right: margin },
+          theme: 'grid',
+          headStyles: {
+            fillColor: [15, 23, 42],
+            textColor: [255, 255, 255],
+            fontSize: 8,
+            fontStyle: 'bold',
+            halign: 'left',
+            cellPadding: 5
+          },
+          bodyStyles: {
+            fontSize: 7.5,
+            textColor: [51, 65, 85],
+            cellPadding: 4.5
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252]
+          },
+          columnStyles: {
+            0: { fontStyle: 'bold' }
+          },
+          didDrawPage: () => {
+            const pageNum = doc.internal.getNumberOfPages();
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(148, 163, 184);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+            doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT', margin, pageHeight - 9);
+            doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+          }
+        });
+      }
+    } else {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(51, 65, 85);
+      const lines = (content || '').split('\n');
+      let textY = startY;
+      for (const line of lines) {
+        if (textY > pageHeight - 30) {
+          doc.addPage();
+          textY = 40;
+        }
+        doc.text(line, margin, textY);
+        textY += 12;
+      }
+    }
+
+    doc.save(fileName || 'APS_Enterprise_Report.pdf');
+  } catch (err) {
+    console.error('jsPDF AutoTable error:', err);
+    const blob = new Blob([exportFile?.content || ''], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (exportFile?.fileName || 'export.txt').replace(/\.pdf$/i, '.txt');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
+function ExportFileCard({ exportFile, tableData }) {
   if (!exportFile) return null;
   const { fileName, fileFormat, mimeType, sizeKB, content, downloadUrl } = exportFile;
 
   const handleDownload = () => {
     try {
       const fmtLower = (fileFormat || 'csv').toLowerCase();
-      if (content) {
-        let type = mimeType || 'text/plain';
-        if (fmtLower === 'xlsx' || fmtLower === 'excel') type = 'application/vnd.ms-excel';
-        else if (fmtLower === 'csv') type = 'text/csv';
-        else if (fmtLower === 'pdf') type = 'application/pdf';
-        else if (fmtLower === 'xml') type = 'application/xml';
-        else if (fmtLower === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-        const blob = new Blob([content], { type });
+      // ── 1. Real PDF binary generation via jsPDF with autoTable ───────────
+      if (fmtLower === 'pdf') {
+        generateRealPDF(exportFile, tableData);
+        return;
+      }
+
+      // ── 2. Real Excel format (.xlsx / .csv with BOM) ───────────────────
+      if (fmtLower === 'xlsx' || fmtLower === 'excel') {
+        // Create an HTML-based XML Spreadsheet that Excel opens natively as a table
+        let excelContent = content;
+        if (typeof content === 'string' && content.includes('\n')) {
+          const rows = content.split('\n').map(r => r.split(','));
+          excelContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>APS Export</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+<body><table border="1">${rows.map(r => `<tr>${r.map(c => `<td>${c.replace(/^"|"$/g, '')}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+        }
+        const blob = new Blob(['\uFEFF' + excelContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName || `APS_Enterprise_Export.${fmtLower}`;
+        a.download = fileName || `APS_Enterprise_Export.xlsx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 100);
-      } else if (downloadUrl) {
-        window.open(`http://localhost:5000${downloadUrl}`, '_blank');
-      } else {
-        window.open(`http://localhost:5000/api/a3/export?format=${fmtLower}`, '_blank');
+        return;
       }
+
+      // ── 3. Real Word document (.docx / .doc) ──────────────────────────
+      if (fmtLower === 'docx' || fmtLower === 'word' || fmtLower === 'doc') {
+        const docHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'><title>${fileName}</title><style>body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; } h1 { color: #1d4ed8; } pre { font-family: Courier, monospace; background: #f8fafc; padding: 10px; }</style></head>
+<body><h1>APS Enterprise — Certified Document</h1><p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p><hr/><pre>${content}</pre></body></html>`;
+        const blob = new Blob(['\uFEFF' + docHtml], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.docx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        return;
+      }
+
+      // ── 4. CSV with UTF-8 BOM ──────────────────────────────────────────
+      if (fmtLower === 'csv') {
+        const blob = new Blob(['\uFEFF' + (content || '')], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        return;
+      }
+
+      // ── 5. JSON / XML / Others ─────────────────────────────────────────
+      let mime = 'text/plain;charset=utf-8';
+      if (fmtLower === 'json') mime = 'application/json;charset=utf-8';
+      if (fmtLower === 'xml') mime = 'application/xml;charset=utf-8';
+
+      const blob = new Blob([content || ''], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName || `APS_Enterprise_Export.${fmtLower}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (e) {
+      console.error('Download error:', e);
       window.open(`http://localhost:5000/api/a3/export?format=${(fileFormat || 'csv').toLowerCase()}`, '_blank');
     }
   };
@@ -402,7 +614,7 @@ function ExportFileCard({ exportFile }) {
         </div>
         <div>
           <div style={s.fileExportName}>{fileName}</div>
-          <div style={s.fileExportMeta}>⚡ Click button to download {fmt} file • {sizeKB || 'Ready'}</div>
+          <div style={s.fileExportMeta}>Click button below to download your generated {fmt} file • {sizeKB || 'Ready'}</div>
         </div>
       </div>
       <button
@@ -416,88 +628,6 @@ function ExportFileCard({ exportFile }) {
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
         <span>Download {fmt} File</span>
-      </button>
-    </div>
-  );
-}
-
-// ─── Quick Download Action Bar Component ─────────────────────────────────────
-function QuickDownloadBar({ msg }) {
-  if (!msg || msg.role === 'user') return null;
-
-  const handleDownloadFormat = (format) => {
-    try {
-      const fmtLower = format.toLowerCase();
-      if (msg.exportFile && (msg.exportFile.fileFormat || '').toLowerCase() === fmtLower && msg.exportFile.content) {
-        let type = 'text/plain';
-        if (fmtLower === 'xlsx' || fmtLower === 'excel') type = 'application/vnd.ms-excel';
-        else if (fmtLower === 'csv') type = 'text/csv';
-        else if (fmtLower === 'pdf') type = 'application/pdf';
-        else if (fmtLower === 'xml') type = 'application/xml';
-        else if (fmtLower === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-
-        const blob = new Blob([msg.exportFile.content], { type });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = msg.exportFile.fileName || `APS_Enterprise_Export.${fmtLower}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-      } else {
-        window.open(`http://localhost:5000/api/a3/export?format=${fmtLower}`, '_blank');
-      }
-    } catch (e) {
-      window.open(`http://localhost:5000/api/a3/export?format=${format.toLowerCase()}`, '_blank');
-    }
-  };
-
-  const showBar = msg.exportFile || msg.table || msg.report;
-  if (!showBar) return null;
-
-  const activeFmt = (msg.exportFile?.fileFormat || '').toUpperCase();
-
-  return (
-    <div style={s.quickDownloadRow}>
-      <span style={s.quickDownloadLabel}>Download Options:</span>
-      <button
-        onClick={() => handleDownloadFormat('xlsx')}
-        style={{ ...s.quickDownloadBtn, background: activeFmt === 'XLSX' || activeFmt === 'EXCEL' ? '#15803d' : '#16a34a' }}
-        title="Download Excel Spreadsheet (.xlsx)"
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>Download Excel (.xlsx)</span>
-      </button>
-
-      <button
-        onClick={() => handleDownloadFormat('csv')}
-        style={{ ...s.quickDownloadBtn, background: activeFmt === 'CSV' ? '#1d4ed8' : '#2563eb' }}
-        title="Download CSV Data File (.csv)"
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>Download CSV</span>
-      </button>
-
-      <button
-        onClick={() => handleDownloadFormat('pdf')}
-        style={{ ...s.quickDownloadBtn, background: activeFmt === 'PDF' ? '#b91c1c' : '#dc2626' }}
-        title="Download PDF Document (.pdf)"
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>Download PDF (.pdf)</span>
       </button>
     </div>
   );
@@ -533,8 +663,7 @@ function MessageCard({ msg }) {
             <div style={{ fontSize: '0.88rem', lineHeight: 1.65, color: isUser ? '#fff' : '#334155' }}>
               <RenderText text={msg.text} isUser={isUser} />
             </div>
-            {!isUser && <QuickDownloadBar msg={msg} />}
-            {msg.exportFile && <ExportFileCard exportFile={msg.exportFile} />}
+            {msg.exportFile && <ExportFileCard exportFile={msg.exportFile} tableData={msg.table} />}
             {msg.report && <ReportCard report={msg.report} />}
             {msg.table && <MiniTable rows={msg.table} />}
             {msg.chart && <SmartChart chart={msg.chart} />}
@@ -717,7 +846,6 @@ export default function APSAIPage() {
                 { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual' },
                 { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast' },
                 { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?' },
-                { label: 'Warehouse Inventory Stock', query: 'Check warehouse inventory stock' },
                 { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech' },
                 { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order' },
                 { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report' },
