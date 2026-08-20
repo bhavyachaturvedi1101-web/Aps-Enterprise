@@ -109,28 +109,28 @@ export default function PaymentGate() {
       </div>
 
       {pendingPayments.length > 0 ? (
-        <div style={s.alertBox}>
+        <div style={{ ...s.alertBox, backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
           <div style={s.alertIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           <div>
-            <div style={s.alertTitle}>{pendingPayments.length} payment(s) pending verification</div>
-            <div style={s.alertSub}>
+            <div style={{ ...s.alertTitle, color: '#b45309' }}>{pendingPayments.length} payment(s) pending verification</div>
+            <div style={{ ...s.alertSub, color: '#92400e' }}>
               {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp.
             </div>
           </div>
-          <button onClick={handleSendReminder} disabled={sendingReminder} style={s.alertBtn}>
+          <button onClick={handleSendReminder} disabled={sendingReminder} className="btn-blue-primary" style={s.alertBtn}>
             {sendingReminder ? 'Sending…' : 'Send Reminder'}
           </button>
         </div>
       ) : (
-        <div style={{...s.alertBox, backgroundColor: '#f4f4f5', borderColor: '#e4e4e7'}}>
+        <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
           <div style={s.alertIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style={{...s.alertTitle, color: '#09090b'}}>All payments verified</div>
-            <div style={{...s.alertSub, color: '#52525b'}}>No pending 10% advance payments ledger matches require action.</div>
+            <div style={{...s.alertTitle, color: '#047857'}}>All payments verified</div>
+            <div style={{...s.alertSub, color: '#065f46'}}>No pending 10% advance payments ledger matches require action.</div>
           </div>
         </div>
       )}
@@ -142,7 +142,7 @@ export default function PaymentGate() {
           ))}
         </div>
         {payments.map(pay => (
-          <div key={pay.id} style={s.payRow}>
+          <div key={pay.id} className="table-row-hover" style={s.payRow}>
             <div style={{...s.payLeft, flex: 1}}>
               <div style={s.payId}>{pay.id}</div>
               <div style={s.payLead}>{pay.lead}</div>
@@ -156,12 +156,12 @@ export default function PaymentGate() {
             </div>
             <div style={{...s.payRight, flex: 1}}>
               {pay.status === 'Verified' ? (
-                <div style={{ ...s.verified, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Verified</span>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#047857', fontWeight: 700, fontSize: '0.82rem' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#10b981' }}/>
+                  <span>Verified with Tally</span>
                 </div>
               ) : (
-                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} style={{ ...s.verifyBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} className="btn-blue-primary" style={{ ...s.verifyBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                   <span>{verifying === pay.leadId ? 'Verifying…' : 'Verify with Tally'}</span>
                 </button>
@@ -179,16 +179,15 @@ export default function PaymentGate() {
 
 const s = {
   page: { padding:'2rem', fontFamily:'var(--font-body)' },
-  pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' },
+  pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.25rem' },
   title: { fontSize:'1.8rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#09090b', margin:0 },
   sub: { fontSize:'0.78rem', color:'#71717a', marginTop:4 },
-  tallyBadge: { backgroundColor:'#f4f4f5', color:'#09090b', border:'1px solid #e4e4e7', borderRadius:20, padding:'6px 14px', fontSize:'0.8rem', fontWeight:700 },
-  alertBox: { backgroundColor:'#f4f4f5', border:'1px solid #e4e4e7', borderRadius:14, padding:'1rem 1.25rem', display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.5rem' },
+  alertBox: { border:'1px solid', borderRadius:14, padding:'1rem 1.25rem', display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.25rem' },
   alertIcon: { fontSize:'1.4rem' },
-  alertTitle: { fontWeight:700, color:'#09090b', fontSize:'0.88rem' },
-  alertSub: { fontSize:'0.72rem', color:'#52525b', marginTop:2 },
-  alertBtn: { marginLeft:'auto', padding:'6px 14px', backgroundColor:'#09090b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', flexShrink:0, boxShadow: '0 2px 6px rgba(0,0,0,0.12)' },
-  card: { backgroundColor:'#fff', borderRadius:18, border:'1px solid #e4e4e7', overflow:'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' },
+  alertTitle: { fontWeight:700, fontSize:'0.88rem' },
+  alertSub: { fontSize:'0.72rem', marginTop:2 },
+  alertBtn: { marginLeft:'auto', padding:'6px 14px', backgroundColor:'#2563eb', color:'#fff', border:'none', borderRadius:8, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', flexShrink:0, boxShadow: '0 2px 6px rgba(37,99,235,0.25)' },
+  card: { backgroundColor:'#fff', borderRadius:16, border:'1px solid #e4e4e7', overflow:'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' },
   tableHead: { display:'flex', backgroundColor:'#f8fafc', borderBottom:'1px solid #e4e4e7', padding:'0.65rem 1.25rem', gap:'1.5rem' },
   th: { fontSize:'0.65rem', fontWeight:700, color:'#71717a', textTransform:'uppercase', letterSpacing:'0.5px' },
   payRow: { display:'flex', alignItems:'center', padding:'1.25rem 1.5rem', borderBottom:'1px solid #f4f4f5', gap:'1.5rem' },
@@ -199,9 +198,9 @@ const s = {
   payAmount: { fontSize:'1rem', fontWeight:700, color:'#09090b' },
   payPct: { fontSize:'0.75rem', fontWeight:500, color:'#71717a' },
   payDue: { fontSize:'0.72rem', color:'#71717a' },
-  overdue: { backgroundColor:'#f4f4f5', color:'#09090b', border: '1px solid #e4e4e7', padding:'1px 7px', borderRadius:10, fontWeight:700, marginLeft:6 },
+  overdue: { backgroundColor:'#fef2f2', color:'#ef4444', border: '1px solid #fca5a5', padding:'2px 7px', borderRadius:6, fontWeight:700, marginLeft:6, fontSize:'0.68rem' },
   tallyRef: { fontSize:'0.68rem', fontFamily:'monospace', color:'#52525b', marginTop:2 },
   payRight: { minWidth: 150, textAlign:'right' },
-  verified: { color:'#09090b', fontWeight:700, fontSize:'0.85rem' },
-  verifyBtn: { padding:'8px 16px', backgroundColor:'#09090b', color:'#fff', border:'none', borderRadius:20, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }
+  verified: { color:'#047857', fontWeight:700, fontSize:'0.85rem' },
+  verifyBtn: { padding:'8px 16px', backgroundColor:'#2563eb', color:'#fff', border:'none', borderRadius:8, fontWeight:700, fontSize:'0.78rem', cursor:'pointer', boxShadow: '0 2px 6px rgba(37,99,235,0.25)' }
 };

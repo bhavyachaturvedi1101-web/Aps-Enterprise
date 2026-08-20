@@ -10,14 +10,14 @@
   --text-primary: #09090b;
   --text-secondary: #52525b;
   --text-muted: #71717a;
-  
+
   --font-heading: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
-  
+
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-  --shadow-inset: inset 0 2px 4px 0 rgba(0,0,0,0.02);
+  --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
 }
 
 * {
@@ -40,7 +40,12 @@ body {
   flex-direction: column;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   color: var(--text-primary);
   margin: 0;
@@ -63,4 +68,198 @@ h1, h2, h3, h4, h5, h6 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Professional Transparent Grey Hover & Interactive States                */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+/* Sidebar Navigation Items */
+.sidebar-nav-item {
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.12s ease-out !important;
+}
+
+.sidebar-nav-item:not(.active):hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+  /* Elegant transparent grey hover */
+}
+
+.sidebar-nav-item:not(.active):hover .nav-icon {
+  color: #18181b !important;
+}
+
+.sidebar-nav-item:not(.active):hover .nav-label {
+  color: #09090b !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-nav-item.active:hover {
+  background-color: #18181b !important;
+  /* Slightly lighter tone on active pill hover */
+}
+
+.sidebar-nav-item:active {
+  transform: scale(0.985);
+}
+
+/* Header Strategy/Pipeline/KPI Pills */
+.header-pill-btn {
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.12s ease !important;
+}
+
+.header-pill-btn:not(.active):hover {
+  background-color: rgba(9, 9, 11, 0.06) !important;
+  color: #09090b !important;
+}
+
+.header-pill-btn.active:hover {
+  background-color: #18181b !important;
+}
+
+/* Header Notification Bell & User Card */
+.notif-bell-btn,
+.header-user-card {
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.notif-bell-btn:hover,
+.header-user-card:hover {
+  background-color: rgba(9, 9, 11, 0.04) !important;
+  border-color: #d4d4d8 !important;
+}
+
+/* Dropdown Menu Items */
+.dropdown-menu-item {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.dropdown-menu-item:hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+  color: #09090b !important;
+}
+
+/* Sidebar User Footer & Logout */
+.sidebar-user-card {
+  transition: background-color 0.18s ease, border-color 0.18s ease !important;
+}
+
+.sidebar-user-card:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.sidebar-logout-btn {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.sidebar-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
+/* Table Row & Button Hover for Users & Roles */
+.table-row-hover {
+  transition: background-color 0.15s ease !important;
+}
+
+.table-row-hover:hover {
+  background-color: #f8fafc !important;
+}
+
+.edit-btn-hover {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+}
+
+.edit-btn-hover:hover {
+  background-color: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+}
+
+/* Custom & Native Select Enterprise Styling */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  color: #09090b;
+  font-family: var(--font-body);
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+select:focus {
+  border-color: #09090b;
+  box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.08);
+}
+
+select option {
+  background-color: #ffffff;
+  color: #09090b;
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.custom-select-trigger:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+.custom-select-option {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.custom-select-option:hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+  color: #09090b !important;
+}
+
+/* Primary Blue Action Buttons */
+.btn-blue-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease !important;
+}
+
+.btn-blue-primary:hover {
+  background-color: #1d4ed8 !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+}
+
+.btn-blue-primary:active {
+  transform: scale(0.975);
+}
+
+/* Red Reset Filters Button Only */
+.btn-red-reset {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25) !important;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease !important;
+}
+
+.btn-red-reset:hover {
+  background-color: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important;
+}
+
+.btn-red-reset:active {
+  transform: scale(0.975);
 }

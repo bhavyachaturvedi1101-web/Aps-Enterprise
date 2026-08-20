@@ -1,8 +1,134 @@
 // Team KPIs & Performance Dashboard
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api';
+
+const ROLE_OPTIONS = [
+  { label: 'All Roles', value: 'ALL' },
+  { label: 'Voice / Telecaller', value: 'Voice' },
+  { label: 'System Architect', value: 'Architect' },
+  { label: 'Analytics & Automation Specialist', value: 'Analytics' },
+  { label: 'ERP / Dispatch', value: 'ERP' }
+];
+
+function CustomSelect({ value, options, onChange, minWidth = 160 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOpt = options.find(o => (typeof o === 'object' ? o.value === value : o === value)) || options[0];
+  const selectedLabel = typeof selectedOpt === 'object' ? selectedOpt.label : selectedOpt;
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="custom-select-trigger"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '0.5rem 0.85rem',
+          borderRadius: 8,
+          border: '1px solid #e4e4e7',
+          backgroundColor: '#ffffff',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          color: '#09090b',
+          cursor: 'pointer',
+          fontFamily: 'var(--font-body)',
+          minWidth: minWidth,
+          justifyContent: 'space-between',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <span>{selectedLabel}</span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#71717a"
+          strokeWidth="2.5"
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            right: 0,
+            minWidth: '100%',
+            backgroundColor: '#ffffff',
+            borderRadius: 10,
+            border: '1px solid #e4e4e7',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.12)',
+            zIndex: 1050,
+            padding: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            maxHeight: 220,
+            overflowY: 'auto'
+          }}
+        >
+          {options.map((opt) => {
+            const optVal = typeof opt === 'object' ? opt.value : opt;
+            const optLbl = typeof opt === 'object' ? opt.label : opt;
+            const isSelected = optVal === value;
+            return (
+              <div
+                key={optVal}
+                onClick={() => {
+                  onChange(optVal);
+                  setOpen(false);
+                }}
+                className={`custom-select-option ${isSelected ? 'selected' : ''}`}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? '#ffffff' : '#09090b',
+                  backgroundColor: isSelected ? '#2563eb' : 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.12s ease'
+                }}
+              >
+                <span>{optLbl}</span>
+                {isSelected && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TeamKPIs() {
   const navigate = useNavigate();
@@ -229,7 +355,7 @@ export default function TeamKPIs() {
             </svg>
             Export Report (.CSV)
           </button>
-          <button onClick={() => setShowAddModal(true)} style={s.addBtn}>
+          <button onClick={() => setShowAddModal(true)} className="btn-blue-primary" style={s.addBtn}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -292,10 +418,10 @@ export default function TeamKPIs() {
       <div style={s.tabsContainer}>
         <div style={s.tabsLeft}>
           {[
-            { key: 'leaderboard', label: 'Employee Profiles & Leaderboard', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-            { key: 'timeInStage', label: 'Time-in-Stage & Bottleneck Funnel', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
-            { key: 'comparison', label: 'Side-by-Side KPI Comparison', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-            { key: 'audit', label: 'Live Activity Audit Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> }
+            { key: 'leaderboard', label: 'Employee Profiles & Leaderboard', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg> },
+            { key: 'timeInStage', label: 'Time-in-Stage & Bottleneck Funnel', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg> },
+            { key: 'comparison', label: 'Side-by-Side KPI Comparison', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg> },
+            { key: 'audit', label: 'Live Activity Audit Stream', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg> }
           ].map(tab => (
             <button
               key={tab.key}
@@ -317,17 +443,12 @@ export default function TeamKPIs() {
               onChange={e => setSearchQuery(e.target.value)}
               style={s.searchInput}
             />
-            <select
+            <CustomSelect
               value={roleFilter}
-              onChange={e => setRoleFilter(e.target.value)}
-              style={s.selectFilter}
-            >
-              <option value="ALL">All Roles</option>
-              <option value="Voice">Voice / Telecaller</option>
-              <option value="Architect">System Architect</option>
-              <option value="Analytics">Analytics & Automation Specialist</option>
-              <option value="ERP">ERP / Dispatch</option>
-            </select>
+              options={ROLE_OPTIONS}
+              onChange={setRoleFilter}
+              minWidth={180}
+            />
           </div>
         )}
       </div>
@@ -338,30 +459,45 @@ export default function TeamKPIs() {
           {filteredEmployees.map((emp) => {
             const kpiNum = emp.kpiScoreNum !== undefined ? emp.kpiScoreNum : (parseInt(emp.kpiScore) || 0);
             const isTop = kpiNum === maxKpiScore && maxKpiScore > 0;
+
+            const AVATAR_COLORS = {
+              e1: 'linear-gradient(135deg, #2563eb, #1d4ed8)', // Animesh - Sapphire Blue
+              e2: 'linear-gradient(135deg, #2563eb, #1d4ed8)', // Bhavya - Sapphire Blue
+              e3: 'linear-gradient(135deg, #059669, #047857)', // Aaditya - Emerald Green
+              e4: 'linear-gradient(135deg, #7c3aed, #6d28d9)', // Rohan - Violet
+              e5: 'linear-gradient(135deg, #d97706, #b45309)'  // Pooja - Amber
+            };
+            const avatarBg = isTop ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : (AVATAR_COLORS[emp.id] || 'linear-gradient(135deg, #334155, #0f172a)');
+
             return (
               <div key={emp.id} style={{ ...s.empCard, ...(isTop ? s.empCardTop : {}) }}>
                 {isTop && (
                   <div style={s.topRibbon}>
-                    #1
+                    #1 TOP PERFORMER
                   </div>
                 )}
 
                 <div style={s.empCardHeader}>
                   <div style={s.avatarWrap}>
-                    <div style={s.avatar}>{emp.name.charAt(0)}</div>
-                    <div style={s.statusDot} />
+                    <div style={{ ...s.avatar, background: avatarBg, boxShadow: isTop ? '0 4px 12px rgba(37,99,235,0.3)' : '0 2px 6px rgba(0,0,0,0.1)' }}>
+                      {emp.name.charAt(0)}
+                    </div>
+                    <div style={{ ...s.statusDot, backgroundColor: '#10b981' }} />
                   </div>
                   <div style={s.empInfo}>
-                    <div style={s.empNameRow}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <span style={s.empName}>{emp.name}</span>
-                      <span style={s.empDept}>{emp.department || 'Operations'}</span>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isTop ? '#2563eb' : '#64748b', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: isTop ? '#2563eb' : '#94a3b8' }}/>
+                        {emp.department || 'Operations'}
+                      </span>
                     </div>
                     <div style={s.empRole}>{emp.role}</div>
                     <div style={s.empContact}>{emp.email} • {emp.phone}</div>
                   </div>
-                  <div style={s.kpiBadge}>
-                    <div style={s.kpiBadgeVal}>{emp.kpiScore}</div>
-                    <div style={s.kpiBadgeLbl}>KPI SCORE</div>
+                  <div style={{ ...s.kpiBadge, backgroundColor: isTop ? '#eff6ff' : '#f8fafc', border: isTop ? '1px solid #bfdbfe' : '1px solid #e2e8f0', borderRadius: 12, padding: '8px 12px', textAlign: 'center', flexShrink: 0 }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: isTop ? '#2563eb' : '#09090b', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{emp.kpiScore}</div>
+                    <div style={{ fontSize: '0.58rem', fontWeight: 800, color: isTop ? '#3b82f6' : '#71717a', letterSpacing: '0.5px', marginTop: 3 }}>KPI SCORE</div>
                   </div>
                 </div>
 
@@ -369,9 +505,11 @@ export default function TeamKPIs() {
                 <div style={s.empCardFooter}>
                   <button
                     onClick={() => handleSelectEmployee(emp)}
-                    style={s.viewDetailsBtn}
+                    className="edit-btn-hover"
+                    style={{ ...s.viewDetailsBtn, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   >
-                    View Deep Profile & Assigned Pipeline →
+                    <span>View Deep Profile & Assigned Pipeline</span>
+                    <span style={{ color: '#2563eb', fontWeight: 800 }}>→</span>
                   </button>
                 </div>
               </div>
@@ -384,13 +522,12 @@ export default function TeamKPIs() {
       {/* ── TAB 2: TIME-IN-STAGE & BOTTLENECK FUNNEL ── */}
       {activeTab === 'timeInStage' && (
         <div style={s.tisSection}>
-          {/* Critical Warning Alert Banner */}
           <div style={s.alertBanner}>
             <div style={s.alertIconBox}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 1 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
             <div style={s.alertContent}>
@@ -399,7 +536,7 @@ export default function TeamKPIs() {
                 <span style={s.alertTitle}>Pipeline Dwell Time Exceeds SLA in Confirmed Lead</span>
               </div>
               <div style={s.alertDesc}>
-                Average duration in <strong style={{ color: '#0f172a' }}>Confirmed Lead</strong> is <span style={s.dwellHighlight}>48.5 hours</span> against target SLA of <strong style={{ color: '#0f172a' }}>24.0 hours</strong>. High risk of lead decay awaiting customer 10% advance deposit.
+                Average duration in <strong style={{ color: '#78350f' }}>Confirmed Lead</strong> is <span style={s.dwellHighlight}>48.5 hours</span> against target SLA of <strong style={{ color: '#78350f' }}>24.0 hours</strong>. High risk of lead decay awaiting customer 10% advance deposit.
               </div>
             </div>
             <button
@@ -407,7 +544,7 @@ export default function TeamKPIs() {
               style={s.alertActionBtn}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
               <span>Dispatch Payment Reminder Sequence</span>
             </button>
@@ -444,9 +581,9 @@ export default function TeamKPIs() {
                         }}
                       >
                         {isOverSLA ? (
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                         ) : (
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                         )}
                         <span>{isOverSLA ? 'SLA Breached' : 'Normal'}</span>
                       </span>
@@ -482,456 +619,461 @@ export default function TeamKPIs() {
             </div>
           </div>
 
-          {/* Stalled Deals Table */ }
-  <div style={s.stalledDealsCard}>
-    <h3 style={s.sectionTitle}>High-Risk / Cold Deals Exceeding Stage Thresholds</h3>
-    <p style={s.sectionSub}>Deals at risk of cold-off requiring immediate telecaller outreach or automated WhatsApp sequences</p>
+          {/* Stalled Deals Table */}
+          <div style={s.stalledDealsCard}>
+            <h3 style={s.sectionTitle}>High-Risk / Cold Deals Exceeding Stage Thresholds</h3>
+            <p style={s.sectionSub}>Deals at risk of cold-off requiring immediate telecaller outreach or automated WhatsApp sequences</p>
 
-    <table style={s.table}>
-      <thead>
-        <tr>
-          <th style={s.th}>Lead / Customer</th>
-          <th style={s.th}>Current Stage</th>
-          <th style={s.th}>Hours in Dwell</th>
-          <th style={s.th}>Total Deal Value</th>
-          <th style={s.th}>10% Advance Required</th>
-          <th style={s.th}>Assigned Rep</th>
-          <th style={s.th}>Risk Level</th>
-          <th style={s.th}>Automation Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style={s.td}>
-            <div style={s.dealName}>Global Tech</div>
-            <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
-          </td>
-          <td style={s.td}>
-            <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-              Confirmed Lead
-            </span>
-          </td>
-          <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
-          <td style={s.td}>₹42,000</td>
-          <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
-          <td style={s.td}>Aaditya (Analytics)</td>
-          <td style={s.td}>
-            <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10"/></svg>
-              <span>Critical Stalled</span>
-            </span>
-          </td>
-          <td style={s.td}>
-            <button
-              onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
-              style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Send WhatsApp Reminder</span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+            <table style={s.table}>
+              <thead>
+                <tr>
+                  <th style={s.th}>Lead / Customer</th>
+                  <th style={s.th}>Current Stage</th>
+                  <th style={s.th}>Hours in Dwell</th>
+                  <th style={s.th}>Total Deal Value</th>
+                  <th style={s.th}>10% Advance Required</th>
+                  <th style={s.th}>Assigned Rep</th>
+                  <th style={s.th}>Risk Level</th>
+                  <th style={s.th}>Automation Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={s.td}>
+                    <div style={s.dealName}>Global Tech</div>
+                    <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
+                  </td>
+                  <td style={s.td}>
+                    <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                      Confirmed Lead
+                    </span>
+                  </td>
+                  <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
+                  <td style={s.td}>₹42,000</td>
+                  <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
+                  <td style={s.td}>Aaditya (Analytics)</td>
+                  <td style={s.td}>
+                    <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10" /></svg>
+                      <span>Critical Stalled</span>
+                    </span>
+                  </td>
+                  <td style={s.td}>
+                    <button
+                      onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
+                      style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                      <span>Send WhatsApp Reminder</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div >
       )
-}
+      }
 
-{/* ── TAB 3: SIDE-BY-SIDE KPI COMPARISON ── */ }
-{
-  activeTab === 'comparison' && (
-    <div style={s.comparisonCard}>
-      <div style={s.sectionHeader}>
-        <div>
-          <h3 style={s.sectionTitle}>Employee Metric Comparison & Conversion Matrix</h3>
-          <p style={s.sectionSub}>Cross-functional evaluation across Voice AI, Admin Operations, and Lifecycle Automation</p>
-        </div>
-      </div>
-
-      <table style={s.table}>
-        <thead>
-          <tr>
-            <th style={s.th}>Team Member</th>
-            <th style={s.th}>Role & Department</th>
-            <th style={s.th}>KPI Score</th>
-            <th style={s.th}>Tasks Done</th>
-            <th style={s.th}>Calls (Duration)</th>
-            <th style={s.th}>Closed Deals</th>
-            <th style={s.th}>Revenue Generated</th>
-            <th style={s.th}>Conversion Rate</th>
-            <th style={s.th}>Avg Response Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map(emp => (
-            <tr key={emp.id} style={s.trHover}>
-              <td style={s.td}>
-                <div style={s.tableUserRow}>
-                  <div style={s.tableAvatar}>{emp.name.charAt(0)}</div>
-                  <div>
-                    <div style={s.tableUserName}>{emp.name}</div>
-                    <div style={s.tableUserEmail}>{emp.email}</div>
-                  </div>
-                </div>
-              </td>
-              <td style={s.td}>
-                <div style={s.roleText}>{emp.role}</div>
-                <div style={s.deptText}>{emp.department}</div>
-              </td>
-              <td style={s.td}>
-                <span style={s.kpiScoreChip}>{emp.kpiScore}</span>
-              </td>
-              <td style={s.td}><strong>{emp.tasksCompleted}</strong></td>
-              <td style={s.td}>{emp.callsHandled} ({emp.avgCallDurationSec}s)</td>
-              <td style={{ ...s.td, fontWeight: 700, color: '#10b981' }}>{emp.salesClosed}</td>
-              <td style={{ ...s.td, fontWeight: 700 }}>₹{(emp.totalRevenue || 0).toLocaleString('en-IN')}</td>
-              <td style={s.td}>{emp.conversionRate || '32%'}</td>
-              <td style={s.td}>{emp.avgResponseTimeMin || 4.0} min</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-{/* ── TAB 4: LIVE AUDIT ACTIVITY STREAM ── */ }
-{
-  activeTab === 'audit' && (
-    <div style={s.auditCard}>
-      <div style={s.sectionHeader}>
-        <div>
-          <h3 style={s.sectionTitle}>Central Control Cockpit Audit Action Stream</h3>
-          <p style={s.sectionSub}>Complete chronological log of all operator actions, state transitions, and integration triggers</p>
-        </div>
-        <span style={s.liveChip}>● LIVE SYNC</span>
-      </div>
-
-      <div style={s.auditTimeline}>
-        {activityLogs.map(log => (
-          <div key={log.id} style={s.auditItem}>
-            <div style={s.auditDot} />
-            <div style={s.auditBody}>
-              <div style={s.auditHeaderRow}>
-                <span style={s.auditStaff}>{log.employeeName || 'Staff Operator'}</span>
-                <span style={s.auditActionTag}>{log.action}</span>
-                <span style={s.auditTime}>
-                  {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </span>
-              </div>
-              {log.details && <div style={s.auditDetails}>{log.details}</div>}
-              {log.leadName && (
-                <div style={s.auditLeadBadge}>
-                  Target Record: <strong>{log.leadName}</strong> ({log.leadId})
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-{/* ── MODAL: EMPLOYEE DEEP DRILL-DOWN ── */ }
-{
-  selectedEmployee && (
-    <div style={s.modalOverlay} onClick={() => setSelectedEmployee(null)}>
-      <div style={s.modalContent} onClick={e => e.stopPropagation()}>
-        <div style={s.modalHeader}>
-          <div style={s.modalUserHead}>
-            <div style={s.modalAvatar}>{selectedEmployee.name.charAt(0)}</div>
-            <div>
-              <h2 style={s.modalTitle}>{selectedEmployee.name}</h2>
-              <div style={s.modalSub}>{selectedEmployee.role} • {selectedEmployee.department}</div>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: 2 }}>{selectedEmployee.email} • {selectedEmployee.phone}</div>
-            </div>
-          </div>
-          <button onClick={() => setSelectedEmployee(null)} style={s.closeModalBtn}>✕</button>
-        </div>
-
-        {detailsLoading ? (
-          <div style={s.modalLoading}>Loading drilldown metrics…</div>
-        ) : employeeDetails ? (
-          <div style={s.modalBody}>
-            {/* Metric Strip */}
-            <div style={s.drillStatGrid}>
-              <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.kpiScore}</div>
-                <div style={s.drillLbl}>KPI Score</div>
-              </div>
-              <div style={s.drillStat}>
-                <div style={s.drillVal}>₹{(employeeDetails.metrics.totalAssignedPipelineValue || 0).toLocaleString('en-IN')}</div>
-                <div style={s.drillLbl}>Assigned Pipeline</div>
-              </div>
-              <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.salesClosed}</div>
-                <div style={s.drillLbl}>Closed Deals</div>
-              </div>
-              <div style={s.drillStat}>
-                <div style={s.drillVal}>₹{(selectedEmployee.totalRevenue || 0).toLocaleString('en-IN')}</div>
-                <div style={s.drillLbl}>Total Revenue</div>
-              </div>
-              <div style={s.drillStat}>
-                <div style={{ ...s.drillVal, color: '#09090b' }}>{employeeDetails.metrics.conversionRate}</div>
-                <div style={s.drillLbl}>Conversion Velocity</div>
-              </div>
-            </div>
-
-            {/* Performance Indicators & Conversion Goals */}
-            <div style={s.modalSection}>
-              <h4 style={s.modalSectionTitle}>Target Attainment & Pipeline Goals</h4>
-              
-              <div style={{ marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
-                  <span style={{ color: '#71717a' }}>Target Attainment ({selectedEmployee.salesClosed || 0} / {selectedEmployee.targetSales || 10} Deals)</span>
-                  <span style={{ color: '#09090b', fontWeight: 800 }}>{Math.round(((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%</span>
-                </div>
-                <div style={{ height: 8, backgroundColor: '#f4f4f5', borderRadius: 10, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      borderRadius: 10,
-                      width: `${Math.min(100, ((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%`,
-                      background: '#09090b',
-                      transition: 'width 0.5s ease'
-                    }}
-                  />
-                </div>
-              </div>
-
+      {/* ── TAB 3: SIDE-BY-SIDE KPI COMPARISON ── */}
+      {
+        activeTab === 'comparison' && (
+          <div style={s.comparisonCard}>
+            <div style={s.sectionHeader}>
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
-                  <span style={{ color: '#71717a' }}>Lead Conversion Velocity</span>
-                  <span style={{ color: '#09090b', fontWeight: 800 }}>{selectedEmployee.conversionRate || '34.5%'}</span>
-                </div>
-                <div style={{ height: 8, backgroundColor: '#f4f4f5', borderRadius: 10, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      borderRadius: 10,
-                      width: selectedEmployee.conversionRate || '34.5%',
-                      background: '#27272a',
-                      transition: 'width 0.5s ease'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Call & Response Speed Mini Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1.25rem' }}>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.callsHandled || 0}</div>
-                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Calls Handled ({selectedEmployee.avgCallDurationSec || 90}s avg)</div>
-                </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.tasksCompleted || 0}</div>
-                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Tasks Completed</div>
-                </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: 10, border: '1px solid #e4e4e7', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b' }}>{selectedEmployee.avgResponseTimeMin || 3.2}m</div>
-                  <div style={{ fontSize: '0.66rem', color: '#71717a', fontWeight: 600, marginTop: 2 }}>Avg Response SLA</div>
-                </div>
+                <h3 style={s.sectionTitle}>Employee Metric Comparison & Conversion Matrix</h3>
+                <p style={s.sectionSub}>Cross-functional evaluation across Voice AI, Admin Operations, and Lifecycle Automation</p>
               </div>
             </div>
 
-            {/* 4-Week Performance Trajectory Bar Chart */}
-            {selectedEmployee.weeklyKpiHistory && (
-              <div style={s.modalSection}>
-                <h4 style={s.modalSectionTitle}>4-Week Performance Trajectory</h4>
-                <div style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: '1rem 1.25rem', border: '1px solid #e4e4e7' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: 90, gap: '1.5rem' }}>
-                    {selectedEmployee.weeklyKpiHistory.map((val, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
-                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#09090b', marginBottom: 4 }}>{val}%</span>
-                        <div
-                          style={{
-                            width: '100%',
-                            maxWidth: 36,
-                            height: `${val * 0.7}px`,
-                            background: '#09090b',
-                            borderRadius: '6px 6px 0 0',
-                            transition: 'height 0.4s ease'
-                          }}
-                          title={`Week ${idx + 1}: ${val}%`}
-                        />
-                        <span style={{ fontSize: '0.68rem', color: '#71717a', fontWeight: 700, marginTop: 6 }}>Week {idx + 1}</span>
+            <table style={s.table}>
+              <thead>
+                <tr>
+                  <th style={s.th}>Team Member</th>
+                  <th style={s.th}>Role & Department</th>
+                  <th style={s.th}>KPI Score</th>
+                  <th style={s.th}>Tasks Done</th>
+                  <th style={s.th}>Calls (Duration)</th>
+                  <th style={s.th}>Closed Deals</th>
+                  <th style={s.th}>Revenue Generated</th>
+                  <th style={s.th}>Conversion Rate</th>
+                  <th style={s.th}>Avg Response Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map(emp => (
+                  <tr key={emp.id} style={s.trHover}>
+                    <td style={s.td}>
+                      <div style={s.tableUserRow}>
+                        <div style={s.tableAvatar}>{emp.name.charAt(0)}</div>
+                        <div>
+                          <div style={s.tableUserName}>{emp.name}</div>
+                          <div style={s.tableUserEmail}>{emp.email}</div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+                    </td>
+                    <td style={s.td}>
+                      <div style={s.roleText}>{emp.role}</div>
+                      <div style={s.deptText}>{emp.department}</div>
+                    </td>
+                    <td style={s.td}>
+                      <span style={s.kpiScoreChip}>{emp.kpiScore}</span>
+                    </td>
+                    <td style={s.td}><strong>{emp.tasksCompleted}</strong></td>
+                    <td style={s.td}>{emp.callsHandled} ({emp.avgCallDurationSec}s)</td>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#10b981' }}>{emp.salesClosed}</td>
+                    <td style={{ ...s.td, fontWeight: 700 }}>₹{(emp.totalRevenue || 0).toLocaleString('en-IN')}</td>
+                    <td style={s.td}>{emp.conversionRate || '32%'}</td>
+                    <td style={s.td}>{emp.avgResponseTimeMin || 4.0} min</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
 
-            {/* Assigned Pipeline Deals */}
-            <div style={s.modalSection}>
-              <h4 style={s.modalSectionTitle}>Assigned Active Pipeline Deals</h4>
-              {employeeDetails.metrics.pipelineDeals?.length > 0 ? (
-                <div style={s.dealsList}>
-                  {employeeDetails.metrics.pipelineDeals.map(d => (
-                    <div key={d.id} style={s.dealItemRow}>
-                      <div>
-                        <div style={s.dealItemName}>{d.name} ({d.id})</div>
-                        <div style={s.dealItemSub}>{d.company || 'Direct Buyer'} • ₹{parseFloat(d.budget).toLocaleString('en-IN')}</div>
-                      </div>
-                      <span style={{ ...s.badge, background: '#f1f5f9', color: '#0f172a', fontWeight: 700 }}>
-                        Stage: {d.stage}
+      {/* ── TAB 4: LIVE AUDIT ACTIVITY STREAM ── */}
+      {
+        activeTab === 'audit' && (
+          <div style={s.auditCard}>
+            <div style={s.sectionHeader}>
+              <div>
+                <h3 style={s.sectionTitle}>Central Control Cockpit Audit Action Stream</h3>
+                <p style={s.sectionSub}>Complete chronological log of all operator actions, state transitions, and integration triggers</p>
+              </div>
+              <span style={s.liveChip}>● LIVE SYNC</span>
+            </div>
+
+            <div style={s.auditTimeline}>
+              {activityLogs.map(log => (
+                <div key={log.id} style={s.auditItem}>
+                  <div style={s.auditDot} />
+                  <div style={s.auditBody}>
+                    <div style={s.auditHeaderRow}>
+                      <span style={s.auditStaff}>{log.employeeName || 'Staff Operator'}</span>
+                      <span style={s.auditActionTag}>{log.action}</span>
+                      <span style={s.auditTime}>
+                        {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={s.emptyDeals}>No currently open deals assigned.</div>
-              )}
-            </div>
-
-            {/* Recent Operator Actions */}
-            <div style={s.modalSection}>
-              <h4 style={s.modalSectionTitle}>Recent Actions in Operating Layer</h4>
-              <div style={s.miniAuditList}>
-                {employeeDetails.activityLogs?.map(log => (
-                  <div key={log.id} style={s.miniAuditItem}>
-                    <span style={s.miniAuditAction}>{log.action}</span>
-                    <span style={s.miniAuditTime}>
-                      {new Date(log.createdAt).toLocaleTimeString()}
-                    </span>
+                    {log.details && <div style={s.auditDetails}>{log.details}</div>}
+                    {log.leadName && (
+                      <div style={s.auditLeadBadge}>
+                        Target Record: <strong>{log.leadName}</strong> ({log.leadId})
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* ── MODAL: EMPLOYEE DEEP DRILL-DOWN ── */}
+      {
+        selectedEmployee && (
+          <div style={s.modalOverlay} onClick={() => setSelectedEmployee(null)}>
+            <div style={s.modalContent} onClick={e => e.stopPropagation()}>
+              <div style={s.modalHeader}>
+                <div style={s.modalUserHead}>
+                  <div style={{ ...s.modalAvatar, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)', color: '#ffffff' }}>
+                    {selectedEmployee.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 style={s.modalTitle}>{selectedEmployee.name}</h2>
+                    <div style={s.modalSub}>{selectedEmployee.role} • <span style={{ color: '#2563eb', fontWeight: 700 }}>{selectedEmployee.department}</span></div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 2 }}>{selectedEmployee.email} • {selectedEmployee.phone}</div>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedEmployee(null)} style={s.closeModalBtn}>✕</button>
               </div>
+
+              {detailsLoading ? (
+                <div style={s.modalLoading}>Loading drilldown metrics…</div>
+              ) : employeeDetails ? (
+                <div style={s.modalBody}>
+                  {/* Metric Strip */}
+                  <div style={s.drillStatGrid}>
+                    <div style={{ ...s.drillStat, backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }}>
+                      <div style={{ ...s.drillVal, color: '#2563eb' }}>{employeeDetails.metrics.kpiScore}</div>
+                      <div style={{ ...s.drillLbl, color: '#3b82f6' }}>KPI Score</div>
+                    </div>
+                    <div style={{ ...s.drillStat, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' }}>
+                      <div style={{ ...s.drillVal, color: '#059669' }}>₹{(employeeDetails.metrics.totalAssignedPipelineValue || 0).toLocaleString('en-IN')}</div>
+                      <div style={{ ...s.drillLbl, color: '#10b981' }}>Assigned Pipeline</div>
+                    </div>
+                    <div style={{ ...s.drillStat, backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }}>
+                      <div style={{ ...s.drillVal, color: '#7c3aed' }}>{employeeDetails.metrics.salesClosed}</div>
+                      <div style={{ ...s.drillLbl, color: '#a855f7' }}>Closed Deals</div>
+                    </div>
+                    <div style={{ ...s.drillStat, backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
+                      <div style={{ ...s.drillVal, color: '#d97706' }}>₹{(selectedEmployee.totalRevenue || 0).toLocaleString('en-IN')}</div>
+                      <div style={{ ...s.drillLbl, color: '#f59e0b' }}>Total Revenue</div>
+                    </div>
+                    <div style={{ ...s.drillStat, backgroundColor: '#ecfeff', borderColor: '#a5f3fc' }}>
+                      <div style={{ ...s.drillVal, color: '#0891b2' }}>{employeeDetails.metrics.conversionRate}</div>
+                      <div style={{ ...s.drillLbl, color: '#06b6d4' }}>Conversion Velocity</div>
+                    </div>
+                  </div>
+
+                  {/* Performance Indicators & Conversion Goals */}
+                  <div style={s.modalSection}>
+                    <h4 style={s.modalSectionTitle}>Target Attainment & Pipeline Goals</h4>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
+                        <span style={{ color: '#64748b' }}>Target Attainment ({selectedEmployee.salesClosed || 0} / {selectedEmployee.targetSales || 10} Deals)</span>
+                        <span style={{ color: '#2563eb', fontWeight: 800 }}>{Math.round(((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%</span>
+                      </div>
+                      <div style={{ height: 8, backgroundColor: '#eff6ff', borderRadius: 10, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            borderRadius: 10,
+                            width: `${Math.min(100, ((selectedEmployee.salesClosed || 0) / (selectedEmployee.targetSales || 10)) * 100)}%`,
+                            background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
+                            boxShadow: '0 2px 6px rgba(37,99,235,0.3)',
+                            transition: 'width 0.5s ease'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, marginBottom: 6 }}>
+                        <span style={{ color: '#64748b' }}>Lead Conversion Velocity</span>
+                        <span style={{ color: '#047857', fontWeight: 800 }}>{selectedEmployee.conversionRate || '34.5%'}</span>
+                      </div>
+                      <div style={{ height: 8, backgroundColor: '#ecfdf5', borderRadius: 10, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            borderRadius: 10,
+                            width: selectedEmployee.conversionRate || '34.5%',
+                            background: 'linear-gradient(90deg, #34d399, #059669)',
+                            boxShadow: '0 2px 6px rgba(16,185,129,0.3)',
+                            transition: 'width 0.5s ease'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Call & Response Speed Mini Stats */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1.25rem' }}>
+                      <div style={{ backgroundColor: '#eff6ff', padding: '0.75rem', borderRadius: 10, border: '1px solid #bfdbfe', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#2563eb' }}>{selectedEmployee.callsHandled || 0}</div>
+                        <div style={{ fontSize: '0.66rem', color: '#1d4ed8', fontWeight: 700, marginTop: 2 }}>Calls Handled ({selectedEmployee.avgCallDurationSec || 90}s avg)</div>
+                      </div>
+                      <div style={{ backgroundColor: '#ecfdf5', padding: '0.75rem', borderRadius: 10, border: '1px solid #a7f3d0', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#059669' }}>{selectedEmployee.tasksCompleted || 0}</div>
+                        <div style={{ fontSize: '0.66rem', color: '#047857', fontWeight: 700, marginTop: 2 }}>Tasks Completed</div>
+                      </div>
+                      <div style={{ backgroundColor: '#fffbeb', padding: '0.75rem', borderRadius: 10, border: '1px solid #fde68a', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#d97706' }}>{selectedEmployee.avgResponseTimeMin || 3.2}m</div>
+                        <div style={{ fontSize: '0.66rem', color: '#b45309', fontWeight: 700, marginTop: 2 }}>Avg Response SLA</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4-Week Performance Trajectory Bar Chart */}
+                  {selectedEmployee.weeklyKpiHistory && (
+                    <div style={s.modalSection}>
+                      <h4 style={s.modalSectionTitle}>4-Week Performance Trajectory</h4>
+                      <div style={{ backgroundColor: '#ffffff', borderRadius: 14, padding: '1rem 1.25rem', border: '1px solid #e4e4e7', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: 90, gap: '1.5rem' }}>
+                          {selectedEmployee.weeklyKpiHistory.map((val, idx) => (
+                            <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#2563eb', marginBottom: 4 }}>{val}%</span>
+                              <div
+                                style={{
+                                  width: '100%',
+                                  maxWidth: 36,
+                                  height: `${val * 0.7}px`,
+                                  background: 'linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%)',
+                                  borderRadius: '6px 6px 0 0',
+                                  boxShadow: '0 4px 10px rgba(37,99,235,0.25)',
+                                  transition: 'height 0.4s ease'
+                                }}
+                                title={`Week ${idx + 1}: ${val}%`}
+                              />
+                              <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 700, marginTop: 6 }}>Week {idx + 1}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Assigned Pipeline Deals */}
+                  <div style={s.modalSection}>
+                    <h4 style={s.modalSectionTitle}>Assigned Active Pipeline Deals</h4>
+                    {employeeDetails.metrics.pipelineDeals?.length > 0 ? (
+                      <div style={s.dealsList}>
+                        {employeeDetails.metrics.pipelineDeals.map(d => (
+                          <div key={d.id} style={s.dealItemRow}>
+                            <div>
+                              <div style={s.dealItemName}>{d.name} ({d.id})</div>
+                              <div style={s.dealItemSub}>{d.company || 'Direct Buyer'} • ₹{parseFloat(d.budget).toLocaleString('en-IN')}</div>
+                            </div>
+                            <span style={{ ...s.badge, background: '#f1f5f9', color: '#0f172a', fontWeight: 700 }}>
+                              Stage: {d.stage}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={s.emptyDeals}>No currently open deals assigned.</div>
+                    )}
+                  </div>
+
+                  {/* Recent Operator Actions */}
+                  <div style={s.modalSection}>
+                    <h4 style={s.modalSectionTitle}>Recent Actions in Operating Layer</h4>
+                    <div style={s.miniAuditList}>
+                      {employeeDetails.activityLogs?.map(log => (
+                        <div key={log.id} style={s.miniAuditItem}>
+                          <span style={s.miniAuditAction}>{log.action}</span>
+                          <span style={s.miniAuditTime}>
+                            {new Date(log.createdAt).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Modal Footer Actions */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteEmployee(selectedEmployee.id, selectedEmployee.name, e)}
+                      style={{ padding: '8px 16px', backgroundColor: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                      <span>Delete / Remove Member</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedEmployee(null)}
+                      style={s.cancelBtn}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
             </div>
+          </div>
+        )
+      }
 
-            {/* Modal Footer Actions */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
-              <button
-                type="button"
-                onClick={(e) => handleDeleteEmployee(selectedEmployee.id, selectedEmployee.name, e)}
-                style={{ padding: '8px 16px', backgroundColor: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                <span>Delete / Remove Member</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedEmployee(null)}
-                style={s.cancelBtn}
-              >
-                Close
-              </button>
+
+      {/* ── MODAL: ADD TEAM MEMBER ── */}
+      {
+        showAddModal && (
+          <div style={s.modalOverlay} onClick={() => setShowAddModal(false)}>
+            <div style={s.modalContentSmall} onClick={e => e.stopPropagation()}>
+              <div style={s.modalHeader}>
+                <h3 style={s.modalTitle}>Provision New Team Member</h3>
+                <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
+              </div>
+              <form onSubmit={handleCreateMember} style={s.form}>
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Vikram Singhal"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    style={s.formInput}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Corporate Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. vikram@aps-enterprise.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    style={s.formInput}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Phone Number</label>
+                  <input
+                    type="text"
+                    placeholder="+91 98000 11223"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    style={s.formInput}
+                  />
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Role Assignment</label>
+                  <select
+                    value={formData.role}
+                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                    style={s.formSelect}
+                  >
+                    <option value="Voice Operations Specialist">Voice Operations Specialist</option>
+                    <option value="Admin Cockpit Operator">Admin Cockpit Operator</option>
+                    <option value="Performance & Analytics Specialist">Performance & Analytics Specialist</option>
+                    <option value="WhatsApp Automation Lead">WhatsApp Automation Lead</option>
+                    <option value="Inside Sales & Telecaller">Inside Sales & Telecaller</option>
+                    <option value="ERP & Factory Dispatch Officer">ERP & Factory Dispatch Officer</option>
+                  </select>
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.formLabel}>Department</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Customer Success / Sales"
+                    value={formData.department}
+
+                    onChange={e => setFormData({ ...formData, department: e.target.value })}
+                    style={s.formInput}
+                  />
+                </div>
+
+                <div style={s.formActions}>
+                  <button type="button" onClick={() => setShowAddModal(false)} style={s.cancelBtn}>
+                    Cancel
+                  </button>
+                  <button type="submit" style={s.submitBtn}>
+                    Save & Provision Member
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        ) : null}
-
-      </div>
+        )}
     </div>
-  )
-}
-
-
-{/* ── MODAL: ADD TEAM MEMBER ── */ }
-{
-  showAddModal && (
-    <div style={s.modalOverlay} onClick={() => setShowAddModal(false)}>
-      <div style={s.modalContentSmall} onClick={e => e.stopPropagation()}>
-        <div style={s.modalHeader}>
-          <h3 style={s.modalTitle}>Provision New Team Member</h3>
-          <button onClick={() => setShowAddModal(false)} style={s.closeModalBtn}>✕</button>
-        </div>
-        <form onSubmit={handleCreateMember} style={s.form}>
-          <div style={s.formGroup}>
-            <label style={s.formLabel}>Full Name</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Vikram Singhal"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              style={s.formInput}
-            />
-          </div>
-
-          <div style={s.formGroup}>
-            <label style={s.formLabel}>Corporate Email</label>
-            <input
-              type="email"
-              required
-              placeholder="e.g. vikram@aps-enterprise.com"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              style={s.formInput}
-            />
-          </div>
-
-          <div style={s.formGroup}>
-            <label style={s.formLabel}>Phone Number</label>
-            <input
-              type="text"
-              placeholder="+91 98000 11223"
-              value={formData.phone}
-              onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              style={s.formInput}
-            />
-          </div>
-
-          <div style={s.formGroup}>
-            <label style={s.formLabel}>Role Assignment</label>
-            <select
-              value={formData.role}
-              onChange={e => setFormData({ ...formData, role: e.target.value })}
-              style={s.formSelect}
-            >
-              <option value="Voice Operations Specialist">Voice Operations Specialist</option>
-              <option value="Admin Cockpit Operator">Admin Cockpit Operator</option>
-              <option value="Performance & Analytics Specialist">Performance & Analytics Specialist</option>
-              <option value="WhatsApp Automation Lead">WhatsApp Automation Lead</option>
-              <option value="Inside Sales & Telecaller">Inside Sales & Telecaller</option>
-              <option value="ERP & Factory Dispatch Officer">ERP & Factory Dispatch Officer</option>
-            </select>
-          </div>
-
-          <div style={s.formGroup}>
-            <label style={s.formLabel}>Department</label>
-            <input
-              type="text"
-              placeholder="e.g. Customer Success / Sales"
-              value={formData.department}
-
-              onChange={e => setFormData({ ...formData, department: e.target.value })}
-              style={s.formInput}
-            />
-          </div>
-
-          <div style={s.formActions}>
-            <button type="button" onClick={() => setShowAddModal(false)} style={s.cancelBtn}>
-              Cancel
-            </button>
-            <button type="submit" style={s.submitBtn}>
-              Save & Provision Member
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )}
-</div>
-);
+  );
 }
 
 // ─── STYLES ───────────────────────────────────────────────────────────────────
 const s = {
-        page: {
-        padding: '2rem 2.5rem',
-      fontFamily: 'var(--font-body)',
-      maxWidth: 1440,
-      margin: '0 auto'
+  page: {
+    padding: '2rem 2.5rem',
+    fontFamily: 'var(--font-body)',
+    maxWidth: 1440,
+    margin: '0 auto'
   },
-      centerContainer: {
-        padding: '6rem 2rem',
-      textAlign: 'center',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '1rem'
+  centerContainer: {
+    padding: '6rem 2rem',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '1rem'
   },
   spinner: {
     width: 38,
@@ -984,408 +1126,408 @@ const s = {
   },
   title: {
     fontSize: '1.85rem',
-      fontWeight: 800,
-      fontFamily: 'var(--font-heading)',
-      color: '#08060d',
-      letterSpacing: '-0.5px',
-      margin: 0
+    fontWeight: 800,
+    fontFamily: 'var(--font-heading)',
+    color: '#08060d',
+    letterSpacing: '-0.5px',
+    margin: 0
   },
-      subtitle: {
-        fontSize: '0.82rem',
-      color: '#64748b',
-      marginTop: 4,
-      maxWidth: 680
+  subtitle: {
+    fontSize: '0.82rem',
+    color: '#64748b',
+    marginTop: 4,
+    maxWidth: 680
   },
-      headerActions: {
-        display: 'flex',
-      gap: '0.75rem',
-      alignItems: 'center'
+  headerActions: {
+    display: 'flex',
+    gap: '0.75rem',
+    alignItems: 'center'
   },
-      exportBtn: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      padding: '8px 16px',
-      backgroundColor: '#fff',
-      color: '#0f172a',
-      border: '1px solid #e2e8f0',
-      borderRadius: 10,
-      fontSize: '0.82rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-      transition: 'all 0.15s'
+  exportBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 16px',
+    backgroundColor: '#fff',
+    color: '#0f172a',
+    border: '1px solid #e2e8f0',
+    borderRadius: 10,
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    transition: 'all 0.15s'
   },
-      addBtn: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      padding: '8px 18px',
-      backgroundColor: '#08060d',
-      color: '#fff',
-      border: 'none',
-      borderRadius: 10,
-      fontSize: '0.82rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+  addBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 18px',
+    backgroundColor: '#08060d',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 10,
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
   },
-      kpiGrid: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-      gap: '1.25rem',
-      marginBottom: '2rem'
+  kpiGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: '1.25rem',
+    marginBottom: '2rem'
   },
-      kpiCard: {
-        backgroundColor: '#fff',
-      borderRadius: 16,
-      padding: '1.35rem',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+  kpiCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: '1.35rem',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
   },
-      kpiTop: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '0.75rem'
+  kpiTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '0.75rem'
   },
-      kpiLabel: {
-        fontSize: '0.75rem',
-      fontWeight: 700,
-      color: '#64748b',
-      textTransform: 'uppercase',
-      letterSpacing: '0.5px'
+  kpiLabel: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
   },
-      kpiIconWrap: {
-        width: 32,
-      height: 32,
-      borderRadius: 8,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '1rem'
+  kpiIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1rem'
   },
-      kpiValueRow: {
-        display: 'flex',
-      alignItems: 'baseline',
-      gap: '0.6rem',
-      marginBottom: '0.35rem'
+  kpiValueRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '0.6rem',
+    marginBottom: '0.35rem'
   },
-      kpiMainValue: {
-        fontSize: '1.75rem',
-      fontWeight: 800,
-      fontFamily: 'var(--font-heading)',
-      color: '#08060d',
-      letterSpacing: '-0.5px'
+  kpiMainValue: {
+    fontSize: '1.75rem',
+    fontWeight: 800,
+    fontFamily: 'var(--font-heading)',
+    color: '#08060d',
+    letterSpacing: '-0.5px'
   },
-      kpiTrendBadge: {
-        fontSize: '0.68rem',
-      fontWeight: 700,
-      padding: '2px 8px',
-      borderRadius: 20,
-      backgroundColor: '#f4f4f5',
-      color: '#09090b'
+  kpiTrendBadge: {
+    fontSize: '0.68rem',
+    fontWeight: 700,
+    padding: '2px 8px',
+    borderRadius: 20,
+    backgroundColor: '#f4f4f5',
+    color: '#09090b'
   },
-      kpiSubTag: {
-        fontSize: '0.72rem',
-      fontWeight: 600,
-      color: '#71717a'
+  kpiSubTag: {
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    color: '#71717a'
   },
-      kpiSub: {
-        fontSize: '0.7rem',
-      color: '#71717a'
+  kpiSub: {
+    fontSize: '0.7rem',
+    color: '#71717a'
   },
-      tabsContainer: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderBottom: '1px solid #e4e4e7',
-      marginBottom: '1.75rem',
-      gap: '1rem',
-      flexWrap: 'wrap'
+  tabsContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid #e4e4e7',
+    marginBottom: '1.75rem',
+    gap: '1rem',
+    flexWrap: 'wrap'
   },
-      tabsLeft: {
-        display: 'flex',
-      gap: '0.5rem'
+  tabsLeft: {
+    display: 'flex',
+    gap: '0.5rem'
   },
-      tabActive: {
-        padding: '10px 18px',
-      border: 'none',
-      background: 'none',
-      fontSize: '0.85rem',
-      fontWeight: 800,
-      color: '#09090b',
-      borderBottom: '2.5px solid #09090b',
-      cursor: 'pointer'
+  tabActive: {
+    padding: '10px 18px',
+    border: 'none',
+    background: 'none',
+    fontSize: '0.85rem',
+    fontWeight: 800,
+    color: '#2563eb',
+    borderBottom: '2.5px solid #2563eb',
+    cursor: 'pointer'
   },
-      tabInactive: {
-        padding: '10px 18px',
-      border: 'none',
-      background: 'none',
-      fontSize: '0.85rem',
-      fontWeight: 600,
-      color: '#71717a',
-      borderBottom: '2.5px solid transparent',
-      cursor: 'pointer'
+  tabInactive: {
+    padding: '10px 18px',
+    border: 'none',
+    background: 'none',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    color: '#71717a',
+    borderBottom: '2.5px solid transparent',
+    cursor: 'pointer'
   },
-      filtersRight: {
-        display: 'flex',
-      gap: '0.6rem',
-      alignItems: 'center'
+  filtersRight: {
+    display: 'flex',
+    gap: '0.6rem',
+    alignItems: 'center'
   },
-      searchInput: {
-        padding: '7px 14px',
-      borderRadius: 8,
-      border: '1px solid #e4e4e7',
-      fontSize: '0.78rem',
-      width: 200,
-      outline: 'none',
-      backgroundColor: '#fff',
-      color: '#09090b'
+  searchInput: {
+    padding: '7px 14px',
+    borderRadius: 8,
+    border: '1px solid #e4e4e7',
+    fontSize: '0.78rem',
+    width: 200,
+    outline: 'none',
+    backgroundColor: '#fff',
+    color: '#09090b'
   },
-      selectFilter: {
-        padding: '7px 12px',
-      borderRadius: 8,
-      border: '1px solid #e4e4e7',
-      fontSize: '0.78rem',
-      backgroundColor: '#fff',
-      color: '#09090b',
-      outline: 'none',
-      cursor: 'pointer'
+  selectFilter: {
+    padding: '7px 12px',
+    borderRadius: 8,
+    border: '1px solid #e4e4e7',
+    fontSize: '0.78rem',
+    backgroundColor: '#fff',
+    color: '#09090b',
+    outline: 'none',
+    cursor: 'pointer'
   },
-      employeeGrid: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-      gap: '1.5rem'
+  employeeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+    gap: '1.5rem'
   },
-      empCard: {
-        backgroundColor: '#fff',
-      borderRadius: 18,
-      padding: '1.25rem 1.4rem',
-      border: '1px solid #e4e4e7',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column'
+  empCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: '1.25rem 1.4rem',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column'
   },
-      empCardTop: {
-        border: '1.5px solid #09090b',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
+  empCardTop: {
+    border: '1.5px solid #2563eb',
+    boxShadow: '0 4px 16px rgba(37,99,235,0.12)'
   },
-      topRibbon: {
-        position: 'absolute',
-        top: -10,
-        left: 20,
-        backgroundColor: '#09090b',
-        color: '#fff',
-        fontSize: '0.72rem',
-        fontWeight: 800,
-        padding: '2px 10px',
-        borderRadius: 14,
-        boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-        letterSpacing: '0.5px'
-      },
-      empCardHeader: {
+  topRibbon: {
+    position: 'absolute',
+    top: -10,
+    left: 20,
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    fontSize: '0.72rem',
+    fontWeight: 800,
+    padding: '2px 10px',
+    borderRadius: 14,
+    boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+    letterSpacing: '0.5px'
+  },
+  empCardHeader: {
     display: 'flex',
     alignItems: 'center',
     gap: '0.85rem',
     marginBottom: '0.85rem'
   },
+  avatarWrap: {
+    position: 'relative'
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    fontWeight: 800,
+    fontSize: '1.2rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)'
+  },
+  statusDot: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 11,
+    height: 11,
+    borderRadius: '50%',
+    backgroundColor: '#09090b',
+    border: '2px solid #fff'
+  },
+  empInfo: {
+    flex: 1,
+    minWidth: 0
+  },
+  empNameRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  },
+  empName: {
+    fontSize: '1.05rem',
+    fontWeight: 800,
+    fontFamily: 'var(--font-heading)',
+    color: '#09090b'
+  },
+  empDept: {
+    fontSize: '0.62rem',
+    fontWeight: 700,
+    padding: '1px 6px',
+    borderRadius: 10,
+    backgroundColor: '#f4f4f5',
+    color: '#09090b'
+  },
+  empRole: {
+    fontSize: '0.74rem',
+    color: '#52525b',
+    fontWeight: 600,
+    marginTop: 2
+  },
+  empContact: {
+    fontSize: '0.66rem',
+    color: '#71717a',
+    marginTop: 2
+  },
+  kpiBadge: {
+    textAlign: 'center',
+    backgroundColor: '#f4f4f5',
+    border: '1px solid #e4e4e7',
+    padding: '6px 12px',
+    borderRadius: 12
+  },
+  kpiBadgeVal: {
+    fontSize: '1.3rem',
+    fontWeight: 800,
+    color: '#09090b',
+    fontFamily: 'var(--font-heading)'
+  },
+  kpiBadgeLbl: {
+    fontSize: '0.55rem',
+    fontWeight: 800,
+    color: '#71717a',
+    letterSpacing: '0.5px'
+  },
+  deleteEmpBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '3px 8px',
+    backgroundColor: '#f4f4f5',
+    border: '1px solid #e4e4e7',
+    borderRadius: 6,
+    color: '#71717a',
+    fontSize: '0.66rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.15s'
+  },
 
-      avatarWrap: {
-        position: 'relative'
+  statBoxesRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '0.5rem',
+    marginBottom: '1.25rem'
   },
-      avatar: {
-        width: 48,
-      height: 48,
-      borderRadius: 14,
-      backgroundColor: '#09090b',
-      color: '#fff',
-      fontWeight: 800,
-      fontSize: '1.2rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: 0
+  statBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 10,
+    padding: '0.6rem 0.4rem',
+    textAlign: 'center',
+    border: '1px solid #e4e4e7'
   },
-      statusDot: {
-        position: 'absolute',
-      bottom: -2,
-      right: -2,
-      width: 11,
-      height: 11,
-      borderRadius: '50%',
-      backgroundColor: '#09090b',
-      border: '2px solid #fff'
+  statBoxVal: {
+    fontSize: '0.95rem',
+    fontWeight: 800,
+    color: '#09090b'
   },
-      empInfo: {
-        flex: 1,
-      minWidth: 0
+  statBoxLbl: {
+    fontSize: '0.6rem',
+    color: '#71717a',
+    fontWeight: 600,
+    marginTop: 2
   },
-      empNameRow: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem'
+  progressSection: {
+    marginBottom: '0.85rem'
   },
-      empName: {
-        fontSize: '1.05rem',
-      fontWeight: 800,
-      fontFamily: 'var(--font-heading)',
-      color: '#09090b'
+  progressRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    marginBottom: 4
   },
-      empDept: {
-        fontSize: '0.62rem',
-      fontWeight: 700,
-      padding: '1px 6px',
-      borderRadius: 10,
-      backgroundColor: '#f4f4f5',
-      color: '#09090b'
+  progLabel: {
+    color: '#71717a'
   },
-      empRole: {
-        fontSize: '0.74rem',
-      color: '#52525b',
-      fontWeight: 600,
-      marginTop: 2
+  progVal: {
+    color: '#09090b',
+    fontWeight: 800
   },
-      empContact: {
-        fontSize: '0.66rem',
-      color: '#71717a',
-      marginTop: 2
+  progressBarBg: {
+    height: 6,
+    backgroundColor: '#f4f4f5',
+    borderRadius: 10,
+    overflow: 'hidden'
   },
-      kpiBadge: {
-        textAlign: 'center',
-      backgroundColor: '#f4f4f5',
-      border: '1px solid #e4e4e7',
-      padding: '6px 12px',
-      borderRadius: 12
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 10,
+    backgroundColor: '#09090b',
+    transition: 'width 0.5s ease'
   },
-      kpiBadgeVal: {
-        fontSize: '1.3rem',
-      fontWeight: 800,
-      color: '#09090b',
-      fontFamily: 'var(--font-heading)'
+  trendBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: '0.75rem 1rem',
+    marginTop: '0.5rem',
+    marginBottom: '1rem',
+    border: '1px solid #e4e4e7'
   },
-      kpiBadgeLbl: {
-        fontSize: '0.55rem',
-      fontWeight: 800,
-      color: '#71717a',
-      letterSpacing: '0.5px'
+  trendLabel: {
+    fontSize: '0.65rem',
+    fontWeight: 700,
+    color: '#71717a',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '0.5rem'
   },
-      deleteEmpBtn: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: 4,
-      padding: '3px 8px',
-      backgroundColor: '#f4f4f5',
-      border: '1px solid #e4e4e7',
-      borderRadius: 6,
-      color: '#71717a',
-      fontSize: '0.66rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      transition: 'all 0.15s'
+  sparkBars: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: '1rem',
+    height: 44
   },
-
-      statBoxesRow: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '0.5rem',
-      marginBottom: '1.25rem'
+  sparkBarCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    flex: 1
   },
-      statBox: {
-        backgroundColor: '#f8fafc',
-      borderRadius: 10,
-      padding: '0.6rem 0.4rem',
-      textAlign: 'center',
-      border: '1px solid #e4e4e7'
+  sparkBar: {
+    width: '100%',
+    maxWidth: 24,
+    borderRadius: '4px 4px 0 0',
+    backgroundColor: '#09090b',
+    transition: 'height 0.4s ease'
   },
-      statBoxVal: {
-        fontSize: '0.95rem',
-      fontWeight: 800,
-      color: '#09090b'
+  sparkBarLabel: {
+    fontSize: '0.6rem',
+    color: '#71717a',
+    fontWeight: 600,
+    marginTop: 3
   },
-      statBoxLbl: {
-        fontSize: '0.6rem',
-      color: '#71717a',
-      fontWeight: 600,
-      marginTop: 2
+  empCardFooter: {
+    marginTop: 'auto',
+    paddingTop: '0.6rem',
+    borderTop: '1px solid #f4f4f5'
   },
-      progressSection: {
-        marginBottom: '0.85rem'
-  },
-      progressRow: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      fontSize: '0.72rem',
-      fontWeight: 600,
-      marginBottom: 4
-  },
-      progLabel: {
-        color: '#71717a'
-  },
-      progVal: {
-        color: '#09090b',
-      fontWeight: 800
-  },
-      progressBarBg: {
-        height: 6,
-      backgroundColor: '#f4f4f5',
-      borderRadius: 10,
-      overflow: 'hidden'
-  },
-      progressBarFill: {
-        height: '100%',
-      borderRadius: 10,
-      backgroundColor: '#09090b',
-      transition: 'width 0.5s ease'
-  },
-      trendBox: {
-        backgroundColor: '#f8fafc',
-      borderRadius: 12,
-      padding: '0.75rem 1rem',
-      marginTop: '0.5rem',
-      marginBottom: '1rem',
-      border: '1px solid #e4e4e7'
-  },
-      trendLabel: {
-        fontSize: '0.65rem',
-      fontWeight: 700,
-      color: '#71717a',
-      textTransform: 'uppercase',
-      letterSpacing: '0.5px',
-      marginBottom: '0.5rem'
-  },
-      sparkBars: {
-        display: 'flex',
-      alignItems: 'flex-end',
-      gap: '1rem',
-      height: 44
-  },
-      sparkBarCol: {
-        display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      flex: 1
-  },
-      sparkBar: {
-        width: '100%',
-      maxWidth: 24,
-      borderRadius: '4px 4px 0 0',
-      backgroundColor: '#09090b',
-      transition: 'height 0.4s ease'
-  },
-      sparkBarLabel: {
-        fontSize: '0.6rem',
-      color: '#71717a',
-      fontWeight: 600,
-      marginTop: 3
-  },
-      empCardFooter: {
-        marginTop: 'auto',
-      paddingTop: '0.6rem',
-      borderTop: '1px solid #f4f4f5'
-  },
-      viewDetailsBtn: {
+  viewDetailsBtn: {
     width: '100%',
     padding: '9px 0',
     backgroundColor: '#ffffff',
@@ -1398,605 +1540,607 @@ const s = {
     transition: 'all 0.15s'
   },
 
-      tisSection: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '1.75rem'
+  tisSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.75rem'
   },
-      alertBanner: {
-        backgroundColor: '#ffffff',
-      border: '1px solid #e4e4e7',
-      borderLeft: '4px solid #09090b',
-      borderRadius: 16,
-      padding: '1.25rem 1.5rem',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1.25rem',
-      flexWrap: 'wrap',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-      background: '#ffffff'
+  alertBanner: {
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderLeft: '4px solid #f59e0b',
+    borderRadius: 16,
+    padding: '1.25rem 1.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1.25rem',
+    flexWrap: 'wrap',
+    boxShadow: '0 2px 10px rgba(245,158,11,0.06)'
   },
-      alertIconBox: {
-        width: 44,
-      height: 44,
-      borderRadius: 12,
-      backgroundColor: '#f4f4f5',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: 0
+  alertIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#fef3c7',
+    border: '1px solid #fde68a',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
   },
-      alertContent: {
-        flex: 1,
-      minWidth: 280
+  alertContent: {
+    flex: 1,
+    minWidth: 280
   },
-      alertHeaderRow: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 4,
-      flexWrap: 'wrap'
+  alertHeaderRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+    flexWrap: 'wrap'
   },
-      alertBadgeTag: {
-        fontSize: '0.68rem',
-      fontWeight: 800,
-      backgroundColor: '#f4f4f5',
-      color: '#09090b',
-      padding: '2px 8px',
-      borderRadius: 6,
-      letterSpacing: '0.5px'
+  alertBadgeTag: {
+    fontSize: '0.68rem',
+    fontWeight: 800,
+    backgroundColor: '#fef3c7',
+    color: '#b45309',
+    border: '1px solid #fde68a',
+    padding: '2px 8px',
+    borderRadius: 6,
+    letterSpacing: '0.5px'
   },
-      alertTitle: {
-        fontSize: '0.95rem',
-      fontWeight: 800,
-      color: '#09090b',
-      fontFamily: 'var(--font-heading)'
+  alertTitle: {
+    fontSize: '0.95rem',
+    fontWeight: 800,
+    color: '#78350f',
+    fontFamily: 'var(--font-heading)'
   },
-      alertDesc: {
-        fontSize: '0.8rem',
-      color: '#52525b',
-      marginTop: 2,
-      lineHeight: 1.45
+  alertDesc: {
+    fontSize: '0.8rem',
+    color: '#92400e',
+    marginTop: 2,
+    lineHeight: 1.45
   },
-      dwellHighlight: {
-        color: '#09090b',
-      fontWeight: 700,
-      backgroundColor: '#f4f4f5',
-      padding: '1px 6px',
-      borderRadius: 4
+  dwellHighlight: {
+    color: '#78350f',
+    fontWeight: 800,
+    backgroundColor: '#fef3c7',
+    padding: '1px 6px',
+    borderRadius: 4
   },
-      alertActionBtn: {
+  alertActionBtn: {
     padding: '10px 18px',
-    backgroundColor: '#09090b',
+    backgroundColor: '#2563eb',
     color: '#fff',
     border: 'none',
-    borderRadius: 10,
+    borderRadius: 8,
     fontSize: '0.82rem',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
     transition: 'all 0.2s ease'
   },
 
-      funnelCard: {
-        backgroundColor: '#fff',
-      borderRadius: 18,
-      padding: '1.75rem',
-      border: '1px solid #e4e4e7',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+  funnelCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: '1.75rem',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
-      sectionHeader: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: '1.5rem',
-      flexWrap: 'wrap',
-      gap: '0.75rem'
+  sectionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '1.5rem',
+    flexWrap: 'wrap',
+    gap: '0.75rem'
   },
-      sectionTitle: {
-        fontSize: '1.15rem',
-      fontWeight: 800,
-      fontFamily: 'var(--font-heading)',
-      color: '#09090b',
-      margin: 0
+  sectionTitle: {
+    fontSize: '1.15rem',
+    fontWeight: 800,
+    fontFamily: 'var(--font-heading)',
+    color: '#09090b',
+    margin: 0
   },
-      sectionSub: {
-        fontSize: '0.76rem',
-      color: '#71717a',
-      marginTop: 3
+  sectionSub: {
+    fontSize: '0.76rem',
+    color: '#71717a',
+    marginTop: 3
   },
-      slaTargetChip: {
-        fontSize: '0.72rem',
-      fontWeight: 700,
-      padding: '4px 12px',
-      backgroundColor: '#f4f4f5',
-      color: '#09090b',
-      borderRadius: 20
+  slaTargetChip: {
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    padding: '4px 12px',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    borderRadius: 20
   },
-      stagesTimeline: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '1.25rem'
+  stagesTimeline: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '1.25rem'
   },
-      stageItem: {
-        backgroundColor: '#f8fafc',
-      borderRadius: 14,
-      padding: '1.2rem',
-      border: '1px solid #e4e4e7'
+  stageItem: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    padding: '1.2rem',
+    border: '1px solid #e4e4e7'
   },
-      stageItemHeader: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      marginBottom: '0.85rem'
+  stageItemHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.85rem'
   },
-      stageStepNum: {
-        width: 22,
-      height: 22,
-      borderRadius: '50%',
-      backgroundColor: '#09090b',
-      color: '#fff',
-      fontSize: '0.7rem',
-      fontWeight: 800,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
+  stageStepNum: {
+    width: 22,
+    height: 22,
+    borderRadius: '50%',
+    backgroundColor: '#09090b',
+    color: '#fff',
+    fontSize: '0.7rem',
+    fontWeight: 800,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-      stageName: {
-        fontSize: '0.88rem',
-      fontWeight: 800,
-      color: '#09090b',
-      flex: 1
+  stageName: {
+    fontSize: '0.88rem',
+    fontWeight: 800,
+    color: '#09090b',
+    flex: 1
   },
-      stageStatusTag: {
-        fontSize: '0.62rem',
-      fontWeight: 700,
-      padding: '2px 8px',
-      borderRadius: 12
+  stageStatusTag: {
+    fontSize: '0.62rem',
+    fontWeight: 700,
+    padding: '2px 8px',
+    borderRadius: 12
   },
-      stageMetricsRow: {
-        display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: '0.5rem',
-      marginBottom: '0.75rem'
+  stageMetricsRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '0.5rem',
+    marginBottom: '0.75rem'
   },
-      stageMetricBlock: {
-        display: 'flex',
-      flexDirection: 'column'
+  stageMetricBlock: {
+    display: 'flex',
+    flexDirection: 'column'
   },
-      stageMetricVal: {
-        fontSize: '0.9rem',
-      fontWeight: 800,
-      color: '#09090b'
+  stageMetricVal: {
+    fontSize: '0.9rem',
+    fontWeight: 800,
+    color: '#09090b'
   },
-      stageMetricLbl: {
-        fontSize: '0.6rem',
-      color: '#71717a',
-      fontWeight: 600
+  stageMetricLbl: {
+    fontSize: '0.6rem',
+    color: '#71717a',
+    fontWeight: 600
   },
-      stageBarContainer: {
-        height: 6,
-      backgroundColor: '#e4e4e7',
-      borderRadius: 10,
-      overflow: 'hidden'
+  stageBarContainer: {
+    height: 6,
+    backgroundColor: '#e4e4e7',
+    borderRadius: 10,
+    overflow: 'hidden'
   },
-      stageBarFill: {
-        height: '100%',
-      borderRadius: 10,
-      backgroundColor: '#09090b'
+  stageBarFill: {
+    height: '100%',
+    borderRadius: 10,
+    backgroundColor: '#09090b'
   },
-      stalledDealsCard: {
-        backgroundColor: '#fff',
-      borderRadius: 18,
-      padding: '1.75rem',
-      border: '1px solid #e4e4e7',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+  stalledDealsCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: '1.75rem',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
-      comparisonCard: {
-        backgroundColor: '#fff',
-      borderRadius: 18,
-      padding: '1.75rem',
-      border: '1px solid #e4e4e7',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+  comparisonCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: '1.75rem',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
-      auditCard: {
-        backgroundColor: '#fff',
-      borderRadius: 18,
-      padding: '1.75rem',
-      border: '1px solid #e4e4e7',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+  auditCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: '1.75rem',
+    border: '1px solid #e4e4e7',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
-      liveChip: {
-        fontSize: '0.68rem',
-      fontWeight: 800,
-      padding: '3px 10px',
-      backgroundColor: '#f4f4f5',
-      color: '#09090b',
-      borderRadius: 20
+  liveChip: {
+    fontSize: '0.68rem',
+    fontWeight: 800,
+    padding: '3px 10px',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    borderRadius: 20
   },
-      table: {
-        width: '100%',
-      borderCollapse: 'collapse',
-      marginTop: '1rem',
-      fontSize: '0.8rem'
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginTop: '1rem',
+    fontSize: '0.8rem'
   },
-      th: {
-        textAlign: 'left',
-      padding: '10px 14px',
-      borderBottom: '1px solid #e4e4e7',
-      color: '#71717a',
-      fontWeight: 700,
-      fontSize: '0.72rem',
-      textTransform: 'uppercase',
-      letterSpacing: '0.5px'
+  th: {
+    textAlign: 'left',
+    padding: '10px 14px',
+    borderBottom: '1px solid #e4e4e7',
+    color: '#71717a',
+    fontWeight: 700,
+    fontSize: '0.72rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
   },
-      td: {
-        padding: '12px 14px',
-      borderBottom: '1px solid #f4f4f5',
-      color: '#09090b'
+  td: {
+    padding: '12px 14px',
+    borderBottom: '1px solid #f4f4f5',
+    color: '#09090b'
   },
-      trHover: {
-        transition: 'background 0.15s'
+  trHover: {
+    transition: 'background 0.15s'
   },
-      dealName: {
-        fontWeight: 700,
-      fontSize: '0.85rem',
-      color: '#09090b'
+  dealName: {
+    fontWeight: 700,
+    fontSize: '0.85rem',
+    color: '#09090b'
   },
-      dealSub: {
-        fontSize: '0.7rem',
-      color: '#71717a',
-      marginTop: 1
+  dealSub: {
+    fontSize: '0.7rem',
+    color: '#71717a',
+    marginTop: 1
   },
-      badge: {
-        fontSize: '0.65rem',
-      fontWeight: 700,
-      padding: '3px 8px',
-      borderRadius: 12,
-      display: 'inline-block'
+  badge: {
+    fontSize: '0.65rem',
+    fontWeight: 700,
+    padding: '3px 8px',
+    borderRadius: 12,
+    display: 'inline-block'
   },
-      sendReminderBtn: {
-        padding: '6px 12px',
-      backgroundColor: '#09090b',
-      color: '#fff',
-      border: 'none',
-      borderRadius: 8,
-      fontSize: '0.72rem',
-      fontWeight: 700,
-      cursor: 'pointer',
-      boxShadow: '0 2px 6px rgba(0,0,0,0.12)'
+  sendReminderBtn: {
+    padding: '6px 12px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 8,
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 6px rgba(37,99,235,0.2)'
   },
-      tableUserRow: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '0.65rem'
+  tableUserRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.65rem'
   },
-      tableAvatar: {
-        width: 32,
-      height: 32,
-      borderRadius: '50%',
-      backgroundColor: '#09090b',
-      color: '#fff',
-      fontWeight: 800,
-      fontSize: '0.85rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
+  tableAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    backgroundColor: '#09090b',
+    color: '#fff',
+    fontWeight: 800,
+    fontSize: '0.85rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-      tableUserName: {
-        fontWeight: 800,
-      fontSize: '0.85rem',
-      color: '#09090b'
+  tableUserName: {
+    fontWeight: 800,
+    fontSize: '0.85rem',
+    color: '#09090b'
   },
-      tableUserEmail: {
-        fontSize: '0.68rem',
-      color: '#71717a'
+  tableUserEmail: {
+    fontSize: '0.68rem',
+    color: '#71717a'
   },
-      roleText: {
-        fontWeight: 600,
-      fontSize: '0.8rem',
-      color: '#52525b'
+  roleText: {
+    fontWeight: 600,
+    fontSize: '0.8rem',
+    color: '#52525b'
   },
-      deptText: {
-        fontSize: '0.68rem',
-      color: '#71717a'
+  deptText: {
+    fontSize: '0.68rem',
+    color: '#71717a'
   },
-      kpiScoreChip: {
-        display: 'inline-block',
-      padding: '2px 8px',
-      backgroundColor: '#f4f4f5',
-      color: '#09090b',
-      fontWeight: 800,
-      borderRadius: 12,
-      fontSize: '0.78rem'
+  kpiScoreChip: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    backgroundColor: '#f4f4f5',
+    color: '#09090b',
+    fontWeight: 800,
+    borderRadius: 12,
+    fontSize: '0.78rem'
   },
-      auditTimeline: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem',
-      marginTop: '1rem'
+  auditTimeline: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    marginTop: '1rem'
   },
-      auditItem: {
-        display: 'flex',
-      gap: '1rem',
-      padding: '0.85rem 1rem',
-      backgroundColor: '#f8fafc',
-      borderRadius: 12,
-      border: '1px solid #e4e4e7'
+  auditItem: {
+    display: 'flex',
+    gap: '1rem',
+    padding: '0.85rem 1rem',
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    border: '1px solid #e4e4e7'
   },
-      auditDot: {
-        width: 10,
-      height: 10,
-      borderRadius: '50%',
-      backgroundColor: '#09090b',
-      marginTop: 5,
-      flexShrink: 0
+  auditDot: {
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    backgroundColor: '#09090b',
+    marginTop: 5,
+    flexShrink: 0
   },
-      auditBody: {
-        flex: 1
+  auditBody: {
+    flex: 1
   },
-      auditHeaderRow: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      flexWrap: 'wrap'
+  auditHeaderRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    flexWrap: 'wrap'
   },
-      auditStaff: {
-        fontWeight: 800,
-      fontSize: '0.82rem',
-      color: '#08060d'
+  auditStaff: {
+    fontWeight: 800,
+    fontSize: '0.82rem',
+    color: '#08060d'
   },
-      auditActionTag: {
-        fontSize: '0.78rem',
-      color: '#334155',
-      flex: 1
+  auditActionTag: {
+    fontSize: '0.78rem',
+    color: '#334155',
+    flex: 1
   },
-      auditTime: {
-        fontSize: '0.68rem',
-      color: '#94a3b8'
+  auditTime: {
+    fontSize: '0.68rem',
+    color: '#94a3b8'
   },
-      auditDetails: {
-        fontSize: '0.72rem',
-      color: '#64748b',
-      marginTop: 4
+  auditDetails: {
+    fontSize: '0.72rem',
+    color: '#64748b',
+    marginTop: 4
   },
-      auditLeadBadge: {
-        fontSize: '0.68rem',
-      color: '#475569',
-      marginTop: 4,
-      backgroundColor: '#fff',
-      padding: '2px 8px',
-      borderRadius: 6,
-      display: 'inline-block',
-      border: '1px solid #e2e8f0'
+  auditLeadBadge: {
+    fontSize: '0.68rem',
+    color: '#475569',
+    marginTop: 4,
+    backgroundColor: '#fff',
+    padding: '2px 8px',
+    borderRadius: 6,
+    display: 'inline-block',
+    border: '1px solid #e2e8f0'
   },
-      modalOverlay: {
-        position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(8,6,13,0.65)',
-      backdropFilter: 'blur(4px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 999,
-      padding: '1rem'
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(8,6,13,0.65)',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999,
+    padding: '1rem'
   },
-      modalContent: {
-        backgroundColor: '#fff',
-      borderRadius: 20,
-      width: '100%',
-      maxWidth: 680,
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      padding: '2rem',
-      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    width: '100%',
+    maxWidth: 680,
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    padding: '2rem',
+    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
   },
-      modalContentSmall: {
-        backgroundColor: '#fff',
-      borderRadius: 20,
-      width: '100%',
-      maxWidth: 480,
-      padding: '2rem',
-      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+  modalContentSmall: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    width: '100%',
+    maxWidth: 480,
+    padding: '2rem',
+    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
   },
-      modalHeader: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      borderBottom: '1px solid #e2e8f0',
-      paddingBottom: '1rem',
-      marginBottom: '1.5rem'
+  modalHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    borderBottom: '1px solid #e2e8f0',
+    paddingBottom: '1rem',
+    marginBottom: '1.5rem'
   },
-      modalUserHead: {
-        display: 'flex',
-      alignItems: 'center',
-      gap: '1rem'
+  modalUserHead: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
   },
-      modalAvatar: {
-        width: 46,
-      height: 46,
-      borderRadius: 14,
-      backgroundColor: '#09090b',
-      color: '#fff',
-      fontWeight: 800,
-      fontSize: '1.2rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
+  modalAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: '#09090b',
+    color: '#fff',
+    fontWeight: 800,
+    fontSize: '1.2rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-      modalTitle: {
-        fontSize: '1.25rem',
-      fontWeight: 800,
-      color: '#08060d',
-      margin: 0,
-      fontFamily: 'var(--font-heading)'
+  modalTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 800,
+    color: '#08060d',
+    margin: 0,
+    fontFamily: 'var(--font-heading)'
   },
-      modalSub: {
-        fontSize: '0.74rem',
-      color: '#64748b',
-      marginTop: 2
+  modalSub: {
+    fontSize: '0.74rem',
+    color: '#64748b',
+    marginTop: 2
   },
-      closeModalBtn: {
-        background: 'none',
-      border: 'none',
-      fontSize: '1.2rem',
-      color: '#94a3b8',
-      cursor: 'pointer'
+  closeModalBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.2rem',
+    color: '#94a3b8',
+    cursor: 'pointer'
   },
-      modalLoading: {
-        padding: '3rem',
-      textAlign: 'center',
-      color: '#64748b'
+  modalLoading: {
+    padding: '3rem',
+    textAlign: 'center',
+    color: '#64748b'
   },
-      modalBody: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '1.5rem'
+  modalBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem'
   },
-      drillStatGrid: {
+  drillStatGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
     gap: '0.75rem'
   },
 
-      drillStat: {
-        backgroundColor: '#f8fafc',
-      borderRadius: 12,
-      padding: '0.85rem',
-      textAlign: 'center',
-      border: '1px solid #e2e8f0'
+  drillStat: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: '0.85rem',
+    textAlign: 'center',
+    border: '1px solid #e2e8f0'
   },
-      drillVal: {
-        fontSize: '1.15rem',
-      fontWeight: 800,
-      color: '#08060d'
+  drillVal: {
+    fontSize: '1.15rem',
+    fontWeight: 800,
+    color: '#08060d'
   },
-      drillLbl: {
-        fontSize: '0.62rem',
-      color: '#64748b',
-      fontWeight: 600,
-      marginTop: 2
+  drillLbl: {
+    fontSize: '0.62rem',
+    color: '#64748b',
+    fontWeight: 600,
+    marginTop: 2
   },
-      modalSection: {
-        borderTop: '1px solid #f1f5f9',
-      paddingTop: '1.25rem'
+  modalSection: {
+    borderTop: '1px solid #f1f5f9',
+    paddingTop: '1.25rem'
   },
-      modalSectionTitle: {
-        fontSize: '0.88rem',
-      fontWeight: 800,
-      color: '#08060d',
-      marginBottom: '0.75rem',
-      fontFamily: 'var(--font-heading)'
+  modalSectionTitle: {
+    fontSize: '0.88rem',
+    fontWeight: 800,
+    color: '#08060d',
+    marginBottom: '0.75rem',
+    fontFamily: 'var(--font-heading)'
   },
-      dealsList: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '0.6rem'
+  dealsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.6rem'
   },
-      dealItemRow: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '0.75rem 1rem',
-      backgroundColor: '#f8fafc',
-      borderRadius: 10,
-      border: '1px solid #e2e8f0'
+  dealItemRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.75rem 1rem',
+    backgroundColor: '#f8fafc',
+    borderRadius: 10,
+    border: '1px solid #e2e8f0'
   },
-      dealItemName: {
-        fontWeight: 700,
-      fontSize: '0.82rem',
-      color: '#08060d'
+  dealItemName: {
+    fontWeight: 700,
+    fontSize: '0.82rem',
+    color: '#08060d'
   },
-      dealItemSub: {
-        fontSize: '0.68rem',
-      color: '#64748b',
-      marginTop: 1
+  dealItemSub: {
+    fontSize: '0.68rem',
+    color: '#64748b',
+    marginTop: 1
   },
-      emptyDeals: {
-        fontSize: '0.78rem',
-      color: '#94a3b8',
-      fontStyle: 'italic'
+  emptyDeals: {
+    fontSize: '0.78rem',
+    color: '#94a3b8',
+    fontStyle: 'italic'
   },
-      miniAuditList: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '0.5rem'
+  miniAuditList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem'
   },
-      miniAuditItem: {
-        display: 'flex',
-      justifyContent: 'space-between',
-      padding: '6px 10px',
-      backgroundColor: '#f8fafc',
-      borderRadius: 8,
-      fontSize: '0.72rem'
+  miniAuditItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '6px 10px',
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    fontSize: '0.72rem'
   },
-      miniAuditAction: {
-        color: '#334155',
-      fontWeight: 500
+  miniAuditAction: {
+    color: '#334155',
+    fontWeight: 500
   },
-      miniAuditTime: {
-        color: '#94a3b8'
+  miniAuditTime: {
+    color: '#94a3b8'
   },
-      form: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem'
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem'
   },
-      formGroup: {
-        display: 'flex',
-      flexDirection: 'column',
-      gap: 4
+  formGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4
   },
-      formLabel: {
-        fontSize: '0.74rem',
-      fontWeight: 700,
-      color: '#334155'
+  formLabel: {
+    fontSize: '0.74rem',
+    fontWeight: 700,
+    color: '#334155'
   },
-      formInput: {
-        padding: '8px 12px',
-      borderRadius: 8,
-      border: '1px solid #cbd5e1',
-      fontSize: '0.8rem',
-      outline: 'none'
+  formInput: {
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.8rem',
+    outline: 'none'
   },
-      formSelect: {
-        padding: '8px 12px',
-      borderRadius: 8,
-      border: '1px solid #cbd5e1',
-      fontSize: '0.8rem',
-      outline: 'none',
-      backgroundColor: '#fff'
+  formSelect: {
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.8rem',
+    outline: 'none',
+    backgroundColor: '#fff'
   },
-      formActions: {
-        display: 'flex',
-      justifyContent: 'flex-end',
-      gap: '0.75rem',
-      marginTop: '0.5rem'
+  formActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '0.75rem',
+    marginTop: '0.5rem'
   },
-      cancelBtn: {
-        padding: '8px 16px',
-      backgroundColor: '#f1f5f9',
-      color: '#475569',
-      border: 'none',
-      borderRadius: 8,
-      fontSize: '0.8rem',
-      fontWeight: 700,
-      cursor: 'pointer'
+  cancelBtn: {
+    padding: '8px 16px',
+    backgroundColor: '#f1f5f9',
+    color: '#475569',
+    border: 'none',
+    borderRadius: 8,
+    fontSize: '0.8rem',
+    fontWeight: 700,
+    cursor: 'pointer'
   },
-      submitBtn: {
-        padding: '8px 20px',
-        backgroundColor: '#08060d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: 8,
-        fontSize: '0.8rem',
-        fontWeight: 700,
-        cursor: 'pointer'
-      }
+  submitBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 8,
+    fontSize: '0.8rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)'
+  }
 };

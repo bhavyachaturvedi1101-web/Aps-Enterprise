@@ -1,0 +1,35 @@
+# Environment & Sensitive Files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database & SQLite
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+
+# Temporary / Uploads
+uploads/
+temp/
+tmp/
+coverage/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
