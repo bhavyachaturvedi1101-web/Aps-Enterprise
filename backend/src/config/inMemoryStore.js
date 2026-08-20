@@ -1215,6 +1215,69 @@ const mockTimeInStage = [
   }
 ];
 
+const companyProfile = {
+  name: 'APS Enterprises',
+  website: 'https://www.apsenterprises.in',
+  tagline: 'Leading Dona Pattal & Paper Plate Machine Manufacturer in Madhya Pradesh',
+  address: '832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001',
+  phones: ['+91-7869755871', '+91-8827848099'],
+  emails: ['support.apsenterprises@gmail.com', 'apsenterprisesdp.229@gmail.com'],
+  products: [
+    'Fully Automatic Double Die Dona Pattal Machine',
+    'Hydraulic Paper Plate & Thali Making Machine',
+    'Automatic High-Speed Paper Cup Making Machine',
+    'Semi-Automatic Heavy Paper Cutter Machine',
+    'Raw Material Paper Roll & Lamination Machine'
+  ]
+};
+
+const mockDocuments = [
+  {
+    id: 'DOC-APS-01',
+    title: 'APS Enterprises Official Catalog & Dona Pattal Machine Brochure',
+    category: 'Product Catalog',
+    keywords: ['aps', 'dona', 'pattal', 'paper plate', 'indore', 'machine', 'contact', 'address', 'website'],
+    excerpt: 'APS Enterprises (Indore, MP): Manufacturer of Fully Automatic Double Die Dona Pattal Machines, Hydraulic Paper Plate Machines, Paper Cup Makers & Roll Cutters. Contact: +91-7869755871, Address: 832 Old Loha Mandi, Indore.',
+    pageRef: 'Website Home & Contact Page',
+    downloads: 320
+  },
+  {
+    id: 'DOC-001',
+    title: 'CNC Machine 500T Heavy Industrial Specification Manual',
+    category: 'Technical Specs',
+    keywords: ['cnc', '500t', 'spindle', 'rpm', 'specification', 'manual', 'power'],
+    excerpt: 'CNC Machine 500T featuring dual-spindle 24,000 RPM water-cooled motor, 5-axis synchro control, automatic tool changer (24 slots), and heavy cast-iron frame vibration dampening.',
+    pageRef: 'Page 12, Section 3.2',
+    downloads: 142
+  },
+  {
+    id: 'DOC-002',
+    title: 'Fiber Laser Cutter 6kW Operating Datasheet & Warranty Policy',
+    category: 'User Manuals & Warranty',
+    keywords: ['laser', 'fiber', '6kw', 'warranty', 'cutting speed', 'sheet metal'],
+    excerpt: 'Fiber Laser Cutter 6kW handles stainless steel up to 25mm, mild steel 30mm, aluminium 20mm. Standard 3-year comprehensive warranty covering Raycus laser source and IPG optical head.',
+    pageRef: 'Page 4, Warranty Terms',
+    downloads: 98
+  },
+  {
+    id: 'DOC-003',
+    title: 'APS Enterprise Standard Quotation & Payment Gate Terms',
+    category: 'Commercial Templates',
+    keywords: ['quotation', 'payment terms', '10%', 'advance', 'tally', 'invoice'],
+    excerpt: 'All orders require a 10% advance deposit verified against Tally ledger before releasing job cards to shopfloor manufacturing. Balance 90% payable upon dispatch notification.',
+    pageRef: 'Terms & Conditions Annexure A',
+    downloads: 215
+  }
+];
+
+const mockInventory = [
+  { id: 'INV-101', name: 'CNC Machine 500T Dual-Spindle', category: 'Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, warehouse: 'Pune Unit 1', unitPrice: 150000 },
+  { id: 'INV-102', name: 'Fiber Laser Cutter 6kW', category: 'Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, warehouse: 'Chakan Unit 2', unitPrice: 180000 },
+  { id: 'INV-103', name: 'Hydraulic Press 200T', category: 'Machinery', stockUnits: 5, reservedUnits: 3, availableUnits: 2, warehouse: 'Pune Unit 1', unitPrice: 42000 },
+  { id: 'INV-104', name: 'Heavy Sheet Metal Bender 120T', category: 'Machinery', stockUnits: 2, reservedUnits: 1, availableUnits: 1, warehouse: 'Chakan Unit 2', unitPrice: 28000 },
+  { id: 'INV-105', name: 'High-Grade Steel Plates (ISO 9001)', category: 'Raw Material', stockUnits: 450, reservedUnits: 120, availableUnits: 330, warehouse: 'Raw Material Yard', unitPrice: 850 }
+];
+
 const systemConfig = {
   approvalPolicy: 'single-action', // 'single-action' vs 'countersign' (dual-approval)
   paymentGatePercentage: 10,
@@ -1234,6 +1297,9 @@ module.exports = {
   mockWhatsAppSequences,
   mockWhatsAppTemplates,
   mockTimeInStage,
+  mockDocuments,
+  mockInventory,
+  companyProfile,
   systemConfig
 };
 

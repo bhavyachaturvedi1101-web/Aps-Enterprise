@@ -284,6 +284,225 @@ function RenderText({ text, isUser }) {
   );
 }
 
+// ─── Report Card Component ───────────────────────────────────────────────────
+function ReportCard({ report }) {
+  if (!report) return null;
+  const { title, date, summary, keyFindings, actionableInsights } = report;
+
+  const handleDownloadPdf = () => {
+    const content = `APS ENTERPRISE EXECUTIVE REPORT\nDate: ${date || new Date().toISOString().slice(0, 10)}\nTitle: ${title}\n\nSUMMARY:\n${summary}\n\nKEY FINDINGS:\n${(keyFindings || []).map(k => '• ' + k).join('\n')}\n\nACTIONABLE INSIGHTS:\n${(actionableInsights || []).map(a => '⚡ ' + a).join('\n')}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `APS_Enterprise_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+  };
+
+  return (
+    <div style={s.reportBox}>
+      <div style={s.reportHeader}>
+        <div>
+          <span style={s.reportBadge}>Executive Report</span>
+          <h3 style={s.reportTitle}>{title}</h3>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {date && <span style={s.reportDate}>{date}</span>}
+          <button onClick={handleDownloadPdf} style={s.fileDownloadBtn} title="Download Report PDF">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Download PDF</span>
+          </button>
+        </div>
+      </div>
+
+      {summary && (
+        <div style={s.reportSummary}>
+          <strong>Summary:</strong> {summary}
+        </div>
+      )}
+
+      {keyFindings && keyFindings.length > 0 && (
+        <div style={s.reportSection}>
+          <div style={s.reportSectionHeading}>Key Findings</div>
+          <ul style={s.reportList}>
+            {keyFindings.map((item, i) => (
+              <li key={i} style={s.reportItemFinding}>
+                <span style={{ color: '#2563eb', fontWeight: 800 }}>✓</span> {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {actionableInsights && actionableInsights.length > 0 && (
+        <div style={s.reportSection}>
+          <div style={s.reportSectionHeading}>Actionable Insights</div>
+          <ul style={s.reportList}>
+            {actionableInsights.map((item, i) => (
+              <li key={i} style={s.reportItemInsight}>
+                <span style={{ color: '#10b981', fontWeight: 800 }}>⚡</span> {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Export File Download Card Component ─────────────────────────────────────
+function ExportFileCard({ exportFile }) {
+  if (!exportFile) return null;
+  const { fileName, fileFormat, mimeType, sizeKB, content, downloadUrl } = exportFile;
+
+  const handleDownload = () => {
+    try {
+      const fmtLower = (fileFormat || 'csv').toLowerCase();
+      if (content) {
+        let type = mimeType || 'text/plain';
+        if (fmtLower === 'xlsx' || fmtLower === 'excel') type = 'application/vnd.ms-excel';
+        else if (fmtLower === 'csv') type = 'text/csv';
+        else if (fmtLower === 'pdf') type = 'application/pdf';
+        else if (fmtLower === 'xml') type = 'application/xml';
+        else if (fmtLower === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.${fmtLower}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } else if (downloadUrl) {
+        window.open(`http://localhost:5000${downloadUrl}`, '_blank');
+      } else {
+        window.open(`http://localhost:5000/api/a3/export?format=${fmtLower}`, '_blank');
+      }
+    } catch (e) {
+      window.open(`http://localhost:5000/api/a3/export?format=${(fileFormat || 'csv').toLowerCase()}`, '_blank');
+    }
+  };
+
+  const fmt = (fileFormat || 'CSV').toUpperCase();
+
+  return (
+    <div style={s.fileExportCard}>
+      <div style={s.fileExportLeft}>
+        <div style={s.fileExportIcon}>
+          {fmt}
+        </div>
+        <div>
+          <div style={s.fileExportName}>{fileName}</div>
+          <div style={s.fileExportMeta}>⚡ Click button to download {fmt} file • {sizeKB || 'Ready'}</div>
+        </div>
+      </div>
+      <button
+        onClick={handleDownload}
+        style={s.fileDownloadBtn}
+        id={`download-btn-${fmt.toLowerCase()}`}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download {fmt} File</span>
+      </button>
+    </div>
+  );
+}
+
+// ─── Quick Download Action Bar Component ─────────────────────────────────────
+function QuickDownloadBar({ msg }) {
+  if (!msg || msg.role === 'user') return null;
+
+  const handleDownloadFormat = (format) => {
+    try {
+      const fmtLower = format.toLowerCase();
+      if (msg.exportFile && (msg.exportFile.fileFormat || '').toLowerCase() === fmtLower && msg.exportFile.content) {
+        let type = 'text/plain';
+        if (fmtLower === 'xlsx' || fmtLower === 'excel') type = 'application/vnd.ms-excel';
+        else if (fmtLower === 'csv') type = 'text/csv';
+        else if (fmtLower === 'pdf') type = 'application/pdf';
+        else if (fmtLower === 'xml') type = 'application/xml';
+        else if (fmtLower === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+        const blob = new Blob([msg.exportFile.content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = msg.exportFile.fileName || `APS_Enterprise_Export.${fmtLower}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } else {
+        window.open(`http://localhost:5000/api/a3/export?format=${fmtLower}`, '_blank');
+      }
+    } catch (e) {
+      window.open(`http://localhost:5000/api/a3/export?format=${format.toLowerCase()}`, '_blank');
+    }
+  };
+
+  const showBar = msg.exportFile || msg.table || msg.report;
+  if (!showBar) return null;
+
+  const activeFmt = (msg.exportFile?.fileFormat || '').toUpperCase();
+
+  return (
+    <div style={s.quickDownloadRow}>
+      <span style={s.quickDownloadLabel}>Download Options:</span>
+      <button
+        onClick={() => handleDownloadFormat('xlsx')}
+        style={{ ...s.quickDownloadBtn, background: activeFmt === 'XLSX' || activeFmt === 'EXCEL' ? '#15803d' : '#16a34a' }}
+        title="Download Excel Spreadsheet (.xlsx)"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download Excel (.xlsx)</span>
+      </button>
+
+      <button
+        onClick={() => handleDownloadFormat('csv')}
+        style={{ ...s.quickDownloadBtn, background: activeFmt === 'CSV' ? '#1d4ed8' : '#2563eb' }}
+        title="Download CSV Data File (.csv)"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download CSV</span>
+      </button>
+
+      <button
+        onClick={() => handleDownloadFormat('pdf')}
+        style={{ ...s.quickDownloadBtn, background: activeFmt === 'PDF' ? '#b91c1c' : '#dc2626' }}
+        title="Download PDF Document (.pdf)"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download PDF (.pdf)</span>
+      </button>
+    </div>
+  );
+}
+
 // ─── Message Component ────────────────────────────────────────────────────────
 function MessageCard({ msg }) {
   const isUser = msg.role === 'user';
@@ -298,7 +517,7 @@ function MessageCard({ msg }) {
               <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
             </svg>
           </div>
-          <span style={s.aiNameBadge}>APS AI</span>
+          <span style={s.aiNameBadge}>Dashboard AI Assistant</span>
         </div>
       )}
 
@@ -314,6 +533,9 @@ function MessageCard({ msg }) {
             <div style={{ fontSize: '0.88rem', lineHeight: 1.65, color: isUser ? '#fff' : '#334155' }}>
               <RenderText text={msg.text} isUser={isUser} />
             </div>
+            {!isUser && <QuickDownloadBar msg={msg} />}
+            {msg.exportFile && <ExportFileCard exportFile={msg.exportFile} />}
+            {msg.report && <ReportCard report={msg.report} />}
             {msg.table && <MiniTable rows={msg.table} />}
             {msg.chart && <SmartChart chart={msg.chart} />}
             {msg.processingMs && (
@@ -331,7 +553,7 @@ function MessageCard({ msg }) {
 // ─── Welcome Message ──────────────────────────────────────────────────────────
 const WELCOME_MSG = {
   role: 'bot',
-  text: "Hello! I'm **APS AI**, your executive intelligence assistant for APS Enterprise.\n\nI have full visibility into your **CRM leads, pipeline stages, closed sales, revenue, team KPIs, Tally payment gates, and dialer logs**.\n\nAsk me anything in plain English or select one of the suggested queries below.",
+  text: "Hello! I am your **Dashboard AI Assistant** for APS Enterprise.\n\nI can **analyze dashboard data, generate executive PDF reports, export Excel/CSV/XML/DOCX files, detect trend anomalies, and explain key business KPIs**.\n\nSelect a quick query from the sidebar or ask anything in plain English below.",
   table: null,
   chart: null
 };
@@ -406,9 +628,11 @@ export default function APSAIPage() {
         ...prev.slice(0, -1),
         {
           role: 'bot',
-          text: data.text,
+          text: data.text || data.answer,
           table: data.table,
           chart: data.chart,
+          report: data.report,
+          exportFile: data.exportFile,
           processingMs: data.processingMs
         }
       ]);
@@ -485,14 +709,20 @@ export default function APSAIPage() {
             <div style={s.sideCardTitle}>Quick Queries</div>
             <div style={s.quickList}>
               {[
-                { label: 'Hot leads needing follow-up', query: 'Show me hot leads' },
-                { label: 'Leads awaiting 10% payment', query: 'Which leads are awaiting payment?' },
-                { label: 'Lead pipeline stage breakdown', query: 'Give me a pipeline breakdown' },
-                { label: 'Month-over-month sales comparison', query: 'Compare this month vs last month' },
-                { label: 'Top performing sales representative', query: 'Who is the top performing employee?' },
-                { label: 'Total revenue & advance collected', query: 'What is the total revenue?' },
-                { label: 'Team performance & KPI scores', query: 'Show team KPI scores' },
-                { label: 'Recent system activity log', query: 'Show recent activity log' }
+                { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status' },
+                { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000' },
+                { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts' },
+                { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics' },
+                { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges' },
+                { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual' },
+                { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast' },
+                { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?' },
+                { label: 'Warehouse Inventory Stock', query: 'Check warehouse inventory stock' },
+                { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech' },
+                { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order' },
+                { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report' },
+                { label: 'Export Leads Data to CSV', query: 'Export leads to CSV' },
+                { label: 'Export Leads Data to Excel', query: 'Export leads to Excel' }
               ].map((item, i) => (
                 <button
                   key={i}
@@ -901,5 +1131,182 @@ const s = {
     color: '#334155',
     borderBottom: '1px solid #f1f5f9',
     whiteSpace: 'nowrap'
+  },
+
+  // Report Card Styles
+  reportBox: {
+    marginTop: 14,
+    padding: '16px 18px',
+    borderRadius: 14,
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    border: '1.5px solid #cbd5e1',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+  },
+  reportHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10
+  },
+  reportBadge: {
+    fontSize: '0.66rem',
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.6px',
+    background: '#dbeafe',
+    color: '#1e40af',
+    padding: '3px 8px',
+    borderRadius: 12,
+    display: 'inline-block',
+    marginBottom: 4
+  },
+  reportTitle: {
+    margin: 0,
+    fontSize: '1.05rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  reportDate: {
+    fontSize: '0.72rem',
+    color: '#64748b',
+    fontWeight: 600
+  },
+  reportSummary: {
+    fontSize: '0.82rem',
+    lineHeight: 1.55,
+    color: '#334155',
+    padding: '10px 12px',
+    background: '#ffffff',
+    borderRadius: 8,
+    border: '1px solid #e2e8f0',
+    marginBottom: 12
+  },
+  reportSection: {
+    marginTop: 10
+  },
+  reportSectionHeading: {
+    fontSize: '0.74rem',
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    color: '#475569',
+    marginBottom: 6
+  },
+  reportList: {
+    margin: 0,
+    paddingLeft: 0,
+    listStyle: 'none'
+  },
+  reportItemFinding: {
+    fontSize: '0.8rem',
+    color: '#1e293b',
+    padding: '5px 8px',
+    background: '#eff6ff',
+    borderRadius: 6,
+    marginBottom: 4,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+  reportItemInsight: {
+    fontSize: '0.8rem',
+    color: '#064e3b',
+    padding: '5px 8px',
+    background: '#ecfdf5',
+    borderRadius: 6,
+    marginBottom: 4,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+
+  // File Export Card Styles
+  fileExportCard: {
+    marginTop: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '12px 16px',
+    borderRadius: 12,
+    background: '#1e293b',
+    color: '#ffffff',
+    boxShadow: '0 4px 12px rgba(15,23,42,0.15)'
+  },
+  fileExportLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12
+  },
+  fileExportIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    background: '#3b82f6',
+    color: '#ffffff',
+    fontWeight: 900,
+    fontSize: '0.72rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    letterSpacing: '0.5px'
+  },
+  fileExportName: {
+    fontSize: '0.84rem',
+    fontWeight: 700,
+    color: '#ffffff'
+  },
+  fileExportMeta: {
+    fontSize: '0.7rem',
+    color: '#94a3b8',
+    marginTop: 2
+  },
+  fileDownloadBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#2563eb',
+    color: '#ffffff',
+    border: 'none',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'background 0.15s'
+  },
+
+  // Quick Download Bar directly under text
+  quickDownloadRow: {
+    marginTop: 10,
+    marginBottom: 6,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+    padding: '8px 12px',
+    borderRadius: 10,
+    background: '#f1f5f9',
+    border: '1px solid #cbd5e1'
+  },
+  quickDownloadLabel: {
+    fontSize: '0.7rem',
+    fontWeight: 800,
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  },
+  quickDownloadBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '6px 12px',
+    borderRadius: 8,
+    border: 'none',
+    color: '#ffffff',
+    fontSize: '0.74rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+    transition: 'transform 0.1s, opacity 0.15s'
   }
 };
