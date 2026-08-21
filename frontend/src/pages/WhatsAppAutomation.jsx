@@ -129,6 +129,204 @@ const DEFAULT_ANALYTICS = {
   totalRevenueRecovered: '₹4,85,000'
 };
 
+const INITIAL_CLIENT_THREADS = {
+  'LEAD-001': {
+    id: 'LEAD-001',
+    name: 'John Doe',
+    company: 'Acme Machinery Corp',
+    phone: '+91 98765 43210',
+    product: 'CNC Machine v2 (4-Axis)',
+    stage: 'Confirmed Lead',
+    advanceAmount: '4,200',
+    unreadCount: 0,
+    avatarColor: '#2563eb',
+    avatarLetter: 'JD',
+    messages: [
+      {
+        id: 'msg-101',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Order Advance Notice',
+        text: 'Hello John Doe, your booking for CNC Machine v2 (Total ₹42,000) is approved! To release your machine order to the manufacturing queue, please confirm the 10% advance payment of ₹4,200. Click the payment link below or reply to this message.',
+        buttons: ['Verify & Pay Advance', 'Speak to Account Manager'],
+        time: '11:51 AM',
+        status: 'read'
+      },
+      {
+        id: 'msg-102',
+        sender: 'customer',
+        senderName: 'John Doe (Customer)',
+        text: 'Hello APS Team, I have initiated the 10% advance (₹4,200) via HDFC UPI Ref #UPI-982143. Kindly verify.',
+        time: '11:53 AM'
+      },
+      {
+        id: 'msg-103',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        text: 'Payment received & verified via Tally ERP Sync! Production Job Card #MFG-8821 generated for CNC Machine v2. Estimated dispatch: 4 business days.',
+        time: '11:54 AM',
+        status: 'read'
+      }
+    ]
+  },
+  'LEAD-002': {
+    id: 'LEAD-002',
+    name: 'Priya Patel',
+    company: 'Apex Precision Tech',
+    phone: '+91 98112 33445',
+    product: 'Hydraulic Press HP-50',
+    stage: 'Qualified',
+    advanceAmount: '3,500',
+    unreadCount: 1,
+    avatarColor: '#7c3aed',
+    avatarLetter: 'PP',
+    messages: [
+      {
+        id: 'msg-201',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Quote & Proposal',
+        text: 'Hello Priya, here is the technical quotation and performance sheet for Hydraulic Press HP-50 (₹35,000). Please review the spec sheet and let us know if you need customized tooling.',
+        buttons: ['Download Spec PDF', 'Request Callback'],
+        time: '12:15 PM',
+        status: 'read'
+      },
+      {
+        id: 'msg-202',
+        sender: 'customer',
+        senderName: 'Priya Patel (Apex Precision Tech)',
+        text: 'Received the quotation. Our engineering team has reviewed the specs. We will proceed with the 10% booking advance after tomorrow morning call.',
+        time: '12:23 PM'
+      }
+    ]
+  },
+  'LEAD-003': {
+    id: 'LEAD-003',
+    name: 'Rajesh Nair',
+    company: 'Dynamic Motors Corp',
+    phone: '+91 98220 12345',
+    product: 'Industrial Lathe L-200',
+    stage: 'In Production',
+    advanceAmount: '8,500',
+    unreadCount: 0,
+    avatarColor: '#059669',
+    avatarLetter: 'RN',
+    messages: [
+      {
+        id: 'msg-301',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Production Update',
+        text: 'Dear Rajesh Nair, Batch #MFG-8821 for Industrial Lathe L-200 has completed CNC roughing and is now in QA testing stage. Expected dispatch date: 24th Aug.',
+        buttons: ['Track Batch Progress', 'Download QA Certificate'],
+        time: '10:15 AM',
+        status: 'read'
+      },
+      {
+        id: 'msg-302',
+        sender: 'customer',
+        senderName: 'Rajesh Nair (Dynamic Motors)',
+        text: 'Received the QA checklist. Please ensure calibration certificates are included with shipping consignment.',
+        time: '10:42 AM'
+      },
+      {
+        id: 'msg-303',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        text: 'Confirmed. Hard copies & digital certificates attached to ERP shipping bill.',
+        time: '11:05 AM',
+        status: 'read'
+      }
+    ]
+  },
+  'LEAD-004': {
+    id: 'LEAD-004',
+    name: 'Amit Verma',
+    company: 'Global Tech Ltd',
+    phone: '+91 98330 99887',
+    product: 'Laser Cutter LC-100',
+    stage: 'Booked',
+    advanceAmount: '6,000',
+    unreadCount: 0,
+    avatarColor: '#d97706',
+    avatarLetter: 'AV',
+    messages: [
+      {
+        id: 'msg-401',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Dual Approval Confirmation',
+        text: 'Booking for Laser Cutter LC-100 approved by Sales & Operations. Please verify the 10% advance deposit (₹6,000) to clear factory release gate.',
+        buttons: ['Verify & Pay Advance', 'Contact Operations'],
+        time: 'Yesterday',
+        status: 'read'
+      },
+      {
+        id: 'msg-402',
+        sender: 'customer',
+        senderName: 'Amit Verma (Global Tech)',
+        text: 'We are processing the RTGS payment through our corporate account today by 3 PM.',
+        time: '09:30 AM'
+      }
+    ]
+  },
+  'LEAD-005': {
+    id: 'LEAD-005',
+    name: 'Vikram Malhotra',
+    company: 'Precision Engineering Works',
+    phone: '+91 98450 77665',
+    product: 'Milling Machine M-40',
+    stage: 'Enquiry',
+    advanceAmount: '2,500',
+    unreadCount: 0,
+    avatarColor: '#0891b2',
+    avatarLetter: 'VM',
+    messages: [
+      {
+        id: 'msg-501',
+        sender: 'customer',
+        senderName: 'Vikram Malhotra',
+        text: 'Hello APS Team, is 0% financing or EMI option available for Milling Machine M-40?',
+        time: '10:20 AM'
+      },
+      {
+        id: 'msg-502',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Flexible Financing Plans',
+        text: 'Hello Vikram, yes! We offer 0% interest 6-month EMI on Milling Machine M-40 with just 10% booking advance. Would you like a call from our finance desk?',
+        buttons: ['Request EMI Callback', 'Download EMI Calculator'],
+        time: '10:25 AM',
+        status: 'read'
+      }
+    ]
+  },
+  'LEAD-006': {
+    id: 'LEAD-006',
+    name: 'Sanjay Singhal',
+    company: 'Nexus Automation Plant',
+    phone: '+91 98201 55667',
+    product: 'Robotic Welding Arm R-5',
+    stage: 'Enquiry',
+    advanceAmount: '12,000',
+    unreadCount: 0,
+    avatarColor: '#dc2626',
+    avatarLetter: 'SS',
+    messages: [
+      {
+        id: 'msg-601',
+        sender: 'business',
+        senderName: 'APS Enterprise Verified',
+        header: 'APS Enterprise — Product Brochure',
+        text: 'Hello Nexus Automation Team! Thank you for your interest in Robotic Welding Arm R-5. Attached is the robotic integration catalog.',
+        buttons: ['View Catalog', 'Schedule Technical Demo'],
+        time: '09:10 AM',
+        status: 'read'
+      }
+    ]
+  }
+};
+
 export default function WhatsAppAutomation() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState(DEFAULT_MESSAGES);
@@ -143,45 +341,24 @@ export default function WhatsAppAutomation() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Live 2-Way Chat Simulator State
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 'chat-1',
-      sender: 'business',
-      senderName: 'APS Enterprise Verified',
-      header: 'APS Enterprise — Order Advance Notice',
-      text: 'Hello John Doe, your booking for CNC Machine v2 (Total ₹42,000) is approved! To release your machine order to the manufacturing queue, please confirm the 10% advance payment of ₹1,500. Click the payment link below or reply to this message.',
-      buttons: ['Verify & Pay Advance', 'Speak to Account Manager'],
-      time: '11:51 AM',
-      status: 'read'
-    },
-    {
-      id: 'chat-2',
-      sender: 'customer',
-      senderName: 'John Doe (Customer)',
-      text: 'Hello APS Team, I have initiated the 10% advance (₹1,500) via HDFC UPI Ref #UPI-982143. Kindly verify.',
-      time: '11:53 AM'
-    },
-    {
-      id: 'chat-3',
-      sender: 'business',
-      senderName: 'APS Enterprise Verified',
-      text: 'Payment received & verified via Tally ERP Sync! Production Job Card #MFG-8821 generated for CNC Machine v2. Estimated dispatch: 4 business days.',
-      time: '11:54 AM',
-      status: 'read'
-    }
-  ]);
+  // Multi-Client WhatsApp Inbox & Live Chat State
+  const [clientThreads, setClientThreads] = useState(INITIAL_CLIENT_THREADS);
+  const [selectedClientId, setSelectedClientId] = useState('LEAD-001');
+  const [inboxSearchQuery, setInboxSearchQuery] = useState('');
+  const [inboxFilter, setInboxFilter] = useState('all'); // 'all' | 'unread' | 'confirmed' | 'enquiry'
+  const [showQuickTemplateModal, setShowQuickTemplateModal] = useState(false);
   const [chatInputText, setChatInputText] = useState('');
   const [chatSenderRole, setChatSenderRole] = useState('customer'); // 'customer' | 'business'
 
+
   // Manual Trigger & Broadcast Form State
   const [broadcastData, setBroadcastData] = useState({
-    leadId: '',
-    phone: '',
-    recipientName: '',
+    leadId: 'LEAD-001',
+    phone: '+91 98765 43210',
+    recipientName: 'John Doe',
     templateId: 'payment_reminder_advance_10pct',
-    product: '',
-    amount: '',
+    product: 'CNC Machine v2 (4-Axis)',
+    amount: '4,200',
     customNote: ''
   });
   const [sending, setSending] = useState(false);
@@ -221,17 +398,42 @@ export default function WhatsAppAutomation() {
         const leadData = await leadRes.json();
         if (leadData.leads?.length > 0) {
           setLeads(leadData.leads);
-          if (!broadcastData.leadId) {
-            const firstLead = leadData.leads[0];
-            setBroadcastData(prev => ({
-              ...prev,
-              leadId: firstLead.id,
-              recipientName: firstLead.name,
-              phone: firstLead.phone || '+91 99887 76655',
-              product: firstLead.interest || 'CNC Machinery Unit',
-              amount: (parseFloat(firstLead.budget || 20000) * 0.1).toLocaleString('en-IN')
-            }));
-          }
+          // Sync any missing CRM leads into clientThreads seamlessly
+          setClientThreads(prev => {
+            const next = { ...prev };
+            leadData.leads.forEach((l, idx) => {
+              if (!next[l.id]) {
+                const colors = ['#2563eb', '#7c3aed', '#059669', '#d97706', '#0891b2', '#dc2626'];
+                const letter = l.name ? l.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'LE';
+                const adv = (parseFloat(l.budget || 20000) * 0.1).toLocaleString('en-IN');
+                next[l.id] = {
+                  id: l.id,
+                  name: l.name,
+                  company: l.company || `${l.name} Enterprise`,
+                  phone: l.phone || '+91 98000 11223',
+                  product: l.interest || 'Industrial Machine Unit',
+                  stage: l.stage || 'Enquiry',
+                  advanceAmount: adv,
+                  unreadCount: 0,
+                  avatarColor: colors[idx % colors.length],
+                  avatarLetter: letter,
+                  messages: [
+                    {
+                      id: `msg-${l.id}-1`,
+                      sender: 'business',
+                      senderName: 'APS Enterprise Verified',
+                      header: 'APS Enterprise — Welcome & Lead Acknowledgement',
+                      text: `Hello ${l.name}, thank you for contacting APS Enterprise regarding ${l.interest || 'our industrial equipment'}. Our engineering team is reviewing your requirements.`,
+                      buttons: ['View Catalog', 'Speak with Specialist'],
+                      time: '10:00 AM',
+                      status: 'read'
+                    }
+                  ]
+                };
+              }
+            });
+            return next;
+          });
         }
       }
     } catch (err) {
@@ -243,19 +445,36 @@ export default function WhatsAppAutomation() {
     loadData();
   }, []);
 
-  const handleLeadSelectChange = (leadId) => {
-    const lead = leads.find(l => l.id === leadId);
-    if (!lead) return;
-    const advance = (parseFloat(lead.budget || 20000) * 0.1).toLocaleString('en-IN');
-    setBroadcastData(prev => ({
-      ...prev,
-      leadId: lead.id,
-      recipientName: lead.name,
-      phone: lead.phone || '+91 99887 76655',
-      product: lead.interest || 'Machinery Unit',
-      amount: advance
-    }));
+  const handleSelectClient = (clientId) => {
+    setSelectedClientId(clientId);
+    setClientThreads(prev => {
+      if (!prev[clientId]) return prev;
+      return {
+        ...prev,
+        [clientId]: {
+          ...prev[clientId],
+          unreadCount: 0,
+          messages: prev[clientId].messages.map(m => ({ ...m, status: 'read' }))
+        }
+      };
+    });
+    const client = clientThreads[clientId];
+    if (client) {
+      setBroadcastData(prev => ({
+        ...prev,
+        leadId: client.id,
+        recipientName: client.name,
+        phone: client.phone,
+        product: client.product,
+        amount: client.advanceAmount
+      }));
+    }
   };
+
+  // Total unread messages across all client threads
+  const totalUnreadCount = useMemo(() => {
+    return Object.values(clientThreads).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+  }, [clientThreads]);
 
   const handleToggleSequence = async (seqId) => {
     try {
@@ -294,80 +513,143 @@ export default function WhatsAppAutomation() {
     return templates.find(t => t.id === broadcastData.templateId) || templates[0];
   }, [templates, broadcastData.templateId]);
 
-  const handleSendCustomBroadcast = async (e) => {
-    e.preventDefault();
-    setSending(true);
+  // Active client thread
+  const activeClientThread = useMemo(() => {
+    return clientThreads[selectedClientId] || Object.values(clientThreads)[0] || null;
+  }, [clientThreads, selectedClientId]);
 
-    const dynamicText = activeTemplateObj?.bodyText
-      ?.replace('{{1}}', broadcastData.recipientName || 'John Doe')
-      ?.replace('{{2}}', broadcastData.product || 'CNC Machine v2')
-      ?.replace('{{3}}', '₹42,000')
-      ?.replace('{{4}}', `₹${broadcastData.amount || '4,200'}`)
-      ?.replace('{{5}}', '2 business days') || `Dear ${broadcastData.recipientName}, your notification for ${broadcastData.product} has been delivered.`;
+  // Filtered client list for WhatsApp Inbox
+  const filteredClientList = useMemo(() => {
+    const list = Object.values(clientThreads);
+    return list.filter(client => {
+      const matchesSearch = (client.name || '').toLowerCase().includes(inboxSearchQuery.toLowerCase()) ||
+        (client.company || '').toLowerCase().includes(inboxSearchQuery.toLowerCase()) ||
+        (client.phone || '').includes(inboxSearchQuery) ||
+        (client.product || '').toLowerCase().includes(inboxSearchQuery.toLowerCase());
+      if (!matchesSearch) return false;
 
-    const newChatMsg = {
-      id: `chat-${Date.now()}`,
-      sender: 'business',
-      senderName: 'APS Enterprise Verified',
-      header: activeTemplateObj?.header || 'APS Enterprise — Notification',
-      text: dynamicText,
-      buttons: activeTemplateObj?.buttons || ['Verify & Pay Advance', 'Speak to Account Manager'],
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'read'
-    };
+      if (inboxFilter === 'unread') return client.unreadCount > 0;
+      if (inboxFilter === 'confirmed') return client.stage.toLowerCase().includes('confirmed') || client.stage.toLowerCase().includes('paid');
+      if (inboxFilter === 'enquiry') return client.stage.toLowerCase().includes('enquiry') || client.stage.toLowerCase().includes('qualified');
+      return true;
+    });
+  }, [clientThreads, inboxSearchQuery, inboxFilter]);
 
-    setChatMessages(prev => [...prev, newChatMsg]);
-
-    try {
-      const res = await fetch(`${API}/whatsapp/send-custom`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(broadcastData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        showToast(`WhatsApp message delivered to ${broadcastData.recipientName} (${broadcastData.phone})!`);
-        loadData();
-      }
-    } catch (err) {
-      console.error('Error sending WhatsApp broadcast:', err);
-      showToast(`Message added to live chat simulator!`);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  // Send interactive 2-way message from chat input
+  // Send interactive message from chat input (Exclusively as APS Enterprise Admin)
   const handleSendChatMessage = (e) => {
     if (e) e.preventDefault();
-    if (!chatInputText.trim()) return;
+    if (!chatInputText.trim() || !activeClientThread) return;
 
     const newMsg = {
       id: `chat-${Date.now()}`,
-      sender: chatSenderRole,
-      senderName: chatSenderRole === 'business' ? 'APS Enterprise Verified' : `${broadcastData.recipientName || 'John Doe'} (Customer)`,
+      sender: 'business',
+      senderName: 'APS Enterprise Verified',
       text: chatInputText.trim(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       status: 'read'
     };
 
-    setChatMessages(prev => [...prev, newMsg]);
+    setClientThreads(prev => {
+      const currentThread = prev[activeClientThread.id];
+      return {
+        ...prev,
+        [activeClientThread.id]: {
+          ...currentThread,
+          messages: [...currentThread.messages, newMsg]
+        }
+      };
+    });
+
     setChatInputText('');
-    showToast(`New ${chatSenderRole === 'business' ? 'Sender (APS Enterprise)' : 'Receiver (Customer)'} message added!`);
+    showToast(`Outgoing message dispatched from APS Enterprise to ${activeClientThread.name}!`);
   };
 
   // Quick reply simulator helper
   const handleSimulateQuickReply = (quickText) => {
+    if (!activeClientThread) return;
     const newMsg = {
       id: `chat-${Date.now()}`,
       sender: 'customer',
-      senderName: `${broadcastData.recipientName || 'John Doe'} (Customer)`,
+      senderName: `${activeClientThread.name} (Customer)`,
       text: quickText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    setChatMessages(prev => [...prev, newMsg]);
+    setClientThreads(prev => {
+      const currentThread = prev[activeClientThread.id];
+      return {
+        ...prev,
+        [activeClientThread.id]: {
+          ...currentThread,
+          messages: [...currentThread.messages, newMsg]
+        }
+      };
+    });
     showToast(`Simulated customer response received!`);
   };
+
+  // Dispatch Meta Template directly to active client
+  const handleDispatchTemplateToActiveClient = async (templateId) => {
+    if (!activeClientThread) return;
+    const tpl = templates.find(t => t.id === templateId) || activeTemplateObj;
+    
+    const dynamicText = tpl?.bodyText
+      ?.replace('{{1}}', activeClientThread.name || 'John Doe')
+      ?.replace('{{2}}', activeClientThread.product || 'CNC Machine v2')
+      ?.replace('{{3}}', '₹42,000')
+      ?.replace('{{4}}', `₹${activeClientThread.advanceAmount || '4,200'}`)
+      ?.replace('{{5}}', '2 business days') || `Dear ${activeClientThread.name}, notification for ${activeClientThread.product} dispatched.`;
+
+    const newChatMsg = {
+      id: `chat-${Date.now()}`,
+      sender: 'business',
+      senderName: 'APS Enterprise Verified',
+      header: tpl?.header || 'APS Enterprise — Notification',
+      text: dynamicText,
+      buttons: tpl?.buttons || ['Verify & Pay Advance', 'Speak to Account Manager'],
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: 'read'
+    };
+
+    setClientThreads(prev => {
+      const currentThread = prev[activeClientThread.id];
+      return {
+        ...prev,
+        [activeClientThread.id]: {
+          ...currentThread,
+          messages: [...currentThread.messages, newChatMsg]
+        }
+      };
+    });
+
+    setShowQuickTemplateModal(false);
+
+    try {
+      await fetch(`${API}/whatsapp/send-custom`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId: activeClientThread.id,
+          recipientName: activeClientThread.name,
+          phone: activeClientThread.phone,
+          templateId: tpl.id,
+          product: activeClientThread.product,
+          amount: activeClientThread.advanceAmount
+        })
+      });
+      showToast(`Meta template "${tpl.name}" dispatched to ${activeClientThread.name}!`);
+      loadData();
+    } catch (err) {
+      showToast(`Template added to live chat simulator!`);
+    }
+  };
+
+  const handleSendCustomBroadcast = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    await handleDispatchTemplateToActiveClient(broadcastData.templateId);
+    setSending(false);
+  };
+
 
   // Filtered Messages
   const filteredMessages = useMemo(() => {
@@ -731,131 +1013,199 @@ export default function WhatsAppAutomation() {
         </div>
       )}
 
-      {/* ── TAB 4: MANUAL TRIGGER & BROADCAST SIMULATOR ── */}
+      {/* ── TAB 4: MANUAL TRIGGER & WHATSAPP MULTI-CLIENT LIVE INBOX ── */}
       {activeTab === 'broadcast' && (
-        <div style={s.broadcastContainer}>
-          <div style={s.broadcastFormCard}>
-            <h3 style={s.sectionTitle}>Manual WhatsApp Dispatch & Live Sandbox</h3>
-            <p style={s.sectionSub}>Select a lead from the CRM database or enter custom parameters to fire live WhatsApp notifications</p>
-
-            <form onSubmit={handleSendCustomBroadcast} style={s.form}>
-              <div style={s.formGroup}>
-                <label style={s.formLabel}>Select Lead Record (CRM Database)</label>
-
-                <select
-                  value={broadcastData.leadId}
-                  onChange={e => handleLeadSelectChange(e.target.value)}
-                  style={s.formSelect}
-                >
-                  {leads.map(l => (
-                    <option key={l.id} value={l.id}>
-                      {l.id} — {l.name} ({l.interest}) • Stage: {l.stage}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={s.formRow}>
-                <div style={s.formGroup}>
-                  <label style={s.formLabel}>Recipient Contact Number</label>
-                  <input
-                    type="text"
-                    required
-                    value={broadcastData.phone}
-                    onChange={e => setBroadcastData({ ...broadcastData, phone: e.target.value })}
-                    style={s.formInput}
-                  />
+        <div style={s.waAppContainer}>
+          {/* ──── LEFT PANE: WHATSAPP INBOX CHATS LIST (Matching User Reference Image) ──── */}
+          <div style={s.waInboxPane}>
+            {/* Top Bar Header */}
+            <div style={s.waInboxHeader}>
+              <div style={s.waInboxTitleRow}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={s.waMyAvatar}>
+                    <span>APS</span>
+                  </div>
+                  <h2 style={s.waChatsHeading}>Chats</h2>
                 </div>
 
-                <div style={s.formGroup}>
-                  <label style={s.formLabel}>Customer / Company Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={broadcastData.recipientName}
-                    onChange={e => setBroadcastData({ ...broadcastData, recipientName: e.target.value })}
-                    style={s.formInput}
-                  />
+                <div style={s.waInboxActionIcons}>
+                  {/* Currency Icon */}
+                  <button type="button" style={s.waIconBtn} title="Payments & Invoices">
+                    <span>₹</span>
+                  </button>
+                  {/* Camera Icon */}
+                  <button type="button" style={s.waIconBtn} title="Camera">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </button>
+                  {/* New Chat Plus Icon */}
+                  <button
+                    type="button"
+                    onClick={() => setShowQuickTemplateModal(true)}
+                    style={s.waNewChatPlusBtn}
+                    title="Dispatch New HSM Template to Client"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  {/* 3-dots Menu */}
+                  <button type="button" style={s.waIconBtn} title="Menu">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                  </button>
                 </div>
               </div>
 
-              <div style={s.formGroup}>
-                <label style={s.formLabel}>Select WhatsApp HSM Template</label>
-                <select
-                  value={broadcastData.templateId}
-                  onChange={e => setBroadcastData({ ...broadcastData, templateId: e.target.value })}
-                  style={s.formSelect}
-                >
-                  {templates.map(t => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({t.category})
-                    </option>
-                  ))}
-                </select>
+              {/* Search Bar matching "Ask Meta AI or Search" */}
+              <div style={s.waSearchWrap}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2.5" style={{ marginLeft: 10 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input
+                  type="text"
+                  placeholder="Ask Meta AI or Search"
+                  value={inboxSearchQuery}
+                  onChange={e => setInboxSearchQuery(e.target.value)}
+                  style={s.waSearchInput}
+                />
               </div>
 
-              <div style={s.formRow}>
-                <div style={s.formGroup}>
-                  <label style={s.formLabel}>Product / Machine Model</label>
-                  <input
-                    type="text"
-                    value={broadcastData.product}
-                    onChange={e => setBroadcastData({ ...broadcastData, product: e.target.value })}
-                    style={s.formInput}
-                  />
-                </div>
-
-                <div style={s.formGroup}>
-                  <label style={s.formLabel}>10% Advance Amount (₹)</label>
-                  <input
-                    type="text"
-                    value={broadcastData.amount}
-                    onChange={e => setBroadcastData({ ...broadcastData, amount: e.target.value })}
-                    style={s.formInput}
-                  />
-                </div>
+              {/* Category Filter Pills */}
+              <div style={s.waFilterPillsWrap}>
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'unread', label: totalUnreadCount > 0 ? `Unread ${totalUnreadCount}` : 'Unread' },
+                  { key: 'confirmed', label: 'Confirmed Gate' },
+                  { key: 'enquiry', label: 'Enquiry / Qual' }
+                ].map(flt => (
+                  <button
+                    key={flt.key}
+                    type="button"
+                    onClick={() => setInboxFilter(flt.key)}
+                    style={{
+                      ...s.waFilterPill,
+                      backgroundColor: inboxFilter === flt.key ? '#dcfce7' : '#f1f5f9',
+                      color: inboxFilter === flt.key ? '#15803d' : '#475569',
+                      fontWeight: inboxFilter === flt.key ? 700 : 500,
+                      borderColor: inboxFilter === flt.key ? '#86efac' : 'transparent'
+                    }}
+                  >
+                    {flt.label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <button type="submit" disabled={sending} style={s.sendSubmitBtn}>
-                {sending ? 'Delivering via Meta WABA Cloud…' : 'Send WhatsApp Notification Now'}
-              </button>
-            </form>
+            {/* Scrollable Client Contacts Inbox Stream */}
+            <div style={s.waContactsStream}>
+              {filteredClientList.map(client => {
+                const isSelected = client.id === selectedClientId;
+                const lastMsg = client.messages[client.messages.length - 1];
+                return (
+                  <div
+                    key={client.id}
+                    onClick={() => handleSelectClient(client.id)}
+                    style={{
+                      ...s.waContactItem,
+                      backgroundColor: isSelected ? '#f0f2f5' : '#ffffff',
+                      borderLeft: isSelected ? '4px solid #25D366' : '4px solid transparent'
+                    }}
+                  >
+                    {/* Contact Avatar */}
+                    <div style={{ ...s.waContactAvatar, backgroundColor: client.avatarColor || '#2563eb' }}>
+                      {client.avatarLetter || client.name.slice(0, 2).toUpperCase()}
+                    </div>
+
+                    {/* Contact Details */}
+                    <div style={s.waContactContent}>
+                      <div style={s.waContactTopRow}>
+                        <span style={s.waContactName}>{client.name}</span>
+                        <span style={s.waContactTime}>{lastMsg?.time || 'Today'}</span>
+                      </div>
+
+                      <div style={s.waContactSubRow}>
+                        <span style={s.waContactCompany}>{client.company} • {client.stage}</span>
+                      </div>
+
+                      <div style={s.waContactBottomRow}>
+                        <div style={s.waContactSnippet}>
+                          {lastMsg?.sender === 'business' && (
+                            <span style={{ color: '#53bdeb', fontWeight: 800, marginRight: 4 }}>✓✓</span>
+                          )}
+                          <span style={s.waSnippetText}>
+                            {lastMsg ? (lastMsg.text.length > 45 ? `${lastMsg.text.slice(0, 45)}…` : lastMsg.text) : 'No messages yet'}
+                          </span>
+                        </div>
+
+                        {client.unreadCount > 0 ? (
+                          <span style={s.waUnreadCountBadge}>{client.unreadCount}</span>
+                        ) : (
+                          <span style={s.waStageTagPill}>{client.stage}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Live 2-Way WhatsApp Chat Simulator Panel */}
-          <div style={s.chatSimContainer}>
-            {/* WhatsApp Header */}
-            <div style={s.chatSimHeader}>
+          {/* ──── RIGHT PANE: ACTIVE WHATSAPP CHAT CONVERSATION ──── */}
+          <div style={s.waChatPane}>
+            {/* Top WhatsApp Conversation Header */}
+            <div style={s.waChatHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={s.waHeaderAvatar}>
-                  <span>APS</span>
+                <div style={{ ...s.waHeaderAvatarActive, backgroundColor: activeClientThread?.avatarColor || '#2563eb' }}>
+                  <span>{activeClientThread?.avatarLetter || activeClientThread?.name?.slice(0, 2).toUpperCase() || 'CL'}</span>
                   <span style={s.waOnlineDot} />
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={s.waHeaderName}>APS Enterprise Verified</span>
-                    {/* Meta Verified Green Checkmark */}
+                    <span style={s.waHeaderNameActive}>{activeClientThread?.name || 'Customer'}</span>
+                    <span style={s.waCompanyTagHeader}>({activeClientThread?.company})</span>
+                    {/* Meta Green Checkmark */}
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                     </svg>
                   </div>
-                  <div style={s.waHeaderStatus}>Official Business Account • Online</div>
+                  <div style={s.waHeaderStatusActive}>
+                    <span>{activeClientThread?.phone}</span> • <span style={{ color: '#25D366', fontWeight: 600 }}>● Online</span> • <span>Official WABA Stream</span>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, color: '#a1a1aa' }}>
-                {/* Phone Call Icon */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, color: '#64748b' }}>
+                {/* Search In Chat */}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ cursor: 'pointer' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                {/* Phone Call */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ cursor: 'pointer' }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                {/* Video Call Icon */}
+                {/* Video Call */}
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ cursor: 'pointer' }}><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                {/* More Dots Icon */}
+                {/* 3-dots */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ cursor: 'pointer' }}><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
               </div>
             </div>
 
-            {/* WhatsApp Chat Body Stream */}
+            {/* Client CRM Context Ribbon & Quick HSM Dispatch Action */}
+            <div style={s.waCrmContextRibbon}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <span style={s.ribbonLabel}>Product Interest:</span>
+                <span style={s.ribbonValue}>{activeClientThread?.product || 'Industrial Equipment'}</span>
+                <span style={s.ribbonDivider}>•</span>
+                <span style={s.ribbonLabel}>Stage:</span>
+                <span style={s.ribbonStageBadge}>{activeClientThread?.stage || 'Enquiry'}</span>
+                <span style={s.ribbonDivider}>•</span>
+                <span style={s.ribbonLabel}>10% Advance Gate:</span>
+                <span style={s.ribbonAdvanceVal}>₹{activeClientThread?.advanceAmount || '4,200'}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowQuickTemplateModal(true)}
+                style={s.waTriggerHsmBtn}
+              >
+                ⚡ Dispatch HSM Template
+              </button>
+            </div>
+
+            {/* WhatsApp Scrollable Message History Body */}
             <div style={s.chatSimBody}>
-              {/* Date & Encryption Pills */}
+              {/* Date & Encryption Notice */}
               <div style={{ textAlign: 'center', margin: '2px 0 8px 0' }}>
                 <span style={s.chatDatePill}>TODAY</span>
               </div>
@@ -866,7 +1216,7 @@ export default function WhatsAppAutomation() {
 
               {/* Messages Thread (Sender & Receiver 2-Way) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                {chatMessages.map(msg => {
+                {activeClientThread?.messages?.map(msg => {
                   const isBusiness = msg.sender === 'business';
                   return (
                     <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: isBusiness ? 'flex-end' : 'flex-start' }}>
@@ -893,7 +1243,7 @@ export default function WhatsAppAutomation() {
                                 type="button"
                                 onClick={() => {
                                   if (btn.includes('Pay') || btn.includes('Advance')) {
-                                    handleSimulateQuickReply(`I clicked "${btn}" and transferred 10% advance (₹${broadcastData.amount || '4,200'}) via UPI. Please confirm.`);
+                                    handleSimulateQuickReply(`I clicked "${btn}" and transferred 10% advance (₹${activeClientThread?.advanceAmount || '4,200'}) via UPI. Please confirm.`);
                                   } else {
                                     handleSimulateQuickReply(`I clicked "${btn}". Please connect me with our dedicated account manager.`);
                                   }
@@ -921,21 +1271,25 @@ export default function WhatsAppAutomation() {
               </div>
             </div>
 
-            {/* Quick Simulate Customer Reply Pills */}
+            {/* Incoming Customer Message Simulator Bar */}
             <div style={s.quickSimSection}>
-              <span style={s.quickSimLabel}>Quick Customer Responses:</span>
+              <span style={s.quickSimLabel}>
+                📥 Simulate Customer Response ({activeClientThread?.name}):
+              </span>
               <div style={s.quickSimPillsWrap}>
                 <button
                   type="button"
-                  onClick={() => handleSimulateQuickReply(`Payment of 10% advance (₹${broadcastData.amount || '4,200'}) completed via UPI. Reference #UPI-994821.`)}
+                  onClick={() => handleSimulateQuickReply(`Payment of 10% advance (₹${activeClientThread?.advanceAmount || '4,200'}) completed via UPI. Reference #UPI-994821.`)}
                   style={s.quickSimBtn}
+                  title="Simulate customer confirming advance payment"
                 >
                   ✓ "Payment Done via UPI"
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSimulateQuickReply(`Please share the technical layout drawing and warranty terms for ${broadcastData.product || 'machine'}.`)}
+                  onClick={() => handleSimulateQuickReply(`Please share the technical layout drawing and warranty terms for ${activeClientThread?.product || 'machine'}.`)}
                   style={s.quickSimBtn}
+                  title="Simulate customer requesting documentation"
                 >
                   📄 "Request Warranty PDF"
                 </button>
@@ -943,32 +1297,29 @@ export default function WhatsAppAutomation() {
                   type="button"
                   onClick={() => handleSimulateQuickReply(`Can we schedule delivery and site installation for next week?`)}
                   style={s.quickSimBtn}
+                  title="Simulate customer asking about delivery schedule"
                 >
                   🚚 "Delivery Schedule Query"
                 </button>
               </div>
             </div>
 
-            {/* Live 2-Way Chat Input Box */}
+            {/* APS Enterprise Admin Outgoing Message Input Bar */}
             <form onSubmit={handleSendChatMessage} style={s.chatInputForm}>
-              {/* Role Toggle Button */}
-              <button
-                type="button"
-                onClick={() => setChatSenderRole(chatSenderRole === 'customer' ? 'business' : 'customer')}
-                style={{
-                  ...s.roleSwitchBtn,
-                  backgroundColor: chatSenderRole === 'customer' ? '#ffffff' : '#dcfce7',
-                  color: chatSenderRole === 'customer' ? '#09090b' : '#15803d',
-                  borderColor: chatSenderRole === 'customer' ? '#e4e4e7' : '#86efac'
-                }}
-                title="Click to switch sender role"
-              >
-                {chatSenderRole === 'customer' ? '👤 Customer' : '🏢 APS Admin'}
+              {/* Fixed APS Enterprise Admin Sender Badge */}
+              <div style={s.adminSenderBadge} title="You are typing and sending this message as APS Enterprise (Admin)">
+                <span style={{ fontSize: '0.85rem' }}>🏢</span>
+                <span style={{ fontWeight: 800, color: '#15803d', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>APS Enterprise</span>
+              </div>
+
+              {/* Attachment Icon */}
+              <button type="button" style={s.waInputIconBtn} title="Attach Document / Media">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               </button>
 
               <input
                 type="text"
-                placeholder={chatSenderRole === 'customer' ? `Type message as ${broadcastData.recipientName || 'Customer'}…` : 'Type reply as APS Enterprise…'}
+                placeholder={`Type message as APS Enterprise to ${activeClientThread?.name || 'customer'}…`}
                 value={chatInputText}
                 onChange={e => setChatInputText(e.target.value)}
                 style={s.chatInputField}
@@ -977,7 +1328,7 @@ export default function WhatsAppAutomation() {
               <button
                 type="submit"
                 style={s.chatSendBtn}
-                title="Send message in live chat"
+                title="Send WhatsApp message from APS Enterprise"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"/>
@@ -985,15 +1336,42 @@ export default function WhatsAppAutomation() {
                 </svg>
               </button>
             </form>
+          </div>
+        </div>
+      )}
 
-            <div style={s.previewFooter}>
-              <span style={s.lockIcon}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </span> End-to-end encrypted via Meta Business Cloud API
+      {/* ── MODAL: QUICK HSM TEMPLATE DISPATCH ── */}
+      {showQuickTemplateModal && activeClientThread && (
+        <div style={s.modalOverlay} onClick={() => setShowQuickTemplateModal(false)}>
+          <div style={s.modalContent} onClick={e => e.stopPropagation()}>
+            <div style={s.modalHeader}>
+              <div>
+                <h3 style={s.modalTitle}>Dispatch Meta HSM Template to {activeClientThread.name}</h3>
+                <div style={s.modalSub}>{activeClientThread.company} • {activeClientThread.phone} • Advance: ₹{activeClientThread.advanceAmount}</div>
+              </div>
+              <button onClick={() => setShowQuickTemplateModal(false)} style={s.closeModalBtn}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', margin: '1rem 0' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#334155' }}>Select Pre-Approved Meta Template:</span>
+              {templates.map(tpl => (
+                <div
+                  key={tpl.id}
+                  onClick={() => handleDispatchTemplateToActiveClient(tpl.id)}
+                  style={s.tplModalPickCard}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.84rem', color: '#09090b' }}>{tpl.name}</span>
+                    <span style={s.approvedBadge}>✓ {tpl.category}</span>
+                  </div>
+                  <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0, lineHeight: 1.4 }}>{tpl.bodyText}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
+
 
 
       {/* ── MODAL: VIEW CHAT BUBBLE DETAILS ── */}
@@ -1596,29 +1974,231 @@ const s = {
     color: '#71717a',
     fontWeight: 600
   },
-  broadcastContainer: {
+  waAppContainer: {
     display: 'grid',
-    gridTemplateColumns: '1.2fr 1fr',
-    gap: '2rem',
-    alignItems: 'start'
-  },
-  broadcastFormCard: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: '2rem',
-    border: '1px solid #e4e4e7',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
-  },
-  chatSimContainer: {
-    backgroundColor: '#09090b',
+    gridTemplateColumns: '360px 1fr',
     borderRadius: 20,
     overflow: 'hidden',
-    boxShadow: '0 12px 36px rgba(0,0,0,0.18)',
-    border: '1px solid #27272a',
+    boxShadow: '0 14px 40px rgba(0,0,0,0.12)',
+    border: '1px solid #e4e4e7',
+    height: 700,
+    backgroundColor: '#ffffff'
+  },
+  waInboxPane: {
+    backgroundColor: '#ffffff',
+    borderRight: '1px solid #e4e4e7',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'hidden'
+  },
+  waInboxHeader: {
+    backgroundColor: '#ffffff',
+    padding: '1rem 1rem 0.65rem 1rem',
+    borderBottom: '1px solid #f1f5f9',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.65rem'
+  },
+  waInboxTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  waMyAvatar: {
+    width: 34,
+    height: 34,
+    borderRadius: '50%',
+    backgroundColor: '#09090b',
+    color: '#ffffff',
+    fontWeight: 800,
+    fontSize: '0.74rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  waChatsHeading: {
+    fontSize: '1.25rem',
+    fontWeight: 800,
+    color: '#09090b',
+    margin: 0,
+    letterSpacing: '-0.3px'
+  },
+  waInboxActionIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  },
+  waIconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    backgroundColor: '#f4f4f5',
+    border: 'none',
+    color: '#334155',
+    fontSize: '0.85rem',
+    fontWeight: 800,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease'
+  },
+  waNewChatPlusBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    backgroundColor: '#25D366',
+    border: 'none',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(37,211,102,0.4)',
+    transition: 'transform 0.15s ease'
+  },
+  waSearchWrap: {
+    backgroundColor: '#f1f5f9',
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '4px 6px'
+  },
+  waSearchInput: {
+    flex: 1,
+    border: 'none',
+    backgroundColor: 'transparent',
+    fontSize: '0.8rem',
+    outline: 'none',
+    color: '#09090b',
+    padding: '6px 4px'
+  },
+  waFilterPillsWrap: {
+    display: 'flex',
+    gap: 6,
+    overflowX: 'auto',
+    paddingBottom: 2
+  },
+  waFilterPill: {
+    padding: '4px 10px',
+    borderRadius: 14,
+    border: '1px solid transparent',
+    fontSize: '0.7rem',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.12s ease'
+  },
+  waContactsStream: {
+    flex: 1,
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column'
   },
-  chatSimHeader: {
+  waContactItem: {
+    padding: '10px 14px',
+    borderBottom: '1px solid #f8fafc',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    transition: 'background 0.12s ease'
+  },
+  waContactAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    color: '#ffffff',
+    fontWeight: 800,
+    fontSize: '0.86rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+  },
+  waContactContent: {
+    flex: 1,
+    minWidth: 0
+  },
+  waContactTopRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 2
+  },
+  waContactName: {
+    fontWeight: 800,
+    fontSize: '0.86rem',
+    color: '#09090b',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  waContactTime: {
+    fontSize: '0.66rem',
+    color: '#71717a',
+    flexShrink: 0
+  },
+  waContactSubRow: {
+    fontSize: '0.68rem',
+    color: '#71717a',
+    marginBottom: 3,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  waContactCompany: {
+    color: '#64748b',
+    fontWeight: 600
+  },
+  waContactBottomRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6
+  },
+  waContactSnippet: {
+    fontSize: '0.74rem',
+    color: '#475569',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  waSnippetText: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  waUnreadCountBadge: {
+    backgroundColor: '#25D366',
+    color: '#ffffff',
+    fontSize: '0.62rem',
+    fontWeight: 800,
+    padding: '2px 7px',
+    borderRadius: 10,
+    flexShrink: 0
+  },
+  waStageTagPill: {
+    backgroundColor: '#f1f5f9',
+    color: '#475569',
+    fontSize: '0.6rem',
+    fontWeight: 700,
+    padding: '2px 6px',
+    borderRadius: 6,
+    flexShrink: 0
+  },
+  waChatPane: {
+    backgroundColor: '#09090b',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'hidden'
+  },
+  waChatHeader: {
     backgroundColor: '#18181b',
     padding: '0.85rem 1.25rem',
     display: 'flex',
@@ -1626,18 +2206,18 @@ const s = {
     justifyContent: 'space-between',
     borderBottom: '1px solid #27272a'
   },
-  waHeaderAvatar: {
+  waHeaderAvatarActive: {
     width: 38,
     height: 38,
     borderRadius: '50%',
-    backgroundColor: '#27272a',
     color: '#fff',
     fontWeight: 800,
     fontSize: '0.82rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative'
+    position: 'relative',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
   },
   waOnlineDot: {
     position: 'absolute',
@@ -1649,20 +2229,74 @@ const s = {
     borderRadius: '50%',
     border: '2px solid #18181b'
   },
-  waHeaderName: {
+  waHeaderNameActive: {
     color: '#ffffff',
     fontWeight: 800,
-    fontSize: '0.88rem'
+    fontSize: '0.9rem'
   },
-  waHeaderStatus: {
+  waCompanyTagHeader: {
     color: '#a1a1aa',
-    fontSize: '0.66rem'
+    fontSize: '0.76rem',
+    fontWeight: 600
+  },
+  waHeaderStatusActive: {
+    color: '#a1a1aa',
+    fontSize: '0.66rem',
+    marginTop: 2
+  },
+  waCrmContextRibbon: {
+    backgroundColor: '#ffffff',
+    padding: '0.65rem 1.25rem',
+    borderBottom: '1px solid #e4e4e7',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10
+  },
+  ribbonLabel: {
+    fontSize: '0.7rem',
+    color: '#64748b',
+    fontWeight: 600
+  },
+  ribbonValue: {
+    fontSize: '0.74rem',
+    color: '#09090b',
+    fontWeight: 800
+  },
+  ribbonDivider: {
+    color: '#cbd5e1',
+    fontSize: '0.75rem'
+  },
+  ribbonStageBadge: {
+    backgroundColor: 'rgba(37,99,235,0.1)',
+    color: '#2563eb',
+    fontSize: '0.65rem',
+    fontWeight: 800,
+    padding: '2px 8px',
+    borderRadius: 8
+  },
+  ribbonAdvanceVal: {
+    fontSize: '0.76rem',
+    fontWeight: 800,
+    color: '#15803d'
+  },
+  waTriggerHsmBtn: {
+    padding: '5px 12px',
+    backgroundColor: '#25D366',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: 8,
+    fontSize: '0.72rem',
+    fontWeight: 800,
+    cursor: 'pointer',
+    boxShadow: '0 2px 6px rgba(37,211,102,0.35)',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.15s ease'
   },
   chatSimBody: {
     backgroundColor: '#efeae2',
     padding: '1.25rem 1rem',
-    minHeight: 340,
-    maxHeight: 440,
+    flex: 1,
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
@@ -1697,7 +2331,7 @@ const s = {
     borderRadius: '10px 10px 0 10px',
     padding: '0.75rem 0.9rem',
     boxShadow: '0 1px 2px rgba(11,20,26,0.12)',
-    maxWidth: '90%',
+    maxWidth: '85%',
     marginLeft: 'auto'
   },
   waIncomingBubble: {
@@ -1705,7 +2339,7 @@ const s = {
     borderRadius: '10px 10px 10px 0',
     padding: '0.75rem 0.9rem',
     boxShadow: '0 1px 2px rgba(11,20,26,0.12)',
-    maxWidth: '90%',
+    maxWidth: '85%',
     marginRight: 'auto'
   },
   waSenderTagBiz: {
@@ -1798,15 +2432,24 @@ const s = {
     alignItems: 'center',
     gap: 8
   },
-  roleSwitchBtn: {
-    padding: '6px 10px',
+  adminSenderBadge: {
+    padding: '6px 11px',
     borderRadius: 8,
-    border: '1px solid',
-    fontSize: '0.68rem',
-    fontWeight: 700,
+    border: '1px solid #86efac',
+    backgroundColor: '#dcfce7',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    userSelect: 'none'
+  },
+  waInputIconBtn: {
+    background: 'none',
+    border: 'none',
+    padding: '4px',
     cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    transition: 'all 0.15s ease'
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   chatInputField: {
     flex: 1,
@@ -1830,63 +2473,13 @@ const s = {
     boxShadow: '0 2px 6px rgba(37,211,102,0.4)',
     transition: 'transform 0.12s ease'
   },
-  previewFooter: {
-    backgroundColor: '#18181b',
-    padding: '0.55rem',
-    textAlign: 'center',
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: '0.64rem'
-  },
-  lockIcon: {
-    fontSize: '0.68rem'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    marginTop: '1.25rem'
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
-    flex: 1
-  },
-  formRow: {
-    display: 'flex',
-    gap: '1rem'
-  },
-  formLabel: {
-    fontSize: '0.74rem',
-    fontWeight: 700,
-    color: '#334155'
-  },
-  formInput: {
-    padding: '8px 12px',
-    borderRadius: 8,
-    border: '1px solid #cbd5e1',
-    fontSize: '0.8rem',
-    outline: 'none'
-  },
-  formSelect: {
-    padding: '8px 12px',
-    borderRadius: 8,
-    border: '1px solid #cbd5e1',
-    fontSize: '0.8rem',
-    outline: 'none',
-    backgroundColor: '#fff'
-  },
-  sendSubmitBtn: {
-    padding: '11px',
-    backgroundColor: '#25D366',
-    color: '#fff',
-    border: 'none',
+  tplModalPickCard: {
+    backgroundColor: '#f8fafc',
     borderRadius: 10,
-    fontSize: '0.85rem',
-    fontWeight: 800,
+    padding: '0.85rem',
+    border: '1px solid #e2e8f0',
     cursor: 'pointer',
-    marginTop: '0.5rem',
-    boxShadow: '0 4px 14px rgba(37,211,102,0.35)'
+    transition: 'all 0.15s ease'
   },
   modalOverlay: {
     position: 'fixed',
@@ -1908,7 +2501,9 @@ const s = {
     width: '100%',
     maxWidth: 520,
     padding: '2rem',
-    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+    maxHeight: '85vh',
+    overflowY: 'auto'
   },
   modalHeader: {
     display: 'flex',
@@ -1974,3 +2569,4 @@ const s = {
     fontWeight: 600
   }
 };
+
