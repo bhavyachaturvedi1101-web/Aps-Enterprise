@@ -160,10 +160,10 @@ export default function BookingsERP() {
           id: `BK${String(index + 1).padStart(3, '0')}`,
           client: l.name,
           product: l.interest,
-          erpRef: `ERP-2026-${1000 + parseInt(l.id || index)}`,
+          erpRef: `ERP-2026-${1000 + parseInt(l.id ? l.id.replace('LEAD-', '') : index)}`,
           status: mapStageToStatus(l.stage),
-          date: '2026-08-14',
-          amount: `₹${parseFloat(l.budget).toLocaleString('en-IN')}`,
+          date: l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '14 Aug 2026',
+          amount: `₹${parseFloat(l.budget || 0).toLocaleString('en-IN')}`,
           rawAmount: parseFloat(l.budget) || 0
         }));
         

@@ -189,6 +189,468 @@ const mockLeads = [
     source: 'WhatsApp', 
     assignedEmployeeId: 'e2',
     createdAt: new Date(Date.now() - 345600000)
+  },
+  { 
+    id: 'LEAD-013', 
+    name: 'Mahindra Heavy Eng', 
+    company: 'Mahindra Industrial Solutions',
+    phone: '+919912388776',
+    email: 'purchasing@mahindra-heavy.com',
+    interest: 'CNC 5-Axis Machining Center', 
+    budget: '150000', 
+    stage: 'Confirmed Lead', 
+    notes: 'ERP Booking created. Advance invoice generated for ₹15,000.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: false, 
+    source: 'Meta Ads', 
+    assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 2)
+  },
+  { 
+    id: 'LEAD-014', 
+    name: 'Bharat Forge Systems', 
+    company: 'Bharat Forge Group',
+    phone: '+919877712345',
+    email: 'contact@bharatforge-sys.com',
+    interest: 'Robotic Welding Cell', 
+    budget: '95000', 
+    stage: 'Dispatched', 
+    notes: 'Dispatched via Gati KWE tracking #GATI-441092. WhatsApp notice sent.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 6)
+  },
+  { 
+    id: 'LEAD-015', 
+    name: 'L&T Precision Components', 
+    company: 'Larsen & Toubro Heavy Machinery',
+    phone: '+919765432109',
+    email: 'procurement@lnt-heavy.com',
+    interest: 'Fiber Laser Cutter 6kW', 
+    budget: '180000', 
+    stage: 'Booked', 
+    notes: 'ERP booking created, waiting for dual-approval countersignature.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: false, 
+    source: 'Telecaller', 
+    assignedEmployeeId: 'e4',
+    createdAt: new Date(Date.now() - 86400000 * 1.5)
+  },
+  { 
+    id: 'LEAD-016', 
+    name: 'Schneider Automation', 
+    company: 'Schneider Electricals India',
+    phone: '+919654321098',
+    email: 'admin@schneider-automation.in',
+    interest: 'Automated Assembly Conveyor', 
+    budget: '40000', 
+    stage: 'Enquiry', 
+    notes: 'Inquired through web portal; budget verified.', 
+    crmSynced: true, 
+    erpBookingCreated: false, 
+    tallyPaymentVerified: false, 
+    source: 'A2 Admin Cockpit', 
+    assignedEmployeeId: 'e5',
+    createdAt: new Date(Date.now() - 3600000 * 4)
+  },
+  { 
+    id: 'LEAD-017', 
+    name: 'Bosch Chassis Systems', 
+    company: 'Bosch Automotive India',
+    phone: '+919543210987',
+    email: 'supply@bosch-chassis.in',
+    interest: 'Hydraulic Press 500T', 
+    budget: '110000', 
+    stage: 'In Production', 
+    notes: 'Shopfloor job card #APS-MFG-9102 active. Frame welding stage.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'WhatsApp A5', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 4.5)
+  },
+  { 
+    id: 'LEAD-018', 
+    name: 'Jindal Steel & Power', 
+    company: 'Jindal Fabrications',
+    phone: '+919432109876',
+    email: 'purchases@jindalsteel.co.in',
+    interest: 'Plasma Tube Cutter', 
+    budget: '65000', 
+    stage: 'Qualified', 
+    notes: 'A1 Voice Agent qualified purchase timeline as Q3.', 
+    crmSynced: true, 
+    erpBookingCreated: false, 
+    tallyPaymentVerified: false, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 2.5)
+  },
+  { 
+    id: 'LEAD-019', 
+    name: 'TVS Motor Components', 
+    company: 'TVS Auto Ancillaries Ltd',
+    phone: '+919940122334',
+    email: 'procurement@tvs-components.co.in',
+    interest: 'Robotic Spot Welding Cell', 
+    budget: '140000', 
+    stage: 'Confirmed Lead', 
+    notes: 'ERP Booking created. Pending 10% advance (₹14,000) Tally gate verification.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: false, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 1.2)
+  },
+  { 
+    id: 'LEAD-020', 
+    name: 'Siemens Energy India', 
+    company: 'Siemens Industrial Turbines',
+    phone: '+919810233445',
+    email: 'turbines@siemens-energy.in',
+    interest: 'VMC 5-Axis Heavy Machining Unit', 
+    budget: '220000', 
+    stage: 'Client (Paid)', 
+    notes: '10% advance deposit verified in Tally. Order released to manufacturing queue.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'Meta Ads', 
+    assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 3.5)
+  },
+  { 
+    id: 'LEAD-021', 
+    name: 'Cummins Generator Systems', 
+    company: 'Cummins India Heavy Diesel',
+    phone: '+919720344556',
+    email: 'supplychain@cummins-gen.com',
+    interest: 'CNC Sheet Metal Punching Center', 
+    budget: '88000', 
+    stage: 'Booked', 
+    notes: 'ERP Booking created with high-capacity punch head tooling package.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: false, 
+    source: 'Telecaller', 
+    assignedEmployeeId: 'e4',
+    createdAt: new Date(Date.now() - 86400000 * 2.1)
+  },
+  { 
+    id: 'LEAD-022', 
+    name: 'Eicher Motors Foundry', 
+    company: 'Eicher Castings & Alloys',
+    phone: '+919630455667',
+    email: 'foundry@eicher-alloys.in',
+    interest: 'Automatic Core Shooter Machine', 
+    budget: '52000', 
+    stage: 'In Production', 
+    notes: 'Shopfloor job card #APS-MFG-9204 active. Assembly 70% completed.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'WhatsApp A5', 
+    assignedEmployeeId: 'e5',
+    createdAt: new Date(Date.now() - 86400000 * 5.2)
+  },
+  { 
+    id: 'LEAD-023', 
+    name: 'Thermax Boilers & Piping', 
+    company: 'Thermax Heavy Engineering',
+    phone: '+919540566778',
+    email: 'projects@thermax-boilers.com',
+    interest: 'Heavy Duty Tube Bender 150mm', 
+    budget: '78000', 
+    stage: 'Dispatched', 
+    notes: 'Dispatched via Safexpress LR #SAF-90021. WhatsApp dispatch tracking sent.', 
+    crmSynced: true, 
+    erpBookingCreated: true, 
+    tallyPaymentVerified: true, 
+    source: 'A1 Voice Agent', 
+    assignedEmployeeId: 'e3',
+    createdAt: new Date(Date.now() - 86400000 * 7)
+  },
+  { 
+    id: 'LEAD-024', 
+    name: 'Hero MotoCorp Toolroom', 
+    company: 'Hero Die & Tool Division',
+    phone: '+919450677889',
+    email: 'toolroom@heromotocorp.in',
+    interest: 'EDM Wire Cut Machine', 
+    budget: '62000', 
+    stage: 'Enquiry', 
+    notes: 'Inquired via website form for Toolroom expansion project in Gurgaon.', 
+    crmSynced: true, 
+    erpBookingCreated: false, 
+    tallyPaymentVerified: false, 
+    source: 'Meta Ads', 
+    assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 3600000 * 6)
+  },
+  // ── MARCH 2026 HISTORICAL LEADS ─────────────────────────────────
+  {
+    id: 'LEAD-025',
+    name: 'Hindustan Aeronautics (HAL)',
+    company: 'HAL Aerospace Division',
+    phone: '+919810101010',
+    email: 'contracts@hal-india.co.in',
+    interest: '5-Axis Gantry CNC Machine',
+    budget: '320000',
+    stage: 'Dispatched',
+    notes: 'March 2026 order dispatched via Heavy Transport LR #HAL-901.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Inbound Call', assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 165)
+  },
+  {
+    id: 'LEAD-026',
+    name: 'BHEL Power Equipment',
+    company: 'Bharat Heavy Electricals Trichy',
+    phone: '+919820202020',
+    email: 'procurement@bhel-trichy.co.in',
+    interest: 'Heavy Duty Boiler Pipe Bender',
+    budget: '145000',
+    stage: 'Client (Paid)',
+    notes: 'March 2026 order 10% advance verified in Tally. Order completed.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Telecaller', assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 155)
+  },
+  {
+    id: 'LEAD-027',
+    name: 'Ashok Leyland Chassis',
+    company: 'Ashok Leyland Heavy Vehicles',
+    phone: '+919830303030',
+    email: 'chassis@ashokleyland.com',
+    interest: 'Robotic Frame Welding Line',
+    budget: '210000',
+    stage: 'Dispatched',
+    notes: 'March 2026 order delivered to Hosur manufacturing unit.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'A1 Voice Agent', assignedEmployeeId: 'e4',
+    createdAt: new Date(Date.now() - 86400000 * 150)
+  },
+  // ── APRIL 2026 HISTORICAL LEADS ─────────────────────────────────
+  {
+    id: 'LEAD-028',
+    name: 'Escorts Kubota Tractors',
+    company: 'Escorts Agri Machinery',
+    phone: '+919840404040',
+    email: 'factory@escorts-tractors.in',
+    interest: 'Laser Cutter 8kW High Speed',
+    budget: '175000',
+    stage: 'Client (Paid)',
+    notes: 'April 2026 order advance cleared via HDFC Bank UTR #HDFC-APR-991.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Meta Ads', assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 135)
+  },
+  {
+    id: 'LEAD-029',
+    name: 'Force Motors Auto Line',
+    company: 'Force Motors Ltd Pithampur',
+    phone: '+919850505050',
+    email: 'purchasing@forcemotors.co.in',
+    interest: 'CNC Turning Center Dual Spindle',
+    budget: '98000',
+    stage: 'Dispatched',
+    notes: 'April 2026 order dispatched via V-Trans logistics.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'WhatsApp A5', assignedEmployeeId: 'e3',
+    createdAt: new Date(Date.now() - 86400000 * 125)
+  },
+  {
+    id: 'LEAD-030',
+    name: 'Sonalika International',
+    company: 'Sonalika Tractors Tooling',
+    phone: '+919860606060',
+    email: 'toolroom@sonalika.com',
+    interest: 'Automatic Core Shooter Machine',
+    budget: '68000',
+    stage: 'Client (Paid)',
+    notes: 'April 2026 advance verified in Tally ledger #MST-7712.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Telecaller', assignedEmployeeId: 'e5',
+    createdAt: new Date(Date.now() - 86400000 * 120)
+  },
+  // ── MAY 2026 HISTORICAL LEADS ───────────────────────────────────
+  {
+    id: 'LEAD-031',
+    name: 'Havells Industrial Motors',
+    company: 'Havells Electricals Neemrana',
+    phone: '+919870707070',
+    email: 'motors@havells.com',
+    interest: 'Stator Coil Winding Machine',
+    budget: '85000',
+    stage: 'Dispatched',
+    notes: 'May 2026 order dispatched via Safexpress LR #SAF-MAY-102.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'A1 Voice Agent', assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 105)
+  },
+  {
+    id: 'LEAD-032',
+    name: 'Crompton Greaves Consumer',
+    company: 'Crompton Pumps & Motors',
+    phone: '+919880808080',
+    email: 'pumps@crompton.co.in',
+    interest: 'CNC Die Casting Cell 400T',
+    budget: '190000',
+    stage: 'Client (Paid)',
+    notes: 'May 2026 order 10% advance verified via ICICI UTR #ICICI-MAY-881.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Meta Ads', assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 95)
+  },
+  {
+    id: 'LEAD-033',
+    name: 'ABB Power Grids India',
+    company: 'ABB Transformers & Switchgear',
+    phone: '+919890909090',
+    email: 'transformers@abb.com',
+    interest: 'Transformer Core Lamination Cutter',
+    budget: '240000',
+    stage: 'Dispatched',
+    notes: 'May 2026 order delivered to Vadodara unit.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Inbound Call', assignedEmployeeId: 'e4',
+    createdAt: new Date(Date.now() - 86400000 * 90)
+  },
+  // ── JUNE 2026 HISTORICAL LEADS ──────────────────────────────────
+  {
+    id: 'LEAD-034',
+    name: 'Voltas Heavy HVAC Systems',
+    company: 'Voltas Industrial Chillers',
+    phone: '+919900101010',
+    email: 'chillers@voltas.com',
+    interest: 'HVAC Copper Tube Expansion Press',
+    budget: '72000',
+    stage: 'Client (Paid)',
+    notes: 'June 2026 advance verified in Tally ledger #MST-8012.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'WhatsApp A5', assignedEmployeeId: 'e3',
+    createdAt: new Date(Date.now() - 86400000 * 75)
+  },
+  {
+    id: 'LEAD-035',
+    name: 'Hindalco Metal Extrusions',
+    company: 'Hindalco Aluminium Extrusions',
+    phone: '+919910202020',
+    email: 'extrusions@hindalco.adityabirla.com',
+    interest: 'Aluminium Extrusion Puller Machine',
+    budget: '160000',
+    stage: 'In Production',
+    notes: 'June 2026 order active on shopfloor #APS-MFG-8711.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'A1 Voice Agent', assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 68)
+  },
+  {
+    id: 'LEAD-036',
+    name: 'Vedanta Alloys & Extrusions',
+    company: 'Vedanta Smelter Toolroom',
+    phone: '+919920303030',
+    email: 'smelter@vedanta.co.in',
+    interest: 'High Precision EDM Wire Cut',
+    budget: '89000',
+    stage: 'Client (Paid)',
+    notes: 'June 2026 order 10% advance verified via SBI Bank.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Telecaller', assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 62)
+  },
+  // ── JULY 2026 HISTORICAL LEADS ──────────────────────────────────
+  {
+    id: 'LEAD-037',
+    name: 'UltraTech ReadyMix Machines',
+    company: 'UltraTech Concrete Equipment',
+    phone: '+919930404040',
+    email: 'concrete@ultratech.adityabirla.com',
+    interest: 'Concrete Batching Plant Automation',
+    budget: '135000',
+    stage: 'In Production',
+    notes: 'July 2026 order manufacturing 80% completed.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Meta Ads', assignedEmployeeId: 'e5',
+    createdAt: new Date(Date.now() - 86400000 * 45)
+  },
+  {
+    id: 'LEAD-038',
+    name: 'Blue Star Industrial HVAC',
+    company: 'Blue Star Climate Solutions',
+    phone: '+919940505050',
+    email: 'chillers@bluestarindia.com',
+    interest: 'Sheet Metal CNC Punching Press',
+    budget: '95000',
+    stage: 'Confirmed Lead',
+    notes: 'July 2026 ERP booking created. Awaiting Tally 10% advance.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: false,
+    source: 'A1 Voice Agent', assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 38)
+  },
+  {
+    id: 'LEAD-039',
+    name: 'Alstom Transport India',
+    company: 'Alstom Metro & Rail Components',
+    phone: '+919950606060',
+    email: 'metro@alstom.com',
+    interest: 'Bogie Welding Robotic Cell',
+    budget: '280000',
+    stage: 'Client (Paid)',
+    notes: 'July 2026 advance verified via Kotak Bank UTR #KOTAK-JUL-109.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: true,
+    source: 'Inbound Call', assignedEmployeeId: 'e2',
+    createdAt: new Date(Date.now() - 86400000 * 34)
+  },
+  // ── AUGUST 2026 HISTORICAL LEADS ────────────────────────────────
+  {
+    id: 'LEAD-040',
+    name: 'BEML Mining Machinery',
+    company: 'BEML KGF Heavy Division',
+    phone: '+919960707070',
+    email: 'mining@beml.co.in',
+    interest: 'Heavy Earthmover Cylinder Honing',
+    budget: '155000',
+    stage: 'Booked',
+    notes: 'August 2026 booking created, awaiting dual-approval countersign.',
+    crmSynced: true, erpBookingCreated: true, tallyPaymentVerified: false,
+    source: 'Telecaller', assignedEmployeeId: 'e4',
+    createdAt: new Date(Date.now() - 86400000 * 18)
+  },
+  {
+    id: 'LEAD-041',
+    name: 'Amara Raja Batteries',
+    company: 'Amara Raja Industrial Energy',
+    phone: '+919970808080',
+    email: 'factory@amararaja.com',
+    interest: 'Lead Acid Plate Die Cutting Machine',
+    budget: '64000',
+    stage: 'Qualified',
+    notes: 'August 2026 lead qualified by A1 Voice Agent.',
+    crmSynced: true, erpBookingCreated: false, tallyPaymentVerified: false,
+    source: 'A1 Voice Agent', assignedEmployeeId: 'e1',
+    createdAt: new Date(Date.now() - 86400000 * 12)
+  },
+  {
+    id: 'LEAD-042',
+    name: 'Exide Industries Energy',
+    company: 'Exide Industrial Batteries',
+    phone: '+919980909090',
+    email: 'energy@exide.co.in',
+    interest: 'Automatic Grid Casting Machine',
+    budget: '78000',
+    stage: 'Enquiry',
+    notes: 'August 2026 inquiry received via Meta Ads.',
+    crmSynced: true, erpBookingCreated: false, tallyPaymentVerified: false,
+    source: 'Meta Ads', assignedEmployeeId: 'e3',
+    createdAt: new Date(Date.now() - 86400000 * 5)
   }
 ];
 
@@ -252,6 +714,87 @@ const mockActivityLogs = [
     toStage: 'Confirmed Lead', 
     details: 'Sent template payment_reminder_advance_10pct for $4,200 advance',
     createdAt: new Date(Date.now() - 3600000) 
+  },
+  {
+    id: 'log-006',
+    employeeId: 'e2', employeeName: 'Bhavya',
+    leadId: 'LEAD-025', leadName: 'Hindustan Aeronautics (HAL)',
+    action: 'Dispatched 5-Axis Gantry CNC Machine order to HAL Bengaluru',
+    fromStage: 'In Production', toStage: 'Dispatched',
+    details: 'March 2026 milestone completion & heavy logistics dispatch LR #HAL-901',
+    createdAt: new Date(Date.now() - 86400000 * 160)
+  },
+  {
+    id: 'log-007',
+    employeeId: 'e1', employeeName: 'Animesh',
+    leadId: 'LEAD-026', leadName: 'BHEL Power Equipment',
+    action: 'Tally 10% Advance Payment Verified (₹14,500)',
+    fromStage: 'Confirmed Lead', toStage: 'Client (Paid)',
+    details: 'March 2026 Tally ledger sync complete via SBI UTR #SBI-MAR-112',
+    createdAt: new Date(Date.now() - 86400000 * 153)
+  },
+  {
+    id: 'log-008',
+    employeeId: 'e4', employeeName: 'Pooja Sharma',
+    leadId: 'LEAD-027', leadName: 'Ashok Leyland Chassis',
+    action: 'Order Released to Manufacturing Queue #APS-MFG-7102',
+    fromStage: 'Client (Paid)', toStage: 'In Production',
+    details: 'March 2026 factory release triggered for Robotic Frame Welding Line',
+    createdAt: new Date(Date.now() - 86400000 * 148)
+  },
+  {
+    id: 'log-009',
+    employeeId: 'e2', employeeName: 'Bhavya',
+    leadId: 'LEAD-028', leadName: 'Escorts Kubota Tractors',
+    action: 'Tally Ledger Reconciliation Completed (₹17,500)',
+    fromStage: 'Confirmed Lead', toStage: 'Client (Paid)',
+    details: 'April 2026 advance verified against HDFC Current A/c #5020',
+    createdAt: new Date(Date.now() - 86400000 * 132)
+  },
+  {
+    id: 'log-010',
+    employeeId: 'e3', employeeName: 'Aaditya',
+    leadId: 'LEAD-029', leadName: 'Force Motors Auto Line',
+    action: 'WhatsApp Dispatch Notice & Courier Tracking Sent',
+    fromStage: 'In Production', toStage: 'Dispatched',
+    details: 'April 2026 template dispatch_tracking_alert sent to Force Motors',
+    createdAt: new Date(Date.now() - 86400000 * 122)
+  },
+  {
+    id: 'log-011',
+    employeeId: 'e1', employeeName: 'Animesh',
+    leadId: 'LEAD-031', leadName: 'Havells Industrial Motors',
+    action: 'Voice Agent Qualified Purchase Timeline & Budget',
+    fromStage: 'Enquiry', toStage: 'Qualified',
+    details: 'May 2026 call qualification completed for Stator Winding Machine',
+    createdAt: new Date(Date.now() - 86400000 * 104)
+  },
+  {
+    id: 'log-012',
+    employeeId: 'e2', employeeName: 'Bhavya',
+    leadId: 'LEAD-032', leadName: 'Crompton Greaves Consumer',
+    action: 'Dual Countersign Approved by Operations Manager',
+    fromStage: 'Booked', toStage: 'Confirmed Lead',
+    details: 'May 2026 countersigned by Aaditya for ₹190,000 CNC Die Casting Cell',
+    createdAt: new Date(Date.now() - 86400000 * 94)
+  },
+  {
+    id: 'log-013',
+    employeeId: 'e5', employeeName: 'Rohan Mehta',
+    leadId: 'LEAD-035', leadName: 'Hindalco Metal Extrusions',
+    action: 'Shopfloor Job Card #APS-MFG-8711 Activated',
+    fromStage: 'Client (Paid)', toStage: 'In Production',
+    details: 'June 2026 Extrusion Puller assembly started at Unit 2',
+    createdAt: new Date(Date.now() - 86400000 * 66)
+  },
+  {
+    id: 'log-014',
+    employeeId: 'e2', employeeName: 'Bhavya',
+    leadId: 'LEAD-039', leadName: 'Alstom Transport India',
+    action: 'Tally 10% Advance Deposit Verified (₹28,000)',
+    fromStage: 'Confirmed Lead', toStage: 'Client (Paid)',
+    details: 'July 2026 advance verified via Kotak Bank UTR #KOTAK-JUL-109',
+    createdAt: new Date(Date.now() - 86400000 * 32)
   }
 ];
 
@@ -824,6 +1367,112 @@ const mockTimeInStage = [
   }
 ];
 
+const companyProfile = {
+  name: 'APS Enterprises',
+  website: 'https://www.apsenterprises.in',
+  tagline: 'Leading Dona Pattal & Paper Plate Machine Manufacturer in Madhya Pradesh',
+  address: '832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001',
+  phones: ['+91-7869755871', '+91-8827848099'],
+  emails: ['support.apsenterprises@gmail.com', 'apsenterprisesdp.229@gmail.com'],
+  products: [
+    'Fully Automatic Double Die Dona Pattal Machine',
+    'Hydraulic Paper Plate & Thali Making Machine',
+    'Automatic High-Speed Paper Cup Making Machine',
+    'Semi-Automatic Heavy Paper Cutter Machine',
+    'Raw Material Paper Roll & Lamination Machine'
+  ]
+};
+
+const mockDocuments = [
+  {
+    id: 'DOC-APS-01',
+    title: 'APS Enterprises Official Catalog & Dona Pattal Machine Brochure',
+    category: 'Product Catalog',
+    keywords: ['aps', 'dona', 'pattal', 'paper plate', 'indore', 'machine', 'contact', 'address', 'website'],
+    excerpt: 'APS Enterprises (Indore, MP): Manufacturer of Fully Automatic Double Die Dona Pattal Machines, Hydraulic Paper Plate Machines, Paper Cup Makers & Roll Cutters. Contact: +91-7869755871, Address: 832 Old Loha Mandi, Indore.',
+    pageRef: 'Website Home & Contact Page',
+    downloads: 320
+  },
+  {
+    id: 'DOC-001',
+    title: 'CNC Machine 500T Heavy Industrial Specification Manual',
+    category: 'Technical Specs',
+    keywords: ['cnc', '500t', 'spindle', 'rpm', 'specification', 'manual', 'power'],
+    excerpt: 'CNC Machine 500T featuring dual-spindle 24,000 RPM water-cooled motor, 5-axis synchro control, automatic tool changer (24 slots), and heavy cast-iron frame vibration dampening.',
+    pageRef: 'Page 12, Section 3.2',
+    downloads: 142
+  },
+  {
+    id: 'DOC-002',
+    title: 'Fiber Laser Cutter 6kW Operating Datasheet & Warranty Policy',
+    category: 'User Manuals & Warranty',
+    keywords: ['laser', 'fiber', '6kw', 'warranty', 'cutting speed', 'sheet metal'],
+    excerpt: 'Fiber Laser Cutter 6kW handles stainless steel up to 25mm, mild steel 30mm, aluminium 20mm. Standard 3-year comprehensive warranty covering Raycus laser source and IPG optical head.',
+    pageRef: 'Page 4, Warranty Terms',
+    downloads: 98
+  },
+  {
+    id: 'DOC-003',
+    title: 'APS Enterprise Standard Quotation & Payment Gate Terms',
+    category: 'Commercial Templates',
+    keywords: ['quotation', 'payment terms', '10%', 'advance', 'tally', 'invoice'],
+    excerpt: 'All orders require a 10% advance deposit verified against Tally ledger before releasing job cards to shopfloor manufacturing. Balance 90% payable upon dispatch notification.',
+    pageRef: 'Terms & Conditions Annexure A',
+    downloads: 215
+  }
+];
+
+const mockInventory = [
+  // ─── Dona & Paper Plate Machinery (Indore Main Plant) ─────────────────────────
+  { id: 'INV-101', sku: 'APS-DP-200', name: 'Fully Automatic Double Die Dona Pattal Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 14, reservedUnits: 5, availableUnits: 9, minThreshold: 3, warehouse: 'Indore Main Plant', unitPrice: 85000, status: 'In Stock', lastRestocked: '2026-08-15' },
+  { id: 'INV-102', sku: 'APS-HP-500', name: 'Heavy-Duty Hydraulic 2-Cylinder Paper Plate & Thali Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 9, reservedUnits: 3, availableUnits: 6, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 125000, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-103', sku: 'APS-CUP-80', name: 'Automatic High-Speed Paper Cup Making Machine (80 CPM)', category: 'Dona & Paper Plate Machinery', stockUnits: 7, reservedUnits: 2, availableUnits: 5, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 350000, status: 'In Stock', lastRestocked: '2026-08-12' },
+  { id: 'INV-104', sku: 'APS-CUT-90', name: 'Semi-Automatic Heavy Paper Cutter Machine (32 Inch Blade)', category: 'Dona & Paper Plate Machinery', stockUnits: 6, reservedUnits: 1, availableUnits: 5, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 65000, status: 'In Stock', lastRestocked: '2026-08-10' },
+  { id: 'INV-105', sku: 'APS-SD-100', name: 'Single Die High-Speed Crank Dona Making Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 18, reservedUnits: 6, availableUnits: 12, minThreshold: 4, warehouse: 'Indore Main Plant', unitPrice: 48000, status: 'In Stock', lastRestocked: '2026-08-18' },
+  { id: 'INV-106', sku: 'APS-THL-4C', name: 'Automatic 4-Cavity Hydraulic Buffet Thali Machine (15T)', category: 'Dona & Paper Plate Machinery', stockUnits: 5, reservedUnits: 2, availableUnits: 3, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 165000, status: 'In Stock', lastRestocked: '2026-08-09' },
+  { id: 'INV-107', sku: 'APS-LAM-ROLL', name: 'Automatic Thermal Lamination Machine for Paper Rolls', category: 'Dona & Paper Plate Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 195000, status: 'In Stock', lastRestocked: '2026-08-07' },
+  { id: 'INV-108', sku: 'APS-BWL-70', name: 'Automatic Paper Bowl & Ripple Cup Forming Machine', category: 'Dona & Paper Plate Machinery', stockUnits: 3, reservedUnits: 2, availableUnits: 1, minThreshold: 2, warehouse: 'Indore Main Plant', unitPrice: 280000, status: 'Low Stock', lastRestocked: '2026-08-04' },
+
+  // ─── Heavy Industrial Machinery & CNC (Pune Unit 1 & Chakan Unit 2) ───────────
+  { id: 'INV-109', sku: 'APS-CNC-500T', name: 'CNC Machine 500T Dual-Spindle Heavy Industrial Unit', category: 'Heavy Industrial Machinery', stockUnits: 4, reservedUnits: 2, availableUnits: 2, minThreshold: 2, warehouse: 'Pune Unit 1', unitPrice: 150000, status: 'In Stock', lastRestocked: '2026-08-11' },
+  { id: 'INV-110', sku: 'APS-FLC-6KW', name: 'Fiber Laser Cutter 6kW with Raycus Laser Source', category: 'Heavy Industrial Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 180000, status: 'In Stock', lastRestocked: '2026-08-08' },
+  { id: 'INV-111', sku: 'APS-HYD-200T', name: 'Heavy Hydraulic Press 200T Industrial Frame', category: 'Heavy Industrial Machinery', stockUnits: 5, reservedUnits: 3, availableUnits: 2, minThreshold: 2, warehouse: 'Pune Unit 1', unitPrice: 42000, status: 'In Stock', lastRestocked: '2026-08-09' },
+  { id: 'INV-112', sku: 'APS-VMC-5AX', name: 'Industrial 5-Axis VMC Milling Center (24 Tool ATC)', category: 'Heavy Industrial Machinery', stockUnits: 2, reservedUnits: 1, availableUnits: 1, minThreshold: 1, warehouse: 'Pune Unit 1', unitPrice: 420000, status: 'In Stock', lastRestocked: '2026-08-02' },
+  { id: 'INV-113', sku: 'APS-BRK-120T', name: 'Heavy Sheet Metal CNC Press Brake (120 Ton / 3.2m)', category: 'Heavy Industrial Machinery', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 220000, status: 'In Stock', lastRestocked: '2026-08-06' },
+  { id: 'INV-114', sku: 'APS-PLS-3000', name: 'Industrial CNC Plasma Cutting Table (3000x1500mm)', category: 'Heavy Industrial Machinery', stockUnits: 2, reservedUnits: 2, availableUnits: 0, minThreshold: 1, warehouse: 'Chakan Unit 2', unitPrice: 110000, status: 'Out of Stock', lastRestocked: '2026-07-28' },
+
+  // ─── Components & Precision Spares ────────────────────────────────────────────
+  { id: 'INV-115', sku: 'APS-SPN-24K', name: 'Water-Cooled High-Speed Spindle Motor 24,000 RPM', category: 'Components & Spares', stockUnits: 16, reservedUnits: 5, availableUnits: 11, minThreshold: 5, warehouse: 'Pune Unit 1', unitPrice: 22000, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-116', sku: 'APS-DIE-7IN', name: 'Hardened Steel 7-inch Wrinkle Dona Dies (Set of 4)', category: 'Components & Spares', stockUnits: 32, reservedUnits: 8, availableUnits: 24, minThreshold: 8, warehouse: 'Indore Main Plant', unitPrice: 3800, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-117', sku: 'APS-DIE-12TH', name: 'Precision Diamond-Polished 12-inch Buffet Thali Dies', category: 'Components & Spares', stockUnits: 20, reservedUnits: 6, availableUnits: 14, minThreshold: 6, warehouse: 'Indore Main Plant', unitPrice: 6500, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-118', sku: 'APS-PWR-5HP', name: 'Hydraulic Power Pack 5HP 200 Bar with Solenoid Valve', category: 'Components & Spares', stockUnits: 12, reservedUnits: 4, availableUnits: 8, minThreshold: 3, warehouse: 'Indore Main Plant', unitPrice: 28500, status: 'In Stock', lastRestocked: '2026-08-13' },
+  { id: 'INV-119', sku: 'APS-CAST-FRAME', name: 'Heavy Vibration Dampening Cast-Iron Bed Base Frame', category: 'Components & Spares', stockUnits: 4, reservedUnits: 3, availableUnits: 1, minThreshold: 2, warehouse: 'Chakan Unit 2', unitPrice: 34000, status: 'Low Stock', lastRestocked: '2026-08-05' },
+  { id: 'INV-120', sku: 'APS-RAY-6KW', name: 'Raycus 6kW Fiber Laser Source Module (Optical Ready)', category: 'Components & Spares', stockUnits: 3, reservedUnits: 1, availableUnits: 2, minThreshold: 2, warehouse: 'Chakan Unit 2', unitPrice: 85000, status: 'In Stock', lastRestocked: '2026-08-10' },
+  { id: 'INV-121', sku: 'APS-PLC-7IN', name: 'Digital Delta PLC Controller with 7" Color Touchscreen HMI', category: 'Components & Spares', stockUnits: 22, reservedUnits: 6, availableUnits: 16, minThreshold: 5, warehouse: 'Indore Main Plant', unitPrice: 14500, status: 'In Stock', lastRestocked: '2026-08-17' },
+  { id: 'INV-122', sku: 'APS-BLD-36TC', name: 'Tungsten Carbide Precision Paper Cutting Blades 36"', category: 'Components & Spares', stockUnits: 15, reservedUnits: 3, availableUnits: 12, minThreshold: 4, warehouse: 'Indore Main Plant', unitPrice: 4200, status: 'In Stock', lastRestocked: '2026-08-12' },
+
+  // ─── Raw Materials & Consumables (Raw Material Yard) ──────────────────────────
+  { id: 'INV-123', sku: 'APS-ROLL-80G', name: 'Raw Material PE Coated Paper Roll (80 GSM / 400kg Reel)', category: 'Raw Materials', stockUnits: 140, reservedUnits: 35, availableUnits: 105, minThreshold: 30, warehouse: 'Raw Material Yard', unitPrice: 4500, status: 'In Stock', lastRestocked: '2026-08-17' },
+  { id: 'INV-124', sku: 'APS-ROLL-SLV', name: 'Silver Craft Film Laminated Rolls (120 GSM / 500kg Reel)', category: 'Raw Materials', stockUnits: 95, reservedUnits: 30, availableUnits: 65, minThreshold: 25, warehouse: 'Raw Material Yard', unitPrice: 5200, status: 'In Stock', lastRestocked: '2026-08-18' },
+  { id: 'INV-125', sku: 'APS-ROLL-PRN', name: 'Multi-Color Custom Printed Dona Paper Rolls (100 GSM)', category: 'Raw Materials', stockUnits: 60, reservedUnits: 20, availableUnits: 40, minThreshold: 15, warehouse: 'Raw Material Yard', unitPrice: 5800, status: 'In Stock', lastRestocked: '2026-08-15' },
+  { id: 'INV-126', sku: 'APS-PLA-ECO', name: 'Biodegradable PLA Coated Food-Grade Paper Reel (110 GSM)', category: 'Raw Materials', stockUnits: 45, reservedUnits: 15, availableUnits: 30, minThreshold: 10, warehouse: 'Raw Material Yard', unitPrice: 6800, status: 'In Stock', lastRestocked: '2026-08-16' },
+  { id: 'INV-127', sku: 'APS-OIL-VG68', name: 'Industrial Anti-Wear Hydraulic Oil ISO VG 68 (210L Drum)', category: 'Raw Materials', stockUnits: 18, reservedUnits: 4, availableUnits: 14, minThreshold: 5, warehouse: 'Raw Material Yard', unitPrice: 18500, status: 'In Stock', lastRestocked: '2026-08-14' },
+  { id: 'INV-128', sku: 'APS-PLT-25MM', name: 'Heavy Mild Steel Structural Plates 25mm (ISO 9001 Graded)', category: 'Raw Materials', stockUnits: 55, reservedUnits: 20, availableUnits: 35, minThreshold: 15, warehouse: 'Raw Material Yard', unitPrice: 12500, status: 'In Stock', lastRestocked: '2026-08-12' }
+];
+
+const mockInventoryLogs = [
+  { id: 'LOG-01', itemId: 'INV-101', itemName: 'Fully Automatic Double Die Dona Pattal Machine', change: +4, type: 'Stock In', reason: 'Assembly Completed at Indore Plant (Unit 1)', user: 'Bhavya (Ops Lead)', date: '2026-08-15 14:30' },
+  { id: 'LOG-02', itemId: 'INV-103', itemName: 'Automatic High-Speed Paper Cup Making Machine', change: -1, type: 'Reserved', reason: 'Allocated to LEAD-002 (Acme Corp Order #APS-882)', user: 'Animesh (Admin)', date: '2026-08-14 11:15' },
+  { id: 'LOG-03', itemId: 'INV-123', itemName: 'Raw Material PE Coated Paper Roll (80 GSM)', change: +50, type: 'Restock', reason: 'Supplier Bulk Delivery from MP Paper Mills (Lot #4419)', user: 'Warehouse Yard Team', date: '2026-08-17 09:45' },
+  { id: 'LOG-04', itemId: 'INV-109', itemName: 'CNC Machine 500T Dual-Spindle Heavy Unit', change: -1, type: 'Dispatched', reason: 'Dispatched to Global Tech (Invoice #INV-2026-088)', user: 'Bhavya (Ops Lead)', date: '2026-08-16 16:20' },
+  { id: 'LOG-05', itemId: 'INV-115', itemName: 'Water-Cooled High-Speed Spindle Motor 24,000 RPM', change: +6, type: 'Restock', reason: 'Precision Imports Batch Received at Pune Facility', user: 'QC Inspection Team', date: '2026-08-16 10:10' },
+  { id: 'LOG-06', itemId: 'INV-102', itemName: 'Heavy-Duty Hydraulic 2-Cylinder Paper Plate Machine', change: +2, type: 'Stock In', reason: 'Factory Testing & Calibration Pass (Indore Plant)', user: 'Production Supervisor', date: '2026-08-14 15:40' },
+  { id: 'LOG-07', itemId: 'INV-124', itemName: 'Silver Craft Film Laminated Rolls (120 GSM)', change: +30, type: 'Restock', reason: 'Raw Material Stock Replenishment (Yard A3)', user: 'Warehouse Supervisor', date: '2026-08-18 08:30' },
+  { id: 'LOG-08', itemId: 'INV-114', itemName: 'Industrial CNC Plasma Cutting Table (3000x1500mm)', change: -1, type: 'Reserved', reason: 'Factory Release to Eicher Motors Assembly Line', user: 'Animesh (Admin)', date: '2026-08-13 13:50' },
+  { id: 'LOG-09', itemId: 'INV-121', itemName: 'Digital Delta PLC Controller with 7" Touchscreen HMI', change: +10, type: 'Restock', reason: 'Component Procurement from Delta Automation', user: 'Procurement Officer', date: '2026-08-17 11:25' },
+  { id: 'LOG-10', itemId: 'INV-105', itemName: 'Single Die High-Speed Crank Dona Making Machine', change: +6, type: 'Stock In', reason: 'Batch 4 Manufacturing Complete (Indore Shopfloor)', user: 'Indore Shopfloor Team', date: '2026-08-18 12:00' }
+];
+
 const systemConfig = {
   approvalPolicy: 'single-action', // 'single-action' vs 'countersign' (dual-approval)
   paymentGatePercentage: 10,
@@ -843,6 +1492,10 @@ module.exports = {
   mockWhatsAppSequences,
   mockWhatsAppTemplates,
   mockTimeInStage,
+  mockDocuments,
+  mockInventory,
+  mockInventoryLogs,
+  companyProfile,
   systemConfig
 };
 
