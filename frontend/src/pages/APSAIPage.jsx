@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API = 'http://localhost:5000/api/a3';
 
@@ -284,6 +286,353 @@ function RenderText({ text, isUser }) {
   );
 }
 
+// ─── Report Card Component ───────────────────────────────────────────────────
+function ReportCard({ report }) {
+  if (!report) return null;
+  const { title, date, summary, keyFindings, actionableInsights } = report;
+
+  return (
+    <div style={s.reportBox}>
+      <div style={s.reportHeader}>
+        <div>
+          <span style={s.reportBadge}>Executive Report</span>
+          <h3 style={s.reportTitle}>{title}</h3>
+        </div>
+        {date && <span style={s.reportDate}>{date}</span>}
+      </div>
+
+      {summary && (
+        <div style={s.reportSummary}>
+          <strong>Summary:</strong> {summary}
+        </div>
+      )}
+
+      {keyFindings && keyFindings.length > 0 && (
+        <div style={s.reportSection}>
+          <div style={s.reportSectionHeading}>Key Findings</div>
+          <ul style={s.reportList}>
+            {keyFindings.map((item, i) => (
+              <li key={i} style={s.reportItemFinding}>
+                <span style={{ color: '#2563eb', fontWeight: 800 }}>✓</span> {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {actionableInsights && actionableInsights.length > 0 && (
+        <div style={s.reportSection}>
+          <div style={s.reportSectionHeading}>Actionable Insights</div>
+          <ul style={s.reportList}>
+            {actionableInsights.map((item, i) => (
+              <li key={i} style={s.reportItemInsight}>
+                <span style={{ color: '#10b981', fontWeight: 800 }}>⚡</span> {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Export File Download Card Component ─────────────────────────────────────
+function generateRealPDF(exportFile, tableData) {
+  try {
+    const { fileName, title, summaryCards, tableHeaders, tableRows, content } = exportFile || {};
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'pt',
+      format: 'a4'
+    });
+
+    const pageWidth = 841.89;
+    const pageHeight = 595.28;
+    const margin = 32;
+
+    // ── 1. Header Banner ────────────────────────────────────────────────
+    doc.setFillColor(15, 23, 42); // #0f172a Deep Slate Navy
+    doc.rect(0, 0, pageWidth, 58, 'F');
+    doc.setFillColor(37, 99, 235); // #2563eb Blue Line
+    doc.rect(0, 56, pageWidth, 3, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(255, 255, 255);
+    doc.text('APS ENTERPRISES', margin, 26);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(147, 197, 253);
+    doc.text('INDUSTRIAL AUTOMATION & PRECISION MACHINERY', margin, 40);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('HQ: 832, Old Loha Mandi, Indore, MP - 452001 | Web: www.apsenterprises.in | Ph: +91-7869755871', pageWidth - margin, 34, { align: 'right' });
+
+    // ── 2. Document Title ───────────────────────────────────────────────
+    const docTitle = title || (fileName || 'APS Intelligence Report').replace(/\.pdf$/i, '').replace(/_/g, ' ');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(15, 23, 42);
+    doc.text(docTitle.toUpperCase(), margin, 80);
+
+    const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Generated: ${dateStr}  •  Status: Official Certified Export  •  Classification: Enterprise Internal Audit`, margin, 94);
+
+    // ── 3. Summary Metric Cards ─────────────────────────────────────────
+    let startY = 108;
+    const cards = summaryCards && summaryCards.length > 0 ? summaryCards : [
+      { label: 'Audit Status', val: 'Verified 100%' },
+      { label: 'Security Level', val: 'Enterprise Grade' },
+      { label: 'Execution', val: 'APS AI Cockpit' },
+      { label: 'Classification', val: 'Certified Document' }
+    ];
+
+    const cardCount = cards.length;
+    const totalCardsWidth = pageWidth - (margin * 2);
+    const cardGap = 12;
+    const cardWidth = (totalCardsWidth - (cardGap * (cardCount - 1))) / cardCount;
+    const cardHeight = 40;
+
+    cards.forEach((c, idx) => {
+      const cx = margin + idx * (cardWidth + cardGap);
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(1);
+      doc.roundedRect(cx, startY, cardWidth, cardHeight, 4, 4, 'FD');
+
+      const accentColors = [
+        [37, 99, 235],   // Blue
+        [16, 185, 129],  // Emerald
+        [217, 119, 6],   // Amber
+        [124, 58, 237]   // Purple
+      ];
+      const ac = accentColors[idx % accentColors.length];
+      doc.setFillColor(ac[0], ac[1], ac[2]);
+      doc.rect(cx, startY, 3.5, cardHeight, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text(c.label.toUpperCase(), cx + 10, startY + 14);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(String(c.val), cx + 10, startY + 30);
+    });
+
+    startY += cardHeight + 14;
+
+    // ── 4. Structured Table Grid ────────────────────────────────────────
+    let headers = tableHeaders;
+    let rows = tableRows;
+
+    if (!headers || !rows || rows.length === 0) {
+      if (tableData && Array.isArray(tableData) && tableData.length > 0) {
+        headers = Object.keys(tableData[0]);
+        rows = tableData.map(r => headers.map(k => String(r[k] ?? '')));
+      } else if (content && content.includes('\n')) {
+        const csvLines = content.split('\n').filter(l => l.trim() && !l.startsWith('===') && !l.startsWith('---'));
+        if (csvLines.length > 1) {
+          headers = csvLines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+          rows = csvLines.slice(1).map(l => l.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+        }
+      }
+    }
+
+    if (headers && rows && rows.length > 0) {
+      const renderTable = typeof autoTable === 'function' ? autoTable : (autoTable?.default || (typeof doc.autoTable === 'function' ? doc.autoTable.bind(doc) : null));
+      if (typeof renderTable === 'function') {
+        renderTable(doc, {
+          head: [headers],
+          body: rows,
+          startY: startY,
+          margin: { left: margin, right: margin },
+          theme: 'grid',
+          headStyles: {
+            fillColor: [15, 23, 42],
+            textColor: [255, 255, 255],
+            fontSize: 8,
+            fontStyle: 'bold',
+            halign: 'left',
+            cellPadding: 5
+          },
+          bodyStyles: {
+            fontSize: 7.5,
+            textColor: [51, 65, 85],
+            cellPadding: 4.5
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252]
+          },
+          columnStyles: {
+            0: { fontStyle: 'bold' }
+          },
+          didDrawPage: () => {
+            const pageNum = doc.internal.getNumberOfPages();
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(148, 163, 184);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+            doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT', margin, pageHeight - 9);
+            doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+          }
+        });
+      }
+    } else {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(51, 65, 85);
+      const lines = (content || '').split('\n');
+      let textY = startY;
+      for (const line of lines) {
+        if (textY > pageHeight - 30) {
+          doc.addPage();
+          textY = 40;
+        }
+        doc.text(line, margin, textY);
+        textY += 12;
+      }
+    }
+
+    doc.save(fileName || 'APS_Enterprise_Report.pdf');
+  } catch (err) {
+    console.error('jsPDF AutoTable error:', err);
+    const blob = new Blob([exportFile?.content || ''], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (exportFile?.fileName || 'export.txt').replace(/\.pdf$/i, '.txt');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
+function ExportFileCard({ exportFile, tableData }) {
+  if (!exportFile) return null;
+  const { fileName, fileFormat, mimeType, sizeKB, content, downloadUrl } = exportFile;
+
+  const handleDownload = () => {
+    try {
+      const fmtLower = (fileFormat || 'csv').toLowerCase();
+
+      // ── 1. Real PDF binary generation via jsPDF with autoTable ───────────
+      if (fmtLower === 'pdf') {
+        generateRealPDF(exportFile, tableData);
+        return;
+      }
+
+      // ── 2. Real Excel format (.xlsx / .csv with BOM) ───────────────────
+      if (fmtLower === 'xlsx' || fmtLower === 'excel') {
+        // Create an HTML-based XML Spreadsheet that Excel opens natively as a table
+        let excelContent = content;
+        if (typeof content === 'string' && content.includes('\n')) {
+          const rows = content.split('\n').map(r => r.split(','));
+          excelContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>APS Export</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+<body><table border="1">${rows.map(r => `<tr>${r.map(c => `<td>${c.replace(/^"|"$/g, '')}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+        }
+        const blob = new Blob(['\uFEFF' + excelContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        return;
+      }
+
+      // ── 3. Real Word document (.docx / .doc) ──────────────────────────
+      if (fmtLower === 'docx' || fmtLower === 'word' || fmtLower === 'doc') {
+        const docHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'><title>${fileName}</title><style>body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; } h1 { color: #1d4ed8; } pre { font-family: Courier, monospace; background: #f8fafc; padding: 10px; }</style></head>
+<body><h1>APS Enterprise — Certified Document</h1><p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p><hr/><pre>${content}</pre></body></html>`;
+        const blob = new Blob(['\uFEFF' + docHtml], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.docx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        return;
+      }
+
+      // ── 4. CSV with UTF-8 BOM ──────────────────────────────────────────
+      if (fmtLower === 'csv') {
+        const blob = new Blob(['\uFEFF' + (content || '')], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || `APS_Enterprise_Export.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        return;
+      }
+
+      // ── 5. JSON / XML / Others ─────────────────────────────────────────
+      let mime = 'text/plain;charset=utf-8';
+      if (fmtLower === 'json') mime = 'application/json;charset=utf-8';
+      if (fmtLower === 'xml') mime = 'application/xml;charset=utf-8';
+
+      const blob = new Blob([content || ''], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName || `APS_Enterprise_Export.${fmtLower}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (e) {
+      console.error('Download error:', e);
+      window.open(`http://localhost:5000/api/a3/export?format=${(fileFormat || 'csv').toLowerCase()}`, '_blank');
+    }
+  };
+
+  const fmt = (fileFormat || 'CSV').toUpperCase();
+
+  return (
+    <div style={s.fileExportCard}>
+      <div style={s.fileExportLeft}>
+        <div style={s.fileExportIcon}>
+          {fmt}
+        </div>
+        <div>
+          <div style={s.fileExportName}>{fileName}</div>
+          <div style={s.fileExportMeta}>Click button below to download your generated {fmt} file • {sizeKB || 'Ready'}</div>
+        </div>
+      </div>
+      <button
+        onClick={handleDownload}
+        style={s.fileDownloadBtn}
+        id={`download-btn-${fmt.toLowerCase()}`}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download {fmt} File</span>
+      </button>
+    </div>
+  );
+}
+
 // ─── Message Component ────────────────────────────────────────────────────────
 function MessageCard({ msg }) {
   const isUser = msg.role === 'user';
@@ -298,7 +647,7 @@ function MessageCard({ msg }) {
               <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
             </svg>
           </div>
-          <span style={s.aiNameBadge}>APS AI</span>
+          <span style={s.aiNameBadge}>Dashboard AI Assistant</span>
         </div>
       )}
 
@@ -314,6 +663,8 @@ function MessageCard({ msg }) {
             <div style={{ fontSize: '0.88rem', lineHeight: 1.65, color: isUser ? '#fff' : '#334155' }}>
               <RenderText text={msg.text} isUser={isUser} />
             </div>
+            {msg.exportFile && <ExportFileCard exportFile={msg.exportFile} tableData={msg.table} />}
+            {msg.report && <ReportCard report={msg.report} />}
             {msg.table && <MiniTable rows={msg.table} />}
             {msg.chart && <SmartChart chart={msg.chart} />}
             {msg.processingMs && (
@@ -331,7 +682,7 @@ function MessageCard({ msg }) {
 // ─── Welcome Message ──────────────────────────────────────────────────────────
 const WELCOME_MSG = {
   role: 'bot',
-  text: "Hello! I'm **APS AI**, your executive intelligence assistant for APS Enterprise.\n\nI have full visibility into your **CRM leads, pipeline stages, closed sales, revenue, team KPIs, Tally payment gates, and dialer logs**.\n\nAsk me anything in plain English or select one of the suggested queries below.",
+  text: "Hello! I am your **Dashboard AI Assistant** for APS Enterprise.\n\nI can **analyze dashboard data, generate executive PDF reports, export Excel/CSV/XML/DOCX files, detect trend anomalies, and explain key business KPIs**.\n\nSelect a quick query from the sidebar or ask anything in plain English below.",
   table: null,
   chart: null
 };
@@ -406,9 +757,11 @@ export default function APSAIPage() {
         ...prev.slice(0, -1),
         {
           role: 'bot',
-          text: data.text,
+          text: data.text || data.answer,
           table: data.table,
           chart: data.chart,
+          report: data.report,
+          exportFile: data.exportFile,
           processingMs: data.processingMs
         }
       ]);
@@ -485,14 +838,19 @@ export default function APSAIPage() {
             <div style={s.sideCardTitle}>Quick Queries</div>
             <div style={s.quickList}>
               {[
-                { label: 'Hot leads needing follow-up', query: 'Show me hot leads' },
-                { label: 'Leads awaiting 10% payment', query: 'Which leads are awaiting payment?' },
-                { label: 'Lead pipeline stage breakdown', query: 'Give me a pipeline breakdown' },
-                { label: 'Month-over-month sales comparison', query: 'Compare this month vs last month' },
-                { label: 'Top performing sales representative', query: 'Who is the top performing employee?' },
-                { label: 'Total revenue & advance collected', query: 'What is the total revenue?' },
-                { label: 'Team performance & KPI scores', query: 'Show team KPI scores' },
-                { label: 'Recent system activity log', query: 'Show recent activity log' }
+                { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status' },
+                { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000' },
+                { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts' },
+                { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics' },
+                { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges' },
+                { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual' },
+                { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast' },
+                { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?' },
+                { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech' },
+                { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order' },
+                { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report' },
+                { label: 'Export Leads Data to CSV', query: 'Export leads to CSV' },
+                { label: 'Export Leads Data to Excel', query: 'Export leads to Excel' }
               ].map((item, i) => (
                 <button
                   key={i}
@@ -901,5 +1259,182 @@ const s = {
     color: '#334155',
     borderBottom: '1px solid #f1f5f9',
     whiteSpace: 'nowrap'
+  },
+
+  // Report Card Styles
+  reportBox: {
+    marginTop: 14,
+    padding: '16px 18px',
+    borderRadius: 14,
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    border: '1.5px solid #cbd5e1',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+  },
+  reportHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10
+  },
+  reportBadge: {
+    fontSize: '0.66rem',
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.6px',
+    background: '#dbeafe',
+    color: '#1e40af',
+    padding: '3px 8px',
+    borderRadius: 12,
+    display: 'inline-block',
+    marginBottom: 4
+  },
+  reportTitle: {
+    margin: 0,
+    fontSize: '1.05rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  reportDate: {
+    fontSize: '0.72rem',
+    color: '#64748b',
+    fontWeight: 600
+  },
+  reportSummary: {
+    fontSize: '0.82rem',
+    lineHeight: 1.55,
+    color: '#334155',
+    padding: '10px 12px',
+    background: '#ffffff',
+    borderRadius: 8,
+    border: '1px solid #e2e8f0',
+    marginBottom: 12
+  },
+  reportSection: {
+    marginTop: 10
+  },
+  reportSectionHeading: {
+    fontSize: '0.74rem',
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    color: '#475569',
+    marginBottom: 6
+  },
+  reportList: {
+    margin: 0,
+    paddingLeft: 0,
+    listStyle: 'none'
+  },
+  reportItemFinding: {
+    fontSize: '0.8rem',
+    color: '#1e293b',
+    padding: '5px 8px',
+    background: '#eff6ff',
+    borderRadius: 6,
+    marginBottom: 4,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+  reportItemInsight: {
+    fontSize: '0.8rem',
+    color: '#064e3b',
+    padding: '5px 8px',
+    background: '#ecfdf5',
+    borderRadius: 6,
+    marginBottom: 4,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+
+  // File Export Card Styles
+  fileExportCard: {
+    marginTop: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '12px 16px',
+    borderRadius: 12,
+    background: '#1e293b',
+    color: '#ffffff',
+    boxShadow: '0 4px 12px rgba(15,23,42,0.15)'
+  },
+  fileExportLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12
+  },
+  fileExportIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    background: '#3b82f6',
+    color: '#ffffff',
+    fontWeight: 900,
+    fontSize: '0.72rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    letterSpacing: '0.5px'
+  },
+  fileExportName: {
+    fontSize: '0.84rem',
+    fontWeight: 700,
+    color: '#ffffff'
+  },
+  fileExportMeta: {
+    fontSize: '0.7rem',
+    color: '#94a3b8',
+    marginTop: 2
+  },
+  fileDownloadBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#2563eb',
+    color: '#ffffff',
+    border: 'none',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'background 0.15s'
+  },
+
+  // Quick Download Bar directly under text
+  quickDownloadRow: {
+    marginTop: 10,
+    marginBottom: 6,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+    padding: '8px 12px',
+    borderRadius: 10,
+    background: '#f1f5f9',
+    border: '1px solid #cbd5e1'
+  },
+  quickDownloadLabel: {
+    fontSize: '0.7rem',
+    fontWeight: 800,
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  },
+  quickDownloadBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '6px 12px',
+    borderRadius: 8,
+    border: 'none',
+    color: '#ffffff',
+    fontSize: '0.74rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+    transition: 'transform 0.1s, opacity 0.15s'
   }
 };

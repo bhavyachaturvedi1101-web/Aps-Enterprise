@@ -97,7 +97,7 @@ const INITIAL_NOTIFICATIONS = [
     route: '/crm',
     color: '#2563eb',
     bg: '#eff6ff',
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
   },
   {
     id: 'n2',
@@ -108,7 +108,7 @@ const INITIAL_NOTIFICATIONS = [
     route: '/payments',
     color: '#d97706',
     bg: '#fffbeb',
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2"><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
   },
   {
     id: 'n3',
@@ -119,7 +119,7 @@ const INITIAL_NOTIFICATIONS = [
     route: '/whatsapp',
     color: '#10b981',
     bg: '#ecfdf5',
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
   },
   {
     id: 'n4',
@@ -130,7 +130,7 @@ const INITIAL_NOTIFICATIONS = [
     route: '/voice',
     color: '#7c3aed',
     bg: '#f3e8ff',
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" /></svg>
   }
 ];
 
@@ -239,129 +239,36 @@ export default function DashboardLayout() {
         {/* Right Actions */}
         <div style={{ ...s.headerRight, position: 'relative' }}>
           {/* Notification Bell */}
-          <div className="notif-bell-btn" style={{ ...s.notifWrap, width: 40, height: 40 }} onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={unreadCount > 0 ? '#2563eb' : '#64748b'} strokeWidth="2.2">
+          <div style={s.notifWrap} onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-            {unreadCount > 0 ? (
-              <div style={s.notifBadgeCount}>
-                {unreadCount}
-              </div>
-            ) : (
-              <div style={s.notifDotRead} />
-            )}
+            <div style={s.notifDot} />
           </div>
 
           {/* Notifications Dropdown */}
           {notifOpen && (
-            <div style={{ ...s.dropdownPanel, width: 380, padding: '1rem' }}>
-              <div style={s.notifHeaderRow}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={s.dropdownHeaderTitle}>Notifications</span>
-                  {unreadCount > 0 && (
-                    <span style={s.unreadPill}>{unreadCount} new</span>
-                  )}
+            <div style={s.dropdownPanel}>
+              <div style={s.dropdownHeader}>System Notifications</div>
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                  <span>Payment Gate Pending</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {unreadCount > 0 && (
-                    <button onClick={handleMarkAllRead} style={s.markAllBtn}>
-                      Mark all read
-                    </button>
-                  )}
-                  {notifications.length > 0 && (
-                    <button onClick={handleDeleteAllNotifs} style={s.deleteAllBtn}>
-                      Delete all
-                    </button>
-                  )}
+                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>Acme Manufacturing 10% advance verification required.</div>
+              </div>
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" /></svg>
+                  <span>AI Voice Calls Active</span>
                 </div>
               </div>
-
-              <div style={s.notifList}>
-                {notifications.map(n => (
-                  <div
-                    key={n.id}
-                    onClick={() => handleNotifClick(n)}
-                    style={{
-                      ...s.notifItem,
-                      backgroundColor: n.read ? '#ffffff' : n.bg,
-                      borderLeft: `4px solid ${n.read ? '#cbd5e1' : n.color}`,
-                      borderTop: `1px solid ${n.read ? '#f1f5f9' : '#e2e8f0'}`,
-                      borderRight: `1px solid ${n.read ? '#f1f5f9' : '#e2e8f0'}`,
-                      borderBottom: `1px solid ${n.read ? '#f1f5f9' : '#e2e8f0'}`,
-                      opacity: n.read ? 0.8 : 1,
-                      padding: '12px 14px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: n.read ? '#475569' : '#09090b', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {n.icon}
-                        <span>{n.title}</span>
-                      </div>
-
-                      {/* Action Buttons: Tick & Delete */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                        <button
-                          onClick={(e) => handleToggleRead(n.id, e)}
-                          title={n.read ? 'Mark as unread' : 'Mark as read'}
-                          style={{
-                            background: n.read ? '#f1f5f9' : n.color,
-                            color: n.read ? '#64748b' : '#ffffff',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: 24,
-                            height: 24,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '0.78rem',
-                            fontWeight: 800,
-                            transition: 'all 0.15s ease',
-                            boxShadow: n.read ? 'none' : '0 2px 5px rgba(0,0,0,0.15)'
-                          }}
-                        >
-                          ✓
-                        </button>
-
-                        <button
-                          onClick={(e) => handleDeleteNotif(n.id, e)}
-                          title="Delete notification"
-                          style={{
-                            background: '#fee2e2',
-                            color: '#ef4444',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: 24,
-                            height: 24,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            fontWeight: 800,
-                            transition: 'all 0.15s ease'
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{ fontSize: '0.78rem', color: n.read ? '#64748b' : '#334155', marginTop: 4, lineHeight: 1.4 }}>
-                      {n.message}
-                    </div>
-
-                    <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: 6, fontWeight: 600 }}>
-                      {n.time}
-                    </div>
-                  </div>
-                ))}
-
-                {notifications.length === 0 && (
-                  <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
-                    All caught up! No notifications.
-                  </div>
-                )}
+              <div style={s.notifItem}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                  <span>WhatsApp Automation</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>3 sequences dispatched to pending leads.</div>
               </div>
             </div>
           )}
@@ -382,15 +289,15 @@ export default function DashboardLayout() {
           {userMenuOpen && (
             <div style={{ ...s.dropdownPanel, right: 0, width: 200 }}>
               <div style={s.dropdownHeader}>Signed in as Admin</div>
-              <div className="dropdown-menu-item" style={s.menuItem} onClick={() => { handleTabChange('settings'); setUserMenuOpen(false); }}>
+              <div style={s.menuItem} onClick={() => { handleTabChange('settings'); setUserMenuOpen(false); }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
                 <span>System Settings</span>
               </div>
-              <div className="dropdown-menu-item" style={s.menuItem} onClick={() => { handleTabChange('users'); setUserMenuOpen(false); }}>
+              <div style={s.menuItem} onClick={() => { handleTabChange('users'); setUserMenuOpen(false); }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                 <span>Users & Roles</span>
               </div>
-              <div className="dropdown-menu-item" style={{ ...s.menuItem, color: '#ef4444' }} onClick={() => navigate('/login')}>
+              <div style={{ ...s.menuItem, color: '#ef4444' }} onClick={() => navigate('/login')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                 <span>Logout</span>
               </div>
@@ -420,8 +327,8 @@ export default function DashboardLayout() {
                       style={isActive ? s.navItemActive : s.navItem}
                     >
                       {isActive && <div style={s.activePill} />}
-                      <span style={isActive ? s.navIconActive : s.navIcon} className="nav-icon">{item.icon}</span>
-                      <span style={isActive ? s.navLabelActive : s.navLabel} className="nav-label">{item.label}</span>
+                      <span style={isActive ? s.navIconActive : s.navIcon}>{item.icon}</span>
+                      <span style={isActive ? s.navLabelActive : s.navLabel}>{item.label}</span>
                       {item.badge && (
                         <span style={{
                           ...s.badge,
@@ -441,7 +348,7 @@ export default function DashboardLayout() {
           {/* Bottom user card */}
           <div style={s.sidebarBottom}>
             <div style={s.sidebarDivider} />
-            <div className="sidebar-user-card" style={s.userCard}>
+            <div style={s.userCard}>
               <div style={s.sidebarInitial}>A</div>
               <div style={s.userCardInfo}>
                 <div style={s.userCardName}>admin</div>
