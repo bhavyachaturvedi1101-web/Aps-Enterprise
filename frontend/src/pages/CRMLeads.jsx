@@ -630,21 +630,6 @@ export default function CRMLeads() {
             minWidth={135}
           />
 
-          {/* Policy Toggle */}
-          <div style={s.policyToggle}>
-            <span style={s.policyLabel}>Policy:</span>
-            <button
-              onClick={() => handlePolicyToggle(approvalPolicy === 'single-action' ? 'countersign' : 'single-action')}
-              style={{
-                ...s.policyBadge,
-                backgroundColor: approvalPolicy === 'countersign' ? '#fef3c7' : '#f1f5f9',
-                color: approvalPolicy === 'countersign' ? '#b45309' : '#475569',
-                borderColor: approvalPolicy === 'countersign' ? '#fde68a' : '#e2e8f0'
-              }}
-            >
-              {approvalPolicy === 'countersign' ? 'Dual Countersign' : 'Single Action'}
-            </button>
-          </div>
 
           {/* Bulk Import CSV / JSON Button */}
           <button

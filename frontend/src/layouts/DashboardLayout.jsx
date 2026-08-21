@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import APSAIChatPanel from '../components/A3ChatPanel';
 
-// ─── Nav Structure (APS Enterprise specific) ────────────────────────────────
-const NAV_GROUPS = [
+// ─── Master Nav Structure (APS Enterprise specific) ─────────────────────────
+const ALL_NAV_GROUPS = [
   {
     group: 'PLATFORM',
     items: [
@@ -138,29 +139,83 @@ const INITIAL_NOTIFICATIONS = [
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser, logout, loginWithRole } = useAuth();
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
 
+  // Dynamic Navigation Groups based on active User Role
+  const filteredNavGroups = useMemo(() => {
+    const role = currentUser?.role || 'admin';
+    if (role === 'admin') return ALL_NAV_GROUPS;
+
+    if (role === 'manager') {
+      return [
+        {
+          group: 'PLATFORM',
+          items: ALL_NAV_GROUPS[0].items.filter(i => i.key === 'analytics')
+        },
+        {
+          group: 'OPERATIONS',
+          items: ALL_NAV_GROUPS[1].items
+        },
+        {
+          group: 'AI AGENTS',
+          items: ALL_NAV_GROUPS[2].items.filter(i => ['ai', 'whatsapp', 'dialer'].includes(i.key))
+        },
+        {
+          group: 'FINANCE',
+          items: ALL_NAV_GROUPS[3].items.filter(i => i.key === 'invoices')
+        },
+        {
+          group: 'PRODUCTIVITY',
+          items: ALL_NAV_GROUPS[4].items.filter(i => ['build', 'activity'].includes(i.key))
+        }
+      ].filter(g => g.items.length > 0);
+    }
+
+    // Employee Role
+    return [
+      {
+        group: 'OPERATIONS',
+        items: ALL_NAV_GROUPS[1].items.filter(i => i.key === 'pipeline')
+      },
+      {
+        group: 'AI AGENTS',
+        items: ALL_NAV_GROUPS[2].items.filter(i => ['voice', 'dialer'].includes(i.key))
+      },
+      {
+        group: 'PRODUCTIVITY',
+        items: [
+          {
+            key: 'build',
+            label: 'My Tasks & KPIs',
+            badge: null,
+            icon: ALL_NAV_GROUPS[4].items[0].icon
+          },
+          ALL_NAV_GROUPS[4].items[1] // activity
+        ]
+      }
+    ].filter(g => g.items.length > 0);
+  }, [currentUser?.role]);
+
+  // Dynamic Header Pills based on Role
+  const headerPills = useMemo(() => {
+    const role = currentUser?.role || 'admin';
+    if (role === 'employee') {
+      return [
+        { key: 'pipeline', label: 'Lead Pipeline' },
+        { key: 'build', label: 'My Tasks & KPIs' }
+      ];
+    }
+    return [
+      { key: 'analytics', label: 'AI Strategy' },
+      { key: 'pipeline', label: 'Lead Pipeline' },
+      { key: 'build', label: 'Team KPIs' }
+    ];
+  }, [currentUser?.role]);
+
   const unreadCount = notifications.filter(n => !n.read).length;
-
-  const handleToggleRead = (id, e) => {
-    if (e) e.stopPropagation();
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
-  };
-
-  const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const handleDeleteNotif = (id, e) => {
-    if (e) e.stopPropagation();
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
-  const handleDeleteAllNotifs = () => {
-    setNotifications([]);
-  };
 
   const handleNotifClick = (notif) => {
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
@@ -208,23 +263,32 @@ export default function DashboardLayout() {
     navigate(routes[key] || '/dashboard');
   };
 
+  const handleSwitchRole = (roleKey) => {
+    const user = loginWithRole(roleKey);
+    setUserMenuOpen(false);
+    navigate(user.defaultRoute || '/dashboard');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const roleTitleDisplay = currentUser?.role === 'admin' ? 'System Administrator' : currentUser?.role === 'manager' ? 'Operations Manager' : 'Sales Specialist';
+
   return (
     <div style={s.container}>
 
       {/* ─── TOP HEADER ─────────────────────────────────────────────────── */}
       <header style={s.header}>
         {/* Logo */}
-        <div style={s.logoSection} onClick={() => navigate('/dashboard')}>
+        <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
           <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
         </div>
 
         {/* Center Pills */}
         <div style={s.pillContainer}>
-          {[
-            { key: 'analytics', label: 'AI Strategy' },
-            { key: 'pipeline', label: 'Lead Pipeline' },
-            { key: 'build', label: 'Team KPIs' }
-          ].map(({ key, label }) => (
+          {headerPills.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => handleTabChange(key)}
@@ -243,63 +307,109 @@ export default function DashboardLayout() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-            <div style={s.notifDot} />
+            {unreadCount > 0 && <div style={s.notifDot} />}
           </div>
 
           {/* Notifications Dropdown */}
           {notifOpen && (
             <div style={s.dropdownPanel}>
-              <div style={s.dropdownHeader}>System Notifications</div>
-              <div style={s.notifItem}>
-                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                  <span>Payment Gate Pending</span>
+              <div style={s.dropdownHeader}>System Notifications ({unreadCount})</div>
+              {notifications.map(n => (
+                <div key={n.id} style={s.notifItem} onClick={() => handleNotifClick(n)}>
+                  <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {n.icon}
+                    <span>{n.title}</span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#71717a', marginTop: 2 }}>{n.message}</div>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>Acme Manufacturing 10% advance verification required.</div>
-              </div>
-              <div style={s.notifItem}>
-                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" /></svg>
-                  <span>AI Voice Calls Active</span>
-                </div>
-              </div>
-              <div style={s.notifItem}>
-                <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                  <span>WhatsApp Automation</span>
-                </div>
-                <div style={{ fontSize: '0.72rem', color: '#71717a' }}>3 sequences dispatched to pending leads.</div>
-              </div>
+              ))}
             </div>
           )}
 
           {/* User Widget */}
           <div className="header-user-card" style={s.userWidget} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}>
-            <div style={s.userAvatarInitial}>A</div>
+            <div style={{ ...s.userAvatarInitial, backgroundColor: currentUser?.avatarBg || '#09090b' }}>
+              {currentUser?.avatar || 'A'}
+            </div>
             <div style={s.userInfo}>
-              <div style={s.userName}>Admin</div>
-              <div style={s.userRole}>System Administrator</div>
+              <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
+              <div style={s.userRole}>{roleTitleDisplay}</div>
             </div>
             <svg style={s.dropdownIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
 
-          {/* Profile Dropdown */}
+          {/* Profile Dropdown & Quick Switch */}
           {userMenuOpen && (
-            <div style={{ ...s.dropdownPanel, right: 0, width: 200 }}>
-              <div style={s.dropdownHeader}>Signed in as Admin</div>
-              <div style={s.menuItem} onClick={() => { handleTabChange('settings'); setUserMenuOpen(false); }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
-                <span>System Settings</span>
+            <div style={{ ...s.dropdownPanel, right: 0, width: 260 }}>
+              <div style={s.dropdownHeader}>
+                <div>Signed in as <strong>{currentUser?.name}</strong></div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>{currentUser?.email}</div>
               </div>
-              <div style={s.menuItem} onClick={() => { handleTabChange('users'); setUserMenuOpen(false); }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-                <span>Users & Roles</span>
+
+              {/* Role Indicator & Title */}
+              <div style={{ padding: '8px 12px', backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+                <span style={{
+                  fontSize: '0.66rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  padding: '2px 8px',
+                  borderRadius: 8,
+                  backgroundColor: currentUser?.role === 'admin' ? '#fef3c7' : currentUser?.role === 'manager' ? '#dbeafe' : '#d1fae5',
+                  color: currentUser?.role === 'admin' ? '#b45309' : currentUser?.role === 'manager' ? '#1d4ed8' : '#047857'
+                }}>
+                  Active Role: {currentUser?.role}
+                </span>
+                <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 4, fontWeight: 600 }}>{currentUser?.title}</div>
               </div>
-              <div style={{ ...s.menuItem, color: '#ef4444' }} onClick={() => navigate('/login')}>
+
+              {/* Quick Switch Role */}
+              <div style={{ padding: '8px 12px 4px 12px' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                  Switch Demo Account
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+                  {['admin', 'manager', 'employee'].map(r => (
+                    <button
+                      key={r}
+                      onClick={() => handleSwitchRole(r)}
+                      style={{
+                        padding: '5px 2px',
+                        borderRadius: 6,
+                        border: '1px solid',
+                        borderColor: currentUser?.role === r ? '#2563eb' : '#e2e8f0',
+                        backgroundColor: currentUser?.role === r ? '#eff6ff' : '#ffffff',
+                        fontSize: '0.7rem',
+                        fontWeight: currentUser?.role === r ? 800 : 600,
+                        color: currentUser?.role === r ? '#1d4ed8' : '#64748b',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {r === 'admin' ? 'Admin' : r === 'manager' ? 'Manager' : 'Employee'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={s.dropdownDivider} />
+
+              {currentUser?.role === 'admin' && (
+                <>
+                  <div style={s.menuItem} onClick={() => { handleTabChange('settings'); setUserMenuOpen(false); }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+                    <span>System Settings</span>
+                  </div>
+                  <div style={s.menuItem} onClick={() => { handleTabChange('users'); setUserMenuOpen(false); }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    <span>Users & Roles</span>
+                  </div>
+                </>
+              )}
+
+              <div style={{ ...s.menuItem, color: '#ef4444' }} onClick={handleLogout}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
-                <span>Logout</span>
+                <span>Logout Session</span>
               </div>
             </div>
           )}
@@ -314,7 +424,7 @@ export default function DashboardLayout() {
 
           {/* Scrollable Nav */}
           <div style={s.sidebarScroll}>
-            {NAV_GROUPS.map((group) => (
+            {filteredNavGroups.map((group) => (
               <div key={group.group} style={s.navGroup}>
                 <div style={s.navGroupLabel}>{group.group}</div>
                 {group.items.map((item) => {
@@ -349,12 +459,14 @@ export default function DashboardLayout() {
           <div style={s.sidebarBottom}>
             <div style={s.sidebarDivider} />
             <div style={s.userCard}>
-              <div style={s.sidebarInitial}>A</div>
-              <div style={s.userCardInfo}>
-                <div style={s.userCardName}>admin</div>
-                <div style={s.userCardEmail}>admin@aps.enterprise</div>
+              <div style={{ ...s.sidebarInitial, backgroundColor: currentUser?.avatarBg || '#09090b' }}>
+                {currentUser?.avatar || 'A'}
               </div>
-              <button onClick={() => navigate('/login')} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
+              <div style={s.userCardInfo}>
+                <div style={s.userCardName}>{currentUser?.name || 'admin'}</div>
+                <div style={s.userCardEmail}>{currentUser?.email || 'admin@aps.enterprise'}</div>
+              </div>
+              <button onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -371,9 +483,8 @@ export default function DashboardLayout() {
         </main>
       </div>
 
-      {/* ─── APS AI CHATBOT (Floating quick widget when not on /ai page) ── */}
-      {path !== '/ai' && <APSAIChatPanel />}
-
+      {/* Floating AI Assistant Chat Panel */}
+      <APSAIChatPanel />
     </div>
   );
 }
