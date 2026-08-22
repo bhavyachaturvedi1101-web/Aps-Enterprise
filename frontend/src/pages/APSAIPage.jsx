@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 const API = 'http://localhost:5000/api/a3';
 
@@ -90,11 +91,15 @@ function MiniBarChart({ chart }) {
     });
 
     ctx.fillStyle = '#64748b';
-    ctx.font = '10px Inter, sans-serif';
+    ctx.font = '9.5px Inter, sans-serif';
     ctx.textAlign = 'center';
+    const groupSlotW = chartW / numGroups;
+
     labels.forEach((label, gi) => {
-      const groupX = PAD.left + gi * (chartW / numGroups) + (chartW / numGroups) / 2;
-      ctx.fillText(label.length > 10 ? label.slice(0, 9) + '…' : label, groupX, H - PAD.bottom + 15);
+      const groupX = PAD.left + gi * groupSlotW + groupSlotW / 2;
+      const maxChars = groupSlotW < 50 ? 5 : (groupSlotW < 65 ? 6 : (groupSlotW < 80 ? 8 : 11));
+      const displayLabel = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
+      ctx.fillText(displayLabel, groupX, H - PAD.bottom + 16);
     });
 
     for (let t = 0; t <= 4; t++) {
@@ -337,6 +342,15 @@ function ReportCard({ report }) {
 }
 
 // ─── Export File Download Card Component ─────────────────────────────────────
+function cleanPdfText(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu, '')
+    .replace(/[^\x00-\x7F]/g, '')
+    .replace(/[\#\*\_`]/g, '')
+    .trim();
+}
+
 function generateRealPDF(exportFile, tableData) {
   try {
     const { fileName, title, summaryCards, tableHeaders, tableRows, content } = exportFile || {};
@@ -373,7 +387,8 @@ function generateRealPDF(exportFile, tableData) {
     doc.text('HQ: 832, Old Loha Mandi, Indore, MP - 452001 | Web: www.apsenterprises.in | Ph: +91-7869755871', pageWidth - margin, 34, { align: 'right' });
 
     // ── 2. Document Title ───────────────────────────────────────────────
-    const docTitle = title || (fileName || 'APS Intelligence Report').replace(/\.pdf$/i, '').replace(/_/g, ' ');
+    const rawTitle = title || (fileName || 'APS Intelligence Report').replace(/\.pdf$/i, '').replace(/_/g, ' ');
+    const docTitle = cleanPdfText(rawTitle);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(15, 23, 42);
@@ -420,12 +435,12 @@ function generateRealPDF(exportFile, tableData) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
-      doc.text(c.label.toUpperCase(), cx + 10, startY + 14);
+      doc.text(cleanPdfText(c.label).toUpperCase(), cx + 10, startY + 14);
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10.5);
       doc.setTextColor(15, 23, 42);
-      doc.text(String(c.val), cx + 10, startY + 30);
+      doc.text(cleanPdfText(String(c.val)), cx + 10, startY + 30);
     });
 
     startY += cardHeight + 14;
@@ -448,11 +463,14 @@ function generateRealPDF(exportFile, tableData) {
     }
 
     if (headers && rows && rows.length > 0) {
+      const cleanHeaders = headers.map(h => cleanPdfText(h));
+      const cleanRows = rows.map(r => r.map(c => cleanPdfText(c)));
+
       const renderTable = typeof autoTable === 'function' ? autoTable : (autoTable?.default || (typeof doc.autoTable === 'function' ? doc.autoTable.bind(doc) : null));
       if (typeof renderTable === 'function') {
         renderTable(doc, {
-          head: [headers],
-          body: rows,
+          head: [cleanHeaders],
+          body: cleanRows,
           startY: startY,
           margin: { left: margin, right: margin },
           theme: 'grid',
@@ -489,18 +507,51 @@ function generateRealPDF(exportFile, tableData) {
       }
     } else {
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
+      doc.setFontSize(9);
       doc.setTextColor(51, 65, 85);
-      const lines = (content || '').split('\n');
+      const rawText = content || 'APS AI Executive Response';
+      const maxTextWidth = pageWidth - (margin * 2);
+
+      const lines = rawText.split('\n');
       let textY = startY;
-      for (const line of lines) {
-        if (textY > pageHeight - 30) {
-          doc.addPage();
-          textY = 40;
+
+      for (const rawLine of lines) {
+        const cleanLine = cleanPdfText(rawLine);
+        if (!cleanLine) {
+          textY += 6;
+          continue;
         }
-        doc.text(line, margin, textY);
-        textY += 12;
+
+        const isHeading = rawLine.startsWith('#');
+        if (isHeading) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10.5);
+          doc.setTextColor(15, 23, 42);
+        } else {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(51, 65, 85);
+        }
+
+        const wrapped = doc.splitTextToSize(cleanLine, maxTextWidth);
+        for (const subLine of wrapped) {
+          if (textY > pageHeight - 40) {
+            doc.addPage();
+            textY = 40;
+          }
+          doc.text(subLine, margin, textY);
+          textY += isHeading ? 16 : 13;
+        }
       }
+
+      const pageNum = doc.internal.getNumberOfPages();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+      doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT', margin, pageHeight - 9);
+      doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
     }
 
     doc.save(fileName || 'APS_Enterprise_Report.pdf');
@@ -523,7 +574,7 @@ function ExportFileCard({ exportFile, tableData }) {
 
   const handleDownload = () => {
     try {
-      const fmtLower = (fileFormat || 'csv').toLowerCase();
+      const fmtLower = (fileFormat || 'pdf').toLowerCase();
 
       // ── 1. Real PDF binary generation via jsPDF with autoTable ───────────
       if (fmtLower === 'pdf') {
@@ -531,21 +582,38 @@ function ExportFileCard({ exportFile, tableData }) {
         return;
       }
 
-      // ── 2. Real Excel format (.xlsx / .csv with BOM) ───────────────────
+      // ── 2. Real XLSX Binary Excel Workbook (via SheetJS XLSX) ─────────────
       if (fmtLower === 'xlsx' || fmtLower === 'excel') {
-        // Create an HTML-based XML Spreadsheet that Excel opens natively as a table
-        let excelContent = content;
-        if (typeof content === 'string' && content.includes('\n')) {
-          const rows = content.split('\n').map(r => r.split(','));
-          excelContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>APS Export</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
-<body><table border="1">${rows.map(r => `<tr>${r.map(c => `<td>${c.replace(/^"|"$/g, '')}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+        let headers = [];
+        let rows = [];
+
+        if (tableData && Array.isArray(tableData) && tableData.length > 0) {
+          headers = Object.keys(tableData[0]);
+          rows = tableData.map(r => headers.map(k => String(r[k] || '')));
+        } else if (exportFile?.tableHeaders && exportFile?.tableRows) {
+          headers = exportFile.tableHeaders;
+          rows = exportFile.tableRows;
+        } else if (typeof content === 'string' && content.includes('\n')) {
+          const lines = content.split('\n').filter(l => l.trim());
+          if (lines.length > 0) {
+            headers = lines[0].split(',').map(c => c.replace(/^"|"$/g, ''));
+            rows = lines.slice(1).map(l => l.split(',').map(c => c.replace(/^"|"$/g, '')));
+          }
         }
-        const blob = new Blob(['\uFEFF' + excelContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+
+        const wb = XLSX.utils.book_new();
+        const wsData = headers.length > 0 ? [headers, ...rows] : rows;
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        XLSX.utils.book_append_sheet(wb, ws, "APS Export");
+
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName || `APS_Enterprise_Export.xlsx`;
+        const rawName = fileName || 'APS_Enterprise_Export.xlsx';
+        const outName = rawName.toLowerCase().endsWith('.xlsx') ? rawName : `${rawName.replace(/\.[^/.]+$/, '')}.xlsx`;
+        a.download = outName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -613,8 +681,8 @@ function ExportFileCard({ exportFile, tableData }) {
           {fmt}
         </div>
         <div>
-          <div style={s.fileExportName}>{fileName}</div>
-          <div style={s.fileExportMeta}>Click button below to download your generated {fmt} file • {sizeKB || 'Ready'}</div>
+          <div style={s.fileExportName}>{fileName || 'APS_AI_Response.pdf'}</div>
+          <div style={s.fileExportMeta}>Click button below to download your generated {fmt} document • {sizeKB || 'Ready'}</div>
         </div>
       </div>
       <button
@@ -682,7 +750,8 @@ function MessageCard({ msg }) {
 // ─── Welcome Message ──────────────────────────────────────────────────────────
 const WELCOME_MSG = {
   role: 'bot',
-  text: "Hello! I am your **Dashboard AI Assistant** for APS Enterprise.\n\nI can **analyze dashboard data, generate executive PDF reports, export Excel/CSV/XML/DOCX files, detect trend anomalies, and explain key business KPIs**.\n\nSelect a quick query from the sidebar or ask anything in plain English below.",
+  isWelcome: true,
+  text: "Welcome to **APS Enterprise AI Assistant** 🤖\n\nI am your intelligent enterprise co-pilot for real-time analytics, automated PDF reporting, factory tracking, and pipeline analysis.\n\n• **Ask any question** about leads, invoices, factory job cards, calculations, or general business metrics.\n• **Certified PDF Exports**: Every query response includes a downloadable PDF audit document.\n\nSelect a quick suggestion from the sidebar or type your query below to get started!",
   table: null,
   chart: null
 };
@@ -738,6 +807,17 @@ export default function APSAIPage() {
     setMessages([WELCOME_MSG]);
   };
 
+  // Auto focus input on mount and when loading finishes
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [loading]);
+
   const sendQuery = useCallback(async (queryText) => {
     const q = (queryText || input).trim();
     if (!q || loading) return;
@@ -775,6 +855,7 @@ export default function APSAIPage() {
       ]);
     } finally {
       setLoading(false);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [input, loading]);
 

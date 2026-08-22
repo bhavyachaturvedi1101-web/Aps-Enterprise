@@ -10,11 +10,6 @@ export default function APSAIChatPanel() {
   const location = useLocation();
   const [pulse, setPulse] = useState(false);
 
-  // If already on /ai page, don't show the launcher
-  if (location.pathname === '/ai' || location.pathname === '/chatbot') {
-    return null;
-  }
-
   // Periodic subtle pulse animation
   useEffect(() => {
     const id = setInterval(() => {
@@ -23,6 +18,11 @@ export default function APSAIChatPanel() {
     }, 14000);
     return () => clearInterval(id);
   }, []);
+
+  // If already on /ai page, don't show the launcher
+  if (location.pathname === '/ai' || location.pathname === '/chatbot') {
+    return null;
+  }
 
   return (
     <>
