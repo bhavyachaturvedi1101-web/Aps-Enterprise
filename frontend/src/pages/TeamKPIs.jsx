@@ -2351,7 +2351,7 @@ const s = {
     backgroundColor: '#fff',
     borderRadius: 20,
     width: '100%',
-    maxWidth: 680,
+    maxWidth: 780,
     maxHeight: '90vh',
     overflowY: 'auto',
     padding: '2rem',
@@ -2421,27 +2421,43 @@ const s = {
   },
   drillStatGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
-    gap: '0.75rem'
+    gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+    gap: '0.65rem'
   },
-
   drillStat: {
     backgroundColor: '#f8fafc',
     borderRadius: 12,
-    padding: '0.85rem',
+    padding: '0.75rem 0.4rem',
     textAlign: 'center',
-    border: '1px solid #e2e8f0'
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 0,
+    overflow: 'hidden',
+    boxSizing: 'border-box'
   },
   drillVal: {
-    fontSize: '1.15rem',
+    fontSize: '0.92rem',
     fontWeight: 800,
-    color: '#08060d'
+    color: '#08060d',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxWidth: '100%',
+    lineHeight: 1.2,
+    letterSpacing: '-0.3px'
   },
   drillLbl: {
-    fontSize: '0.62rem',
+    fontSize: '0.66rem',
     color: '#64748b',
-    fontWeight: 600,
-    marginTop: 2
+    fontWeight: 700,
+    marginTop: 4,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxWidth: '100%'
   },
   modalSection: {
     borderTop: '1px solid #f1f5f9',
