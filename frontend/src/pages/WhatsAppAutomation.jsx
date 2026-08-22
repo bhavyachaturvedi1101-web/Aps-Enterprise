@@ -1981,7 +1981,8 @@ const s = {
     overflow: 'hidden',
     boxShadow: '0 14px 40px rgba(0,0,0,0.12)',
     border: '1px solid #e4e4e7',
-    height: 700,
+    height: 640,
+    marginBottom: '3.5rem',
     backgroundColor: '#ffffff'
   },
   waInboxPane: {
@@ -2398,7 +2399,7 @@ const s = {
   },
   quickSimSection: {
     backgroundColor: '#ffffff',
-    padding: '0.65rem 0.85rem',
+    padding: '0.65rem 130px 0.65rem 0.85rem',
     borderTop: '1px solid #e4e4e7',
     borderBottom: '1px solid #e4e4e7'
   },
@@ -2427,7 +2428,7 @@ const s = {
   },
   chatInputForm: {
     backgroundColor: '#f0f2f5',
-    padding: '0.65rem 0.85rem',
+    padding: '0.65rem 130px 0.65rem 0.85rem',
     display: 'flex',
     alignItems: 'center',
     gap: 8
@@ -2471,7 +2472,8 @@ const s = {
     justifyContent: 'center',
     cursor: 'pointer',
     boxShadow: '0 2px 6px rgba(37,211,102,0.4)',
-    transition: 'transform 0.12s ease'
+    transition: 'transform 0.12s ease',
+    flexShrink: 0
   },
   tplModalPickCard: {
     backgroundColor: '#f8fafc',
