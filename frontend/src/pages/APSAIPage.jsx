@@ -23,7 +23,7 @@ function loadHistory() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch { }
   return null;
 }
 
@@ -31,7 +31,7 @@ function saveHistory(messages) {
   try {
     const clean = messages.filter(m => !m.loading).slice(-40);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(clean));
-  } catch {}
+  } catch { }
 }
 
 // ─── Bar Chart (Canvas) ───────────────────────────────────────────────────────
@@ -268,19 +268,19 @@ function RenderText({ text, isUser }) {
         p.startsWith('**') && p.endsWith('**')
           ? <strong key={i} style={{ color: isUser ? '#fff' : '#0f172a', fontWeight: 700 }}>{p.slice(2, -2)}</strong>
           : p.split('\n').map((line, j) => (
-              <React.Fragment key={`${i}-${j}`}>
-                {j > 0 && <br />}
-                {line.startsWith('• ') ? (
-                  <span style={{ display: 'block', paddingLeft: 14, color: isUser ? 'rgba(255,255,255,0.9)' : '#475569', margin: '2px 0' }}>
-                    • {line.slice(2)}
-                  </span>
-                ) : line.startsWith('*') && line.endsWith('*') ? (
-                  <em style={{ color: isUser ? 'rgba(255,255,255,0.85)' : '#2563eb', fontStyle: 'italic' }}>
-                    {line.slice(1, -1)}
-                  </em>
-                ) : line}
-              </React.Fragment>
-            ))
+            <React.Fragment key={`${i}-${j}`}>
+              {j > 0 && <br />}
+              {line.startsWith('• ') ? (
+                <span style={{ display: 'block', paddingLeft: 14, color: isUser ? 'rgba(255,255,255,0.9)' : '#475569', margin: '2px 0' }}>
+                  • {line.slice(2)}
+                </span>
+              ) : line.startsWith('*') && line.endsWith('*') ? (
+                <em style={{ color: isUser ? 'rgba(255,255,255,0.85)' : '#2563eb', fontStyle: 'italic' }}>
+                  {line.slice(1, -1)}
+                </em>
+              ) : line}
+            </React.Fragment>
+          ))
       )}
     </span>
   );
@@ -623,9 +623,9 @@ function ExportFileCard({ exportFile, tableData }) {
         id={`download-btn-${fmt.toLowerCase()}`}
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
         <span>Download {fmt} File</span>
       </button>
@@ -643,8 +643,8 @@ function MessageCard({ msg }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <div style={s.aiAvatarCircle}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/>
-              <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
+              <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
+              <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3" />
             </svg>
           </div>
           <span style={s.aiNameBadge}>Dashboard AI Assistant</span>
@@ -712,7 +712,7 @@ export default function APSAIPage() {
   useEffect(() => {
     axios.get(`${API}/suggestions`)
       .then(r => setSuggestions(r.data.suggestions || []))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Handle URL query parameter if navigated with `?q=...`
@@ -811,8 +811,8 @@ export default function APSAIPage() {
         <div style={s.headerLeft}>
           <div style={s.headerIconWrap}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/>
-              <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
+              <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
+              <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3" />
             </svg>
           </div>
           <div>
@@ -823,7 +823,7 @@ export default function APSAIPage() {
         <div style={s.headerRight}>
           <button onClick={clearHistory} style={s.actionBtn} title="Reset Chat">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
             </svg>
             <span>Clear History</span>
           </button>
@@ -941,8 +941,8 @@ export default function APSAIPage() {
                   title="Voice Speech-to-Text"
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
                   </svg>
                   <span>{isListening ? 'Listening…' : 'Voice'}</span>
                 </button>
@@ -959,7 +959,7 @@ export default function APSAIPage() {
               >
                 <span>Send Query</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
               </button>
             </div>

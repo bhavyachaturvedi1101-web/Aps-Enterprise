@@ -82,19 +82,19 @@ const STAGE_META = {
 };
 
 const PRIORITY_THEMES = {
-  Hot:  { bg: '#fef2f2', color: '#ef4444', border: '#fca5a5' },
+  Hot: { bg: '#fef2f2', color: '#ef4444', border: '#fca5a5' },
   Warm: { bg: '#fffbeb', color: '#b45309', border: '#fde68a' },
   Cold: { bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' }
 };
 
 const SOURCE_THEMES = {
-  WhatsApp:         { bg: '#ecfdf5', color: '#047857' },
-  'Meta Ads':       { bg: '#eff6ff', color: '#1d4ed8' },
-  'Facebook Ad':    { bg: '#eff6ff', color: '#1d4ed8' },
-  'Voice Agent':    { bg: '#f3e8ff', color: '#7c3aed' },
-  'Inbound Call':   { bg: '#e0e7ff', color: '#4338ca' },
-  'Direct Web':     { bg: '#f1f5f9', color: '#475569' },
-  Default:          { bg: '#f1f5f9', color: '#475569' }
+  WhatsApp: { bg: '#ecfdf5', color: '#047857' },
+  'Meta Ads': { bg: '#eff6ff', color: '#1d4ed8' },
+  'Facebook Ad': { bg: '#eff6ff', color: '#1d4ed8' },
+  'Voice Agent': { bg: '#f3e8ff', color: '#7c3aed' },
+  'Inbound Call': { bg: '#e0e7ff', color: '#4338ca' },
+  'Direct Web': { bg: '#f1f5f9', color: '#475569' },
+  Default: { bg: '#f1f5f9', color: '#475569' }
 };
 
 // Custom Enterprise Select Component for CRM
@@ -422,7 +422,7 @@ export default function CRMLeads() {
     if (!toStage) return;
 
     const isHighStakes = (lead.stage === 'Confirmed Lead' && toStage === 'Client (Paid)') ||
-                         (lead.stage === 'Client (Paid)' && toStage === 'In Production');
+      (lead.stage === 'Client (Paid)' && toStage === 'In Production');
 
     if (approvalPolicy === 'countersign' && isHighStakes) {
       setTargetLead(lead);
@@ -752,7 +752,7 @@ export default function CRMLeads() {
                       {/* Phone Number Row (Show Numbers) */}
                       <div style={s.phoneRow}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" />
                         </svg>
                         <span style={s.phoneText}>
                           {lead.phone ? lead.phone.replace(/^\+91/, '') : '8120590466'}
