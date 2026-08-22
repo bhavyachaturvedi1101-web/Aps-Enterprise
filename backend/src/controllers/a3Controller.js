@@ -17,6 +17,19 @@ async function query(req, res, next) {
     const result = await processQuery(userQuery.trim(), conversationId || null);
     const processingMs = Date.now() - t0;
 
+    // Log query into activity audit log
+    const store = require('../config/inMemoryStore');
+    if (store.mockActivityLogs) {
+      store.mockActivityLogs.unshift({
+        id: `act-ai-${Date.now()}`,
+        type: 'ai_query',
+        actor: 'APS AI Assistant',
+        action: `Processed query: "${userQuery.trim().slice(0, 45)}${userQuery.trim().length > 45 ? '…' : ''}"`,
+        timestamp: new Date().toISOString(),
+        details: result.text ? result.text.slice(0, 90) : 'Query analyzed.'
+      });
+    }
+
     return res.json({
       ...result,
       query: userQuery.trim(),

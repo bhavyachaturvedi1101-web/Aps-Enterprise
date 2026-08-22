@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import APSAIChatPanel from '../components/A3ChatPanel';
@@ -143,6 +143,8 @@ export default function DashboardLayout() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [notifFilter, setNotifFilter] = useState('all');
+  const [isSimulating, setIsSimulating] = useState(false);
 
   // Dynamic Navigation Groups based on active User Role
   const filteredNavGroups = useMemo(() => {
@@ -215,12 +217,135 @@ export default function DashboardLayout() {
     ];
   }, [currentUser?.role]);
 
+  // Fetch notifications from backend API
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/notifications');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.notifications)) {
+        setNotifications(data.notifications);
+      }
+    } catch (e) {
+      // Keep local state
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const handleNotifClick = (notif) => {
+  const handleToggleRead = async (id, e) => {
+    if (e) e.stopPropagation();
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+    try {
+      await fetch('http://localhost:5000/api/notifications/mark-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+    } catch (e) {}
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    try {
+      await fetch('http://localhost:5000/api/notifications/mark-read', { method: 'POST' });
+    } catch (e) {}
+  };
+
+  const handleClearAll = async () => {
+    setNotifications([]);
+    try {
+      await fetch('http://localhost:5000/api/notifications/clear', { method: 'POST' });
+    } catch (e) {}
+  };
+
+  const handleSimulateAlert = async () => {
+    setIsSimulating(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/notifications/simulate', { method: 'POST' });
+      const data = await res.json();
+      if (data.success && data.notification) {
+        setNotifications(prev => [data.notification, ...prev]);
+      }
+    } catch (e) {
+      const mockEvent = {
+        id: `notif-${Date.now()}`,
+        title: 'Incoming Customer AI Query',
+        message: 'Client asked: "What is the warranty and dispatch timeline for CNC Machine v2?"',
+        time: 'Just now',
+        read: false,
+        category: 'ai',
+        route: '/ai',
+        color: '#0891b2',
+        iconType: 'ai'
+      };
+      setNotifications(prev => [mockEvent, ...prev]);
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
+  const handleNotifClick = async (notif) => {
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    try {
+      await fetch('http://localhost:5000/api/notifications/mark-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: notif.id })
+      });
+    } catch (e) {}
     setNotifOpen(false);
-    navigate(notif.route);
+    if (notif.route) navigate(notif.route);
+  };
+
+  // Filtered notifications list
+  const filteredNotifications = useMemo(() => {
+    if (notifFilter === 'unread') return notifications.filter(n => !n.read);
+    if (notifFilter === 'ai') return notifications.filter(n => n.category === 'ai' || (n.title || '').toLowerCase().includes('ai') || (n.title || '').toLowerCase().includes('query'));
+    if (notifFilter === 'ops') return notifications.filter(n => ['leads', 'payments', 'whatsapp', 'voice'].includes(n.category));
+    return notifications;
+  }, [notifications, notifFilter]);
+
+  const renderNotifIcon = (notif) => {
+    const type = notif.iconType || notif.category;
+    if (type === 'ai') {
+      return (
+        <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#ecfeff', color: '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="11" r="1"/><circle cx="16" cy="11" r="1"/></svg>
+        </div>
+      );
+    }
+    if (type === 'payment' || type === 'payments') {
+      return (
+        <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+      );
+    }
+    if (type === 'whatsapp') {
+      return (
+        <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+      );
+    }
+    if (type === 'voice') {
+      return (
+        <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#f3e8ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
+        </div>
+      );
+    }
+    return (
+      <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      </div>
+    );
   };
 
   const path = location.pathname;
@@ -312,17 +437,151 @@ export default function DashboardLayout() {
 
           {/* Notifications Dropdown */}
           {notifOpen && (
-            <div style={s.dropdownPanel}>
-              <div style={s.dropdownHeader}>System Notifications ({unreadCount})</div>
-              {notifications.map(n => (
-                <div key={n.id} style={s.notifItem} onClick={() => handleNotifClick(n)}>
-                  <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#08060d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {n.icon}
-                    <span>{n.title}</span>
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#71717a', marginTop: 2 }}>{n.message}</div>
+            <div style={{ ...s.dropdownPanel, width: 340, padding: '0.85rem' }}>
+              {/* Header */}
+              <div style={s.notifHeaderRow}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={s.dropdownHeaderTitle}>System Notifications</span>
+                  {unreadCount > 0 && (
+                    <span style={s.unreadPill}>{unreadCount} new</span>
+                  )}
                 </div>
-              ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {unreadCount > 0 && (
+                    <button type="button" onClick={handleMarkAllRead} style={s.markAllBtn} title="Mark all notifications as read">
+                      Mark read
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button type="button" onClick={handleClearAll} style={s.deleteAllBtn} title="Clear all notifications">
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Category Filter Pills & Simulate Trigger */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 2 }}>
+                  {[
+                    { key: 'all', label: `All (${notifications.length})` },
+                    { key: 'unread', label: `Unread (${unreadCount})` },
+                    { key: 'ai', label: 'AI & Queries' },
+                    { key: 'ops', label: 'Operations' }
+                  ].map(f => (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => setNotifFilter(f.key)}
+                      style={{
+                        padding: '3px 8px',
+                        borderRadius: 12,
+                        border: '1px solid',
+                        borderColor: notifFilter === f.key ? '#2563eb' : '#e2e8f0',
+                        backgroundColor: notifFilter === f.key ? '#eff6ff' : '#ffffff',
+                        color: notifFilter === f.key ? '#1d4ed8' : '#64748b',
+                        fontSize: '0.66rem',
+                        fontWeight: notifFilter === f.key ? 700 : 500,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSimulateAlert}
+                  disabled={isSimulating}
+                  style={{
+                    padding: '3px 8px',
+                    borderRadius: 8,
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#f8fafc',
+                    color: '#0f172a',
+                    fontSize: '0.64rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                  title="Simulate a live incoming query or event from backend"
+                >
+                  {isSimulating ? '…' : '+ Simulate'}
+                </button>
+              </div>
+
+              {/* Notification Stream List */}
+              <div style={s.notifList}>
+                {filteredNotifications.length === 0 ? (
+                  <div style={{ padding: '1.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem' }}>
+                    No notifications in this filter.
+                  </div>
+                ) : (
+                  filteredNotifications.map(n => (
+                    <div
+                      key={n.id}
+                      onClick={() => handleNotifClick(n)}
+                      style={{
+                        ...s.notifItem,
+                        backgroundColor: n.read ? '#ffffff' : '#f8fafc',
+                        border: '1px solid',
+                        borderColor: n.read ? '#f1f5f9' : '#e2e8f0',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                        {renderNotifIcon(n)}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 4 }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.8rem', color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {n.title}
+                            </span>
+                            <span style={{ fontSize: '0.64rem', color: '#94a3b8', flexShrink: 0 }}>{n.time}</span>
+                          </div>
+                          <div style={{ fontSize: '0.73rem', color: '#475569', marginTop: 2, lineHeight: 1.35 }}>
+                            {n.message}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                            <span style={{
+                              fontSize: '0.6rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              padding: '1px 6px',
+                              borderRadius: 6,
+                              backgroundColor: '#f1f5f9',
+                              color: '#64748b'
+                            }}>
+                              {n.category || 'system'}
+                            </span>
+                            <span style={{ fontSize: '0.66rem', color: '#2563eb', fontWeight: 700 }}>
+                              Open →
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {!n.read && (
+                        <div
+                          onClick={(e) => handleToggleRead(n.id, e)}
+                          title="Click to mark read"
+                          style={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            backgroundColor: '#2563eb'
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 
