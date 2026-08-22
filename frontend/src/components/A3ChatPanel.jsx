@@ -35,14 +35,14 @@ export default function APSAIChatPanel() {
       >
         <div style={s.iconWrap}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z"/>
-            <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3"/>
+            <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
+            <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3" />
           </svg>
         </div>
         <span style={s.labelText}>Ask Me</span>
         <div style={s.arrowWrap}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
       </button>

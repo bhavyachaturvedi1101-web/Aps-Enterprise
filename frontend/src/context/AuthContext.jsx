@@ -98,7 +98,7 @@ export function AuthProvider({ children }) {
 
   const login = (email, password) => {
     const trimmedEmail = (email || '').trim().toLowerCase();
-    
+
     if (trimmedEmail.includes('manager')) {
       return loginWithRole('manager');
     }
