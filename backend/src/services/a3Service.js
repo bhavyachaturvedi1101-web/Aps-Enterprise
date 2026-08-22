@@ -106,7 +106,18 @@ const INTENTS = [
     /(margin|cost breakdown) for/i,
     /order margin/i
   ] },
-  { name: 'generate_report',  patterns: [/generate.*report/i, /executive report/i, /pdf report/i, /summary report/i, /analytics report/i, /make report/i, /create report/i, /report generate/i] },
+  { name: 'schedule_call', patterns: [
+    /schedule.*(call|dial|phone|voice|followup|meeting)/i,
+    /call.*(schedule|queue|set|book|reminder|time|at|for)/i,
+    /(phone|voice|dialer|telecaller).*call/i,
+    /book.*call/i,
+    /set.*call/i,
+    /call.*kar do/i,
+    /call.*bhejo/i,
+    /call.*queue/i,
+    /can it schedule call/i,
+    /schedule call/i
+  ] },
   { name: 'export_file',      patterns: [
     /\bexport\b/i,
     /\bcsv\b/i,
@@ -1468,6 +1479,62 @@ async function handleActionQueueDialer(query) {
   };
 }
 
+async function handleScheduleCall(query) {
+  const store = getStore();
+  const activityLogs = store.mockActivityLogs || [];
+  const callLogs = store.mockCallLogs || [];
+  const leads = store.mockLeads || [];
+  const qLower = (query || '').toLowerCase();
+
+  const matchedLead = leads.find(l => l && l.name && (qLower.includes(l.name.toLowerCase()) || qLower.includes((l.company || '').toLowerCase()))) || leads[0];
+  const targetName = matchedLead ? `${matchedLead.name} (${matchedLead.company})` : 'CRM Target Lead Queue';
+  const targetPhone = matchedLead ? matchedLead.phone : '+919876543210';
+
+  const timeMatch = query.match(/(?:at|for|by|in)\s+([0-9]{1,2}(?::[0-9]{2})?\s*(?:am|pm)?|tomorrow|today|[0-9]+\s*mins?)/i);
+  const scheduledTimeStr = timeMatch ? timeMatch[1].toUpperCase() : 'Today at 4:30 PM IST';
+
+  const callId = `CALL-SCH-${Math.floor(1000 + Math.random() * 9000)}`;
+
+  callLogs.unshift({
+    callId,
+    leadId: matchedLead ? matchedLead.id : 'DIALER-QUEUE',
+    phone: targetPhone,
+    agent: 'APS Telecaller Assistant',
+    durationSeconds: 0,
+    callOutcome: `Scheduled for ${scheduledTimeStr}`,
+    transcript: `Automated call scheduled via AI Command: "${query}"`,
+    timestamp: new Date()
+  });
+
+  activityLogs.unshift({
+    id: `log-${Date.now()}`,
+    employeeId: 'e1',
+    employeeName: 'Animesh (Voice Lead)',
+    leadId: matchedLead ? matchedLead.id : 'DIALER-QUEUE',
+    leadName: targetName,
+    action: `Scheduled automated Voice Assistant outbound call ${callId} for ${scheduledTimeStr}`,
+    fromStage: 'Voice Dialer',
+    toStage: 'Scheduled Outbound Call',
+    details: `Target: ${targetName} | Phone: ${targetPhone} | Time: ${scheduledTimeStr}`,
+    createdAt: new Date()
+  });
+
+  return {
+    text: `### 📞 Yes! Voice Agent Call Scheduled Successfully\n\n` +
+      `**Call Reference ID:** \`${callId}\`  \n` +
+      `• **Recipient Lead:** **${targetName}**  \n` +
+      `• **Phone Number:** \`${targetPhone}\`  \n` +
+      `• **Scheduled Execution Time:** **${scheduledTimeStr}**  \n` +
+      `• **Assigned Voice Agent:** **APS Telecaller Assistant (Automated Sentiment & Budget Qualifier)**  \n` +
+      `• **Call Capabilities:** Automated Dona Pattal & CNC Machine Interest Verification, Tally 10% Advance Deposit Reminders, & Live Transcript Sentiment Scoring  \n\n` +
+      `*This scheduled call has been logged into your Voice Dialer queue (\`/dialer\`) and system Activity Logs.*`,
+    table: [
+      { "Call Reference": callId, "Recipient Customer": targetName, "Phone Number": targetPhone, "Scheduled Time": scheduledTimeStr, "Voice Agent": "APS Voice Assistant", "Status": "Scheduled in Queue" }
+    ],
+    chart: null
+  };
+}
+
 async function handleActionSendWhatsApp(query) {
   const store = getStore();
   const waMsgs = store.mockWhatsAppMessages || [];
@@ -1854,13 +1921,13 @@ async function processQuery(query, conversationId) {
       const isPdfReq = /pdf/i.test(qLower);
       const fmt = isPdfReq ? 'pdf' : (isCsvReq ? 'csv' : 'xlsx');
 
-      const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **${fmt.toUpperCase()} Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by A1 Voice Agent)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested ${fmt.toUpperCase()} Excel document has been attached below.*`;
+      const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **${fmt.toUpperCase()} Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by Voice Assistant)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested ${fmt.toUpperCase()} Excel document has been attached below.*`;
 
       const resObj = {
         text: leadsText,
         table: [
           { "Pipeline Stage": "Enquiry", "Lead Count": 5, "Description": "New Meta Inbound Inquiries", "Status": "CRM Synced" },
-          { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by A1 Voice Agent", "Status": "CRM Synced" },
+          { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by Voice Assistant", "Status": "CRM Synced" },
           { "Pipeline Stage": "Booked", "Lead Count": 4, "Description": "ERP Production Release Ready", "Status": "ERP Active" },
           { "Pipeline Stage": "Confirmed", "Lead Count": 5, "Description": "Proforma Invoices Issued", "Status": "Quoted" },
           { "Pipeline Stage": "Paid", "Lead Count": 10, "Description": "10% Advance Gate Verified in Tally", "Status": "Tally Pass" },
@@ -1879,11 +1946,11 @@ async function processQuery(query, conversationId) {
           mimeType: fmt === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (fmt === 'csv' ? 'text/csv' : 'application/pdf'),
           sizeKB: '24.5 KB',
           title: `APS LEADS PIPELINE AUDIT REPORT (${fmt.toUpperCase()})`,
-          content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by A1 Voice Agent,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
+          content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by Voice Assistant,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
           tableHeaders: ["Pipeline Stage", "Lead Count", "Description", "System Status"],
           tableRows: [
             ["Enquiry", "5", "New Meta Inbound Inquiries", "CRM Synced"],
-            ["Qualified", "4", "Verified by A1 Voice Agent", "CRM Synced"],
+            ["Qualified", "4", "Verified by Voice Assistant", "CRM Synced"],
             ["Booked", "4", "ERP Production Release Ready", "ERP Active"],
             ["Confirmed", "5", "Proforma Invoices Issued", "Quoted"],
             ["Paid", "10", "10% Advance Gate Verified in Tally", "Tally Pass"],
@@ -1936,6 +2003,7 @@ async function processQuery(query, conversationId) {
       case 'action_post_tally':      result = await handleActionPostTally(query); break;
       case 'action_erp_booking':     result = await handleActionErpBooking(query); break;
       case 'action_queue_dialer':    result = await handleActionQueueDialer(query); break;
+      case 'schedule_call':          result = await handleScheduleCall(query); break;
       case 'action_send_whatsapp':   result = await handleActionSendWhatsApp(query); break;
       case 'leads_by_stage':   result = await handleLeadsByStage(query); break;
       case 'lead_count':       result = await handleLeadCount(); break;
@@ -2021,13 +2089,13 @@ async function processQuery(query, conversationId) {
     const fmt = isPdfReq ? 'pdf' : (isCsvReq ? 'csv' : 'xlsx');
     const ext = fmt;
 
-    const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **XLSX Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by A1 Voice Agent)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested XLSX Excel document has been attached below.*`;
+    const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **XLSX Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by Voice Assistant)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested XLSX Excel document has been attached below.*`;
 
     result = {
       text: leadsText,
       table: [
         { "Pipeline Stage": "Enquiry", "Lead Count": 5, "Description": "New Meta Inbound Inquiries", "Status": "CRM Synced" },
-        { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by A1 Voice Agent", "Status": "CRM Synced" },
+        { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by Voice Assistant", "Status": "CRM Synced" },
         { "Pipeline Stage": "Booked", "Lead Count": 4, "Description": "ERP Production Release Ready", "Status": "ERP Active" },
         { "Pipeline Stage": "Confirmed", "Lead Count": 5, "Description": "Proforma Invoices Issued", "Status": "Quoted" },
         { "Pipeline Stage": "Paid", "Lead Count": 10, "Description": "10% Advance Gate Verified in Tally", "Status": "Tally Pass" },
@@ -2046,11 +2114,11 @@ async function processQuery(query, conversationId) {
         mimeType: fmt === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (fmt === 'csv' ? 'text/csv' : 'application/pdf'),
         sizeKB: '24.5 KB',
         title: 'APS LEADS PIPELINE AUDIT REPORT (XLSX)',
-        content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by A1 Voice Agent,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
+        content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by Voice Assistant,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
         tableHeaders: ["Pipeline Stage", "Lead Count", "Description", "System Status"],
         tableRows: [
           ["Enquiry", "5", "New Meta Inbound Inquiries", "CRM Synced"],
-          ["Qualified", "4", "Verified by A1 Voice Agent", "CRM Synced"],
+          ["Qualified", "4", "Verified by Voice Assistant", "CRM Synced"],
           ["Booked", "4", "ERP Production Release Ready", "ERP Active"],
           ["Confirmed", "5", "Proforma Invoices Issued", "Quoted"],
           ["Paid", "10", "10% Advance Gate Verified in Tally", "Tally Pass"],
