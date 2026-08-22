@@ -1577,49 +1577,55 @@ async function handleActionSendWhatsApp(query) {
   };
 }
 
-// ─── Full context builder for LLM (Compact & High Density) ───────────────────
+// ─── Full context builder for LLM (High Density & Compact to stay well under TPM limit) ──
 function buildFullContext() {
   const store = getStore();
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
-  const docs = store.mockDocuments || [];
-  const inventory = store.mockInventory || [];
 
-  const stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
-  const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
+  // Concise breakdown of all team members and their exact active/queued tasks
+  const empDetails = employees.map(e => {
+    const active = e.activeTask 
+      ? `Active Task: "${e.activeTask.title}" [Priority: ${e.activeTask.priority}, Lead: ${e.activeTask.leadName || 'N/A'}, Stage: ${e.activeTask.stage || 'N/A'}, Due in: ${e.activeTask.dueIn || 'N/A'}]` 
+      : 'No active task';
+    const queue = Array.isArray(e.taskQueue) && e.taskQueue.length > 0 
+      ? `Queued: ` + e.taskQueue.map((t, idx) => `${idx + 1}. "${t.title}" (${t.priority})`).join('; ')
+      : 'Queued: None';
+    return `• **${e.name}** (${e.role} — ${e.department}):
+  - Status: ${e.status} | KPI Score: ${e.kpiScore} | ${e.salesClosed} Sales Closed (₹${(e.totalRevenue || 0).toLocaleString('en-IN')})
+  - ${active}
+  - ${queue}`;
+  }).join('\n');
 
-  const stageCounts = stages.map(s => `${s}: ${leads.filter(l => l.stage === s).length}`).join(', ');
-  const closedLeads = leads.filter(l => closedStages.includes(l.stage));
-  const totalRevenue = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
-  const pendingLeads = leads.filter(l => l.stage === 'Confirmed Lead');
-  const pendingRevenue = pendingLeads.reduce((s, l) => s + (Number(l.budget) || 0) * 0.1, 0);
+  return `APS Enterprise Real-Time Intelligence & Snapshot:
 
-  const empSum = employees.map(e => `${e.name} (${e.role}): KPI ${e.kpiScore}, ${e.salesClosed} sales, ₹${(e.totalRevenue || 0).toLocaleString('en-IN')} revenue`).join('; ');
-  const docSum = docs.map(d => `${d.title} (${d.category}): ${d.excerpt}`).join('; ');
-  const invSum = inventory.map(i => `${i.name}: ${i.availableUnits} available (${i.warehouse})`).join('; ');
+1. Company & Location:
+   - Head Office: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India.
+   - Plants: Indore Main Plant (Dona Pattal & Paper Cup) & Pune Unit 1 (CNC Milling & Fiber Laser Cutters).
+   - Helplines: +91-7869755871, +91-8827848099 | Website: https://www.apsenterprises.in.
 
-  return `APS Enterprise Comprehensive System & Knowledge Base:
-- Company Profile & Location: APS Enterprises, 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India. Phones: +91-7869755871, +91-8827848099. Emails: support.apsenterprises@gmail.com, apsenterprisesdp.229@gmail.com. Website: https://www.apsenterprises.in.
-- Manufacturing Units: Indore Main Plant (Madhya Pradesh) & Pune Unit 1 (Maharashtra).
-- Machinery Products: Fully Automatic Double Die Dona Pattal Machine, Heavy Hydraulic Paper Plate & Thali Machine, High-Speed Paper Cup Making Machine, Semi-Automatic Paper Cutter & Lamination Machine, Industrial CNC Milling & 6kW Fiber Laser Cutters.
-- Platform Architecture & Dashboard Modules:
-  1. Executive Dashboard (/) - Revenue, KPI stats, 10% Advance collected, conversion rate.
-  2. CRM Leads & Pipeline (/leads) - 7 Stages: Enquiry -> Qualified -> Booked -> Confirmed Lead -> Client (Paid) -> In Production -> Dispatched.
-  3. A1 Voice Dialer (/dialer) - Automated outbound call queue, call transcripts, sentiment scoring (82.4% positive).
-  4. A5 WhatsApp Automation (/whatsapp) - WhatsApp Business API sequences & payment reminder templates.
-  5. Tally 10% Advance Reconciliation (/tally) - Mandates 10% advance payment verification before manufacturing release.
-  6. GST Invoices & Billing (/invoices) - HSN 8458.11, 18% GST (CGST 9% + SGST 9%) calculations & PDF export.
-  7. Factory Shopfloor & Job Card Tracker (/factory) - Assembly milestone tracking at Pune Unit 1 & Indore.
-  8. Team KPIs & Sales Leaderboard (/kpis, /employees) - Gamified badges & weighted KPI scoring.
-  9. Warehouse Inventory (/inventory) - Component stocks (spindles, laser sources, raw paper rolls).
-  10. Document Search & RAG (/documents) - Technical catalog & PDF specification search.
-  11. A3 AI Assistant (/ai) - Natural language assistant for dashboard analysis, reports, and file generation.
-- Live CRM Snapshot: Total Leads: ${leads.length} | Pipeline: ${stageCounts}
-- Closed Sales: ${closedLeads.length} deals totaling ₹${totalRevenue.toLocaleString('en-IN')} | 10% Advance Collected: ₹${(totalRevenue * 0.1).toLocaleString('en-IN')}
-- Pending Tally Gate: ${pendingLeads.length} leads (Advance Due: ₹${pendingRevenue.toLocaleString('en-IN')})
-- Employees & Performance: ${empSum}
-- Document Knowledge Base: ${docSum}
-- Warehouse Inventory Stock: ${invSum}`;
+2. Machinery Products:
+   - Fully Automatic Double Die Dona Pattal Machine
+   - Heavy Hydraulic Paper Plate & Thali Machine
+   - High-Speed Paper Cup Making Machine
+   - Industrial CNC Milling & 6kW Fiber Laser Cutters
+
+3. Dashboard Module Navigation Routes:
+   - CRM Leads & Pipeline: /crm
+   - Tally 10% Advance Payment Gate: /payments
+   - A5 WhatsApp Automation: /whatsapp
+   - A1 Voice Dialer: /voice & /dialer
+   - Team KPIs & Employee Profiles: /employees & /kpis
+   - GST Invoices & Billing: /invoices
+   - Factory Manufacturing Tracker: /factory
+   - System Activity Log: /activity
+   - APS AI Workspace: /ai
+
+4. Live Team Members & Tasks:
+${empDetails}
+
+5. CRM Pipeline:
+   - Total Leads: ${leads.length} | Enquiry: ${leads.filter(l => l.stage === 'Enquiry').length} | Confirmed: ${leads.filter(l => l.stage === 'Confirmed Lead').length} | Paid: ${leads.filter(l => l.stage === 'Client (Paid)').length} | In Production: ${leads.filter(l => l.stage === 'In Production').length} | Dispatched: ${leads.filter(l => l.stage === 'Dispatched').length}`;
 }
 
 // ─── HTTPS helper ─────────────────────────────────────────────────────────────
@@ -1650,9 +1656,9 @@ async function callGroq(messages) {
   const result = await httpsPost(
     'api.groq.com', '/openai/v1/chat/completions',
     { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    { model: 'groq/compound', messages, temperature: 0.15, max_tokens: 800 }
+    { model: 'groq/compound-mini', messages, temperature: 0.2, max_tokens: 1200 }
   );
-  if (result.error) throw new Error(`Groq error: ${result.error.message}`);
+  if (result.error) throw new Error(`Groq error: ${result.error.message || JSON.stringify(result.error)}`);
   return result?.choices?.[0]?.message?.content || '';
 }
 
@@ -1662,7 +1668,7 @@ async function callOpenAI(messages) {
   const result = await httpsPost(
     'api.openai.com', '/v1/chat/completions',
     { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    { model: 'gpt-4o-mini', messages, temperature: 0.15, max_tokens: 1500 }
+    { model: 'gpt-4o-mini', messages, temperature: 0.2, max_tokens: 1500 }
   );
   return result?.choices?.[0]?.message?.content || '';
 }
@@ -1673,14 +1679,17 @@ async function callGemini(systemPrompt, history, userQuery) {
   const contents = [
     { role: 'user', parts: [{ text: systemPrompt }] },
     { role: 'model', parts: [{ text: 'Understood.' }] },
-    ...history.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
+    ...history.map(m => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.content }]
+    })),
     { role: 'user', parts: [{ text: userQuery }] }
   ];
   const result = await httpsPost(
     'generativelanguage.googleapis.com',
     `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
     { 'Content-Type': 'application/json' },
-    { contents, generationConfig: { temperature: 0.15, maxOutputTokens: 1500 } }
+    { contents, generationConfig: { temperature: 0.2, maxOutputTokens: 1500 } }
   );
   return result?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
@@ -1689,30 +1698,25 @@ async function callGemini(systemPrompt, history, userQuery) {
 function parseLLMResponse(raw) {
   if (!raw || !raw.trim()) return null;
 
-  // Strip markdown code fences
   let cleaned = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 
-  // Try full parse first
+  // 1. Try full parse first if it's clean JSON
   try {
     const parsed = JSON.parse(cleaned);
-    if (parsed && typeof parsed.text === 'string') return parsed;
+    if (parsed && typeof parsed.text === 'string' && parsed.text.trim()) return parsed;
   } catch {}
 
-  // Try extracting JSON object with regex
-  const match = cleaned.match(/\{[\s\S]*"text"\s*:\s*"[\s\S]*"\s*[\s\S]*\}/);
+  // 2. Try extracting JSON object with regex
+  const match = cleaned.match(/\{[\s\S]*"text"\s*:\s*"([\s\S]*?)"[\s\S]*\}/);
   if (match) {
     try {
       const parsed = JSON.parse(match[0]);
-      if (parsed && typeof parsed.text === 'string') return parsed;
+      if (parsed && typeof parsed.text === 'string' && parsed.text.trim()) return parsed;
     } catch {}
   }
 
-  // If the raw response is readable text (not JSON), wrap it
-  if (cleaned.length > 10 && !cleaned.startsWith('{')) {
-    return { text: cleaned, table: null, chart: null };
-  }
-
-  return null;
+  // 3. Fallback: Return text directly
+  return { text: cleaned, table: null, chart: null };
 }
 
 // ─── Main LLM processor ──────────────────────────────────────────────────────
@@ -1722,38 +1726,28 @@ async function processWithLLM(query, history) {
 
   const context = buildFullContext();
 
-  const systemPrompt = `Dashboard AI Assistant System Prompt
+  const systemPrompt = `You are the Official AI Operations & General Assistant for APS Enterprise (Machinery Manufacturing & Industrial Automation).
 
-You are an advanced AI Dashboard Assistant for APS Enterprise (manufacturing sales: Dona Pattal machines, paper plate machines, paper cup makers, CNC machines, laser cutters, industrial equipment).
+Your primary role is to answer user queries with high intelligence, exact domain knowledge, and conversational natural language in English, Hindi, or Hinglish as requested.
 
-Your primary objective is to help users with:
-1. All inquiries regarding APS Enterprises (Location: 832, Old Loha Mandi, Indore, MP - 452001; Plants in Indore & Pune; Products; Contacts; Website).
-2. All dashboard modules, features, navigation, and options (CRM Pipeline, A1 Voice Dialer, A5 WhatsApp, Tally 10% Gate, Invoices, Factory Tracker, Team KPIs, Inventory, Document Search).
-3. Analyzing data, generating executive reports, creating downloadable format files (only when requested), and answering questions in English, Hindi, or Hinglish accurately.
-
-Rules:
-- Always understand the user's intent before responding.
-- When asked about company location, address, products, contacts, or dashboard features, answer thoroughly with exact details.
-- Provide concise answers for simple questions and detailed answers for analytics requests.
-- Only generate "exportFile" if the user explicitly requested a file generation/download in a format (e.g. CSV, Excel/XLSX, PDF, JSON, DOCX). Otherwise set "exportFile": null.
-
-APS Enterprise CRM & Knowledge Snapshot Data:
+LIVE SYSTEM DATA CONTEXT:
 ${context}
 
-RESPONSE FORMAT — respond ONLY with valid JSON (no markdown fences, no leading/trailing text):
-{
-  "text": "Your clear response text with **bold** for key numbers/names/addresses",
-  "report": null or {"title":"...","date":"...","summary":"...","keyFindings":["..."],"actionableInsights":["..."]},
-  "exportFile": null or {"fileName":"...","fileFormat":"CSV/XLSX/PDF/DOCX/XML/JSON","mimeType":"...","content":"..."},
-  "table": null or [{"Col":"val"}],
-  "chart": null or {"type":"bar|donut","title":"...","labels":["..."],"datasets":[{"label":"...","data":[0],"color":"#6366f1"}]}
-}`;
+Instructions:
+1. DIRECT & ACCURATE ANSWERS:
+   - When asked about employees or specific tasks (e.g. "show complete task of bhavya", "what is animesh working on"), list all active tasks, priority, due timeline, and pending queued tasks clearly with bold titles.
+   - When asked navigation or system action questions (e.g. "open tally sync", "open whatsapp", "show crm"), explain the module status and provide clear direction with direct links (/crm, /payments, /whatsapp, /voice, /invoices, /factory, /employees).
+   - When asked general questions (e.g. "who is groq", "what is cnc machine", "how does dona pattal machine work"), answer intelligently and informatively.
+   - When asked company location or machinery details, state 832 Old Loha Mandi, Indore, MP and exact specs.
+
+2. RESPONSE FORMAT:
+   Respond with clean, direct markdown text with bold headers and bullet points. Never return canned boilerplate. Always answer the specific question asked.`;
 
   try {
     let raw = '';
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...history,
+      ...(Array.isArray(history) ? history : []),
       { role: 'user', content: query }
     ];
 
@@ -1761,12 +1755,14 @@ RESPONSE FORMAT — respond ONLY with valid JSON (no markdown fences, no leading
     else if (provider === 'openai') raw = await callOpenAI(messages);
     else if (provider === 'gemini') raw = await callGemini(systemPrompt, history, query);
 
-    console.log(`[A3 ${provider.toUpperCase()}] Query: "${query.slice(0, 60)}" | Response length: ${raw.length}`);
+    console.log(`[A3 ${provider.toUpperCase()}] Query: "${query.slice(0, 60)}" | Output: ${raw?.length || 0} chars`);
 
-    const parsed = parseLLMResponse(raw);
-    if (parsed) return parsed;
+    if (raw && typeof raw === 'string' && raw.trim()) {
+      const parsed = parseLLMResponse(raw);
+      if (parsed && parsed.text) return parsed;
+      return { text: raw.trim(), table: null, chart: null };
+    }
 
-    console.warn('[A3] JSON parse failed, raw response:', raw.slice(0, 200));
     return null;
   } catch (err) {
     console.error('[A3 LLM Error]', err.message);
@@ -1774,121 +1770,51 @@ RESPONSE FORMAT — respond ONLY with valid JSON (no markdown fences, no leading
   }
 }
 
-// ─── Universal AI Answer Generator ─────────────────────────────────────────────
+// ─── Intelligent Fallback Handler ─────────────────────────────────────────────
 function generateUniversalAnswer(query) {
   const qLower = (query || '').toLowerCase().trim();
-  const mockLeads = getStore().mockLeads || [];
+  const store = getStore();
+  const mockLeads = store.mockLeads || [];
+  const mockEmployees = store.mockEmployees || [];
 
-  // 1. CRM Lead Specific Lookup (e.g. "John Doe", "Jane Smith", "Acme", "Global Tech", "CRM of John Doe", "PDF for John Doe")
-  if (Array.isArray(mockLeads) && mockLeads.length > 0) {
-    const matchedLead = mockLeads.find(l => {
-      if (!l) return false;
-      const nameLower = (l.name || '').toLowerCase();
-      const compLower = (l.company || '').toLowerCase();
-      const idLower   = (l.id || '').toLowerCase();
-      return (nameLower && qLower.includes(nameLower)) ||
-             (compLower && qLower.includes(compLower)) ||
-             (idLower && qLower.includes(idLower)) ||
-             (qLower.includes('john') && nameLower.includes('john')) ||
-             (qLower.includes('doe') && nameLower.includes('doe')) ||
-             (qLower.includes('jane') && nameLower.includes('jane')) ||
-             (qLower.includes('smith') && nameLower.includes('smith'));
-    });
-
-    if (matchedLead) {
-      const cleanName    = matchedLead.name || 'Lead Contact';
-      const cleanCompany = matchedLead.company || 'Enterprise Account';
-      const cleanValue   = matchedLead.budget ? `Rs. ${parseInt(matchedLead.budget).toLocaleString()}` : 'N/A';
-
-      const responseText = `### 👤 CRM Lead Profile Report — ${cleanName}\n\n**Lead ID:** \`${matchedLead.id}\`  \n**Customer Name:** **${cleanName}**  \n**Company:** ${cleanCompany}  \n**Contact Phone:** \`${matchedLead.phone}\` | **Email:** \`${matchedLead.email}\`  \n**Product Interest:** ${matchedLead.interest}  \n**Quoted Budget Value:** **${cleanValue}**  \n**Pipeline Stage:** **${matchedLead.stage}**  \n**Lead Source:** ${matchedLead.source}  \n**Notes:** ${matchedLead.notes}\n\n#### ⚙️ Integration Layer Audit\n• **CRM Sync:** ${matchedLead.crmSynced ? 'Synced (Verified)' : 'Pending Sync'}\n• **ERP Factory Production:** ${matchedLead.erpBookingCreated ? 'Production Released (Job Card Ready)' : 'Pending Booking Release'}\n• **Tally Payment Status:** ${matchedLead.tallyPaymentVerified ? 'Payment Verified (Hard Gate Pass)' : 'Awaiting Payment Receipt Verification'}`;
-
-      const resObj = {
-        text: responseText,
-        report: {
-          title: `CRM LEAD AUDIT REPORT — ${cleanName.toUpperCase()}`,
-          date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-          summary: `Executive lead profile and CRM specification audit for ${cleanName} (${cleanCompany}).`,
-          keyFindings: [
-            `Lead ID ${matchedLead.id} is currently in '${matchedLead.stage}' stage.`,
-            `Product interest logged as '${matchedLead.interest}' with budget of ${cleanValue}.`,
-            `CRM synchronization is confirmed and active.`
-          ],
-          actionableInsights: [
-            `Review advance payment status in Tally Sync before releasing factory production job card.`
-          ]
-        },
-        table: [
-          { "Attribute": "Lead ID", "Value": matchedLead.id, "Status": "Active Record" },
-          { "Attribute": "Customer Name", "Value": matchedLead.name, "Status": "Primary Contact" },
-          { "Attribute": "Company", "Value": matchedLead.company, "Status": "Registered Account" },
-          { "Attribute": "Phone Number", "Value": matchedLead.phone, "Status": "Verified Phone" },
-          { "Attribute": "Email Address", "Value": matchedLead.email, "Status": "Primary Email" },
-          { "Attribute": "Product Interest", "Value": matchedLead.interest, "Status": "Machinery Unit" },
-          { "Attribute": "Quoted Budget", "Value": cleanValue, "Status": "Quoted Value" },
-          { "Attribute": "Pipeline Stage", "Value": matchedLead.stage, "Status": "Current Stage" },
-          { "Attribute": "Lead Source", "Value": matchedLead.source, "Status": "Inbound Channel" },
-          { "Attribute": "CRM Sync", "Value": matchedLead.crmSynced ? 'Synced' : 'Pending', "Status": "System Sync" },
-          { "Attribute": "ERP Booking", "Value": matchedLead.erpBookingCreated ? 'Released' : 'Pending', "Status": "Factory Queue" },
-          { "Attribute": "Tally Verification", "Value": matchedLead.tallyPaymentVerified ? 'Verified' : 'Unpaid', "Status": "Finance Gate" }
-        ]
-      };
-
-      if (/pdf|report|export|download|file|doc/i.test(qLower)) {
-        resObj.exportFile = {
-          fileName: `CRM_Lead_${cleanName.replace(/\s+/g, '_')}_Report.pdf`,
-          fileFormat: 'pdf',
-          mimeType: 'application/pdf',
-          sizeKB: '22.4 KB',
-          title: `CRM LEAD AUDIT REPORT — ${cleanName.toUpperCase()} (${cleanCompany.toUpperCase()})`,
-          content: responseText
-        };
-      }
-
-      return resObj;
-    }
-  }
-
-  // 2. Company / System General Knowledge Queries (e.g. "aps ke bare me batao", "what is aps")
-  if (qLower.includes('aps') || qLower.includes('company') || qLower.includes('indore') || qLower.includes('machine')) {
+  // Employee tasks inquiry fallback
+  const matchedEmp = mockEmployees.find(e => qLower.includes(e.name.toLowerCase()));
+  if (matchedEmp) {
+    const active = matchedEmp.activeTask 
+      ? `• **Active Task:** **${matchedEmp.activeTask.title}**\n  - **Priority:** ${matchedEmp.activeTask.priority}\n  - **Due In:** ${matchedEmp.activeTask.dueIn || '20 mins'}\n  - **Related Account:** ${matchedEmp.activeTask.leadName || 'Enterprise'}`
+      : '• **Active Task:** No active task in progress.';
+    const queued = Array.isArray(matchedEmp.taskQueue) && matchedEmp.taskQueue.length > 0
+      ? `\n\n#### 📋 Queued Backlog Tasks:\n` + matchedEmp.taskQueue.map((t, idx) => `${idx + 1}. **${t.title}** (${t.priority} Priority)`).join('\n')
+      : '\n\n• **Queued Tasks:** None.';
     return {
-      text: `### 🏢 About APS Enterprises\n\n**APS Enterprises** is a leading industrial automation and precision machinery manufacturer headquartered in Indore, MP.\n\n• **Core Machinery:** High-Speed Paper Cup Machines, Double Die Dona Pattal Units, CNC Machining Centers, and Hydraulic Paper Plate Presses.\n• **Headquarters:** 832, Old Loha Mandi, Indore, MP - 452001\n• **Contact & Helpline:** +91-7869755871 | ` + `www.apsenterprises.in\n\n#### 🚀 Operating System Capabilities\nThis **APS Enterprise AI Operating System** connects your CRM leads, ERP factory production queue, Tally accounting vouchers, and automated WhatsApp/Voice campaigns into a single unified cockpit.`
+      text: `### 👤 Employee Profile & Tasks — ${matchedEmp.name}\n\n**Role:** ${matchedEmp.role} (${matchedEmp.department})\n**KPI Score:** **${matchedEmp.kpiScore}** | **Sales Closed:** ${matchedEmp.salesClosed} (₹${(matchedEmp.totalRevenue || 0).toLocaleString('en-IN')})\n**Current Activity:** ${matchedEmp.currentActivity || 'Operational'}\n\n#### ⚡ Active In-Progress Task:\n${active}${queued}\n\n*View full team leaderboard at \`/employees\` or \`/kpis\`.*`
     };
   }
 
-  // 3. Math / Calculation evaluation
-  const mathMatch = qLower.match(/(?:calculate|compute|what is|eval|val|math)?\s*([\d\.\s\+\-\*\/\(\)\%]+)$/i);
-  if (mathMatch && mathMatch[1] && /[\+\-\*\/\%]/.test(mathMatch[1])) {
-    try {
-      const expr = mathMatch[1].replace(/%/g, '/100');
-      const val = Function(`'use strict'; return (${expr})`)();
-      if (typeof val === 'number' && !isNaN(val)) {
-        return {
-          text: `### 🧮 Mathematical Calculation Result\n\n**Query Expression:** \`${mathMatch[1].trim()}\`  \n**Calculated Output:** **${val.toLocaleString()}**\n\n• **Formula Applied:** \`${expr}\`\n• **Accuracy:** 100% Certified Numerical Precision\n• **Usage:** Applicable for quotation estimates, margin calculations, and ledger adjustments.`
-        };
-      }
-    } catch {}
+  // Tally sync / Payments inquiry fallback
+  if (qLower.includes('tally') || qLower.includes('advance') || qLower.includes('payment')) {
+    const pendingLeads = mockLeads.filter(l => l.stage === 'Confirmed Lead');
+    return {
+      text: `### ⚡ Tally 10% Advance Reconciliation Gateway\n\nThe **Tally 10% Advance Gate** mandates receipt of advance payment before factory release.\n\n• **Pending Verification:** **${pendingLeads.length} Lead(s)** awaiting ledger payment sync.\n• **Direct Module Link:** Navigate to **\`/payments\`** to verify incoming payments.\n• **Automated Action:** Use WhatsApp Automation (\`/whatsapp\`) to trigger payment reminder sequences.`
+    };
   }
 
-  // 4. Generic Intelligent Response Synthesizer
-  const topicTitle = (query || 'Executive AI Query').replace(/[^a-zA-Z0-9 ]/g, '').trim();
-  const titleCaps = topicTitle.length > 0 ? topicTitle.charAt(0).toUpperCase() + topicTitle.slice(1) : 'APS Operational Guidance';
+  // CRM / Leads inquiry fallback
+  if (qLower.includes('lead') || qLower.includes('crm') || qLower.includes('pipeline')) {
+    return {
+      text: `### 📊 APS CRM Lead Pipeline Overview\n\n• **Total Active Leads:** **${mockLeads.length} Leads**\n• **Pipeline Stages:** Enquiry (${mockLeads.filter(l => l.stage === 'Enquiry').length}), Confirmed (${mockLeads.filter(l => l.stage === 'Confirmed Lead').length}), Paid (${mockLeads.filter(l => l.stage === 'Client (Paid)').length}), In Production (${mockLeads.filter(l => l.stage === 'In Production').length})\n• **Direct Module Link:** Navigate to **\`/crm\`** to view the Kanban board.`
+    };
+  }
 
-  const responseText = `### 🤖 APS AI Executive Response\n\n**Query:** "${query}"\n\nHere is the detailed analysis and operational summary for your query:\n\n#### 📌 Key Operational Overview\n• **Status & Insights:** Comprehensive automated synthesis performed across **APS Enterprise AI Operating System** data layers.\n• **Context Analysis:** Evaluated relevant parameters, active workflows, performance indicators, and enterprise knowledge records.\n• **System Guidance:** Designed to optimize efficiency across CRM Lead Pipelines, ERP Factory Bookings, Tally Sync Verification, and Automated WhatsApp Communications.\n\n#### 📊 Strategic Recommendations\n1. **Workflow Alignment:** Review relevant pipeline stages in **CRM Leads** and **ERP Production Tracker** for real-time progress.\n2. **Financial Verification:** Ensure all ledger balances and advance payment receipts are synchronized with **Tally Sync**.\n3. **Customer Engagement:** Utilize **WhatsApp Automation & Voice Agent** for automated status updates to clients.`;
+  // Company location fallback
+  if (qLower.includes('aps') || qLower.includes('company') || qLower.includes('location') || qLower.includes('indore')) {
+    return {
+      text: `### 🏢 APS Enterprises Information\n\n• **Head Office:** 832, Old Loha Mandi, Indore, MP - 452001\n• **Plants:** Indore Main Plant & Pune Unit 1\n• **Helpline:** +91-7869755871 | +91-8827848099\n• **Website:** https://www.apsenterprises.in`
+    };
+  }
 
   return {
-    text: responseText,
-    report: {
-      title: `APS AI Intelligence — ${titleCaps}`,
-      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-      summary: `Detailed response and operational guidance generated for: "${query}"`,
-      keyFindings: [
-        `Processed query under APS Enterprise Universal Reasoning Engine.`,
-        `Cross-verified across active modules (CRM, ERP, Tally, WhatsApp, Voice Agent).`
-      ],
-      actionableInsights: [
-        `Use quick actions in the sidebar to execute related workflow operations.`
-      ]
-    }
+    text: `### 🤖 APS AI Assistant\n\nI am ready to assist you with all operations across **CRM Pipeline** (\`/crm\`), **Tally Payment Gate** (\`/payments\`), **WhatsApp Automation** (\`/whatsapp\`), **Voice Dialer** (\`/voice\`), and **Team KPIs** (\`/employees\`).\n\nPlease let me know what specific task, lead, or report you would like to analyze!`
   };
 }
 
