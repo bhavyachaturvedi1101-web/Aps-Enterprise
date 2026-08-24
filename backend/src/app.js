@@ -12,6 +12,15 @@ app.use(cors());
 app.use(express.json());
 app.use(authenticate);
 
+// Disable caching for API responses
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
 // Basic health check route
 app.get('/api/health', (req, res) => {
   res.json({
