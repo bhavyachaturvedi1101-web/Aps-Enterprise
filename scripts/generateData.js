@@ -16,7 +16,8 @@ const firstNames = [
   'Gaurav', 'Harsh', 'Ishaan', 'Kabir', 'Karan', 'Karthik', 'Kunal', 'Lakshya', 'Manish', 'Mohit',
   'Nikhil', 'Pranav', 'Rahul', 'Raj', 'Ravi', 'Rohan', 'Rohit', 'Sahil', 'Sanjay', 'Saurabh',
   'Aadhya', 'Ananya', 'Avni', 'Bhumika', 'Chhavi', 'Diya', 'Isha', 'Kavya', 'Khushi', 'Kiara',
-  'Kriti', 'Meera', 'Neha', 'Nidhi', 'Pooja', 'Priya', 'Riya', 'Roshni', 'Sanya', 'Shruti', 'Sneha'
+  'Kriti', 'Meera', 'Neha', 'Nidhi', 'Pooja', 'Priya', 'Riya', 'Roshni', 'Sanya', 'Shruti', 'Sneha',
+  'Vikram', 'Rajesh', 'Suresh', 'Ramesh', 'Rakesh', 'Siddharth', 'Varun', 'Tarun', 'Nitin', 'Alok'
 ];
 
 const lastNames = [
@@ -24,7 +25,13 @@ const lastNames = [
   'Goel', 'Gupta', 'Iyer', 'Jain', 'Joshi', 'Kapoor', 'Kaur', 'Khan', 'Khatri', 'Kumar', 'Mahajan',
   'Malhotra', 'Mehta', 'Mishra', 'Mukherjee', 'Nair', 'Pandey', 'Patel', 'Pathak', 'Pillai', 'Rao',
   'Reddy', 'Roy', 'Saini', 'Saxena', 'Sen', 'Shah', 'Sharma', 'Singh', 'Sinha', 'Soni', 'Tiwari',
-  'Tripathi', 'Trivedi', 'Verma', 'Yadav'
+  'Tripathi', 'Trivedi', 'Verma', 'Yadav', 'Rathore', 'Choudhary', 'Thakur', 'Bose', 'Chatterjee'
+];
+
+const companySuffixes = [
+  'Industries', 'Packaging', 'Enterprises', 'Paper Cups', 'Disposables', 
+  'Plastics', 'Global', 'Traders', 'Manufacturing', 'Packers', 'Paper Products',
+  'Solutions', 'Ventures', 'Polymers', 'Creations'
 ];
 
 const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Chennai', 'Kolkata', 'Surat', 'Pune', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal'];
@@ -36,12 +43,13 @@ const machineInterests = [
   'Paper Bag Making Machine', 'Non-Woven Bag Making Machine', 
   'Slipper Making Machine', 'Agarbatti Making Machine',
   'Raw Material (Silver Craft Paper Roll)', 'Paper Lamination Machine',
-  '4-Die Dona Pattal Machine', 'Heavy Duty Hydraulic Paper Plate Press'
+  '4-Die Dona Pattal Machine', 'Heavy Duty Hydraulic Paper Plate Press',
+  'Wrinkle Paper Plate Machine', 'Buffet Plate Making Machine'
 ];
 
 const pipelineStages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
 
-const sources = ['Meta Ads', 'A1 Voice Agent', 'Inbound Call', 'Telecaller', 'WhatsApp', 'Direct Web', 'Referral'];
+const sources = ['Meta Ads', 'A1 Voice Agent', 'Inbound Call', 'Telecaller', 'WhatsApp', 'Direct Web', 'Referral', 'Trade Show', 'JustDial', 'IndiaMart'];
 
 const departments = ['Telecalling & Inquiry', 'Direct Field Sales', 'Machine Assembly & Production', 'Dispatch & Logistics', 'Accounts & ERP', 'Spare Parts & Service'];
 const roles = ['Telecaller Executive', 'Lead Qualification Specialist', 'Field Sales Manager', 'Direct Sales Executive', 'Assembly Supervisor', 'Machine Fitter', 'Quality Testing Engineer', 'Dispatch Coordinator', 'Inventory Clerk', 'Accounts Executive', 'ERP Operations Admin', 'Spare Parts Manager'];
@@ -52,20 +60,23 @@ const taskTemplates = {
     { title: 'Outbound follow-up for Double Die Machine enquiry from', type: 'Sales Qualification', stage: 'Enquiry', priority: 'High', currentActivity: 'Live Outbound Telecall' },
     { title: 'Share quotation and ROI video for Dona Pattal setup with', type: 'Sales Follow-up', stage: 'Qualified', priority: 'Normal', currentActivity: 'Drafting Quotation' },
     { title: 'Conduct secondary telecaller qualification for', type: 'Telecalling', stage: 'Enquiry', priority: 'Normal', currentActivity: 'Handling Operations' },
-    { title: 'Follow up on field demo schedule for', type: 'Field Sales', stage: 'Qualified', priority: 'Normal', currentActivity: 'Scheduling Demo' }
+    { title: 'Follow up on field demo schedule for', type: 'Field Sales', stage: 'Qualified', priority: 'Normal', currentActivity: 'Scheduling Demo' },
+    { title: 'Negotiate final pricing and discount for', type: 'Sales Negotiation', stage: 'Qualified', priority: 'High', currentActivity: 'Negotiating Pricing' }
   ],
   erp: [
     { title: 'Generate Production Job Card for Hydraulic Press Machine for', type: 'ERP Factory Release', stage: 'In Production', priority: 'High', currentActivity: 'Dispatching Job Card for Manufacturing' },
     { title: 'Verify motor and heating coil assembly for', type: 'Assembly Check', stage: 'In Production', priority: 'Normal', currentActivity: 'Validating Assembly' },
     { title: 'Pack spare parts kit (dies and heaters) for', type: 'Spare Parts Allocation', stage: 'In Production', priority: 'Normal', currentActivity: 'Packing Spare Parts' },
     { title: 'Test and calibrate hydraulics for Double Die Machine for', type: 'Quality Testing', stage: 'In Production', priority: 'Normal', currentActivity: 'Testing Machinery' },
-    { title: 'Dispatch fully automatic machine via V-Trans for', type: 'Factory Dispatch', stage: 'Dispatched', priority: 'High', currentActivity: 'Processing Shop Floor Dispatch' }
+    { title: 'Dispatch fully automatic machine via transport for', type: 'Factory Dispatch', stage: 'Dispatched', priority: 'High', currentActivity: 'Processing Shop Floor Dispatch' },
+    { title: 'Coordinate with transport vendor for pickup for', type: 'Logistics', stage: 'In Production', priority: 'Normal', currentActivity: 'Booking Transport' }
   ],
   admin: [
     { title: 'Review Booking Specs & Dual-Approval Countersign for', type: 'Admin Dual-Approval', stage: 'Booked', priority: 'Urgent', currentActivity: 'Dual-Approval Review' },
-    { title: 'Verify 10% Tally advance for machine booking by', type: 'Payment Gate Verification', stage: 'Confirmed Lead', priority: 'High', currentActivity: 'Reconciling Ledger' },
+    { title: 'Verify Tally advance payment for machine booking by', type: 'Payment Gate Verification', stage: 'Confirmed Lead', priority: 'High', currentActivity: 'Reconciling Ledger' },
     { title: 'Approve final dispatch invoice & transport LR for', type: 'Factory Release Authorization', stage: 'Client (Paid)', priority: 'Normal', currentActivity: 'Verifying Invoices' },
-    { title: 'Send WhatsApp payment reminder for pending dispatch to', type: 'Payment Reminder', stage: 'Confirmed Lead', priority: 'High', currentActivity: 'Monitoring Confirmed Lead SLAs' }
+    { title: 'Send WhatsApp payment reminder for pending dispatch to', type: 'Payment Reminder', stage: 'Confirmed Lead', priority: 'High', currentActivity: 'Monitoring Confirmed Lead SLAs' },
+    { title: 'Generate GST Tax Invoice for', type: 'Invoicing', stage: 'Client (Paid)', priority: 'High', currentActivity: 'Creating Tax Invoice' }
   ]
 };
 
@@ -101,8 +112,7 @@ for (let i = 1; i <= 30; i++) {
   const activeT = randomChoice(possibleTasks);
   const queueT = randomChoice(possibleTasks);
   
-  // Create mock lead for tasks
-  const leadName = `${randomChoice(firstNames)} Industries`;
+  const leadName = `${randomChoice(lastNames)} ${randomChoice(companySuffixes)}`;
   const leadId = `LEAD-${randomInt(100, 999)}`;
 
   employees.push({
@@ -208,17 +218,20 @@ for (let i = 1; i <= numLeads; i++) {
   
   const createdAt = new Date(now - (daysAgo * oneDay));
   const assignedEmp = randomChoice(employees).id;
+  
+  // Unique company name generator
+  const companyName = `${randomChoice(lastNames)} ${randomChoice(companySuffixes)}`;
 
   leads.push({
     id: `LEAD-${i.toString().padStart(3, '0')}`,
     name: `${randomChoice(firstNames)} ${randomChoice(lastNames)}`,
-    company: `${randomChoice(lastNames)} Industries`,
+    company: companyName,
     phone: `+919${randomInt(100000000, 999999999)}`,
     email: `contact${i}@example.com`,
     interest: interest,
     budget: budget,
     stage: stage,
-    notes: `Lead generated via ${randomChoice(sources)}.`,
+    notes: `Lead generated via ${randomChoice(sources)} from ${randomChoice(cities)}.`,
     crmSynced: true,
     erpBookingCreated: erpBookingCreated,
     tallyPaymentVerified: tallyPaymentVerified,
@@ -250,52 +263,54 @@ for (let i = 1; i <= 200; i++) {
   });
 }
 
-// Generate Activity Logs
+// Generate Dynamic Activity Logs
 const activityLogs = [];
 
-const realisticActions = [
-  { action: 'Verified Tally Advance Payment (₹15,000) for Double Die Machine', from: 'Confirmed Lead', to: 'Client (Paid)' },
-  { action: 'Approved machine quotation & ROI specs for Dona Pattal setup', from: 'Qualified', to: 'Booked' },
-  { action: 'Triggered factory release job card #MFG', from: 'Client (Paid)', to: 'In Production' },
-  { action: 'Dispatched machine via V-Trans Logistics', from: 'In Production', to: 'Dispatched' },
-  { action: 'Sent 10% advance WhatsApp reminder sequence', from: 'Booked', to: 'Confirmed Lead' },
-  { action: 'Logged inbound inquiry call (142s) for paper plate machine', from: 'None', to: 'Enquiry' },
-  { action: 'Qualified machinery requirements & budget', from: 'Enquiry', to: 'Qualified' },
-  { action: 'Countersigned Dual-Approval Booking Sheet', from: 'Qualified', to: 'Booked' },
-  { action: 'System: Auto-flagged dwell time bottleneck SLA', from: 'Confirmed Lead', to: 'Confirmed Lead' },
-  { action: 'Completed Milestone 2: Motor & Heating Coil Assembly', from: 'In Production', to: 'In Production' },
+const transports = ['V-Trans Logistics', 'TCI Freight', 'SafeExpress', 'Rivigo', 'Local Tempo Service', 'Gati Express', 'BlueDart Surface'];
+const advances = ['₹15,000', '₹25,000', '₹10,000', '₹50,000', '₹20,000', '₹35,000'];
+
+const dynamicActions = [
+  (lead) => ({ action: `Verified Tally Advance Payment (${randomChoice(advances)}) for ${lead.interest}`, from: 'Confirmed Lead', to: 'Client (Paid)' }),
+  (lead) => ({ action: `Approved machine quotation & ROI specs for ${lead.interest} setup`, from: 'Qualified', to: 'Booked' }),
+  (lead) => ({ action: `Triggered factory release job card #MFG-${randomInt(1000, 9999)}`, from: 'Client (Paid)', to: 'In Production' }),
+  (lead) => ({ action: `Dispatched ${lead.interest} via ${randomChoice(transports)}`, from: 'In Production', to: 'Dispatched' }),
+  (lead) => ({ action: `Automated WhatsApp sequence triggered for ${lead.company} (Payment Reminder)`, from: 'Booked', to: 'Confirmed Lead' }),
+  (lead) => ({ action: `Logged inbound inquiry call (${randomInt(30, 400)}s) for ${lead.interest}`, from: 'None', to: 'Enquiry' }),
+  (lead) => ({ action: `Qualified machinery requirements & budget (₹${parseInt(lead.budget).toLocaleString()})`, from: 'Enquiry', to: 'Qualified' }),
+  (lead) => ({ action: `Countersigned Dual-Approval Booking Sheet for ${lead.company}`, from: 'Qualified', to: 'Booked' }),
+  (lead) => ({ action: `System: Auto-flagged dwell time bottleneck SLA for ${lead.company}`, from: 'Confirmed Lead', to: 'Confirmed Lead' }),
+  (lead) => ({ action: `Completed Milestone 2: Motor & Heating Coil Assembly for ${lead.interest}`, from: 'In Production', to: 'In Production' }),
+  (lead) => ({ action: `Sent PDF Catalog & Technical Specs via WhatsApp to ${lead.company}`, from: 'Enquiry', to: 'Qualified' }),
+  (lead) => ({ action: `Conducted live factory video tour for ${lead.name}`, from: 'Qualified', to: 'Qualified' }),
+  (lead) => ({ action: `Client requested custom die size change for ${lead.interest}`, from: 'In Production', to: 'In Production' }),
+  (lead) => ({ action: `Generated final GST Tax Invoice for ${lead.company}`, from: 'Client (Paid)', to: 'Client (Paid)' }),
+  (lead) => ({ action: `Packed spare parts kit (dies & heaters) for dispatch`, from: 'In Production', to: 'In Production' })
 ];
 
-for (let i = 1; i <= 250; i++) {
+for (let i = 1; i <= 350; i++) {
   const lead = randomChoice(leads);
   let emp;
   let isSystem = false;
   
-  if (Math.random() < 0.1) {
-    emp = { name: 'system' };
+  if (Math.random() < 0.15) {
+    emp = { name: 'System Automation', id: 'system' };
     isSystem = true;
   } else {
     emp = randomChoice(employees);
   }
   
-  const actionTemplate = randomChoice(realisticActions);
-  
-  // Custom tweaks to action strings
-  let actionText = actionTemplate.action;
-  if (actionText.includes('#MFG')) actionText += `-${randomInt(1000, 9999)}`;
-  if (actionText.includes('WhatsApp')) actionText = `Automated WhatsApp sequence triggered for ${lead.company}`;
+  const actionObj = randomChoice(dynamicActions)(lead);
   
   activityLogs.push({
     id: `log-${i.toString().padStart(3, '0')}`,
-    // The frontend renders log.employeeId directly as the name, so we use the name here to display correctly!
-    employeeId: emp.name, 
+    employeeId: emp.id, 
     employeeName: emp.name,
     leadId: lead.id,
     leadName: lead.company,
-    action: actionText,
-    fromStage: actionTemplate.from,
-    toStage: actionTemplate.to,
-    details: `Action performed by ${isSystem ? 'System Automation' : emp.name}`,
+    action: actionObj.action,
+    fromStage: actionObj.from,
+    toStage: actionObj.to,
+    details: `Action performed by ${emp.name}`,
     createdAt: new Date(Date.now() - randomInt(1000, 86400000 * 30)) // Spread over last 30 days
   });
 }
