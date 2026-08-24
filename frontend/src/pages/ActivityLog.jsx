@@ -7,7 +7,7 @@ export default function ActivityLog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/activity`).then(r => r.json()).then(d => { setLogs(d.logs || []); setLoading(false); }).catch(() => setLoading(false));
+    fetch(`${API}/activity`).then(r => r.json()).then(d => { setLogs(d.activityLogs || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const ICONS = {
