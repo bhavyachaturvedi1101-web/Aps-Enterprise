@@ -1,4 +1,6 @@
 {
+  "outputDirectory": "frontend/dist",
+  "buildCommand": "npm install && npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
   "rewrites": [
     {
       "source": "/api/(.*)",

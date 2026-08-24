@@ -4,13 +4,22 @@
   "description": "APS Enterprise AI Admin System (A1-A5)",
   "main": "backend/src/app.js",
   "scripts": {
-    "build": "npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend && rm -rf public && cp -r frontend/dist public",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
     "start": "node scripts/start-dev.js",
     "dev": "node scripts/start-dev.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "start:backend": "npm --prefix backend start",
     "start:frontend": "npm --prefix frontend run dev"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "groq-sdk": "^0.9.0",
+    "pg": "^8.22.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8"
   },
   "keywords": [],
   "author": "",
