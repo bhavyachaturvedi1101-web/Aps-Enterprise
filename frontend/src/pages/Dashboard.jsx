@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CRMLeads from './CRMLeads';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 const PIPELINE_STAGES = [

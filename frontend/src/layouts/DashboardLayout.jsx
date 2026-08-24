@@ -220,7 +220,7 @@ export default function DashboardLayout() {
   // Fetch notifications from backend API
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/notifications');
+      const res = await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications');
       const data = await res.json();
       if (data.success && Array.isArray(data.notifications)) {
         setNotifications(data.notifications);
@@ -242,7 +242,7 @@ export default function DashboardLayout() {
     if (e) e.stopPropagation();
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', {
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -253,21 +253,21 @@ export default function DashboardLayout() {
   const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', { method: 'POST' });
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', { method: 'POST' });
     } catch (e) {}
   };
 
   const handleClearAll = async () => {
     setNotifications([]);
     try {
-      await fetch('http://localhost:5000/api/notifications/clear', { method: 'POST' });
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/clear', { method: 'POST' });
     } catch (e) {}
   };
 
   const handleSimulateAlert = async () => {
     setIsSimulating(true);
     try {
-      const res = await fetch('http://localhost:5000/api/notifications/simulate', { method: 'POST' });
+      const res = await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/simulate', { method: 'POST' });
       const data = await res.json();
       if (data.success && data.notification) {
         setNotifications(prev => [data.notification, ...prev]);
@@ -293,7 +293,7 @@ export default function DashboardLayout() {
   const handleNotifClick = async (notif) => {
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', {
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: notif.id })

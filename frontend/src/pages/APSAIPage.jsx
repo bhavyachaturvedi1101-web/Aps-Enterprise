@@ -5,7 +5,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-const API = 'http://localhost:5000/api/a3';
+const API = import.meta.env.PROD ? '/api/a3' : 'http://localhost:5000/api/a3';
 
 // ─── Session Conversation ID ──────────────────────────────────────────────────
 function getConversationId() {
@@ -668,7 +668,7 @@ function ExportFileCard({ exportFile, tableData }) {
       setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (e) {
       console.error('Download error:', e);
-      window.open(`http://localhost:5000/api/a3/export?format=${(fileFormat || 'csv').toLowerCase()}`, '_blank');
+      window.open(`${import.meta.env.PROD ? '/api' : 'http://localhost:5000/api'}/a3/export?format=${(fileFormat || 'csv').toLowerCase()}`, '_blank');
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 const STATUS_STYLES = {
   'Booking Created': { color: '#1d4ed8', dot: '#3b82f6' },
