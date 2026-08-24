@@ -640,11 +640,28 @@ function ExportFileCard({ exportFile, tableData }) {
 
       // ── 4. CSV with UTF-8 BOM ──────────────────────────────────────────
       if (fmtLower === 'csv') {
-        const blob = new Blob(['\uFEFF' + (content || '')], { type: 'text/csv;charset=utf-8' });
+        let csvStr = '';
+        if (tableData && Array.isArray(tableData) && tableData.length > 0) {
+          const headers = Object.keys(tableData[0]);
+          const rows = tableData.map(r => headers.map(k => `"${String(r[k] ?? '').replace(/"/g, '""')}"`).join(','));
+          csvStr = [headers.map(h => `"${h}"`).join(','), ...rows].join('\n');
+        } else if (exportFile?.tableHeaders && exportFile?.tableRows) {
+          const headers = exportFile.tableHeaders.map(h => `"${h}"`).join(',');
+          const rows = exportFile.tableRows.map(row => row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+          csvStr = `${headers}\n${rows}`;
+        } else if (typeof content === 'string' && content.trim()) {
+          csvStr = content;
+        } else {
+          csvStr = 'Export Data\n' + (fileName || 'APS_Export');
+        }
+
+        const blob = new Blob(['\uFEFF' + csvStr], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName || `APS_Enterprise_Export.csv`;
+        const rawName = fileName || 'APS_Enterprise_Export.csv';
+        const outName = rawName.toLowerCase().endsWith('.csv') ? rawName : `${rawName.replace(/\.[^/.]+$/, '')}.csv`;
+        a.download = outName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
