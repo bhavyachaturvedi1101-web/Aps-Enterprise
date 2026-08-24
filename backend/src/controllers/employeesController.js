@@ -1,23 +1,31 @@
 const { Employee, ActivityLog, Lead } = require('../models');
-const { mockTimeInStage } = require('../config/inMemoryStore'); // Keep mock time in stage for now
+const { mockTimeInStage, mockEmployees } = require('../config/inMemoryStore');
 
 // Helper to decorate employee with mock UI fields since DB only has basics
 const decorateEmployee = (e) => {
   const emp = e.toJSON ? e.toJSON() : e;
+  const mockEmp = (mockEmployees || []).find(me => me.id === emp.id) || {};
+  
+  const tasksCompleted = emp.tasksCompleted !== undefined ? emp.tasksCompleted : (mockEmp.tasksCompleted || 0);
+  const kpiScoreNum = mockEmp.kpiScoreNum !== undefined ? mockEmp.kpiScoreNum : (tasksCompleted > 0 ? 85 + (tasksCompleted % 10) : 85);
+  const kpiScore = mockEmp.kpiScore || `${kpiScoreNum}%`;
+
   return {
+    ...mockEmp,
     ...emp,
-    email: emp.email || `${emp.name.toLowerCase().replace(' ', '.')}@apsenterprise.com`,
-    department: emp.department || 'Sales & Operations',
-    status: emp.status || 'Active',
-    kpiScore: `${emp.tasksCompleted > 0 ? 85 + (emp.tasksCompleted % 10) : 85}%`,
-    kpiScoreNum: emp.tasksCompleted > 0 ? 85 + (emp.tasksCompleted % 10) : 85,
-    conversionRate: '34.5%',
-    avgCallDurationSec: 112,
-    avgResponseTimeMin: 4.0,
-    weeklyKpiHistory: [85, 88, 90, 93],
-    stageConversions: { enquiryToQualified: 10, qualifiedToBooked: 5, bookedToConfirmed: 3, confirmedToPaid: 2 },
-    activeTask: emp.activeTask || null,
-    taskQueue: emp.taskQueue || []
+    email: emp.email || mockEmp.email || `${emp.name.toLowerCase().replace(' ', '.')}@apsenterprise.com`,
+    phone: emp.phone || mockEmp.phone || '+91 98765 43210',
+    department: emp.department || mockEmp.department || 'Sales & Operations',
+    status: emp.status || mockEmp.status || 'Active',
+    kpiScore,
+    kpiScoreNum,
+    conversionRate: mockEmp.conversionRate || '34.5%',
+    avgCallDurationSec: mockEmp.avgCallDurationSec || 112,
+    avgResponseTimeMin: mockEmp.avgResponseTimeMin || 4.0,
+    weeklyKpiHistory: mockEmp.weeklyKpiHistory || [85, 88, 90, 93],
+    stageConversions: mockEmp.stageConversions || { enquiryToQualified: 10, qualifiedToBooked: 5, bookedToConfirmed: 3, confirmedToPaid: 2 },
+    activeTask: emp.activeTask || mockEmp.activeTask || null,
+    taskQueue: emp.taskQueue || mockEmp.taskQueue || []
   };
 };
 
