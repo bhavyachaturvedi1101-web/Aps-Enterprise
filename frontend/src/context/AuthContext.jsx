@@ -74,10 +74,10 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error('Failed to parse saved auth user:', e);
     }
-    return DEMO_ACCOUNTS.admin; // Default fallback to Admin
+    return null; // Force login screen on first visit
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('aps_auth_user'));
 
   useEffect(() => {
     if (currentUser) {
