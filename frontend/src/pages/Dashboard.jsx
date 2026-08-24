@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CRMLeads from './CRMLeads';
+import { MOCK_LEADS, MOCK_ACTIVITY_LOGS } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
@@ -76,9 +77,9 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search);
   const activeTab = queryParams.get('tab') || 'analytics';
 
-  const [leads, setLeads] = useState([]);
-  const [activityLogs, setActivityLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [leads, setLeads] = useState(MOCK_LEADS);
+  const [activityLogs, setActivityLogs] = useState(MOCK_ACTIVITY_LOGS);
+  const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newLead, setNewLead] = useState({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
 

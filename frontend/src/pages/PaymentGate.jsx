@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { MOCK_PAYMENTS } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 export default function PaymentGate() {
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState(MOCK_PAYMENTS);
+  const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(null);
   const [sendingReminder, setSendingReminder] = useState(false);
 

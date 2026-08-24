@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { MOCK_BOOKINGS } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
@@ -139,8 +140,8 @@ function CustomSelect({ value, options, onChange, minWidth = 140, fullWidth = fa
 }
 
 export default function BookingsERP() {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState(MOCK_BOOKINGS.map((b,i) => ({ id: `BK${String(i+1).padStart(3,'0')}`, client: b.clientName, product: b.product, erpRef: b.erpRef, status: b.status, date: new Date(b.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), amount: `₹${b.amount.toLocaleString('en-IN')}`, rawAmount: b.amount })));
+  const [loading, setLoading] = useState(false);
 
   // Search & Filter State
   const [search, setSearch] = useState('');
