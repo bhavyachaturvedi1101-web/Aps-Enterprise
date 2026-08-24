@@ -32,11 +32,11 @@ function addToHistory(conversationId, userMsg, botMsg) {
     conversationStore.set(conversationId, { messages: [], lastAccess: Date.now() });
   }
   const entry = conversationStore.get(conversationId);
-  const cleanUser = (typeof userMsg === 'string' ? userMsg : '').slice(0, 250);
-  const cleanBot = (typeof botMsg === 'string' ? botMsg : (botMsg?.text || '')).slice(0, 350);
+  const cleanUser = (typeof userMsg === 'string' ? userMsg : '').slice(0, 800);
+  const cleanBot = (typeof botMsg === 'string' ? botMsg : (botMsg?.text || '')).slice(0, 1500);
   entry.messages.push({ role: 'user', content: cleanUser });
   entry.messages.push({ role: 'assistant', content: cleanBot });
-  if (entry.messages.length > 6) entry.messages = entry.messages.slice(-6);
+  if (entry.messages.length > 12) entry.messages = entry.messages.slice(-12);
   entry.lastAccess = Date.now();
 }
 
@@ -224,13 +224,18 @@ async function handleLeadCount() {
 async function handlePendingPayment() {
   const store = getStore();
   const leads = (store.mockLeads || []).filter(l => l.stage === 'Confirmed Lead');
+  const empMap = (store.mockEmployees || []).reduce((acc, e) => {
+    acc[e.id] = e.name;
+    return acc;
+  }, {});
+
   return {
     text: `**${leads.length}** lead${leads.length !== 1 ? 's are' : ' is'} at **Confirmed Lead** stage awaiting the 10% advance payment.`,
     table: leads.map(l => ({
       Name: l.name,
       Budget: l.budget ? `₹${Number(l.budget).toLocaleString('en-IN')}` : '—',
       'Advance Due': l.budget ? `₹${(Number(l.budget) * 0.1).toLocaleString('en-IN')}` : '—',
-      Assigned: l.assignedEmployeeId || 'Unassigned'
+      Assigned: empMap[l.assignedEmployeeId] || l.assignedEmployeeId || 'Unassigned'
     })),
     chart: null
   };
@@ -1577,7 +1582,7 @@ async function handleActionSendWhatsApp(query) {
   };
 }
 
-// ─── Full context builder for LLM (High Density & Compact to stay well under TPM limit) ──
+// ─── Full context builder for LLM (High Density & Compact) ───────────────────
 function buildFullContext() {
   const store = getStore();
   const leads = store.mockLeads || [];
@@ -1592,40 +1597,53 @@ function buildFullContext() {
       ? `Queued: ` + e.taskQueue.map((t, idx) => `${idx + 1}. "${t.title}" (${t.priority})`).join('; ')
       : 'Queued: None';
     return `• **${e.name}** (${e.role} — ${e.department}):
-  - Status: ${e.status} | KPI Score: ${e.kpiScore} | ${e.salesClosed} Sales Closed (₹${(e.totalRevenue || 0).toLocaleString('en-IN')})
+  - Status: ${e.status} | KPI Score: ${e.kpiScore} | ${e.salesClosed} Closed Deals (₹${(e.totalRevenue || 0).toLocaleString('en-IN')})
   - ${active}
   - ${queue}`;
   }).join('\n');
 
-  return `APS Enterprise Real-Time Intelligence & Snapshot:
+  // Key leads summary
+  const sampleLeads = leads.slice(0, 10).map(l => 
+    `- ${l.id || l.name}: ${l.name} | Stage: ${l.stage} | Product: ${l.product || l.machineRequired || 'Machinery'} | Value: ₹${(l.value || l.dealValue || 0).toLocaleString('en-IN')} | Owner: ${l.assignedTo || l.owner || 'Unassigned'}`
+  ).join('\n');
 
-1. Company & Location:
-   - Head Office: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India.
-   - Plants: Indore Main Plant (Dona Pattal & Paper Cup) & Pune Unit 1 (CNC Milling & Fiber Laser Cutters).
-   - Helplines: +91-7869755871, +91-8827848099 | Website: https://www.apsenterprises.in.
+  return `APS ENTERPRISE REAL-TIME INDUSTRIAL & SYSTEM STATE:
 
-2. Machinery Products:
-   - Fully Automatic Double Die Dona Pattal Machine
-   - Heavy Hydraulic Paper Plate & Thali Machine
-   - High-Speed Paper Cup Making Machine
-   - Industrial CNC Milling & 6kW Fiber Laser Cutters
+1. COMPANY HEADQUARTERS & MANUFACTURING FACILITIES:
+   - Head Office & Main Works: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India.
+   - Manufacturing Plants: 
+     • Indore Main Plant: Paper Converting Machinery (Dona Pattal, Paper Cup, Paper Plate, Thali).
+     • Pune Unit 1: Industrial Automation, CNC Milling Centers, 6kW Fiber Laser Cutters, Heavy Hydraulic Tooling.
+   - Helplines / Contacts: +91-7869755871, +91-8827848099 | Email: info@apsenterprises.in | Web: https://www.apsenterprises.in
 
-3. Dashboard Module Navigation Routes:
-   - CRM Leads & Pipeline: /crm
-   - Tally 10% Advance Payment Gate: /payments
-   - A5 WhatsApp Automation: /whatsapp
-   - A1 Voice Dialer: /voice & /dialer
-   - Team KPIs & Employee Profiles: /employees & /kpis
-   - GST Invoices & Billing: /invoices
-   - Factory Manufacturing Tracker: /factory
-   - System Activity Log: /activity
-   - APS AI Workspace: /ai
+2. MACHINERY CATALOGUE & TECHNICAL SPECIFICATIONS:
+   - Double Die Automatic Dona Pattal Machine: Output 2,500 - 4,500 pcs/hr, 80-400 GSM paper roll, 2.0 kW motor (Single/Three Phase), Die 4" to 14", Auto temperature PID controller. Approx Price: ₹65,000 - ₹1,45,000.
+   - High-Speed Paper Cup Machine: Output 70-90 cups/min, Cup size 45ml - 330ml, Ultrasonic side sealing + hot air bottom heater, 140-350 GSM single/double PE paper. Approx Price: ₹6,50,000 - ₹9,50,000.
+   - Heavy Hydraulic Paper Plate & Thali Machine: 2-Die / 4-Die Hydraulic, Pressure 5 Ton to 10 Ton, Motor 2 HP - 5 HP, Oil Grade ISO VG 68. Approx Price: ₹85,000 - ₹2,20,000.
+   - Industrial CNC Milling & 6kW Fiber Laser Systems: 1kW - 6kW Fiber Laser Source (Raycus/IPG), CypCut CNC controller, heavy gantry frame, sheet bed 1500x3000mm. Approx Price: ₹18,00,000 - ₹45,00,000+.
+   - Hydraulic Stamping Press 200T / 500T: Heavy deep-draw industrial stamping with PLC automated safety sensors.
 
-4. Live Team Members & Tasks:
+3. 5-TIER AI ARCHITECTURE (A1 TO A5):
+   - A1 (Voice AI Calling Agent): Exotel + ElevenLabs/Deepgram speech AI. Inbound inquiry handling, outbound lead qualification, multilingual (Gujarati, Hindi, English), sentiment audit. Routes: /voice & /dialer.
+   - A2 (Executive Cockpit & Admin Dashboard): Real-time KPI cockpit, cross-module sync, live sales pipeline, financial health, activity timeline. Routes: /, /crm, /payments.
+   - A3 (AI Query Assistant & Copilot): Natural language Q&A, SQL-like data lookup, interactive charts, automated exports (PDF, Excel, CSV), trigger business actions. Route: /ai.
+   - A4 (Team Performance & Gamification): Real-time KPI scoring, live task assignment, queued backlogs, sales leaderboards, revenue tracking. Routes: /employees & /kpis.
+   - A5 (WhatsApp Business Automation): WABA Cloud API integration, 10% advance reminders, dispatch notifications, invoice delivery, interactive product catalogs. Route: /whatsapp.
+
+4. CORE BUSINESS & PAYMENT RULES:
+   - 10% Advance Gate: Production NEVER starts without 10% advance payment confirmed in Tally ERP. When advance is verified, lead moves from 'Confirmed' to 'Client (Paid)', and Job Card is sent to Indore factory.
+   - 100% Clearance for Dispatch: Machinery is dispatched with transporter e-Waybill only when 100% balance or approved invoice terms are fulfilled.
+
+5. DASHBOARD NAVIGATION ROUTES:
+   - CRM Pipeline: /crm | Tally Payments Gate: /payments | WhatsApp: /whatsapp | Voice Dialer: /voice | Employees/KPIs: /employees | GST Invoices: /invoices | Factory Job Cards: /factory | System Logs: /activity | AI Assistant: /ai
+
+6. LIVE TEAM MEMBERS & ASSIGNED TASKS:
 ${empDetails}
 
-5. CRM Pipeline:
-   - Total Leads: ${leads.length} | Enquiry: ${leads.filter(l => l.stage === 'Enquiry').length} | Confirmed: ${leads.filter(l => l.stage === 'Confirmed Lead').length} | Paid: ${leads.filter(l => l.stage === 'Client (Paid)').length} | In Production: ${leads.filter(l => l.stage === 'In Production').length} | Dispatched: ${leads.filter(l => l.stage === 'Dispatched').length}`;
+7. LIVE CRM PIPELINE SUMMARY:
+   - Total Leads: ${leads.length} | Enquiry: ${leads.filter(l => l.stage === 'Enquiry').length} | Confirmed: ${leads.filter(l => l.stage === 'Confirmed Lead').length} | Paid: ${leads.filter(l => l.stage === 'Client (Paid)').length} | In Production: ${leads.filter(l => l.stage === 'In Production').length} | Dispatched: ${leads.filter(l => l.stage === 'Dispatched').length}
+Sample Active Leads:
+${sampleLeads}`;
 }
 
 // ─── HTTPS helper ─────────────────────────────────────────────────────────────
@@ -1653,13 +1671,31 @@ function httpsPost(hostname, path, headers, body) {
 async function callGroq(messages) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY not set');
-  const result = await httpsPost(
-    'api.groq.com', '/openai/v1/chat/completions',
-    { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    { model: 'groq/compound-mini', messages, temperature: 0.2, max_tokens: 1200 }
-  );
-  if (result.error) throw new Error(`Groq error: ${result.error.message || JSON.stringify(result.error)}`);
-  return result?.choices?.[0]?.message?.content || '';
+
+  const models = ['groq/compound', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b'];
+  let lastError = null;
+
+  for (const model of models) {
+    try {
+      const result = await httpsPost(
+        'api.groq.com', '/openai/v1/chat/completions',
+        { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        { model, messages, temperature: 0.4, max_tokens: 2048 }
+      );
+      if (result.error) {
+        lastError = new Error(result.error.message || JSON.stringify(result.error));
+        continue;
+      }
+      let content = result?.choices?.[0]?.message?.content || '';
+      // Strip <think>...</think> reasoning tags if emitted
+      content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+      if (content) return content;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('All Groq models failed');
 }
 
 async function callOpenAI(messages) {
@@ -1668,7 +1704,7 @@ async function callOpenAI(messages) {
   const result = await httpsPost(
     'api.openai.com', '/v1/chat/completions',
     { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    { model: 'gpt-4o-mini', messages, temperature: 0.2, max_tokens: 1500 }
+    { model: 'gpt-4o-mini', messages, temperature: 0.4, max_tokens: 2048 }
   );
   return result?.choices?.[0]?.message?.content || '';
 }
@@ -1678,7 +1714,7 @@ async function callGemini(systemPrompt, history, userQuery) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
   const contents = [
     { role: 'user', parts: [{ text: systemPrompt }] },
-    { role: 'model', parts: [{ text: 'Understood.' }] },
+    { role: 'model', parts: [{ text: 'Understood. I am APS AI, an advanced conversational intelligence system inspired by ChatGPT and Google Gemini.' }] },
     ...history.map(m => ({
       role: m.role === 'user' ? 'user' : 'model',
       parts: [{ text: m.content }]
@@ -1689,7 +1725,7 @@ async function callGemini(systemPrompt, history, userQuery) {
     'generativelanguage.googleapis.com',
     `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
     { 'Content-Type': 'application/json' },
-    { contents, generationConfig: { temperature: 0.2, maxOutputTokens: 1500 } }
+    { contents, generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }
   );
   return result?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
@@ -1726,22 +1762,29 @@ async function processWithLLM(query, history) {
 
   const context = buildFullContext();
 
-  const systemPrompt = `You are the Official AI Operations & General Assistant for APS Enterprise (Machinery Manufacturing & Industrial Automation).
+  const systemPrompt = `You are APS AI — an advanced, frontier-level AI Assistant and Enterprise Intelligence Copilot (engineered with the reasoning power, depth, versatility, and conversational fluency of ChatGPT-4o and Google Gemini 1.5 Pro).
 
-Your primary role is to answer user queries with high intelligence, exact domain knowledge, and conversational natural language in English, Hindi, or Hinglish as requested.
+CORE INTELLIGENCE & CAPABILITIES:
+1. GENERAL KNOWLEDGE, CODING & REASONING (Like ChatGPT / Gemini):
+   - You can answer ANY question on the planet: Programming & software engineering (JavaScript, Python, C++, Java, React, Node.js, SQL, algorithms, debugging), mathematics & engineering formulas, business strategy, marketing, creative copywriting, email drafting, scientific explanations, history, philosophy, and daily life advice.
+   - Code Formatting: When writing code, provide clean, production-ready code blocks with language tags (e.g. \`\`\`python, \`\`\`javascript) and concise explanations.
+   - Deep Explanations: Break down complex concepts into intuitive, easy-to-understand explanations with examples and bullet points.
 
-LIVE SYSTEM DATA CONTEXT:
-${context}
+2. APS ENTERPRISE & INDUSTRIAL DOMAIN MASTERY:
+   - You are also the dedicated Chief AI Copilot for APS Enterprise (Machinery Manufacturing, Industrial Automation & Paper Converting Equipment).
+   - Head Office & Main Plant: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India.
+   - Plants: Indore Main Plant (Paper Converting) & Pune Unit 1 (CNC & 6kW Fiber Laser).
+   - Machinery Knowledge: Double Die Dona Pattal Machine (2500-4500 pcs/hr, ₹65k-1.45L), High-Speed Paper Cup Machine (70-90 cups/min, ₹6.5L-9.5L), Heavy Hydraulic Paper Plate/Thali Machine (5T-10T, ₹85k-2.2L), 6kW Fiber Laser & CNC Milling (₹18L-45L+), 200T/500T Hydraulic Stamping Press.
+   - Core Financial Rules: Strict 10% Tally advance gate rule (production release only after 10% advance verified in Tally ERP) and 100% clearance for transport dispatch.
+   - 5-Tier AI Modules: A1 Voice AI (/voice, /dialer), A2 Admin Cockpit (/, /crm, /payments), A3 AI Copilot (/ai), A4 Employee KPIs (/employees), A5 WhatsApp Automation (/whatsapp).
 
-Instructions:
-1. DIRECT & ACCURATE ANSWERS:
-   - When asked about employees or specific tasks (e.g. "show complete task of bhavya", "what is animesh working on"), list all active tasks, priority, due timeline, and pending queued tasks clearly with bold titles.
-   - When asked navigation or system action questions (e.g. "open tally sync", "open whatsapp", "show crm"), explain the module status and provide clear direction with direct links (/crm, /payments, /whatsapp, /voice, /invoices, /factory, /employees).
-   - When asked general questions (e.g. "who is groq", "what is cnc machine", "how does dona pattal machine work"), answer intelligently and informatively.
-   - When asked company location or machinery details, state 832 Old Loha Mandi, Indore, MP and exact specs.
+3. CONVERSATIONAL PERSONALITY & MULTI-LINGUAL FLUENCY:
+   - Fluently speak English, Hindi (हिन्दी), Hinglish, Gujarati, and other languages. Match the user's language and tone seamlessly.
+   - Warm, empathetic, polite, articulate, and confident — never robotic or repetitive.
+   - Beautiful Markdown: Use headers (###, ####), bold highlights, bullet lists, numbered steps, and comparison tables when presenting structured information.
 
-2. RESPONSE FORMAT:
-   Respond with clean, direct markdown text with bold headers and bullet points. Never return canned boilerplate. Always answer the specific question asked.`;
+LIVE REAL-TIME SYSTEM STATE:
+${context}`;
 
   try {
     let raw = '';
@@ -2066,20 +2109,55 @@ async function processQuery(query, conversationId) {
     result = generateUniversalAnswer(query);
   }
 
-  // Attach PDF export ONLY if explicitly requested in the query
-  const isPdfExplicitlyRequested = /pdf|report|export|download|file|invoice|sheet|doc/i.test(query || '');
-  if (isPdfExplicitlyRequested && !result.exportFile) {
+  // Intelligently detect the exact format requested (CSV, XLSX, DOCX, JSON, PDF)
+  const qClean = (query || '').toLowerCase();
+  let requestedFormat = null;
+
+  if (/\b(csv)\b/i.test(qClean)) requestedFormat = 'csv';
+  else if (/\b(excel|xlsx|xls|spreadsheet)\b/i.test(qClean)) requestedFormat = 'xlsx';
+  else if (/\b(docx|word|doc)\b/i.test(qClean)) requestedFormat = 'docx';
+  else if (/\b(json)\b/i.test(qClean)) requestedFormat = 'json';
+  else if (/\b(pdf)\b/i.test(qClean)) requestedFormat = 'pdf';
+  else if (/report|export|download|file|invoice|sheet|banao|nikalo|generate/i.test(qClean)) requestedFormat = 'pdf';
+
+  if (requestedFormat) {
     const rawClean = (query || 'APS AI Response').replace(/[^a-zA-Z0-9 ]/g, '').trim();
-    const titleSlug = rawClean.slice(0, 35) || 'APS_AI_Report';
-    const fileName = `APS_AI_${titleSlug.replace(/\s+/g, '_')}.pdf`;
+    const titleSlug = (rawClean.slice(0, 35) || 'APS_AI_Report').replace(/\s+/g, '_');
+    const fileName = `APS_AI_${titleSlug}.${requestedFormat}`;
+
+    let content = result.text || '';
+    let tableHeaders = result.exportFile?.tableHeaders || null;
+    let tableRows = result.exportFile?.tableRows || null;
+
+    if (result.table && Array.isArray(result.table) && result.table.length > 0) {
+      tableHeaders = Object.keys(result.table[0]);
+      tableRows = result.table.map(row => tableHeaders.map(h => String(row[h] ?? '')));
+      if (requestedFormat === 'csv') {
+        const headerLine = tableHeaders.map(h => `"${h.replace(/"/g, '""')}"`).join(',');
+        const rowLines = tableRows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(','));
+        content = [headerLine, ...rowLines].join('\n');
+      }
+    } else if (requestedFormat === 'csv') {
+      content = `APS AI Intelligence Export\nQuery,"${(query || '').replace(/"/g, '""')}"\nDate,"${new Date().toISOString()}"\n\nContent,"${(result.text || '').replace(/"/g, '""')}"`;
+    }
+
+    const mimeMap = {
+      csv: 'text/csv',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pdf: 'application/pdf',
+      docx: 'application/msword',
+      json: 'application/json'
+    };
 
     result.exportFile = {
-      fileName: fileName,
-      fileFormat: 'pdf',
-      mimeType: 'application/pdf',
-      sizeKB: '18.4 KB',
-      title: `APS AI Intelligence — ${titleSlug.toUpperCase()}`,
-      content: result.text
+      fileName,
+      fileFormat: requestedFormat,
+      mimeType: mimeMap[requestedFormat] || 'application/octet-stream',
+      sizeKB: requestedFormat === 'csv' ? '12.4 KB' : (requestedFormat === 'xlsx' ? '24.5 KB' : '18.4 KB'),
+      title: `APS AI Intelligence — ${titleSlug.toUpperCase()} (${requestedFormat.toUpperCase()})`,
+      content,
+      tableHeaders,
+      tableRows
     };
   }
 
