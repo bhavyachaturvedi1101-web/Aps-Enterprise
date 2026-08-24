@@ -6,10 +6,14 @@ const API = 'http://localhost:5000/api';
 
 const ROLE_OPTIONS = [
   { label: 'All Roles', value: 'ALL' },
-  { label: 'Voice / Telecaller', value: 'Voice' },
-  { label: 'System Architect', value: 'Architect' },
-  { label: 'Analytics & Automation Specialist', value: 'Analytics' },
-  { label: 'ERP / Dispatch', value: 'ERP' }
+  { label: 'Telecaller / Qualification', value: 'Telecaller' },
+  { label: 'Field & Direct Sales', value: 'Sales' },
+  { label: 'Assembly Supervisor', value: 'Assembly' },
+  { label: 'Machine Fitter', value: 'Fitter' },
+  { label: 'Quality Testing', value: 'Testing' },
+  { label: 'Dispatch & Logistics', value: 'Dispatch' },
+  { label: 'Accounts & ERP Admin', value: 'Admin' },
+  { label: 'Spare Parts & Service', value: 'Spare' }
 ];
 
 function CustomSelect({ value, options, onChange, minWidth = 160 }) {
