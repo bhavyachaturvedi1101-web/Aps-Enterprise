@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
 const MOCK_CALLS = [
-  { id: 'C001', name: 'Horizon Industries', phone: '+91 98765 43210', product: 'CNC Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C002', name: 'BlueStar Fab', phone: '+91 87654 32109', product: 'Laser Cutter', status: 'In Progress', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C003', name: 'RiverTech', phone: '+91 76543 21098', product: 'Plasma Cutter', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C004', name: 'Apex Steel', phone: '+91 65432 10987', product: 'Sheet Bender', status: 'Completed', priority: 'Low', agent: 'Telecaller' },
-  { id: 'C005', name: 'PrimeMake', phone: '+91 54321 09876', product: 'Hydraulic Press', status: 'Failed', priority: 'High', agent: 'Voice AI' }
+  { id: 'C001', name: 'Agarwal Packaging', phone: '+91 98765 43210', product: 'Double Die Paper Plate Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
+  { id: 'C002', name: 'Sharma Paper Cups', phone: '+91 87654 32109', product: 'Fully Automatic Paper Cup Machine', status: 'In Progress', priority: 'Normal', agent: 'Pooja (Telecaller)' },
+  { id: 'C003', name: 'Bansal Enterprises', phone: '+91 76543 21098', product: 'Hydraulic Dona Pattal Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C004', name: 'Gupta Disposables', phone: '+91 65432 10987', product: 'Silver Craft Paper Roll', status: 'Completed', priority: 'Low', agent: 'Animesh (Sales Lead)' },
+  { id: 'C005', name: 'Mishra Polymers', phone: '+91 54321 09876', product: 'Single Die Paper Plate Machine', status: 'Failed', priority: 'High', agent: 'Voice AI' },
+  { id: 'C006', name: 'Verma Plastics', phone: '+91 98989 12345', product: 'Agarbatti Making Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
+  { id: 'C007', name: 'Desai Traders', phone: '+91 99887 77665', product: 'Paper Lamination Machine', status: 'In Progress', priority: 'High', agent: 'Pooja (Telecaller)' }
 ];
 
 const STATUS_CLR = { Queued:'#09090b', 'In Progress':'#27272a', Completed:'#52525b', Failed:'#71717a' };
@@ -13,7 +15,7 @@ const STATUS_CLR = { Queued:'#09090b', 'In Progress':'#27272a', Completed:'#5252
 export default function DialerQueue() {
   const [calls, setCalls] = useState(MOCK_CALLS);
   const [showModal, setShowModal] = useState(false);
-  const [newCall, setNewCall] = useState({ name: '', phone: '', product: 'CNC Router Pro', priority: 'High' });
+  const [newCall, setNewCall] = useState({ name: '', phone: '', product: 'Double Die Machine', priority: 'High' });
 
   const handleAddCall = (e) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export default function DialerQueue() {
     };
     setCalls(prev => [callObj, ...prev]);
     setShowModal(false);
-    setNewCall({ name: '', phone: '', product: 'CNC Router Pro', priority: 'High' });
+    setNewCall({ name: '', phone: '', product: 'Double Die Machine', priority: 'High' });
   };
 
   const stats = [
