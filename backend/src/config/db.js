@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+require('pg'); // Force Vercel to bundle the PostgreSQL driver
 require('dotenv').config();
 
 const databaseUrl = process.env.DATABASE_URL;
