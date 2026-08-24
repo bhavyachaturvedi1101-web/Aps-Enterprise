@@ -92,8 +92,8 @@ for (let i = 1; i <= 30; i++) {
   const targetSales = randomInt(Math.max(5, salesClosed - 5), salesClosed + 10);
   const totalRevenue = salesClosed * randomInt(20000, 100000);
   const conversionRate = ((salesClosed / callsHandled) * 100).toFixed(1) + '%';
-  const role = randomChoice(roles);
-  const department = role === 'Telecaller' ? 'Inside Sales' : randomChoice(departments);
+  const role = i <= roles.length ? roles[i - 1] : randomChoice(roles);
+  const department = role.includes('Telecaller') ? 'Telecalling & Inquiry' : randomChoice(departments);
   
   const category = getRoleCategory(role);
   const possibleTasks = taskTemplates[category];
