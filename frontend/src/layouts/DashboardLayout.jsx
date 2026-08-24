@@ -135,16 +135,23 @@ const INITIAL_NOTIFICATIONS = [
   }
 ];
 
-// ─── Component ───────────────────────────────────────────────────────────────
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout, loginWithRole } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [notifFilter, setNotifFilter] = useState('all');
   const [isSimulating, setIsSimulating] = useState(false);
+
+  // Auto-close dropdowns and mobile drawer on route navigation
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setNotifOpen(false);
+    setUserMenuOpen(false);
+  }, [location.pathname]);
 
   // Dynamic Navigation Groups based on active User Role
   const filteredNavGroups = useMemo(() => {
@@ -405,14 +412,30 @@ export default function DashboardLayout() {
     <div style={s.container}>
 
       {/* ─── TOP HEADER ─────────────────────────────────────────────────── */}
-      <header style={s.header}>
-        {/* Logo */}
-        <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
-          <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
+      <header style={s.header} className="app-header">
+        {/* Left: Mobile Hamburger & Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <button
+            type="button"
+            className="mobile-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation drawer"
+            title="Toggle Menu"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+
+          <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
+            <img src="/aps-logo.png" alt="APS Enterprises" className="header-logo-img" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
+          </div>
         </div>
 
         {/* Center Pills */}
-        <div style={s.pillContainer}>
+        <div style={s.pillContainer} className="header-pills-container">
           {headerPills.map(({ key, label }) => (
             <button
               key={key}
@@ -437,7 +460,7 @@ export default function DashboardLayout() {
 
           {/* Notifications Dropdown */}
           {notifOpen && (
-            <div style={{ ...s.dropdownPanel, width: 340, padding: '0.85rem' }}>
+            <div style={{ ...s.dropdownPanel, width: 340, maxWidth: 'calc(100vw - 24px)', right: 0, padding: '0.85rem' }}>
               {/* Header */}
               <div style={s.notifHeaderRow}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -460,42 +483,39 @@ export default function DashboardLayout() {
                 </div>
               </div>
 
-              {/* Category Filter Pills & Simulate Trigger */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginBottom: 8 }}>
-                <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 2 }}>
-                  {[
-                    { key: 'all', label: `All (${notifications.length})` },
-                    { key: 'unread', label: `Unread (${unreadCount})` },
-                    { key: 'ai', label: 'AI & Queries' },
-                    { key: 'ops', label: 'Operations' }
-                  ].map(f => (
-                    <button
-                      key={f.key}
-                      type="button"
-                      onClick={() => setNotifFilter(f.key)}
-                      style={{
-                        padding: '3px 8px',
-                        borderRadius: 12,
-                        border: '1px solid',
-                        borderColor: notifFilter === f.key ? '#2563eb' : '#e2e8f0',
-                        backgroundColor: notifFilter === f.key ? '#eff6ff' : '#ffffff',
-                        color: notifFilter === f.key ? '#1d4ed8' : '#64748b',
-                        fontSize: '0.66rem',
-                        fontWeight: notifFilter === f.key ? 700 : 500,
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
+              {/* Notification Filter Chips */}
+              <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid #f1f5f9' }}>
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'unread', label: 'Unread' },
+                  { id: 'ai', label: 'AI Alerts' },
+                  { id: 'ops', label: 'Ops' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setNotifFilter(tab.id)}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                      border: 'none',
+                      backgroundColor: notifFilter === tab.id ? '#09090b' : '#f1f5f9',
+                      color: notifFilter === tab.id ? '#fff' : '#64748b',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
 
                 <button
                   type="button"
                   onClick={handleSimulateAlert}
                   disabled={isSimulating}
                   style={{
+                    marginLeft: 'auto',
                     padding: '3px 8px',
                     borderRadius: 8,
                     border: '1px solid #cbd5e1',
@@ -504,7 +524,6 @@ export default function DashboardLayout() {
                     fontSize: '0.64rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap',
                     flexShrink: 0
                   }}
                   title="Simulate a live incoming query or event from backend"
@@ -590,7 +609,7 @@ export default function DashboardLayout() {
             <div style={{ ...s.userAvatarInitial, backgroundColor: currentUser?.avatarBg || '#09090b' }}>
               {currentUser?.avatar || 'A'}
             </div>
-            <div style={s.userInfo}>
+            <div style={s.userInfo} className="header-user-info">
               <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
               <div style={s.userRole}>{roleTitleDisplay}</div>
             </div>
@@ -601,7 +620,7 @@ export default function DashboardLayout() {
 
           {/* Profile Dropdown & Quick Switch */}
           {userMenuOpen && (
-            <div style={{ ...s.dropdownPanel, right: 0, width: 260 }}>
+            <div style={{ ...s.dropdownPanel, right: 0, width: 260, maxWidth: 'calc(100vw - 24px)' }}>
               <div style={s.dropdownHeader}>
                 <div>Signed in as <strong>{currentUser?.name}</strong></div>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>{currentUser?.email}</div>
@@ -632,6 +651,7 @@ export default function DashboardLayout() {
                   {['admin', 'manager', 'employee'].map(r => (
                     <button
                       key={r}
+                      type="button"
                       onClick={() => handleSwitchRole(r)}
                       style={{
                         padding: '5px 2px',
@@ -678,8 +698,14 @@ export default function DashboardLayout() {
       {/* ─── BODY: SIDEBAR + MAIN ───────────────────────────────────────── */}
       <div style={s.bodyWrapper}>
 
+        {/* Mobile Backdrop Overlay */}
+        <div
+          className={`mobile-sidebar-backdrop ${mobileMenuOpen ? 'active' : ''}`}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+
         {/* ─── SIDEBAR ──────────────────────────────────────────────────── */}
-        <aside style={s.sidebar}>
+        <aside style={s.sidebar} className={`app-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
 
           {/* Scrollable Nav */}
           <div style={s.sidebarScroll}>
@@ -691,7 +717,11 @@ export default function DashboardLayout() {
                   return (
                     <button
                       key={item.key}
-                      onClick={() => handleTabChange(item.key)}
+                      type="button"
+                      onClick={() => {
+                        handleTabChange(item.key);
+                        setMobileMenuOpen(false);
+                      }}
                       className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
                       style={isActive ? s.navItemActive : s.navItem}
                     >
@@ -725,7 +755,7 @@ export default function DashboardLayout() {
                 <div style={s.userCardName}>{currentUser?.name || 'admin'}</div>
                 <div style={s.userCardEmail}>{currentUser?.email || 'admin@aps.enterprise'}</div>
               </div>
-              <button onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
+              <button type="button" onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -737,7 +767,7 @@ export default function DashboardLayout() {
         </aside>
 
         {/* ─── MAIN CONTENT ─────────────────────────────────────────────── */}
-        <main style={s.mainContent}>
+        <main style={s.mainContent} className="app-main-content">
           <Outlet />
         </main>
       </div>
