@@ -5953,6 +5953,1628 @@ const data = {
       "createdAt": new Date("2026-02-11T09:24:01.735Z")
     }
   ],
+  "mockEmployees": [
+    {
+      "id": "e1",
+      "name": "Animesh",
+      "email": "rahul.pathak@aps-enterprise.com",
+      "phone": "+91 9183073592",
+      "role": "Voice Operations & Sales Lead",
+      "department": "Sales",
+      "kpiScore": "98%",
+      "kpiScoreNum": 98,
+      "status": "Active",
+      "currentActivity": "Scheduling Demo",
+      "tasksCompleted": 25,
+      "callsHandled": 90,
+      "salesClosed": 8,
+      "totalRevenue": 679952,
+      "targetSales": 9,
+      "conversionRate": "8.9%",
+      "avgCallDurationSec": 144,
+      "avgResponseTimeMin": "4.0",
+      "weeklyKpiHistory": [
+      91,
+      91,
+      97,
+      98
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 50,
+      "qualifiedToBooked": 38,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 8
+    },
+      "activeTask": {
+      "id": "task-e1-1",
+      "title": "Follow up on field demo schedule for Kumar Traders",
+      "leadId": "LEAD-615",
+      "leadName": "Kumar Traders",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "11 mins",
+      "assignedAt": new Date("2026-08-24T09:13:50.791Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e1-2",
+      "title": "Negotiate final pricing and discount for Kumar Traders",
+      "leadId": "LEAD-615",
+      "leadName": "Kumar Traders",
+      "priority": "High",
+      "type": "Sales Negotiation",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e2",
+      "name": "Sneha",
+      "email": "rakesh.bansal@aps-enterprise.com",
+      "phone": "+91 9605758384",
+      "role": "Core Systems Architect & Admin",
+      "department": "Operations & Administration",
+      "kpiScore": "93%",
+      "kpiScoreNum": 93,
+      "status": "Active",
+      "currentActivity": "Scheduling Demo",
+      "tasksCompleted": 24,
+      "callsHandled": 129,
+      "salesClosed": 11,
+      "totalRevenue": 618310,
+      "targetSales": 15,
+      "conversionRate": "8.5%",
+      "avgCallDurationSec": 181,
+      "avgResponseTimeMin": "5.7",
+      "weeklyKpiHistory": [
+      92,
+      97,
+      90,
+      93
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 28,
+      "qualifiedToBooked": 28,
+      "bookedToConfirmed": 11,
+      "confirmedToPaid": 11
+    },
+      "activeTask": {
+      "id": "task-e2-1",
+      "title": "Follow up on field demo schedule for Iyer Packers",
+      "leadId": "LEAD-910",
+      "leadName": "Iyer Packers",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "23 mins",
+      "assignedAt": new Date("2026-08-24T09:03:21.618Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e2-2",
+      "title": "Follow up on field demo schedule for Iyer Packers",
+      "leadId": "LEAD-910",
+      "leadName": "Iyer Packers",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e3",
+      "name": "Aaditya",
+      "email": "suresh.verma@aps-enterprise.com",
+      "phone": "+91 9141026894",
+      "role": "Analytics & WhatsApp Lead",
+      "department": "Operations & Administration",
+      "kpiScore": "90%",
+      "kpiScoreNum": 90,
+      "status": "Active",
+      "currentActivity": "Drafting Quotation",
+      "tasksCompleted": 19,
+      "callsHandled": 122,
+      "salesClosed": 10,
+      "totalRevenue": 371760,
+      "targetSales": 14,
+      "conversionRate": "8.2%",
+      "avgCallDurationSec": 123,
+      "avgResponseTimeMin": "6.5",
+      "weeklyKpiHistory": [
+      98,
+      93,
+      91,
+      90
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 29,
+      "qualifiedToBooked": 32,
+      "bookedToConfirmed": 14,
+      "confirmedToPaid": 10
+    },
+      "activeTask": {
+      "id": "task-e3-1",
+      "title": "Share quotation and ROI video for Dona Pattal setup with Bose Polymers",
+      "leadId": "LEAD-763",
+      "leadName": "Bose Polymers",
+      "priority": "Normal",
+      "type": "Sales Follow-up",
+      "stage": "Qualified",
+      "dueIn": "37 mins",
+      "assignedAt": new Date("2026-08-24T09:00:38.211Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e3-2",
+      "title": "Follow up on field demo schedule for Bose Polymers",
+      "leadId": "LEAD-763",
+      "leadName": "Bose Polymers",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e4",
+      "name": "Pooja Sharma",
+      "email": "kunal.sen@aps-enterprise.com",
+      "phone": "+91 9475613762",
+      "role": "Senior Telecaller & Conversion Spec",
+      "department": "Sales",
+      "kpiScore": "67%",
+      "kpiScoreNum": 67,
+      "status": "Active",
+      "currentActivity": "Scheduling Demo",
+      "tasksCompleted": 67,
+      "callsHandled": 74,
+      "salesClosed": 4,
+      "totalRevenue": 341056,
+      "targetSales": 14,
+      "conversionRate": "5.4%",
+      "avgCallDurationSec": 151,
+      "avgResponseTimeMin": "8.5",
+      "weeklyKpiHistory": [
+      64,
+      66,
+      63,
+      67
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 52,
+      "qualifiedToBooked": 29,
+      "bookedToConfirmed": 13,
+      "confirmedToPaid": 4
+    },
+      "activeTask": {
+      "id": "task-e4-1",
+      "title": "Follow up on field demo schedule for Das Global",
+      "leadId": "LEAD-115",
+      "leadName": "Das Global",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "17 mins",
+      "assignedAt": new Date("2026-08-24T08:35:27.945Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e4-2",
+      "title": "Negotiate final pricing and discount for Das Global",
+      "leadId": "LEAD-115",
+      "leadName": "Das Global",
+      "priority": "High",
+      "type": "Sales Negotiation",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e5",
+      "name": "Rohan Mehta",
+      "email": "harsh.dixit@aps-enterprise.com",
+      "phone": "+91 9716940960",
+      "role": "ERP & Factory Dispatch Officer",
+      "department": "Operations & Administration",
+      "kpiScore": "64%",
+      "kpiScoreNum": 64,
+      "status": "Active",
+      "currentActivity": "Packing Spare Parts",
+      "tasksCompleted": 99,
+      "callsHandled": 152,
+      "salesClosed": 9,
+      "totalRevenue": 405234,
+      "targetSales": 10,
+      "conversionRate": "5.9%",
+      "avgCallDurationSec": 138,
+      "avgResponseTimeMin": "1.2",
+      "weeklyKpiHistory": [
+      65,
+      63,
+      64,
+      64
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 44,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 9
+    },
+      "activeTask": {
+      "id": "task-e5-1",
+      "title": "Pack spare parts kit (dies and heaters) for Bose Solutions",
+      "leadId": "LEAD-930",
+      "leadName": "Bose Solutions",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "37 mins",
+      "assignedAt": new Date("2026-08-24T09:00:55.370Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e5-2",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Bose Solutions",
+      "leadId": "LEAD-930",
+      "leadName": "Bose Solutions",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e6",
+      "name": "Dhruv Bhatia",
+      "email": "dhruv.bhatia@aps-enterprise.com",
+      "phone": "+91 9312518082",
+      "role": "Machine Fitter",
+      "department": "Production & Assembly",
+      "kpiScore": "82%",
+      "kpiScoreNum": 82,
+      "status": "Offline",
+      "currentActivity": "Booking Transport",
+      "tasksCompleted": 70,
+      "callsHandled": 233,
+      "salesClosed": 19,
+      "totalRevenue": 642105,
+      "targetSales": 29,
+      "conversionRate": "8.2%",
+      "avgCallDurationSec": 216,
+      "avgResponseTimeMin": "2.2",
+      "weeklyKpiHistory": [
+      82,
+      83,
+      75,
+      82
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 20,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 19
+    },
+      "activeTask": {
+      "id": "task-e6-1",
+      "title": "Coordinate with transport vendor for pickup for Nair Enterprises",
+      "leadId": "LEAD-136",
+      "leadName": "Nair Enterprises",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "33 mins",
+      "assignedAt": new Date("2026-08-24T09:08:11.394Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e6-2",
+      "title": "Pack spare parts kit (dies and heaters) for Nair Enterprises",
+      "leadId": "LEAD-136",
+      "leadName": "Nair Enterprises",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e7",
+      "name": "Animesh Saini",
+      "email": "animesh.saini@aps-enterprise.com",
+      "phone": "+91 9768854464",
+      "role": "Quality Testing Engineer",
+      "department": "Production & Assembly",
+      "kpiScore": "75%",
+      "kpiScoreNum": 75,
+      "status": "Active",
+      "currentActivity": "Validating Assembly",
+      "tasksCompleted": 62,
+      "callsHandled": 197,
+      "salesClosed": 14,
+      "totalRevenue": 878976,
+      "targetSales": 22,
+      "conversionRate": "7.1%",
+      "avgCallDurationSec": 126,
+      "avgResponseTimeMin": "5.7",
+      "weeklyKpiHistory": [
+      76,
+      75,
+      78,
+      75
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 71,
+      "qualifiedToBooked": 37,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 14
+    },
+      "activeTask": {
+      "id": "task-e7-1",
+      "title": "Verify motor and heating coil assembly for Goel Solutions",
+      "leadId": "LEAD-135",
+      "leadName": "Goel Solutions",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "57 mins",
+      "assignedAt": new Date("2026-08-24T08:49:38.099Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e7-2",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Goel Solutions",
+      "leadId": "LEAD-135",
+      "leadName": "Goel Solutions",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e8",
+      "name": "Rahul Choudhary",
+      "email": "rahul.choudhary@aps-enterprise.com",
+      "phone": "+91 9969424283",
+      "role": "Dispatch Coordinator",
+      "department": "Logistics & Service",
+      "kpiScore": "95%",
+      "kpiScoreNum": 95,
+      "status": "Active",
+      "currentActivity": "Packing Spare Parts",
+      "tasksCompleted": 16,
+      "callsHandled": 135,
+      "salesClosed": 12,
+      "totalRevenue": 433644,
+      "targetSales": 14,
+      "conversionRate": "8.9%",
+      "avgCallDurationSec": 81,
+      "avgResponseTimeMin": "8.7",
+      "weeklyKpiHistory": [
+      95,
+      93,
+      99,
+      95
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 70,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 12
+    },
+      "activeTask": {
+      "id": "task-e8-1",
+      "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
+      "leadId": "LEAD-758",
+      "leadName": "Singh Polymers",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "14 mins",
+      "assignedAt": new Date("2026-08-24T09:09:55.899Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e8-2",
+      "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
+      "leadId": "LEAD-758",
+      "leadName": "Singh Polymers",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e9",
+      "name": "Manish Mahajan",
+      "email": "manish.mahajan@aps-enterprise.com",
+      "phone": "+91 9606890406",
+      "role": "Inventory Clerk",
+      "department": "Logistics & Service",
+      "kpiScore": "77%",
+      "kpiScoreNum": 77,
+      "status": "Active",
+      "currentActivity": "Validating Assembly",
+      "tasksCompleted": 64,
+      "callsHandled": 91,
+      "salesClosed": 7,
+      "totalRevenue": 316512,
+      "targetSales": 6,
+      "conversionRate": "7.7%",
+      "avgCallDurationSec": 165,
+      "avgResponseTimeMin": "2.9",
+      "weeklyKpiHistory": [
+      81,
+      75,
+      81,
+      77
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 38,
+      "qualifiedToBooked": 40,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 7
+    },
+      "activeTask": {
+      "id": "task-e9-1",
+      "title": "Verify motor and heating coil assembly for Garg Packers",
+      "leadId": "LEAD-289",
+      "leadName": "Garg Packers",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "54 mins",
+      "assignedAt": new Date("2026-08-24T08:37:42.316Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e9-2",
+      "title": "Dispatch fully automatic machine via transport for Garg Packers",
+      "leadId": "LEAD-289",
+      "leadName": "Garg Packers",
+      "priority": "High",
+      "type": "Factory Dispatch",
+      "stage": "Dispatched"
+    }
+    ]
+    },
+    {
+      "id": "e10",
+      "name": "Dev Patel",
+      "email": "dev.patel@aps-enterprise.com",
+      "phone": "+91 9434695766",
+      "role": "Accounts Executive",
+      "department": "Operations & Administration",
+      "kpiScore": "75%",
+      "kpiScoreNum": 75,
+      "status": "Active",
+      "currentActivity": "Creating Tax Invoice",
+      "tasksCompleted": 57,
+      "callsHandled": 284,
+      "salesClosed": 21,
+      "totalRevenue": 1530984,
+      "targetSales": 29,
+      "conversionRate": "7.4%",
+      "avgCallDurationSec": 177,
+      "avgResponseTimeMin": "1.1",
+      "weeklyKpiHistory": [
+      82,
+      84,
+      76,
+      75
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 50,
+      "qualifiedToBooked": 38,
+      "bookedToConfirmed": 16,
+      "confirmedToPaid": 21
+    },
+      "activeTask": {
+      "id": "task-e10-1",
+      "title": "Generate GST Tax Invoice for Chaturvedi Creations",
+      "leadId": "LEAD-694",
+      "leadName": "Chaturvedi Creations",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "9 mins",
+      "assignedAt": new Date("2026-08-24T08:49:01.275Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e10-2",
+      "title": "Approve final dispatch invoice & transport LR for Chaturvedi Creations",
+      "leadId": "LEAD-694",
+      "leadName": "Chaturvedi Creations",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)"
+    }
+    ]
+    },
+    {
+      "id": "e11",
+      "name": "Kabir Mahajan",
+      "email": "kabir.mahajan@aps-enterprise.com",
+      "phone": "+91 9875417161",
+      "role": "ERP Operations Admin",
+      "department": "Operations & Administration",
+      "kpiScore": "68%",
+      "kpiScoreNum": 68,
+      "status": "Active",
+      "currentActivity": "Verifying Invoices",
+      "tasksCompleted": 59,
+      "callsHandled": 100,
+      "salesClosed": 6,
+      "totalRevenue": 458970,
+      "targetSales": 13,
+      "conversionRate": "6.0%",
+      "avgCallDurationSec": 122,
+      "avgResponseTimeMin": "0.1",
+      "weeklyKpiHistory": [
+      63,
+      65,
+      65,
+      68
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 34,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 6
+    },
+      "activeTask": {
+      "id": "task-e11-1",
+      "title": "Approve final dispatch invoice & transport LR for Choudhary Paper Products",
+      "leadId": "LEAD-689",
+      "leadName": "Choudhary Paper Products",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)",
+      "dueIn": "50 mins",
+      "assignedAt": new Date("2026-08-24T09:08:07.225Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e11-2",
+      "title": "Review Booking Specs & Dual-Approval Countersign for Choudhary Paper Products",
+      "leadId": "LEAD-689",
+      "leadName": "Choudhary Paper Products",
+      "priority": "Urgent",
+      "type": "Admin Dual-Approval",
+      "stage": "Booked"
+    }
+    ]
+    },
+    {
+      "id": "e12",
+      "name": "Bhumika Rao",
+      "email": "bhumika.rao@aps-enterprise.com",
+      "phone": "+91 9670349626",
+      "role": "Spare Parts Manager",
+      "department": "Logistics & Service",
+      "kpiScore": "60%",
+      "kpiScoreNum": 60,
+      "status": "Active",
+      "currentActivity": "Creating Tax Invoice",
+      "tasksCompleted": 46,
+      "callsHandled": 254,
+      "salesClosed": 15,
+      "totalRevenue": 552585,
+      "targetSales": 13,
+      "conversionRate": "5.9%",
+      "avgCallDurationSec": 191,
+      "avgResponseTimeMin": "8.8",
+      "weeklyKpiHistory": [
+      60,
+      67,
+      61,
+      60
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 74,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 15
+    },
+      "activeTask": {
+      "id": "task-e12-1",
+      "title": "Generate GST Tax Invoice for Dixit Disposables",
+      "leadId": "LEAD-308",
+      "leadName": "Dixit Disposables",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "45 mins",
+      "assignedAt": new Date("2026-08-24T08:56:10.749Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e12-2",
+      "title": "Review Booking Specs & Dual-Approval Countersign for Dixit Disposables",
+      "leadId": "LEAD-308",
+      "leadName": "Dixit Disposables",
+      "priority": "Urgent",
+      "type": "Admin Dual-Approval",
+      "stage": "Booked"
+    }
+    ]
+    },
+    {
+      "id": "e13",
+      "name": "Rajesh Khatri",
+      "email": "rajesh.khatri@aps-enterprise.com",
+      "phone": "+91 9410859666",
+      "role": "Field Sales Manager",
+      "department": "Sales",
+      "kpiScore": "84%",
+      "kpiScoreNum": 84,
+      "status": "Active",
+      "currentActivity": "Negotiating Pricing",
+      "tasksCompleted": 64,
+      "callsHandled": 206,
+      "salesClosed": 17,
+      "totalRevenue": 795940,
+      "targetSales": 25,
+      "conversionRate": "8.3%",
+      "avgCallDurationSec": 169,
+      "avgResponseTimeMin": "1.3",
+      "weeklyKpiHistory": [
+      75,
+      77,
+      76,
+      84
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 80,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 17
+    },
+      "activeTask": {
+      "id": "task-e13-1",
+      "title": "Negotiate final pricing and discount for Patel Industries",
+      "leadId": "LEAD-380",
+      "leadName": "Patel Industries",
+      "priority": "High",
+      "type": "Sales Negotiation",
+      "stage": "Qualified",
+      "dueIn": "25 mins",
+      "assignedAt": new Date("2026-08-24T08:46:27.399Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e13-2",
+      "title": "Negotiate final pricing and discount for Patel Industries",
+      "leadId": "LEAD-380",
+      "leadName": "Patel Industries",
+      "priority": "High",
+      "type": "Sales Negotiation",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e14",
+      "name": "Bhavya Chauhan",
+      "email": "bhavya.chauhan@aps-enterprise.com",
+      "phone": "+91 9686985337",
+      "role": "Direct Sales Executive",
+      "department": "Sales",
+      "kpiScore": "98%",
+      "kpiScoreNum": 98,
+      "status": "Active",
+      "currentActivity": "Handling Operations",
+      "tasksCompleted": 26,
+      "callsHandled": 199,
+      "salesClosed": 19,
+      "totalRevenue": 647577,
+      "targetSales": 25,
+      "conversionRate": "9.5%",
+      "avgCallDurationSec": 121,
+      "avgResponseTimeMin": "7.9",
+      "weeklyKpiHistory": [
+      95,
+      96,
+      92,
+      98
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 54,
+      "qualifiedToBooked": 25,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 19
+    },
+      "activeTask": {
+      "id": "task-e14-1",
+      "title": "Conduct secondary telecaller qualification for Pandey Global",
+      "leadId": "LEAD-258",
+      "leadName": "Pandey Global",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "28 mins",
+      "assignedAt": new Date("2026-08-24T09:01:58.778Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e14-2",
+      "title": "Share quotation and ROI video for Dona Pattal setup with Pandey Global",
+      "leadId": "LEAD-258",
+      "leadName": "Pandey Global",
+      "priority": "Normal",
+      "type": "Sales Follow-up",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e15",
+      "name": "Ravi Reddy",
+      "email": "ravi.reddy@aps-enterprise.com",
+      "phone": "+91 9270888073",
+      "role": "Lead Qualification Specialist",
+      "department": "Operations & Administration",
+      "kpiScore": "80%",
+      "kpiScoreNum": 80,
+      "status": "Active",
+      "currentActivity": "Handling Operations",
+      "tasksCompleted": 18,
+      "callsHandled": 213,
+      "salesClosed": 17,
+      "totalRevenue": 1129701,
+      "targetSales": 15,
+      "conversionRate": "8.0%",
+      "avgCallDurationSec": 191,
+      "avgResponseTimeMin": "8.1",
+      "weeklyKpiHistory": [
+      82,
+      83,
+      77,
+      80
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 49,
+      "qualifiedToBooked": 12,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 17
+    },
+      "activeTask": {
+      "id": "task-e15-1",
+      "title": "Conduct secondary telecaller qualification for Pathak Paper Products",
+      "leadId": "LEAD-785",
+      "leadName": "Pathak Paper Products",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "31 mins",
+      "assignedAt": new Date("2026-08-24T08:37:38.226Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e15-2",
+      "title": "Outbound follow-up for Double Die Machine enquiry from Pathak Paper Products",
+      "leadId": "LEAD-785",
+      "leadName": "Pathak Paper Products",
+      "priority": "High",
+      "type": "Sales Qualification",
+      "stage": "Enquiry"
+    }
+    ]
+    },
+    {
+      "id": "e16",
+      "name": "Karan Bose",
+      "email": "karan.bose@aps-enterprise.com",
+      "phone": "+91 9152734797",
+      "role": "Lead Qualification Specialist",
+      "department": "Operations & Administration",
+      "kpiScore": "60%",
+      "kpiScoreNum": 60,
+      "status": "Active",
+      "currentActivity": "Live Outbound Telecall",
+      "tasksCompleted": 39,
+      "callsHandled": 192,
+      "salesClosed": 11,
+      "totalRevenue": 589105,
+      "targetSales": 10,
+      "conversionRate": "5.7%",
+      "avgCallDurationSec": 83,
+      "avgResponseTimeMin": "9.6",
+      "weeklyKpiHistory": [
+      66,
+      67,
+      69,
+      60
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 32,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 11
+    },
+      "activeTask": {
+      "id": "task-e16-1",
+      "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
+      "leadId": "LEAD-977",
+      "leadName": "Thakur Packaging",
+      "priority": "High",
+      "type": "Sales Qualification",
+      "stage": "Enquiry",
+      "dueIn": "45 mins",
+      "assignedAt": new Date("2026-08-24T08:51:02.182Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e16-2",
+      "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
+      "leadId": "LEAD-977",
+      "leadName": "Thakur Packaging",
+      "priority": "High",
+      "type": "Sales Qualification",
+      "stage": "Enquiry"
+    }
+    ]
+    },
+    {
+      "id": "e17",
+      "name": "Suresh Soni",
+      "email": "suresh.soni@aps-enterprise.com",
+      "phone": "+91 9852033735",
+      "role": "Assembly Supervisor",
+      "department": "Production & Assembly",
+      "kpiScore": "99%",
+      "kpiScoreNum": 99,
+      "status": "Active",
+      "currentActivity": "Packing Spare Parts",
+      "tasksCompleted": 65,
+      "callsHandled": 172,
+      "salesClosed": 17,
+      "totalRevenue": 1663705,
+      "targetSales": 18,
+      "conversionRate": "9.9%",
+      "avgCallDurationSec": 159,
+      "avgResponseTimeMin": "9.0",
+      "weeklyKpiHistory": [
+      98,
+      91,
+      99,
+      99
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 27,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 11,
+      "confirmedToPaid": 17
+    },
+      "activeTask": {
+      "id": "task-e17-1",
+      "title": "Pack spare parts kit (dies and heaters) for Mehta Solutions",
+      "leadId": "LEAD-462",
+      "leadName": "Mehta Solutions",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "57 mins",
+      "assignedAt": new Date("2026-08-24T09:08:50.177Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e17-2",
+      "title": "Generate Production Job Card for Hydraulic Press Machine for Mehta Solutions",
+      "leadId": "LEAD-462",
+      "leadName": "Mehta Solutions",
+      "priority": "High",
+      "type": "ERP Factory Release",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e18",
+      "name": "Nikhil Patel",
+      "email": "nikhil.patel@aps-enterprise.com",
+      "phone": "+91 9998795437",
+      "role": "Quality Testing Engineer",
+      "department": "Production & Assembly",
+      "kpiScore": "98%",
+      "kpiScoreNum": 98,
+      "status": "Active",
+      "currentActivity": "Booking Transport",
+      "tasksCompleted": 99,
+      "callsHandled": 151,
+      "salesClosed": 14,
+      "totalRevenue": 961926,
+      "targetSales": 13,
+      "conversionRate": "9.3%",
+      "avgCallDurationSec": 199,
+      "avgResponseTimeMin": "3.6",
+      "weeklyKpiHistory": [
+      94,
+      94,
+      94,
+      98
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 37,
+      "qualifiedToBooked": 18,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 14
+    },
+      "activeTask": {
+      "id": "task-e18-1",
+      "title": "Coordinate with transport vendor for pickup for Soni Ventures",
+      "leadId": "LEAD-560",
+      "leadName": "Soni Ventures",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "21 mins",
+      "assignedAt": new Date("2026-08-24T09:03:29.589Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e18-2",
+      "title": "Pack spare parts kit (dies and heaters) for Soni Ventures",
+      "leadId": "LEAD-560",
+      "leadName": "Soni Ventures",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e19",
+      "name": "Karthik Verma",
+      "email": "karthik.verma@aps-enterprise.com",
+      "phone": "+91 9180426475",
+      "role": "Accounts Executive",
+      "department": "Operations & Administration",
+      "kpiScore": "83%",
+      "kpiScoreNum": 83,
+      "status": "Offline",
+      "currentActivity": "Creating Tax Invoice",
+      "tasksCompleted": 32,
+      "callsHandled": 50,
+      "salesClosed": 4,
+      "totalRevenue": 165472,
+      "targetSales": 8,
+      "conversionRate": "8.0%",
+      "avgCallDurationSec": 194,
+      "avgResponseTimeMin": "2.4",
+      "weeklyKpiHistory": [
+      81,
+      77,
+      80,
+      83
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 46,
+      "qualifiedToBooked": 24,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 4
+    },
+      "activeTask": {
+      "id": "task-e19-1",
+      "title": "Generate GST Tax Invoice for Chaturvedi Manufacturing",
+      "leadId": "LEAD-596",
+      "leadName": "Chaturvedi Manufacturing",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "41 mins",
+      "assignedAt": new Date("2026-08-24T08:45:35.475Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e19-2",
+      "title": "Approve final dispatch invoice & transport LR for Chaturvedi Manufacturing",
+      "leadId": "LEAD-596",
+      "leadName": "Chaturvedi Manufacturing",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)"
+    }
+    ]
+    },
+    {
+      "id": "e20",
+      "name": "Ramesh Goel",
+      "email": "ramesh.goel@aps-enterprise.com",
+      "phone": "+91 9721462050",
+      "role": "Telecaller Executive",
+      "department": "Sales",
+      "kpiScore": "77%",
+      "kpiScoreNum": 77,
+      "status": "Active",
+      "currentActivity": "Scheduling Demo",
+      "tasksCompleted": 21,
+      "callsHandled": 107,
+      "salesClosed": 8,
+      "totalRevenue": 525968,
+      "targetSales": 11,
+      "conversionRate": "7.5%",
+      "avgCallDurationSec": 145,
+      "avgResponseTimeMin": "6.1",
+      "weeklyKpiHistory": [
+      78,
+      79,
+      81,
+      77
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 78,
+      "qualifiedToBooked": 29,
+      "bookedToConfirmed": 13,
+      "confirmedToPaid": 8
+    },
+      "activeTask": {
+      "id": "task-e20-1",
+      "title": "Follow up on field demo schedule for Pandey Paper Cups",
+      "leadId": "LEAD-715",
+      "leadName": "Pandey Paper Cups",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "26 mins",
+      "assignedAt": new Date("2026-08-24T08:54:35.310Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e20-2",
+      "title": "Follow up on field demo schedule for Pandey Paper Cups",
+      "leadId": "LEAD-715",
+      "leadName": "Pandey Paper Cups",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e21",
+      "name": "Nikhil Nair",
+      "email": "nikhil.nair@aps-enterprise.com",
+      "phone": "+91 9940046837",
+      "role": "Direct Sales Executive",
+      "department": "Sales",
+      "kpiScore": "78%",
+      "kpiScoreNum": 78,
+      "status": "Active",
+      "currentActivity": "Scheduling Demo",
+      "tasksCompleted": 22,
+      "callsHandled": 292,
+      "salesClosed": 22,
+      "totalRevenue": 1931864,
+      "targetSales": 17,
+      "conversionRate": "7.5%",
+      "avgCallDurationSec": 196,
+      "avgResponseTimeMin": "2.7",
+      "weeklyKpiHistory": [
+      79,
+      77,
+      79,
+      78
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 53,
+      "qualifiedToBooked": 12,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 22
+    },
+      "activeTask": {
+      "id": "task-e21-1",
+      "title": "Follow up on field demo schedule for Rao Creations",
+      "leadId": "LEAD-159",
+      "leadName": "Rao Creations",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "49 mins",
+      "assignedAt": new Date("2026-08-24T08:33:41.837Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e21-2",
+      "title": "Conduct secondary telecaller qualification for Rao Creations",
+      "leadId": "LEAD-159",
+      "leadName": "Rao Creations",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry"
+    }
+    ]
+    },
+    {
+      "id": "e22",
+      "name": "Manish Mahajan",
+      "email": "manish.mahajan@aps-enterprise.com",
+      "phone": "+91 9549036488",
+      "role": "ERP Operations Admin",
+      "department": "Operations & Administration",
+      "kpiScore": "97%",
+      "kpiScoreNum": 97,
+      "status": "Active",
+      "currentActivity": "Reconciling Ledger",
+      "tasksCompleted": 89,
+      "callsHandled": 177,
+      "salesClosed": 17,
+      "totalRevenue": 1135668,
+      "targetSales": 27,
+      "conversionRate": "9.6%",
+      "avgCallDurationSec": 200,
+      "avgResponseTimeMin": "9.4",
+      "weeklyKpiHistory": [
+      90,
+      98,
+      97,
+      97
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 56,
+      "qualifiedToBooked": 35,
+      "bookedToConfirmed": 12,
+      "confirmedToPaid": 17
+    },
+      "activeTask": {
+      "id": "task-e22-1",
+      "title": "Verify Tally advance payment for machine booking by Shah Ventures",
+      "leadId": "LEAD-870",
+      "leadName": "Shah Ventures",
+      "priority": "High",
+      "type": "Payment Gate Verification",
+      "stage": "Confirmed Lead",
+      "dueIn": "21 mins",
+      "assignedAt": new Date("2026-08-24T08:39:07.294Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e22-2",
+      "title": "Send WhatsApp payment reminder for pending dispatch to Shah Ventures",
+      "leadId": "LEAD-870",
+      "leadName": "Shah Ventures",
+      "priority": "High",
+      "type": "Payment Reminder",
+      "stage": "Confirmed Lead"
+    }
+    ]
+    },
+    {
+      "id": "e23",
+      "name": "Sneha Pillai",
+      "email": "sneha.pillai@aps-enterprise.com",
+      "phone": "+91 9690455053",
+      "role": "Dispatch Coordinator",
+      "department": "Logistics & Service",
+      "kpiScore": "79%",
+      "kpiScoreNum": 79,
+      "status": "Active",
+      "currentActivity": "Validating Assembly",
+      "tasksCompleted": 56,
+      "callsHandled": 105,
+      "salesClosed": 8,
+      "totalRevenue": 224024,
+      "targetSales": 6,
+      "conversionRate": "7.6%",
+      "avgCallDurationSec": 234,
+      "avgResponseTimeMin": "1.4",
+      "weeklyKpiHistory": [
+      82,
+      76,
+      80,
+      79
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 60,
+      "qualifiedToBooked": 25,
+      "bookedToConfirmed": 14,
+      "confirmedToPaid": 8
+    },
+      "activeTask": {
+      "id": "task-e23-1",
+      "title": "Verify motor and heating coil assembly for Bansal Paper Products",
+      "leadId": "LEAD-969",
+      "leadName": "Bansal Paper Products",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "40 mins",
+      "assignedAt": new Date("2026-08-24T08:57:32.303Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e23-2",
+      "title": "Coordinate with transport vendor for pickup for Bansal Paper Products",
+      "leadId": "LEAD-969",
+      "leadName": "Bansal Paper Products",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e24",
+      "name": "Karan Kapoor",
+      "email": "karan.kapoor@aps-enterprise.com",
+      "phone": "+91 9756198198",
+      "role": "Assembly Supervisor",
+      "department": "Production & Assembly",
+      "kpiScore": "95%",
+      "kpiScoreNum": 95,
+      "status": "Active",
+      "currentActivity": "Booking Transport",
+      "tasksCompleted": 57,
+      "callsHandled": 80,
+      "salesClosed": 7,
+      "totalRevenue": 498512,
+      "targetSales": 10,
+      "conversionRate": "8.8%",
+      "avgCallDurationSec": 219,
+      "avgResponseTimeMin": "9.4",
+      "weeklyKpiHistory": [
+      92,
+      95,
+      99,
+      95
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 29,
+      "qualifiedToBooked": 23,
+      "bookedToConfirmed": 16,
+      "confirmedToPaid": 7
+    },
+      "activeTask": {
+      "id": "task-e24-1",
+      "title": "Coordinate with transport vendor for pickup for Saini Polymers",
+      "leadId": "LEAD-846",
+      "leadName": "Saini Polymers",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "20 mins",
+      "assignedAt": new Date("2026-08-24T09:07:01.806Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e24-2",
+      "title": "Verify motor and heating coil assembly for Saini Polymers",
+      "leadId": "LEAD-846",
+      "leadName": "Saini Polymers",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e25",
+      "name": "Kunal Das",
+      "email": "kunal.das@aps-enterprise.com",
+      "phone": "+91 9731488013",
+      "role": "ERP Operations Admin",
+      "department": "Operations & Administration",
+      "kpiScore": "77%",
+      "kpiScoreNum": 77,
+      "status": "Active",
+      "currentActivity": "Verifying Invoices",
+      "tasksCompleted": 84,
+      "callsHandled": 173,
+      "salesClosed": 13,
+      "totalRevenue": 478972,
+      "targetSales": 10,
+      "conversionRate": "7.5%",
+      "avgCallDurationSec": 235,
+      "avgResponseTimeMin": "6.9",
+      "weeklyKpiHistory": [
+      77,
+      80,
+      76,
+      77
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 34,
+      "qualifiedToBooked": 14,
+      "bookedToConfirmed": 5,
+      "confirmedToPaid": 13
+    },
+      "activeTask": {
+      "id": "task-e25-1",
+      "title": "Approve final dispatch invoice & transport LR for Roy Packers",
+      "leadId": "LEAD-969",
+      "leadName": "Roy Packers",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)",
+      "dueIn": "37 mins",
+      "assignedAt": new Date("2026-08-24T08:48:23.203Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e25-2",
+      "title": "Verify Tally advance payment for machine booking by Roy Packers",
+      "leadId": "LEAD-969",
+      "leadName": "Roy Packers",
+      "priority": "High",
+      "type": "Payment Gate Verification",
+      "stage": "Confirmed Lead"
+    }
+    ]
+    },
+    {
+      "id": "e26",
+      "name": "Rohan Kapoor",
+      "email": "rohan.kapoor@aps-enterprise.com",
+      "phone": "+91 9440809262",
+      "role": "Inventory Clerk",
+      "department": "Logistics & Service",
+      "kpiScore": "99%",
+      "kpiScoreNum": 99,
+      "status": "Active",
+      "currentActivity": "Booking Transport",
+      "tasksCompleted": 98,
+      "callsHandled": 292,
+      "salesClosed": 28,
+      "totalRevenue": 1660344,
+      "targetSales": 23,
+      "conversionRate": "9.6%",
+      "avgCallDurationSec": 168,
+      "avgResponseTimeMin": "7.8",
+      "weeklyKpiHistory": [
+      96,
+      90,
+      99,
+      99
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 71,
+      "qualifiedToBooked": 40,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 28
+    },
+      "activeTask": {
+      "id": "task-e26-1",
+      "title": "Coordinate with transport vendor for pickup for Mishra Manufacturing",
+      "leadId": "LEAD-465",
+      "leadName": "Mishra Manufacturing",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "36 mins",
+      "assignedAt": new Date("2026-08-24T09:03:16.553Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e26-2",
+      "title": "Pack spare parts kit (dies and heaters) for Mishra Manufacturing",
+      "leadId": "LEAD-465",
+      "leadName": "Mishra Manufacturing",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e27",
+      "name": "Meera Rathore",
+      "email": "meera.rathore@aps-enterprise.com",
+      "phone": "+91 9536112922",
+      "role": "Inventory Clerk",
+      "department": "Logistics & Service",
+      "kpiScore": "81%",
+      "kpiScoreNum": 81,
+      "status": "Active",
+      "currentActivity": "Testing Machinery",
+      "tasksCompleted": 93,
+      "callsHandled": 193,
+      "salesClosed": 15,
+      "totalRevenue": 452955,
+      "targetSales": 20,
+      "conversionRate": "7.8%",
+      "avgCallDurationSec": 70,
+      "avgResponseTimeMin": "0.0",
+      "weeklyKpiHistory": [
+      81,
+      77,
+      83,
+      81
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 57,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 15
+    },
+      "activeTask": {
+      "id": "task-e27-1",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
+      "leadId": "LEAD-416",
+      "leadName": "Tiwari Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production",
+      "dueIn": "10 mins",
+      "assignedAt": new Date("2026-08-24T09:02:55.752Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e27-2",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
+      "leadId": "LEAD-416",
+      "leadName": "Tiwari Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e28",
+      "name": "Ramesh Chauhan",
+      "email": "ramesh.chauhan@aps-enterprise.com",
+      "phone": "+91 9507516396",
+      "role": "Inventory Clerk",
+      "department": "Logistics & Service",
+      "kpiScore": "98%",
+      "kpiScoreNum": 98,
+      "status": "Active",
+      "currentActivity": "Testing Machinery",
+      "tasksCompleted": 20,
+      "callsHandled": 174,
+      "salesClosed": 17,
+      "totalRevenue": 422875,
+      "targetSales": 26,
+      "conversionRate": "9.8%",
+      "avgCallDurationSec": 96,
+      "avgResponseTimeMin": "3.0",
+      "weeklyKpiHistory": [
+      94,
+      93,
+      91,
+      98
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 58,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 17
+    },
+      "activeTask": {
+      "id": "task-e28-1",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
+      "leadId": "LEAD-357",
+      "leadName": "Patel Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production",
+      "dueIn": "33 mins",
+      "assignedAt": new Date("2026-08-24T08:36:30.556Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e28-2",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
+      "leadId": "LEAD-357",
+      "leadName": "Patel Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production"
+    }
+    ]
+    },
+    {
+      "id": "e29",
+      "name": "Akshay Thakur",
+      "email": "akshay.thakur@aps-enterprise.com",
+      "phone": "+91 9246769411",
+      "role": "Lead Qualification Specialist",
+      "department": "Operations & Administration",
+      "kpiScore": "97%",
+      "kpiScoreNum": 97,
+      "status": "Active",
+      "currentActivity": "Handling Operations",
+      "tasksCompleted": 66,
+      "callsHandled": 224,
+      "salesClosed": 21,
+      "totalRevenue": 1493604,
+      "targetSales": 22,
+      "conversionRate": "9.4%",
+      "avgCallDurationSec": 182,
+      "avgResponseTimeMin": "5.4",
+      "weeklyKpiHistory": [
+      96,
+      93,
+      94,
+      97
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 49,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 21
+    },
+      "activeTask": {
+      "id": "task-e29-1",
+      "title": "Conduct secondary telecaller qualification for Shah Plastics",
+      "leadId": "LEAD-485",
+      "leadName": "Shah Plastics",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "48 mins",
+      "assignedAt": new Date("2026-08-24T08:43:16.889Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e29-2",
+      "title": "Share quotation and ROI video for Dona Pattal setup with Shah Plastics",
+      "leadId": "LEAD-485",
+      "leadName": "Shah Plastics",
+      "priority": "Normal",
+      "type": "Sales Follow-up",
+      "stage": "Qualified"
+    }
+    ]
+    },
+    {
+      "id": "e30",
+      "name": "Siddharth Desai",
+      "email": "siddharth.desai@aps-enterprise.com",
+      "phone": "+91 9539433776",
+      "role": "Quality Testing Engineer",
+      "department": "Production & Assembly",
+      "kpiScore": "91%",
+      "kpiScoreNum": 91,
+      "status": "Active",
+      "currentActivity": "Packing Spare Parts",
+      "tasksCompleted": 51,
+      "callsHandled": 234,
+      "salesClosed": 21,
+      "totalRevenue": 1878429,
+      "targetSales": 23,
+      "conversionRate": "9.0%",
+      "avgCallDurationSec": 149,
+      "avgResponseTimeMin": "5.0",
+      "weeklyKpiHistory": [
+      90,
+      93,
+      98,
+      91
+    ],
+      "stageConversions": {
+      "enquiryToQualified": 48,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 21
+    },
+      "activeTask": {
+      "id": "task-e30-1",
+      "title": "Pack spare parts kit (dies and heaters) for Kapoor Paper Cups",
+      "leadId": "LEAD-887",
+      "leadName": "Kapoor Paper Cups",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "56 mins",
+      "assignedAt": new Date("2026-08-24T09:05:54.295Z")
+    },
+      "taskQueue": [
+      {
+      "id": "task-e30-2",
+      "title": "Coordinate with transport vendor for pickup for Kapoor Paper Cups",
+      "leadId": "LEAD-887",
+      "leadName": "Kapoor Paper Cups",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production"
+    }
+    ]
+    }
+  ],
   "mockActivityLogs": [
     {
       "id": "log-161",
@@ -6701,7 +8323,7 @@ const data = {
     {
       "id": "log-061",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-172",
       "leadName": "Jain Packaging",
       "action": "Logged inbound inquiry call (94s) for Raw Material (Silver Craft Paper Roll)",
@@ -7181,7 +8803,7 @@ const data = {
     {
       "id": "log-140",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-130",
       "leadName": "Roy Global",
       "action": "Verified Tally Advance Payment (₹15,000) for Double Die Paper Plate Machine",
@@ -7469,7 +9091,7 @@ const data = {
     {
       "id": "log-155",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-320",
       "leadName": "Das Paper Cups",
       "action": "Approved machine quotation & ROI specs for Double Die Paper Plate Machine setup",
@@ -8129,7 +9751,7 @@ const data = {
     {
       "id": "log-230",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-171",
       "leadName": "Dixit Industries",
       "action": "Conducted live factory video tour for Manish Dubey",
@@ -8153,7 +9775,7 @@ const data = {
     {
       "id": "log-055",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-052",
       "leadName": "Khan Paper Products",
       "action": "Logged inbound inquiry call (216s) for Semi-Automatic Dona Making Machine",
@@ -8273,7 +9895,7 @@ const data = {
     {
       "id": "log-163",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-273",
       "leadName": "Thakur Creations",
       "action": "Logged inbound inquiry call (262s) for Paper Bag Making Machine",
@@ -8945,7 +10567,7 @@ const data = {
     {
       "id": "log-244",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-253",
       "leadName": "Choudhary Traders",
       "action": "Conducted live factory video tour for Dhruv Tripathi",
@@ -9269,7 +10891,7 @@ const data = {
     {
       "id": "log-262",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-082",
       "leadName": "Das Enterprises",
       "action": "Automated WhatsApp sequence triggered for Das Enterprises (Payment Reminder)",
@@ -9689,7 +11311,7 @@ const data = {
     {
       "id": "log-197",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-178",
       "leadName": "Mishra Plastics",
       "action": "Qualified machinery requirements & budget (₹1,06,910)",
@@ -9725,7 +11347,7 @@ const data = {
     {
       "id": "log-329",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-243",
       "leadName": "Garg Polymers",
       "action": "Verified Tally Advance Payment (₹15,000) for Non-Woven Bag Making Machine",
@@ -9929,7 +11551,7 @@ const data = {
     {
       "id": "log-087",
       "employeeId": "e2",
-      "employeeName": "Bhavya",
+      "employeeName": "Sneha",
       "leadId": "LEAD-180",
       "leadName": "Thakur Disposables",
       "action": "Generated final GST Tax Invoice for Thakur Disposables",
@@ -10153,4187 +11775,6 @@ const data = {
       "toStage": "In Production",
       "details": "Action performed by Rohan Kapoor",
       "createdAt": new Date("2026-07-25T10:00:29.934Z")
-    }
-  ],
-  "mockEmployees": [
-    {
-      "id": "e1",
-      "name": "Animesh",
-      "email": "rahul.pathak@aps-enterprise.com",
-      "phone": "+91 9183073592",
-      "role": "Voice Operations & Sales Lead",
-      "department": "Voice Operations & Telecalling",
-      "kpiScore": "98%",
-      "kpiScoreNum": 98,
-      "status": "Active",
-      "currentActivity": "Scheduling Demo",
-      "tasksCompleted": 25,
-      "callsHandled": 90,
-      "salesClosed": 8,
-      "totalRevenue": 679952,
-      "targetSales": 9,
-      "conversionRate": "8.9%",
-      "avgCallDurationSec": 144,
-      "avgResponseTimeMin": "4.0",
-      "weeklyKpiHistory": [
-        91,
-        91,
-        97,
-        98
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 50,
-        "qualifiedToBooked": 38,
-        "bookedToConfirmed": 18,
-        "confirmedToPaid": 8
-      },
-      "activeTask": {
-        "id": "task-e1-1",
-        "title": "Follow up on field demo schedule for Kumar Traders",
-        "leadId": "LEAD-615",
-        "leadName": "Kumar Traders",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified",
-        "dueIn": "11 mins",
-        "assignedAt": new Date("2026-08-24T09:13:50.791Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e1-2",
-          "title": "Negotiate final pricing and discount for Kumar Traders",
-          "leadId": "LEAD-615",
-          "leadName": "Kumar Traders",
-          "priority": "High",
-          "type": "Sales Negotiation",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e2",
-      "name": "Bhavya",
-      "email": "rakesh.bansal@aps-enterprise.com",
-      "phone": "+91 9605758384",
-      "role": "Core Systems Architect & Admin",
-      "department": "Operations & Systems",
-      "kpiScore": "93%",
-      "kpiScoreNum": 93,
-      "status": "Active",
-      "currentActivity": "Scheduling Demo",
-      "tasksCompleted": 24,
-      "callsHandled": 129,
-      "salesClosed": 11,
-      "totalRevenue": 618310,
-      "targetSales": 15,
-      "conversionRate": "8.5%",
-      "avgCallDurationSec": 181,
-      "avgResponseTimeMin": "5.7",
-      "weeklyKpiHistory": [
-        92,
-        97,
-        90,
-        93
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 28,
-        "qualifiedToBooked": 28,
-        "bookedToConfirmed": 11,
-        "confirmedToPaid": 11
-      },
-      "activeTask": {
-        "id": "task-e2-1",
-        "title": "Follow up on field demo schedule for Iyer Packers",
-        "leadId": "LEAD-910",
-        "leadName": "Iyer Packers",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified",
-        "dueIn": "23 mins",
-        "assignedAt": new Date("2026-08-24T09:03:21.618Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e2-2",
-          "title": "Follow up on field demo schedule for Iyer Packers",
-          "leadId": "LEAD-910",
-          "leadName": "Iyer Packers",
-          "priority": "Normal",
-          "type": "Field Sales",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e3",
-      "name": "Aaditya",
-      "email": "suresh.verma@aps-enterprise.com",
-      "phone": "+91 9141026894",
-      "role": "Analytics & WhatsApp Lead",
-      "department": "Customer Success & Automation",
-      "kpiScore": "90%",
-      "kpiScoreNum": 90,
-      "status": "Active",
-      "currentActivity": "Drafting Quotation",
-      "tasksCompleted": 19,
-      "callsHandled": 122,
-      "salesClosed": 10,
-      "totalRevenue": 371760,
-      "targetSales": 14,
-      "conversionRate": "8.2%",
-      "avgCallDurationSec": 123,
-      "avgResponseTimeMin": "6.5",
-      "weeklyKpiHistory": [
-        98,
-        93,
-        91,
-        90
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 29,
-        "qualifiedToBooked": 32,
-        "bookedToConfirmed": 14,
-        "confirmedToPaid": 10
-      },
-      "activeTask": {
-        "id": "task-e3-1",
-        "title": "Share quotation and ROI video for Dona Pattal setup with Bose Polymers",
-        "leadId": "LEAD-763",
-        "leadName": "Bose Polymers",
-        "priority": "Normal",
-        "type": "Sales Follow-up",
-        "stage": "Qualified",
-        "dueIn": "37 mins",
-        "assignedAt": new Date("2026-08-24T09:00:38.211Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e3-2",
-          "title": "Follow up on field demo schedule for Bose Polymers",
-          "leadId": "LEAD-763",
-          "leadName": "Bose Polymers",
-          "priority": "Normal",
-          "type": "Field Sales",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e4",
-      "name": "Pooja Sharma",
-      "email": "kunal.sen@aps-enterprise.com",
-      "phone": "+91 9475613762",
-      "role": "Senior Telecaller & Conversion Spec",
-      "department": "Inside Sales",
-      "kpiScore": "67%",
-      "kpiScoreNum": 67,
-      "status": "Active",
-      "currentActivity": "Scheduling Demo",
-      "tasksCompleted": 67,
-      "callsHandled": 74,
-      "salesClosed": 4,
-      "totalRevenue": 341056,
-      "targetSales": 14,
-      "conversionRate": "5.4%",
-      "avgCallDurationSec": 151,
-      "avgResponseTimeMin": "8.5",
-      "weeklyKpiHistory": [
-        64,
-        66,
-        63,
-        67
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 52,
-        "qualifiedToBooked": 29,
-        "bookedToConfirmed": 13,
-        "confirmedToPaid": 4
-      },
-      "activeTask": {
-        "id": "task-e4-1",
-        "title": "Follow up on field demo schedule for Das Global",
-        "leadId": "LEAD-115",
-        "leadName": "Das Global",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified",
-        "dueIn": "17 mins",
-        "assignedAt": new Date("2026-08-24T08:35:27.945Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e4-2",
-          "title": "Negotiate final pricing and discount for Das Global",
-          "leadId": "LEAD-115",
-          "leadName": "Das Global",
-          "priority": "High",
-          "type": "Sales Negotiation",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e5",
-      "name": "Rohan Mehta",
-      "email": "harsh.dixit@aps-enterprise.com",
-      "phone": "+91 9716940960",
-      "role": "ERP & Factory Dispatch Officer",
-      "department": "Manufacturing Operations",
-      "kpiScore": "64%",
-      "kpiScoreNum": 64,
-      "status": "Active",
-      "currentActivity": "Packing Spare Parts",
-      "tasksCompleted": 99,
-      "callsHandled": 152,
-      "salesClosed": 9,
-      "totalRevenue": 405234,
-      "targetSales": 10,
-      "conversionRate": "5.9%",
-      "avgCallDurationSec": 138,
-      "avgResponseTimeMin": "1.2",
-      "weeklyKpiHistory": [
-        65,
-        63,
-        64,
-        64
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 44,
-        "qualifiedToBooked": 33,
-        "bookedToConfirmed": 18,
-        "confirmedToPaid": 9
-      },
-      "activeTask": {
-        "id": "task-e5-1",
-        "title": "Pack spare parts kit (dies and heaters) for Bose Solutions",
-        "leadId": "LEAD-930",
-        "leadName": "Bose Solutions",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production",
-        "dueIn": "37 mins",
-        "assignedAt": new Date("2026-08-24T09:00:55.370Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e5-2",
-          "title": "Test and calibrate hydraulics for Double Die Machine for Bose Solutions",
-          "leadId": "LEAD-930",
-          "leadName": "Bose Solutions",
-          "priority": "Normal",
-          "type": "Quality Testing",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e6",
-      "name": "Dhruv Bhatia",
-      "email": "dhruv.bhatia@aps-enterprise.com",
-      "phone": "+91 9312518082",
-      "role": "Machine Fitter",
-      "department": "Dispatch & Logistics",
-      "kpiScore": "82%",
-      "kpiScoreNum": 82,
-      "status": "Offline",
-      "currentActivity": "Booking Transport",
-      "tasksCompleted": 70,
-      "callsHandled": 233,
-      "salesClosed": 19,
-      "totalRevenue": 642105,
-      "targetSales": 29,
-      "conversionRate": "8.2%",
-      "avgCallDurationSec": 216,
-      "avgResponseTimeMin": "2.2",
-      "weeklyKpiHistory": [
-        82,
-        83,
-        75,
-        82
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 20,
-        "qualifiedToBooked": 33,
-        "bookedToConfirmed": 19,
-        "confirmedToPaid": 19
-      },
-      "activeTask": {
-        "id": "task-e6-1",
-        "title": "Coordinate with transport vendor for pickup for Nair Enterprises",
-        "leadId": "LEAD-136",
-        "leadName": "Nair Enterprises",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production",
-        "dueIn": "33 mins",
-        "assignedAt": new Date("2026-08-24T09:08:11.394Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e6-2",
-          "title": "Pack spare parts kit (dies and heaters) for Nair Enterprises",
-          "leadId": "LEAD-136",
-          "leadName": "Nair Enterprises",
-          "priority": "Normal",
-          "type": "Spare Parts Allocation",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e7",
-      "name": "Animesh Saini",
-      "email": "animesh.saini@aps-enterprise.com",
-      "phone": "+91 9768854464",
-      "role": "Quality Testing Engineer",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "75%",
-      "kpiScoreNum": 75,
-      "status": "Active",
-      "currentActivity": "Validating Assembly",
-      "tasksCompleted": 62,
-      "callsHandled": 197,
-      "salesClosed": 14,
-      "totalRevenue": 878976,
-      "targetSales": 22,
-      "conversionRate": "7.1%",
-      "avgCallDurationSec": 126,
-      "avgResponseTimeMin": "5.7",
-      "weeklyKpiHistory": [
-        76,
-        75,
-        78,
-        75
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 71,
-        "qualifiedToBooked": 37,
-        "bookedToConfirmed": 18,
-        "confirmedToPaid": 14
-      },
-      "activeTask": {
-        "id": "task-e7-1",
-        "title": "Verify motor and heating coil assembly for Goel Solutions",
-        "leadId": "LEAD-135",
-        "leadName": "Goel Solutions",
-        "priority": "Normal",
-        "type": "Assembly Check",
-        "stage": "In Production",
-        "dueIn": "57 mins",
-        "assignedAt": new Date("2026-08-24T08:49:38.099Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e7-2",
-          "title": "Test and calibrate hydraulics for Double Die Machine for Goel Solutions",
-          "leadId": "LEAD-135",
-          "leadName": "Goel Solutions",
-          "priority": "Normal",
-          "type": "Quality Testing",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e8",
-      "name": "Rahul Choudhary",
-      "email": "rahul.choudhary@aps-enterprise.com",
-      "phone": "+91 9969424283",
-      "role": "Dispatch Coordinator",
-      "department": "Accounts & ERP",
-      "kpiScore": "95%",
-      "kpiScoreNum": 95,
-      "status": "Active",
-      "currentActivity": "Packing Spare Parts",
-      "tasksCompleted": 16,
-      "callsHandled": 135,
-      "salesClosed": 12,
-      "totalRevenue": 433644,
-      "targetSales": 14,
-      "conversionRate": "8.9%",
-      "avgCallDurationSec": 81,
-      "avgResponseTimeMin": "8.7",
-      "weeklyKpiHistory": [
-        95,
-        93,
-        99,
-        95
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 70,
-        "qualifiedToBooked": 34,
-        "bookedToConfirmed": 9,
-        "confirmedToPaid": 12
-      },
-      "activeTask": {
-        "id": "task-e8-1",
-        "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
-        "leadId": "LEAD-758",
-        "leadName": "Singh Polymers",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production",
-        "dueIn": "14 mins",
-        "assignedAt": new Date("2026-08-24T09:09:55.899Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e8-2",
-          "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
-          "leadId": "LEAD-758",
-          "leadName": "Singh Polymers",
-          "priority": "Normal",
-          "type": "Spare Parts Allocation",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e9",
-      "name": "Manish Mahajan",
-      "email": "manish.mahajan@aps-enterprise.com",
-      "phone": "+91 9606890406",
-      "role": "Inventory Clerk",
-      "department": "Machine Assembly & Production",
-      "kpiScore": "77%",
-      "kpiScoreNum": 77,
-      "status": "Active",
-      "currentActivity": "Validating Assembly",
-      "tasksCompleted": 64,
-      "callsHandled": 91,
-      "salesClosed": 7,
-      "totalRevenue": 316512,
-      "targetSales": 6,
-      "conversionRate": "7.7%",
-      "avgCallDurationSec": 165,
-      "avgResponseTimeMin": "2.9",
-      "weeklyKpiHistory": [
-        81,
-        75,
-        81,
-        77
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 38,
-        "qualifiedToBooked": 40,
-        "bookedToConfirmed": 17,
-        "confirmedToPaid": 7
-      },
-      "activeTask": {
-        "id": "task-e9-1",
-        "title": "Verify motor and heating coil assembly for Garg Packers",
-        "leadId": "LEAD-289",
-        "leadName": "Garg Packers",
-        "priority": "Normal",
-        "type": "Assembly Check",
-        "stage": "In Production",
-        "dueIn": "54 mins",
-        "assignedAt": new Date("2026-08-24T08:37:42.316Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e9-2",
-          "title": "Dispatch fully automatic machine via transport for Garg Packers",
-          "leadId": "LEAD-289",
-          "leadName": "Garg Packers",
-          "priority": "High",
-          "type": "Factory Dispatch",
-          "stage": "Dispatched"
-        }
-      ]
-    },
-    {
-      "id": "e10",
-      "name": "Dev Patel",
-      "email": "dev.patel@aps-enterprise.com",
-      "phone": "+91 9434695766",
-      "role": "Accounts Executive",
-      "department": "Accounts & ERP",
-      "kpiScore": "75%",
-      "kpiScoreNum": 75,
-      "status": "Active",
-      "currentActivity": "Creating Tax Invoice",
-      "tasksCompleted": 57,
-      "callsHandled": 284,
-      "salesClosed": 21,
-      "totalRevenue": 1530984,
-      "targetSales": 29,
-      "conversionRate": "7.4%",
-      "avgCallDurationSec": 177,
-      "avgResponseTimeMin": "1.1",
-      "weeklyKpiHistory": [
-        82,
-        84,
-        76,
-        75
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 50,
-        "qualifiedToBooked": 38,
-        "bookedToConfirmed": 16,
-        "confirmedToPaid": 21
-      },
-      "activeTask": {
-        "id": "task-e10-1",
-        "title": "Generate GST Tax Invoice for Chaturvedi Creations",
-        "leadId": "LEAD-694",
-        "leadName": "Chaturvedi Creations",
-        "priority": "High",
-        "type": "Invoicing",
-        "stage": "Client (Paid)",
-        "dueIn": "9 mins",
-        "assignedAt": new Date("2026-08-24T08:49:01.275Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e10-2",
-          "title": "Approve final dispatch invoice & transport LR for Chaturvedi Creations",
-          "leadId": "LEAD-694",
-          "leadName": "Chaturvedi Creations",
-          "priority": "Normal",
-          "type": "Factory Release Authorization",
-          "stage": "Client (Paid)"
-        }
-      ]
-    },
-    {
-      "id": "e11",
-      "name": "Kabir Mahajan",
-      "email": "kabir.mahajan@aps-enterprise.com",
-      "phone": "+91 9875417161",
-      "role": "ERP Operations Admin",
-      "department": "Dispatch & Logistics",
-      "kpiScore": "68%",
-      "kpiScoreNum": 68,
-      "status": "Active",
-      "currentActivity": "Verifying Invoices",
-      "tasksCompleted": 59,
-      "callsHandled": 100,
-      "salesClosed": 6,
-      "totalRevenue": 458970,
-      "targetSales": 13,
-      "conversionRate": "6.0%",
-      "avgCallDurationSec": 122,
-      "avgResponseTimeMin": "0.1",
-      "weeklyKpiHistory": [
-        63,
-        65,
-        65,
-        68
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 34,
-        "qualifiedToBooked": 13,
-        "bookedToConfirmed": 17,
-        "confirmedToPaid": 6
-      },
-      "activeTask": {
-        "id": "task-e11-1",
-        "title": "Approve final dispatch invoice & transport LR for Choudhary Paper Products",
-        "leadId": "LEAD-689",
-        "leadName": "Choudhary Paper Products",
-        "priority": "Normal",
-        "type": "Factory Release Authorization",
-        "stage": "Client (Paid)",
-        "dueIn": "50 mins",
-        "assignedAt": new Date("2026-08-24T09:08:07.225Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e11-2",
-          "title": "Review Booking Specs & Dual-Approval Countersign for Choudhary Paper Products",
-          "leadId": "LEAD-689",
-          "leadName": "Choudhary Paper Products",
-          "priority": "Urgent",
-          "type": "Admin Dual-Approval",
-          "stage": "Booked"
-        }
-      ]
-    },
-    {
-      "id": "e12",
-      "name": "Bhumika Rao",
-      "email": "bhumika.rao@aps-enterprise.com",
-      "phone": "+91 9670349626",
-      "role": "Spare Parts Manager",
-      "department": "Direct Field Sales",
-      "kpiScore": "60%",
-      "kpiScoreNum": 60,
-      "status": "Active",
-      "currentActivity": "Creating Tax Invoice",
-      "tasksCompleted": 46,
-      "callsHandled": 254,
-      "salesClosed": 15,
-      "totalRevenue": 552585,
-      "targetSales": 13,
-      "conversionRate": "5.9%",
-      "avgCallDurationSec": 191,
-      "avgResponseTimeMin": "8.8",
-      "weeklyKpiHistory": [
-        60,
-        67,
-        61,
-        60
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 74,
-        "qualifiedToBooked": 33,
-        "bookedToConfirmed": 18,
-        "confirmedToPaid": 15
-      },
-      "activeTask": {
-        "id": "task-e12-1",
-        "title": "Generate GST Tax Invoice for Dixit Disposables",
-        "leadId": "LEAD-308",
-        "leadName": "Dixit Disposables",
-        "priority": "High",
-        "type": "Invoicing",
-        "stage": "Client (Paid)",
-        "dueIn": "45 mins",
-        "assignedAt": new Date("2026-08-24T08:56:10.749Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e12-2",
-          "title": "Review Booking Specs & Dual-Approval Countersign for Dixit Disposables",
-          "leadId": "LEAD-308",
-          "leadName": "Dixit Disposables",
-          "priority": "Urgent",
-          "type": "Admin Dual-Approval",
-          "stage": "Booked"
-        }
-      ]
-    },
-    {
-      "id": "e13",
-      "name": "Rajesh Khatri",
-      "email": "rajesh.khatri@aps-enterprise.com",
-      "phone": "+91 9410859666",
-      "role": "Field Sales Manager",
-      "department": "Dispatch & Logistics",
-      "kpiScore": "84%",
-      "kpiScoreNum": 84,
-      "status": "Active",
-      "currentActivity": "Negotiating Pricing",
-      "tasksCompleted": 64,
-      "callsHandled": 206,
-      "salesClosed": 17,
-      "totalRevenue": 795940,
-      "targetSales": 25,
-      "conversionRate": "8.3%",
-      "avgCallDurationSec": 169,
-      "avgResponseTimeMin": "1.3",
-      "weeklyKpiHistory": [
-        75,
-        77,
-        76,
-        84
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 80,
-        "qualifiedToBooked": 30,
-        "bookedToConfirmed": 19,
-        "confirmedToPaid": 17
-      },
-      "activeTask": {
-        "id": "task-e13-1",
-        "title": "Negotiate final pricing and discount for Patel Industries",
-        "leadId": "LEAD-380",
-        "leadName": "Patel Industries",
-        "priority": "High",
-        "type": "Sales Negotiation",
-        "stage": "Qualified",
-        "dueIn": "25 mins",
-        "assignedAt": new Date("2026-08-24T08:46:27.399Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e13-2",
-          "title": "Negotiate final pricing and discount for Patel Industries",
-          "leadId": "LEAD-380",
-          "leadName": "Patel Industries",
-          "priority": "High",
-          "type": "Sales Negotiation",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e14",
-      "name": "Bhavya Chauhan",
-      "email": "bhavya.chauhan@aps-enterprise.com",
-      "phone": "+91 9686985337",
-      "role": "Direct Sales Executive",
-      "department": "Dispatch & Logistics",
-      "kpiScore": "98%",
-      "kpiScoreNum": 98,
-      "status": "Active",
-      "currentActivity": "Handling Operations",
-      "tasksCompleted": 26,
-      "callsHandled": 199,
-      "salesClosed": 19,
-      "totalRevenue": 647577,
-      "targetSales": 25,
-      "conversionRate": "9.5%",
-      "avgCallDurationSec": 121,
-      "avgResponseTimeMin": "7.9",
-      "weeklyKpiHistory": [
-        95,
-        96,
-        92,
-        98
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 54,
-        "qualifiedToBooked": 25,
-        "bookedToConfirmed": 17,
-        "confirmedToPaid": 19
-      },
-      "activeTask": {
-        "id": "task-e14-1",
-        "title": "Conduct secondary telecaller qualification for Pandey Global",
-        "leadId": "LEAD-258",
-        "leadName": "Pandey Global",
-        "priority": "Normal",
-        "type": "Telecalling",
-        "stage": "Enquiry",
-        "dueIn": "28 mins",
-        "assignedAt": new Date("2026-08-24T09:01:58.778Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e14-2",
-          "title": "Share quotation and ROI video for Dona Pattal setup with Pandey Global",
-          "leadId": "LEAD-258",
-          "leadName": "Pandey Global",
-          "priority": "Normal",
-          "type": "Sales Follow-up",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e15",
-      "name": "Ravi Reddy",
-      "email": "ravi.reddy@aps-enterprise.com",
-      "phone": "+91 9270888073",
-      "role": "Lead Qualification Specialist",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "80%",
-      "kpiScoreNum": 80,
-      "status": "Active",
-      "currentActivity": "Handling Operations",
-      "tasksCompleted": 18,
-      "callsHandled": 213,
-      "salesClosed": 17,
-      "totalRevenue": 1129701,
-      "targetSales": 15,
-      "conversionRate": "8.0%",
-      "avgCallDurationSec": 191,
-      "avgResponseTimeMin": "8.1",
-      "weeklyKpiHistory": [
-        82,
-        83,
-        77,
-        80
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 49,
-        "qualifiedToBooked": 12,
-        "bookedToConfirmed": 9,
-        "confirmedToPaid": 17
-      },
-      "activeTask": {
-        "id": "task-e15-1",
-        "title": "Conduct secondary telecaller qualification for Pathak Paper Products",
-        "leadId": "LEAD-785",
-        "leadName": "Pathak Paper Products",
-        "priority": "Normal",
-        "type": "Telecalling",
-        "stage": "Enquiry",
-        "dueIn": "31 mins",
-        "assignedAt": new Date("2026-08-24T08:37:38.226Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e15-2",
-          "title": "Outbound follow-up for Double Die Machine enquiry from Pathak Paper Products",
-          "leadId": "LEAD-785",
-          "leadName": "Pathak Paper Products",
-          "priority": "High",
-          "type": "Sales Qualification",
-          "stage": "Enquiry"
-        }
-      ]
-    },
-    {
-      "id": "e16",
-      "name": "Karan Bose",
-      "email": "karan.bose@aps-enterprise.com",
-      "phone": "+91 9152734797",
-      "role": "Lead Qualification Specialist",
-      "department": "Direct Field Sales",
-      "kpiScore": "60%",
-      "kpiScoreNum": 60,
-      "status": "Active",
-      "currentActivity": "Live Outbound Telecall",
-      "tasksCompleted": 39,
-      "callsHandled": 192,
-      "salesClosed": 11,
-      "totalRevenue": 589105,
-      "targetSales": 10,
-      "conversionRate": "5.7%",
-      "avgCallDurationSec": 83,
-      "avgResponseTimeMin": "9.6",
-      "weeklyKpiHistory": [
-        66,
-        67,
-        69,
-        60
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 32,
-        "qualifiedToBooked": 34,
-        "bookedToConfirmed": 19,
-        "confirmedToPaid": 11
-      },
-      "activeTask": {
-        "id": "task-e16-1",
-        "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
-        "leadId": "LEAD-977",
-        "leadName": "Thakur Packaging",
-        "priority": "High",
-        "type": "Sales Qualification",
-        "stage": "Enquiry",
-        "dueIn": "45 mins",
-        "assignedAt": new Date("2026-08-24T08:51:02.182Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e16-2",
-          "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
-          "leadId": "LEAD-977",
-          "leadName": "Thakur Packaging",
-          "priority": "High",
-          "type": "Sales Qualification",
-          "stage": "Enquiry"
-        }
-      ]
-    },
-    {
-      "id": "e17",
-      "name": "Suresh Soni",
-      "email": "suresh.soni@aps-enterprise.com",
-      "phone": "+91 9852033735",
-      "role": "Assembly Supervisor",
-      "department": "Spare Parts & Service",
-      "kpiScore": "99%",
-      "kpiScoreNum": 99,
-      "status": "Active",
-      "currentActivity": "Packing Spare Parts",
-      "tasksCompleted": 65,
-      "callsHandled": 172,
-      "salesClosed": 17,
-      "totalRevenue": 1663705,
-      "targetSales": 18,
-      "conversionRate": "9.9%",
-      "avgCallDurationSec": 159,
-      "avgResponseTimeMin": "9.0",
-      "weeklyKpiHistory": [
-        98,
-        91,
-        99,
-        99
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 27,
-        "qualifiedToBooked": 13,
-        "bookedToConfirmed": 11,
-        "confirmedToPaid": 17
-      },
-      "activeTask": {
-        "id": "task-e17-1",
-        "title": "Pack spare parts kit (dies and heaters) for Mehta Solutions",
-        "leadId": "LEAD-462",
-        "leadName": "Mehta Solutions",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production",
-        "dueIn": "57 mins",
-        "assignedAt": new Date("2026-08-24T09:08:50.177Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e17-2",
-          "title": "Generate Production Job Card for Hydraulic Press Machine for Mehta Solutions",
-          "leadId": "LEAD-462",
-          "leadName": "Mehta Solutions",
-          "priority": "High",
-          "type": "ERP Factory Release",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e18",
-      "name": "Nikhil Patel",
-      "email": "nikhil.patel@aps-enterprise.com",
-      "phone": "+91 9998795437",
-      "role": "Quality Testing Engineer",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "98%",
-      "kpiScoreNum": 98,
-      "status": "Active",
-      "currentActivity": "Booking Transport",
-      "tasksCompleted": 99,
-      "callsHandled": 151,
-      "salesClosed": 14,
-      "totalRevenue": 961926,
-      "targetSales": 13,
-      "conversionRate": "9.3%",
-      "avgCallDurationSec": 199,
-      "avgResponseTimeMin": "3.6",
-      "weeklyKpiHistory": [
-        94,
-        94,
-        94,
-        98
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 37,
-        "qualifiedToBooked": 18,
-        "bookedToConfirmed": 7,
-        "confirmedToPaid": 14
-      },
-      "activeTask": {
-        "id": "task-e18-1",
-        "title": "Coordinate with transport vendor for pickup for Soni Ventures",
-        "leadId": "LEAD-560",
-        "leadName": "Soni Ventures",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production",
-        "dueIn": "21 mins",
-        "assignedAt": new Date("2026-08-24T09:03:29.589Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e18-2",
-          "title": "Pack spare parts kit (dies and heaters) for Soni Ventures",
-          "leadId": "LEAD-560",
-          "leadName": "Soni Ventures",
-          "priority": "Normal",
-          "type": "Spare Parts Allocation",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e19",
-      "name": "Karthik Verma",
-      "email": "karthik.verma@aps-enterprise.com",
-      "phone": "+91 9180426475",
-      "role": "Accounts Executive",
-      "department": "Dispatch & Logistics",
-      "kpiScore": "83%",
-      "kpiScoreNum": 83,
-      "status": "Offline",
-      "currentActivity": "Creating Tax Invoice",
-      "tasksCompleted": 32,
-      "callsHandled": 50,
-      "salesClosed": 4,
-      "totalRevenue": 165472,
-      "targetSales": 8,
-      "conversionRate": "8.0%",
-      "avgCallDurationSec": 194,
-      "avgResponseTimeMin": "2.4",
-      "weeklyKpiHistory": [
-        81,
-        77,
-        80,
-        83
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 46,
-        "qualifiedToBooked": 24,
-        "bookedToConfirmed": 19,
-        "confirmedToPaid": 4
-      },
-      "activeTask": {
-        "id": "task-e19-1",
-        "title": "Generate GST Tax Invoice for Chaturvedi Manufacturing",
-        "leadId": "LEAD-596",
-        "leadName": "Chaturvedi Manufacturing",
-        "priority": "High",
-        "type": "Invoicing",
-        "stage": "Client (Paid)",
-        "dueIn": "41 mins",
-        "assignedAt": new Date("2026-08-24T08:45:35.475Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e19-2",
-          "title": "Approve final dispatch invoice & transport LR for Chaturvedi Manufacturing",
-          "leadId": "LEAD-596",
-          "leadName": "Chaturvedi Manufacturing",
-          "priority": "Normal",
-          "type": "Factory Release Authorization",
-          "stage": "Client (Paid)"
-        }
-      ]
-    },
-    {
-      "id": "e20",
-      "name": "Ramesh Goel",
-      "email": "ramesh.goel@aps-enterprise.com",
-      "phone": "+91 9721462050",
-      "role": "Telecaller Executive",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "77%",
-      "kpiScoreNum": 77,
-      "status": "Active",
-      "currentActivity": "Scheduling Demo",
-      "tasksCompleted": 21,
-      "callsHandled": 107,
-      "salesClosed": 8,
-      "totalRevenue": 525968,
-      "targetSales": 11,
-      "conversionRate": "7.5%",
-      "avgCallDurationSec": 145,
-      "avgResponseTimeMin": "6.1",
-      "weeklyKpiHistory": [
-        78,
-        79,
-        81,
-        77
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 78,
-        "qualifiedToBooked": 29,
-        "bookedToConfirmed": 13,
-        "confirmedToPaid": 8
-      },
-      "activeTask": {
-        "id": "task-e20-1",
-        "title": "Follow up on field demo schedule for Pandey Paper Cups",
-        "leadId": "LEAD-715",
-        "leadName": "Pandey Paper Cups",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified",
-        "dueIn": "26 mins",
-        "assignedAt": new Date("2026-08-24T08:54:35.310Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e20-2",
-          "title": "Follow up on field demo schedule for Pandey Paper Cups",
-          "leadId": "LEAD-715",
-          "leadName": "Pandey Paper Cups",
-          "priority": "Normal",
-          "type": "Field Sales",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e21",
-      "name": "Nikhil Nair",
-      "email": "nikhil.nair@aps-enterprise.com",
-      "phone": "+91 9940046837",
-      "role": "Direct Sales Executive",
-      "department": "Spare Parts & Service",
-      "kpiScore": "78%",
-      "kpiScoreNum": 78,
-      "status": "Active",
-      "currentActivity": "Scheduling Demo",
-      "tasksCompleted": 22,
-      "callsHandled": 292,
-      "salesClosed": 22,
-      "totalRevenue": 1931864,
-      "targetSales": 17,
-      "conversionRate": "7.5%",
-      "avgCallDurationSec": 196,
-      "avgResponseTimeMin": "2.7",
-      "weeklyKpiHistory": [
-        79,
-        77,
-        79,
-        78
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 53,
-        "qualifiedToBooked": 12,
-        "bookedToConfirmed": 7,
-        "confirmedToPaid": 22
-      },
-      "activeTask": {
-        "id": "task-e21-1",
-        "title": "Follow up on field demo schedule for Rao Creations",
-        "leadId": "LEAD-159",
-        "leadName": "Rao Creations",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified",
-        "dueIn": "49 mins",
-        "assignedAt": new Date("2026-08-24T08:33:41.837Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e21-2",
-          "title": "Conduct secondary telecaller qualification for Rao Creations",
-          "leadId": "LEAD-159",
-          "leadName": "Rao Creations",
-          "priority": "Normal",
-          "type": "Telecalling",
-          "stage": "Enquiry"
-        }
-      ]
-    },
-    {
-      "id": "e22",
-      "name": "Manish Mahajan",
-      "email": "manish.mahajan@aps-enterprise.com",
-      "phone": "+91 9549036488",
-      "role": "ERP Operations Admin",
-      "department": "Accounts & ERP",
-      "kpiScore": "97%",
-      "kpiScoreNum": 97,
-      "status": "Active",
-      "currentActivity": "Reconciling Ledger",
-      "tasksCompleted": 89,
-      "callsHandled": 177,
-      "salesClosed": 17,
-      "totalRevenue": 1135668,
-      "targetSales": 27,
-      "conversionRate": "9.6%",
-      "avgCallDurationSec": 200,
-      "avgResponseTimeMin": "9.4",
-      "weeklyKpiHistory": [
-        90,
-        98,
-        97,
-        97
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 56,
-        "qualifiedToBooked": 35,
-        "bookedToConfirmed": 12,
-        "confirmedToPaid": 17
-      },
-      "activeTask": {
-        "id": "task-e22-1",
-        "title": "Verify Tally advance payment for machine booking by Shah Ventures",
-        "leadId": "LEAD-870",
-        "leadName": "Shah Ventures",
-        "priority": "High",
-        "type": "Payment Gate Verification",
-        "stage": "Confirmed Lead",
-        "dueIn": "21 mins",
-        "assignedAt": new Date("2026-08-24T08:39:07.294Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e22-2",
-          "title": "Send WhatsApp payment reminder for pending dispatch to Shah Ventures",
-          "leadId": "LEAD-870",
-          "leadName": "Shah Ventures",
-          "priority": "High",
-          "type": "Payment Reminder",
-          "stage": "Confirmed Lead"
-        }
-      ]
-    },
-    {
-      "id": "e23",
-      "name": "Sneha Pillai",
-      "email": "sneha.pillai@aps-enterprise.com",
-      "phone": "+91 9690455053",
-      "role": "Dispatch Coordinator",
-      "department": "Machine Assembly & Production",
-      "kpiScore": "79%",
-      "kpiScoreNum": 79,
-      "status": "Active",
-      "currentActivity": "Validating Assembly",
-      "tasksCompleted": 56,
-      "callsHandled": 105,
-      "salesClosed": 8,
-      "totalRevenue": 224024,
-      "targetSales": 6,
-      "conversionRate": "7.6%",
-      "avgCallDurationSec": 234,
-      "avgResponseTimeMin": "1.4",
-      "weeklyKpiHistory": [
-        82,
-        76,
-        80,
-        79
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 60,
-        "qualifiedToBooked": 25,
-        "bookedToConfirmed": 14,
-        "confirmedToPaid": 8
-      },
-      "activeTask": {
-        "id": "task-e23-1",
-        "title": "Verify motor and heating coil assembly for Bansal Paper Products",
-        "leadId": "LEAD-969",
-        "leadName": "Bansal Paper Products",
-        "priority": "Normal",
-        "type": "Assembly Check",
-        "stage": "In Production",
-        "dueIn": "40 mins",
-        "assignedAt": new Date("2026-08-24T08:57:32.303Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e23-2",
-          "title": "Coordinate with transport vendor for pickup for Bansal Paper Products",
-          "leadId": "LEAD-969",
-          "leadName": "Bansal Paper Products",
-          "priority": "Normal",
-          "type": "Logistics",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e24",
-      "name": "Karan Kapoor",
-      "email": "karan.kapoor@aps-enterprise.com",
-      "phone": "+91 9756198198",
-      "role": "Assembly Supervisor",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "95%",
-      "kpiScoreNum": 95,
-      "status": "Active",
-      "currentActivity": "Booking Transport",
-      "tasksCompleted": 57,
-      "callsHandled": 80,
-      "salesClosed": 7,
-      "totalRevenue": 498512,
-      "targetSales": 10,
-      "conversionRate": "8.8%",
-      "avgCallDurationSec": 219,
-      "avgResponseTimeMin": "9.4",
-      "weeklyKpiHistory": [
-        92,
-        95,
-        99,
-        95
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 29,
-        "qualifiedToBooked": 23,
-        "bookedToConfirmed": 16,
-        "confirmedToPaid": 7
-      },
-      "activeTask": {
-        "id": "task-e24-1",
-        "title": "Coordinate with transport vendor for pickup for Saini Polymers",
-        "leadId": "LEAD-846",
-        "leadName": "Saini Polymers",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production",
-        "dueIn": "20 mins",
-        "assignedAt": new Date("2026-08-24T09:07:01.806Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e24-2",
-          "title": "Verify motor and heating coil assembly for Saini Polymers",
-          "leadId": "LEAD-846",
-          "leadName": "Saini Polymers",
-          "priority": "Normal",
-          "type": "Assembly Check",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e25",
-      "name": "Kunal Das",
-      "email": "kunal.das@aps-enterprise.com",
-      "phone": "+91 9731488013",
-      "role": "ERP Operations Admin",
-      "department": "Spare Parts & Service",
-      "kpiScore": "77%",
-      "kpiScoreNum": 77,
-      "status": "Active",
-      "currentActivity": "Verifying Invoices",
-      "tasksCompleted": 84,
-      "callsHandled": 173,
-      "salesClosed": 13,
-      "totalRevenue": 478972,
-      "targetSales": 10,
-      "conversionRate": "7.5%",
-      "avgCallDurationSec": 235,
-      "avgResponseTimeMin": "6.9",
-      "weeklyKpiHistory": [
-        77,
-        80,
-        76,
-        77
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 34,
-        "qualifiedToBooked": 14,
-        "bookedToConfirmed": 5,
-        "confirmedToPaid": 13
-      },
-      "activeTask": {
-        "id": "task-e25-1",
-        "title": "Approve final dispatch invoice & transport LR for Roy Packers",
-        "leadId": "LEAD-969",
-        "leadName": "Roy Packers",
-        "priority": "Normal",
-        "type": "Factory Release Authorization",
-        "stage": "Client (Paid)",
-        "dueIn": "37 mins",
-        "assignedAt": new Date("2026-08-24T08:48:23.203Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e25-2",
-          "title": "Verify Tally advance payment for machine booking by Roy Packers",
-          "leadId": "LEAD-969",
-          "leadName": "Roy Packers",
-          "priority": "High",
-          "type": "Payment Gate Verification",
-          "stage": "Confirmed Lead"
-        }
-      ]
-    },
-    {
-      "id": "e26",
-      "name": "Rohan Kapoor",
-      "email": "rohan.kapoor@aps-enterprise.com",
-      "phone": "+91 9440809262",
-      "role": "Inventory Clerk",
-      "department": "Accounts & ERP",
-      "kpiScore": "99%",
-      "kpiScoreNum": 99,
-      "status": "Active",
-      "currentActivity": "Booking Transport",
-      "tasksCompleted": 98,
-      "callsHandled": 292,
-      "salesClosed": 28,
-      "totalRevenue": 1660344,
-      "targetSales": 23,
-      "conversionRate": "9.6%",
-      "avgCallDurationSec": 168,
-      "avgResponseTimeMin": "7.8",
-      "weeklyKpiHistory": [
-        96,
-        90,
-        99,
-        99
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 71,
-        "qualifiedToBooked": 40,
-        "bookedToConfirmed": 17,
-        "confirmedToPaid": 28
-      },
-      "activeTask": {
-        "id": "task-e26-1",
-        "title": "Coordinate with transport vendor for pickup for Mishra Manufacturing",
-        "leadId": "LEAD-465",
-        "leadName": "Mishra Manufacturing",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production",
-        "dueIn": "36 mins",
-        "assignedAt": new Date("2026-08-24T09:03:16.553Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e26-2",
-          "title": "Pack spare parts kit (dies and heaters) for Mishra Manufacturing",
-          "leadId": "LEAD-465",
-          "leadName": "Mishra Manufacturing",
-          "priority": "Normal",
-          "type": "Spare Parts Allocation",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e27",
-      "name": "Meera Rathore",
-      "email": "meera.rathore@aps-enterprise.com",
-      "phone": "+91 9536112922",
-      "role": "Inventory Clerk",
-      "department": "Spare Parts & Service",
-      "kpiScore": "81%",
-      "kpiScoreNum": 81,
-      "status": "Active",
-      "currentActivity": "Testing Machinery",
-      "tasksCompleted": 93,
-      "callsHandled": 193,
-      "salesClosed": 15,
-      "totalRevenue": 452955,
-      "targetSales": 20,
-      "conversionRate": "7.8%",
-      "avgCallDurationSec": 70,
-      "avgResponseTimeMin": "0.0",
-      "weeklyKpiHistory": [
-        81,
-        77,
-        83,
-        81
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 57,
-        "qualifiedToBooked": 30,
-        "bookedToConfirmed": 17,
-        "confirmedToPaid": 15
-      },
-      "activeTask": {
-        "id": "task-e27-1",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
-        "leadId": "LEAD-416",
-        "leadName": "Tiwari Enterprises",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production",
-        "dueIn": "10 mins",
-        "assignedAt": new Date("2026-08-24T09:02:55.752Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e27-2",
-          "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
-          "leadId": "LEAD-416",
-          "leadName": "Tiwari Enterprises",
-          "priority": "Normal",
-          "type": "Quality Testing",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e28",
-      "name": "Ramesh Chauhan",
-      "email": "ramesh.chauhan@aps-enterprise.com",
-      "phone": "+91 9507516396",
-      "role": "Inventory Clerk",
-      "department": "Accounts & ERP",
-      "kpiScore": "98%",
-      "kpiScoreNum": 98,
-      "status": "Active",
-      "currentActivity": "Testing Machinery",
-      "tasksCompleted": 20,
-      "callsHandled": 174,
-      "salesClosed": 17,
-      "totalRevenue": 422875,
-      "targetSales": 26,
-      "conversionRate": "9.8%",
-      "avgCallDurationSec": 96,
-      "avgResponseTimeMin": "3.0",
-      "weeklyKpiHistory": [
-        94,
-        93,
-        91,
-        98
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 58,
-        "qualifiedToBooked": 34,
-        "bookedToConfirmed": 18,
-        "confirmedToPaid": 17
-      },
-      "activeTask": {
-        "id": "task-e28-1",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
-        "leadId": "LEAD-357",
-        "leadName": "Patel Enterprises",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production",
-        "dueIn": "33 mins",
-        "assignedAt": new Date("2026-08-24T08:36:30.556Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e28-2",
-          "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
-          "leadId": "LEAD-357",
-          "leadName": "Patel Enterprises",
-          "priority": "Normal",
-          "type": "Quality Testing",
-          "stage": "In Production"
-        }
-      ]
-    },
-    {
-      "id": "e29",
-      "name": "Akshay Thakur",
-      "email": "akshay.thakur@aps-enterprise.com",
-      "phone": "+91 9246769411",
-      "role": "Lead Qualification Specialist",
-      "department": "Direct Field Sales",
-      "kpiScore": "97%",
-      "kpiScoreNum": 97,
-      "status": "Active",
-      "currentActivity": "Handling Operations",
-      "tasksCompleted": 66,
-      "callsHandled": 224,
-      "salesClosed": 21,
-      "totalRevenue": 1493604,
-      "targetSales": 22,
-      "conversionRate": "9.4%",
-      "avgCallDurationSec": 182,
-      "avgResponseTimeMin": "5.4",
-      "weeklyKpiHistory": [
-        96,
-        93,
-        94,
-        97
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 49,
-        "qualifiedToBooked": 13,
-        "bookedToConfirmed": 9,
-        "confirmedToPaid": 21
-      },
-      "activeTask": {
-        "id": "task-e29-1",
-        "title": "Conduct secondary telecaller qualification for Shah Plastics",
-        "leadId": "LEAD-485",
-        "leadName": "Shah Plastics",
-        "priority": "Normal",
-        "type": "Telecalling",
-        "stage": "Enquiry",
-        "dueIn": "48 mins",
-        "assignedAt": new Date("2026-08-24T08:43:16.889Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e29-2",
-          "title": "Share quotation and ROI video for Dona Pattal setup with Shah Plastics",
-          "leadId": "LEAD-485",
-          "leadName": "Shah Plastics",
-          "priority": "Normal",
-          "type": "Sales Follow-up",
-          "stage": "Qualified"
-        }
-      ]
-    },
-    {
-      "id": "e30",
-      "name": "Siddharth Desai",
-      "email": "siddharth.desai@aps-enterprise.com",
-      "phone": "+91 9539433776",
-      "role": "Quality Testing Engineer",
-      "department": "Telecalling & Inquiry",
-      "kpiScore": "91%",
-      "kpiScoreNum": 91,
-      "status": "Active",
-      "currentActivity": "Packing Spare Parts",
-      "tasksCompleted": 51,
-      "callsHandled": 234,
-      "salesClosed": 21,
-      "totalRevenue": 1878429,
-      "targetSales": 23,
-      "conversionRate": "9.0%",
-      "avgCallDurationSec": 149,
-      "avgResponseTimeMin": "5.0",
-      "weeklyKpiHistory": [
-        90,
-        93,
-        98,
-        91
-      ],
-      "stageConversions": {
-        "enquiryToQualified": 48,
-        "qualifiedToBooked": 30,
-        "bookedToConfirmed": 7,
-        "confirmedToPaid": 21
-      },
-      "activeTask": {
-        "id": "task-e30-1",
-        "title": "Pack spare parts kit (dies and heaters) for Kapoor Paper Cups",
-        "leadId": "LEAD-887",
-        "leadName": "Kapoor Paper Cups",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production",
-        "dueIn": "56 mins",
-        "assignedAt": new Date("2026-08-24T09:05:54.295Z")
-      },
-      "taskQueue": [
-        {
-          "id": "task-e30-2",
-          "title": "Coordinate with transport vendor for pickup for Kapoor Paper Cups",
-          "leadId": "LEAD-887",
-          "leadName": "Kapoor Paper Cups",
-          "priority": "Normal",
-          "type": "Logistics",
-          "stage": "In Production"
-        }
-      ]
-    }
-  ],
-  "mockCallLogs": [
-    {
-      "callId": "CALL-001",
-      "leadId": "LEAD-181",
-      "phone": "+919335808617",
-      "agent": "Voice Agent",
-      "durationSeconds": 566,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-12T18:37:48.396Z")
-    },
-    {
-      "callId": "CALL-002",
-      "leadId": "LEAD-093",
-      "phone": "+919606022501",
-      "agent": "Animesh",
-      "durationSeconds": 193,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2025-09-14T07:35:15.211Z")
-    },
-    {
-      "callId": "CALL-003",
-      "leadId": "LEAD-289",
-      "phone": "+919192383441",
-      "agent": "Voice Agent",
-      "durationSeconds": 198,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2025-10-25T01:53:42.680Z")
-    },
-    {
-      "callId": "CALL-004",
-      "leadId": "LEAD-132",
-      "phone": "+919503587370",
-      "agent": "Animesh",
-      "durationSeconds": 586,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-11T04:10:15.066Z")
-    },
-    {
-      "callId": "CALL-005",
-      "leadId": "LEAD-162",
-      "phone": "+919747035419",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 112,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Fully Automatic Paper Cup Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-24T02:17:37.442Z")
-    },
-    {
-      "callId": "CALL-006",
-      "leadId": "LEAD-017",
-      "phone": "+919396205313",
-      "agent": "Voice Agent",
-      "durationSeconds": 583,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-11T04:10:04.582Z")
-    },
-    {
-      "callId": "CALL-007",
-      "leadId": "LEAD-039",
-      "phone": "+919231914050",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 498,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-05-22T12:03:19.033Z")
-    },
-    {
-      "callId": "CALL-008",
-      "leadId": "LEAD-007",
-      "phone": "+919148482987",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 141,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-05-15T05:18:58.285Z")
-    },
-    {
-      "callId": "CALL-009",
-      "leadId": "LEAD-001",
-      "phone": "+919231421392",
-      "agent": "Animesh",
-      "durationSeconds": 148,
-      "callOutcome": "No Response",
-      "sentiment": "Positive",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: No Response. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-27T01:47:38.014Z")
-    },
-    {
-      "callId": "CALL-010",
-      "leadId": "LEAD-007",
-      "phone": "+919148482987",
-      "agent": "Voice Agent",
-      "durationSeconds": 141,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-05-15T23:59:23.766Z")
-    },
-    {
-      "callId": "CALL-011",
-      "leadId": "LEAD-225",
-      "phone": "+919655377540",
-      "agent": "Animesh",
-      "durationSeconds": 427,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-30T01:48:34.517Z")
-    },
-    {
-      "callId": "CALL-012",
-      "leadId": "LEAD-346",
-      "phone": "+919812924220",
-      "agent": "Voice Agent",
-      "durationSeconds": 141,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-04-17T22:16:45.179Z")
-    },
-    {
-      "callId": "CALL-013",
-      "leadId": "LEAD-088",
-      "phone": "+919241738347",
-      "agent": "Animesh",
-      "durationSeconds": 44,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-16T00:13:37.485Z")
-    },
-    {
-      "callId": "CALL-014",
-      "leadId": "LEAD-229",
-      "phone": "+919289380937",
-      "agent": "Animesh",
-      "durationSeconds": 174,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-15T15:11:02.215Z")
-    },
-    {
-      "callId": "CALL-015",
-      "leadId": "LEAD-179",
-      "phone": "+919129653224",
-      "agent": "Voice Agent",
-      "durationSeconds": 241,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-24T11:10:44.635Z")
-    },
-    {
-      "callId": "CALL-016",
-      "leadId": "LEAD-192",
-      "phone": "+919338082898",
-      "agent": "Voice Agent",
-      "durationSeconds": 186,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-15T18:54:00.210Z")
-    },
-    {
-      "callId": "CALL-017",
-      "leadId": "LEAD-217",
-      "phone": "+919686831873",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 82,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-02T22:53:00.039Z")
-    },
-    {
-      "callId": "CALL-018",
-      "leadId": "LEAD-319",
-      "phone": "+919109840871",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 56,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-25T20:07:08.554Z")
-    },
-    {
-      "callId": "CALL-019",
-      "leadId": "LEAD-242",
-      "phone": "+919593146640",
-      "agent": "Animesh",
-      "durationSeconds": 239,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-02-06T06:17:57.036Z")
-    },
-    {
-      "callId": "CALL-020",
-      "leadId": "LEAD-109",
-      "phone": "+919237841462",
-      "agent": "Voice Agent",
-      "durationSeconds": 414,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-03-29T15:43:29.223Z")
-    },
-    {
-      "callId": "CALL-021",
-      "leadId": "LEAD-272",
-      "phone": "+919686121043",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 258,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-26T21:13:34.950Z")
-    },
-    {
-      "callId": "CALL-022",
-      "leadId": "LEAD-245",
-      "phone": "+919456229158",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 296,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-19T10:55:27.197Z")
-    },
-    {
-      "callId": "CALL-023",
-      "leadId": "LEAD-133",
-      "phone": "+919311592531",
-      "agent": "Animesh",
-      "durationSeconds": 42,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-17T18:00:32.022Z")
-    },
-    {
-      "callId": "CALL-024",
-      "leadId": "LEAD-294",
-      "phone": "+919953990872",
-      "agent": "Animesh",
-      "durationSeconds": 136,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-18T11:52:34.228Z")
-    },
-    {
-      "callId": "CALL-025",
-      "leadId": "LEAD-182",
-      "phone": "+919788717995",
-      "agent": "Voice Agent",
-      "durationSeconds": 265,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-11T04:24:03.422Z")
-    },
-    {
-      "callId": "CALL-026",
-      "leadId": "LEAD-274",
-      "phone": "+919633955925",
-      "agent": "Voice Agent",
-      "durationSeconds": 75,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-02T04:18:04.305Z")
-    },
-    {
-      "callId": "CALL-027",
-      "leadId": "LEAD-011",
-      "phone": "+919113331945",
-      "agent": "Voice Agent",
-      "durationSeconds": 112,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-03-11T17:05:50.858Z")
-    },
-    {
-      "callId": "CALL-028",
-      "leadId": "LEAD-299",
-      "phone": "+919752284109",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 308,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2025-09-03T03:56:58.040Z")
-    },
-    {
-      "callId": "CALL-029",
-      "leadId": "LEAD-318",
-      "phone": "+919617917613",
-      "agent": "Animesh",
-      "durationSeconds": 182,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2025-10-10T08:23:37.042Z")
-    },
-    {
-      "callId": "CALL-030",
-      "leadId": "LEAD-107",
-      "phone": "+919191287032",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 156,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-09T11:54:13.394Z")
-    },
-    {
-      "callId": "CALL-031",
-      "leadId": "LEAD-185",
-      "phone": "+919868971307",
-      "agent": "Voice Agent",
-      "durationSeconds": 336,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-10T04:57:11.592Z")
-    },
-    {
-      "callId": "CALL-032",
-      "leadId": "LEAD-194",
-      "phone": "+919761100569",
-      "agent": "Voice Agent",
-      "durationSeconds": 289,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-08T20:06:48.480Z")
-    },
-    {
-      "callId": "CALL-033",
-      "leadId": "LEAD-034",
-      "phone": "+919735951166",
-      "agent": "Voice Agent",
-      "durationSeconds": 306,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-01T16:04:49.692Z")
-    },
-    {
-      "callId": "CALL-034",
-      "leadId": "LEAD-148",
-      "phone": "+919731575936",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 48,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2025-10-31T08:46:04.672Z")
-    },
-    {
-      "callId": "CALL-035",
-      "leadId": "LEAD-209",
-      "phone": "+919846216553",
-      "agent": "Animesh",
-      "durationSeconds": 443,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-03T06:48:09.239Z")
-    },
-    {
-      "callId": "CALL-036",
-      "leadId": "LEAD-141",
-      "phone": "+919762393417",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 107,
-      "callOutcome": "No Response",
-      "sentiment": "Positive",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: No Response. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-03T17:09:33.457Z")
-    },
-    {
-      "callId": "CALL-037",
-      "leadId": "LEAD-205",
-      "phone": "+919674572741",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 216,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Slipper Making Machine. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2026-03-27T00:13:42.447Z")
-    },
-    {
-      "callId": "CALL-038",
-      "leadId": "LEAD-292",
-      "phone": "+919198219823",
-      "agent": "Voice Agent",
-      "durationSeconds": 100,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-27T21:11:57.743Z")
-    },
-    {
-      "callId": "CALL-039",
-      "leadId": "LEAD-342",
-      "phone": "+919243899738",
-      "agent": "Animesh",
-      "durationSeconds": 353,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-18T00:51:48.305Z")
-    },
-    {
-      "callId": "CALL-040",
-      "leadId": "LEAD-137",
-      "phone": "+919971691514",
-      "agent": "Animesh",
-      "durationSeconds": 384,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-10T23:07:07.342Z")
-    },
-    {
-      "callId": "CALL-041",
-      "leadId": "LEAD-198",
-      "phone": "+919649859652",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 156,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-01-15T19:09:12.654Z")
-    },
-    {
-      "callId": "CALL-042",
-      "leadId": "LEAD-091",
-      "phone": "+919366936520",
-      "agent": "Voice Agent",
-      "durationSeconds": 509,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-26T06:12:36.726Z")
-    },
-    {
-      "callId": "CALL-043",
-      "leadId": "LEAD-328",
-      "phone": "+919510232589",
-      "agent": "Voice Agent",
-      "durationSeconds": 196,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-03T10:34:36.860Z")
-    },
-    {
-      "callId": "CALL-044",
-      "leadId": "LEAD-325",
-      "phone": "+919471714586",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 61,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2025-12-17T09:43:05.087Z")
-    },
-    {
-      "callId": "CALL-045",
-      "leadId": "LEAD-202",
-      "phone": "+919173044533",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 556,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-18T10:29:31.284Z")
-    },
-    {
-      "callId": "CALL-046",
-      "leadId": "LEAD-171",
-      "phone": "+919926070439",
-      "agent": "Voice Agent",
-      "durationSeconds": 247,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-08T20:11:13.310Z")
-    },
-    {
-      "callId": "CALL-047",
-      "leadId": "LEAD-238",
-      "phone": "+919654438783",
-      "agent": "Voice Agent",
-      "durationSeconds": 554,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-18T18:03:18.451Z")
-    },
-    {
-      "callId": "CALL-048",
-      "leadId": "LEAD-252",
-      "phone": "+919857082536",
-      "agent": "Voice Agent",
-      "durationSeconds": 457,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-05-27T11:39:34.236Z")
-    },
-    {
-      "callId": "CALL-049",
-      "leadId": "LEAD-045",
-      "phone": "+919247075739",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 552,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-18T12:34:16.167Z")
-    },
-    {
-      "callId": "CALL-050",
-      "leadId": "LEAD-038",
-      "phone": "+919744849974",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 431,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-26T11:22:23.179Z")
-    },
-    {
-      "callId": "CALL-051",
-      "leadId": "LEAD-163",
-      "phone": "+919454526224",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 480,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-16T12:00:27.683Z")
-    },
-    {
-      "callId": "CALL-052",
-      "leadId": "LEAD-240",
-      "phone": "+919318316454",
-      "agent": "Animesh",
-      "durationSeconds": 220,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-18T19:23:54.628Z")
-    },
-    {
-      "callId": "CALL-053",
-      "leadId": "LEAD-190",
-      "phone": "+919498534284",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 258,
-      "callOutcome": "No Response",
-      "sentiment": "Positive",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: No Response. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-04T06:30:37.259Z")
-    },
-    {
-      "callId": "CALL-054",
-      "leadId": "LEAD-134",
-      "phone": "+919839206263",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 391,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-30T08:52:59.345Z")
-    },
-    {
-      "callId": "CALL-055",
-      "leadId": "LEAD-304",
-      "phone": "+919396196160",
-      "agent": "Animesh",
-      "durationSeconds": 70,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-08T09:41:38.026Z")
-    },
-    {
-      "callId": "CALL-056",
-      "leadId": "LEAD-287",
-      "phone": "+919116931315",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 344,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-01T08:20:15.478Z")
-    },
-    {
-      "callId": "CALL-057",
-      "leadId": "LEAD-320",
-      "phone": "+919860815169",
-      "agent": "Voice Agent",
-      "durationSeconds": 243,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-07T14:20:14.350Z")
-    },
-    {
-      "callId": "CALL-058",
-      "leadId": "LEAD-289",
-      "phone": "+919192383441",
-      "agent": "Voice Agent",
-      "durationSeconds": 467,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2025-10-23T19:46:41.839Z")
-    },
-    {
-      "callId": "CALL-059",
-      "leadId": "LEAD-323",
-      "phone": "+919569220122",
-      "agent": "Voice Agent",
-      "durationSeconds": 78,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-19T14:23:03.063Z")
-    },
-    {
-      "callId": "CALL-060",
-      "leadId": "LEAD-080",
-      "phone": "+919227592515",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 536,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-19T03:34:48.296Z")
-    },
-    {
-      "callId": "CALL-061",
-      "leadId": "LEAD-064",
-      "phone": "+919676384785",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 145,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2025-09-16T23:56:19.957Z")
-    },
-    {
-      "callId": "CALL-062",
-      "leadId": "LEAD-125",
-      "phone": "+919194659122",
-      "agent": "Animesh",
-      "durationSeconds": 572,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-04-21T15:45:29.323Z")
-    },
-    {
-      "callId": "CALL-063",
-      "leadId": "LEAD-132",
-      "phone": "+919503587370",
-      "agent": "Animesh",
-      "durationSeconds": 263,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-11T13:56:07.462Z")
-    },
-    {
-      "callId": "CALL-064",
-      "leadId": "LEAD-249",
-      "phone": "+919684692882",
-      "agent": "Voice Agent",
-      "durationSeconds": 84,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-26T08:42:07.465Z")
-    },
-    {
-      "callId": "CALL-065",
-      "leadId": "LEAD-058",
-      "phone": "+919217746039",
-      "agent": "Animesh",
-      "durationSeconds": 599,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-05-13T07:08:15.222Z")
-    },
-    {
-      "callId": "CALL-066",
-      "leadId": "LEAD-117",
-      "phone": "+919273539831",
-      "agent": "Voice Agent",
-      "durationSeconds": 429,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-27T05:10:09.598Z")
-    },
-    {
-      "callId": "CALL-067",
-      "leadId": "LEAD-030",
-      "phone": "+919375676969",
-      "agent": "Animesh",
-      "durationSeconds": 191,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-02-20T00:08:52.919Z")
-    },
-    {
-      "callId": "CALL-068",
-      "leadId": "LEAD-221",
-      "phone": "+919734048590",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 409,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-04T10:29:00.100Z")
-    },
-    {
-      "callId": "CALL-069",
-      "leadId": "LEAD-259",
-      "phone": "+919831072653",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 583,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-17T17:19:08.508Z")
-    },
-    {
-      "callId": "CALL-070",
-      "leadId": "LEAD-210",
-      "phone": "+919225947470",
-      "agent": "Animesh",
-      "durationSeconds": 23,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-05-11T18:17:22.067Z")
-    },
-    {
-      "callId": "CALL-071",
-      "leadId": "LEAD-260",
-      "phone": "+919977591007",
-      "agent": "Animesh",
-      "durationSeconds": 468,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-15T20:16:48.409Z")
-    },
-    {
-      "callId": "CALL-072",
-      "leadId": "LEAD-114",
-      "phone": "+919724784834",
-      "agent": "Animesh",
-      "durationSeconds": 573,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-02-12T06:09:45.298Z")
-    },
-    {
-      "callId": "CALL-073",
-      "leadId": "LEAD-104",
-      "phone": "+919250669942",
-      "agent": "Voice Agent",
-      "durationSeconds": 177,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-11T15:11:47.406Z")
-    },
-    {
-      "callId": "CALL-074",
-      "leadId": "LEAD-027",
-      "phone": "+919591143586",
-      "agent": "Voice Agent",
-      "durationSeconds": 596,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2025-10-02T03:58:47.063Z")
-    },
-    {
-      "callId": "CALL-075",
-      "leadId": "LEAD-330",
-      "phone": "+919934550628",
-      "agent": "Voice Agent",
-      "durationSeconds": 357,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-08T15:22:07.260Z")
-    },
-    {
-      "callId": "CALL-076",
-      "leadId": "LEAD-331",
-      "phone": "+919179953594",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 282,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2025-12-17T17:05:11.566Z")
-    },
-    {
-      "callId": "CALL-077",
-      "leadId": "LEAD-344",
-      "phone": "+919591378057",
-      "agent": "Voice Agent",
-      "durationSeconds": 351,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-03-21T01:55:27.743Z")
-    },
-    {
-      "callId": "CALL-078",
-      "leadId": "LEAD-127",
-      "phone": "+919273674273",
-      "agent": "Animesh",
-      "durationSeconds": 340,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2025-11-24T03:58:13.370Z")
-    },
-    {
-      "callId": "CALL-079",
-      "leadId": "LEAD-090",
-      "phone": "+919594901355",
-      "agent": "Voice Agent",
-      "durationSeconds": 279,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-03T22:23:42.372Z")
-    },
-    {
-      "callId": "CALL-080",
-      "leadId": "LEAD-024",
-      "phone": "+919750598092",
-      "agent": "Animesh",
-      "durationSeconds": 530,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2025-11-25T02:08:24.230Z")
-    },
-    {
-      "callId": "CALL-081",
-      "leadId": "LEAD-038",
-      "phone": "+919744849974",
-      "agent": "Voice Agent",
-      "durationSeconds": 372,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-26T21:22:06.194Z")
-    },
-    {
-      "callId": "CALL-082",
-      "leadId": "LEAD-127",
-      "phone": "+919273674273",
-      "agent": "Animesh",
-      "durationSeconds": 115,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2025-11-23T11:31:52.082Z")
-    },
-    {
-      "callId": "CALL-083",
-      "leadId": "LEAD-254",
-      "phone": "+919845026856",
-      "agent": "Animesh",
-      "durationSeconds": 397,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-01-21T12:25:36.957Z")
-    },
-    {
-      "callId": "CALL-084",
-      "leadId": "LEAD-063",
-      "phone": "+919612445175",
-      "agent": "Animesh",
-      "durationSeconds": 379,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-14T03:00:11.753Z")
-    },
-    {
-      "callId": "CALL-085",
-      "leadId": "LEAD-177",
-      "phone": "+919797263700",
-      "agent": "Voice Agent",
-      "durationSeconds": 57,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-01T05:01:16.453Z")
-    },
-    {
-      "callId": "CALL-086",
-      "leadId": "LEAD-218",
-      "phone": "+919775912202",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 504,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-16T08:39:04.685Z")
-    },
-    {
-      "callId": "CALL-087",
-      "leadId": "LEAD-143",
-      "phone": "+919380713494",
-      "agent": "Voice Agent",
-      "durationSeconds": 569,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-18T12:47:56.540Z")
-    },
-    {
-      "callId": "CALL-088",
-      "leadId": "LEAD-003",
-      "phone": "+919662396059",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 258,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2026-05-02T03:43:13.841Z")
-    },
-    {
-      "callId": "CALL-089",
-      "leadId": "LEAD-263",
-      "phone": "+919682754436",
-      "agent": "Voice Agent",
-      "durationSeconds": 349,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-23T13:25:53.023Z")
-    },
-    {
-      "callId": "CALL-090",
-      "leadId": "LEAD-213",
-      "phone": "+919133685247",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 344,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2025-09-18T10:23:05.508Z")
-    },
-    {
-      "callId": "CALL-091",
-      "leadId": "LEAD-109",
-      "phone": "+919237841462",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 486,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-03-30T15:53:34.897Z")
-    },
-    {
-      "callId": "CALL-092",
-      "leadId": "LEAD-282",
-      "phone": "+919736805513",
-      "agent": "Animesh",
-      "durationSeconds": 310,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-21T08:36:16.214Z")
-    },
-    {
-      "callId": "CALL-093",
-      "leadId": "LEAD-278",
-      "phone": "+919344993246",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 569,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-31T02:09:15.398Z")
-    },
-    {
-      "callId": "CALL-094",
-      "leadId": "LEAD-044",
-      "phone": "+919396126444",
-      "agent": "Animesh",
-      "durationSeconds": 103,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-04T19:41:53.559Z")
-    },
-    {
-      "callId": "CALL-095",
-      "leadId": "LEAD-298",
-      "phone": "+919614263763",
-      "agent": "Animesh",
-      "durationSeconds": 81,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-02-10T08:22:09.278Z")
-    },
-    {
-      "callId": "CALL-096",
-      "leadId": "LEAD-190",
-      "phone": "+919498534284",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 433,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-03T20:18:18.824Z")
-    },
-    {
-      "callId": "CALL-097",
-      "leadId": "LEAD-106",
-      "phone": "+919954775268",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 260,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-13T11:00:29.987Z")
-    },
-    {
-      "callId": "CALL-098",
-      "leadId": "LEAD-014",
-      "phone": "+919365090261",
-      "agent": "Animesh",
-      "durationSeconds": 115,
-      "callOutcome": "No Response",
-      "sentiment": "Positive",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: No Response. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-09T07:36:19.028Z")
-    },
-    {
-      "callId": "CALL-099",
-      "leadId": "LEAD-007",
-      "phone": "+919148482987",
-      "agent": "Voice Agent",
-      "durationSeconds": 576,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-05-15T12:08:48.594Z")
-    },
-    {
-      "callId": "CALL-100",
-      "leadId": "LEAD-237",
-      "phone": "+919920748992",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 117,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2026-03-23T09:13:40.224Z")
-    },
-    {
-      "callId": "CALL-101",
-      "leadId": "LEAD-306",
-      "phone": "+919854587930",
-      "agent": "Animesh",
-      "durationSeconds": 539,
-      "callOutcome": "No Response",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: No Response. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-29T06:24:11.862Z")
-    },
-    {
-      "callId": "CALL-102",
-      "leadId": "LEAD-170",
-      "phone": "+919814190082",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 193,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-02-06T07:49:45.402Z")
-    },
-    {
-      "callId": "CALL-103",
-      "leadId": "LEAD-300",
-      "phone": "+919291818814",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 70,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-10T02:30:32.373Z")
-    },
-    {
-      "callId": "CALL-104",
-      "leadId": "LEAD-073",
-      "phone": "+919887792715",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 120,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2025-09-21T16:51:01.263Z")
-    },
-    {
-      "callId": "CALL-105",
-      "leadId": "LEAD-301",
-      "phone": "+919557021307",
-      "agent": "Animesh",
-      "durationSeconds": 359,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-15T02:05:25.302Z")
-    },
-    {
-      "callId": "CALL-106",
-      "leadId": "LEAD-131",
-      "phone": "+919847145385",
-      "agent": "Animesh",
-      "durationSeconds": 323,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-04-02T03:10:51.013Z")
-    },
-    {
-      "callId": "CALL-107",
-      "leadId": "LEAD-249",
-      "phone": "+919684692882",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 531,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-27T08:54:37.084Z")
-    },
-    {
-      "callId": "CALL-108",
-      "leadId": "LEAD-248",
-      "phone": "+919295599224",
-      "agent": "Animesh",
-      "durationSeconds": 164,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-23T10:51:51.596Z")
-    },
-    {
-      "callId": "CALL-109",
-      "leadId": "LEAD-069",
-      "phone": "+919668081051",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 236,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-01T10:53:04.215Z")
-    },
-    {
-      "callId": "CALL-110",
-      "leadId": "LEAD-163",
-      "phone": "+919454526224",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 225,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-17T02:09:50.527Z")
-    },
-    {
-      "callId": "CALL-111",
-      "leadId": "LEAD-121",
-      "phone": "+919492933550",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 70,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-21T09:05:30.215Z")
-    },
-    {
-      "callId": "CALL-112",
-      "leadId": "LEAD-331",
-      "phone": "+919179953594",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 159,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2025-12-18T05:58:53.087Z")
-    },
-    {
-      "callId": "CALL-113",
-      "leadId": "LEAD-008",
-      "phone": "+919841389326",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 100,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-18T22:11:48.271Z")
-    },
-    {
-      "callId": "CALL-114",
-      "leadId": "LEAD-238",
-      "phone": "+919654438783",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 590,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-17T09:26:05.452Z")
-    },
-    {
-      "callId": "CALL-115",
-      "leadId": "LEAD-163",
-      "phone": "+919454526224",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 364,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-16T20:29:20.057Z")
-    },
-    {
-      "callId": "CALL-116",
-      "leadId": "LEAD-310",
-      "phone": "+919156563388",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 412,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Fully Automatic Paper Cup Machine. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-19T08:13:28.156Z")
-    },
-    {
-      "callId": "CALL-117",
-      "leadId": "LEAD-235",
-      "phone": "+919750093624",
-      "agent": "Animesh",
-      "durationSeconds": 271,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-10T18:15:08.383Z")
-    },
-    {
-      "callId": "CALL-118",
-      "leadId": "LEAD-289",
-      "phone": "+919192383441",
-      "agent": "Voice Agent",
-      "durationSeconds": 576,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2025-10-25T09:08:06.856Z")
-    },
-    {
-      "callId": "CALL-119",
-      "leadId": "LEAD-226",
-      "phone": "+919760415900",
-      "agent": "Voice Agent",
-      "durationSeconds": 302,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-03T03:50:06.951Z")
-    },
-    {
-      "callId": "CALL-120",
-      "leadId": "LEAD-001",
-      "phone": "+919231421392",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 563,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-27T10:34:43.552Z")
-    },
-    {
-      "callId": "CALL-121",
-      "leadId": "LEAD-096",
-      "phone": "+919874584031",
-      "agent": "Animesh",
-      "durationSeconds": 162,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2026-01-08T07:54:36.904Z")
-    },
-    {
-      "callId": "CALL-122",
-      "leadId": "LEAD-168",
-      "phone": "+919413732742",
-      "agent": "Animesh",
-      "durationSeconds": 147,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-04-14T01:45:49.976Z")
-    },
-    {
-      "callId": "CALL-123",
-      "leadId": "LEAD-192",
-      "phone": "+919338082898",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 281,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-15T23:31:09.994Z")
-    },
-    {
-      "callId": "CALL-124",
-      "leadId": "LEAD-039",
-      "phone": "+919231914050",
-      "agent": "Animesh",
-      "durationSeconds": 11,
-      "callOutcome": "Not Interested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Not Interested. Sentiment: Negative.",
-      "timestamp": new Date("2026-05-22T14:04:11.085Z")
-    },
-    {
-      "callId": "CALL-125",
-      "leadId": "LEAD-174",
-      "phone": "+919146816552",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 188,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-01-10T05:48:05.191Z")
-    },
-    {
-      "callId": "CALL-126",
-      "leadId": "LEAD-178",
-      "phone": "+919546040756",
-      "agent": "Animesh",
-      "durationSeconds": 545,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-22T16:11:46.818Z")
-    },
-    {
-      "callId": "CALL-127",
-      "leadId": "LEAD-158",
-      "phone": "+919875126664",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 199,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2026-01-31T14:21:01.452Z")
-    },
-    {
-      "callId": "CALL-128",
-      "leadId": "LEAD-088",
-      "phone": "+919241738347",
-      "agent": "Voice Agent",
-      "durationSeconds": 467,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-15T07:21:36.154Z")
-    },
-    {
-      "callId": "CALL-129",
-      "leadId": "LEAD-068",
-      "phone": "+919160288480",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 190,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-28T14:52:53.518Z")
-    },
-    {
-      "callId": "CALL-130",
-      "leadId": "LEAD-050",
-      "phone": "+919855658524",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 58,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2025-11-28T17:44:09.818Z")
-    },
-    {
-      "callId": "CALL-131",
-      "leadId": "LEAD-174",
-      "phone": "+919146816552",
-      "agent": "Voice Agent",
-      "durationSeconds": 167,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-01-08T10:46:27.291Z")
-    },
-    {
-      "callId": "CALL-132",
-      "leadId": "LEAD-304",
-      "phone": "+919396196160",
-      "agent": "Voice Agent",
-      "durationSeconds": 451,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-08T00:45:31.377Z")
-    },
-    {
-      "callId": "CALL-133",
-      "leadId": "LEAD-279",
-      "phone": "+919682327011",
-      "agent": "Animesh",
-      "durationSeconds": 57,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2025-11-28T05:44:21.467Z")
-    },
-    {
-      "callId": "CALL-134",
-      "leadId": "LEAD-058",
-      "phone": "+919217746039",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 271,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-05-12T06:27:06.535Z")
-    },
-    {
-      "callId": "CALL-135",
-      "leadId": "LEAD-128",
-      "phone": "+919161238002",
-      "agent": "Voice Agent",
-      "durationSeconds": 43,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Fully Automatic Paper Cup Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-19T12:50:57.986Z")
-    },
-    {
-      "callId": "CALL-136",
-      "leadId": "LEAD-164",
-      "phone": "+919168452443",
-      "agent": "Voice Agent",
-      "durationSeconds": 413,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2025-09-03T16:02:30.667Z")
-    },
-    {
-      "callId": "CALL-137",
-      "leadId": "LEAD-185",
-      "phone": "+919868971307",
-      "agent": "Animesh",
-      "durationSeconds": 397,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-08T10:36:10.217Z")
-    },
-    {
-      "callId": "CALL-138",
-      "leadId": "LEAD-322",
-      "phone": "+919480608421",
-      "agent": "Animesh",
-      "durationSeconds": 525,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-19T16:24:51.138Z")
-    },
-    {
-      "callId": "CALL-139",
-      "leadId": "LEAD-064",
-      "phone": "+919676384785",
-      "agent": "Animesh",
-      "durationSeconds": 118,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2025-09-16T14:25:57.748Z")
-    },
-    {
-      "callId": "CALL-140",
-      "leadId": "LEAD-219",
-      "phone": "+919547755225",
-      "agent": "Animesh",
-      "durationSeconds": 40,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Fully Automatic Paper Cup Machine. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-19T23:39:30.314Z")
-    },
-    {
-      "callId": "CALL-141",
-      "leadId": "LEAD-323",
-      "phone": "+919569220122",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 243,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-19T06:16:31.314Z")
-    },
-    {
-      "callId": "CALL-142",
-      "leadId": "LEAD-089",
-      "phone": "+919698721365",
-      "agent": "Animesh",
-      "durationSeconds": 68,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-13T06:23:11.889Z")
-    },
-    {
-      "callId": "CALL-143",
-      "leadId": "LEAD-165",
-      "phone": "+919314971652",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 132,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-10T11:39:11.533Z")
-    },
-    {
-      "callId": "CALL-144",
-      "leadId": "LEAD-325",
-      "phone": "+919471714586",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 454,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2025-12-16T13:14:55.658Z")
-    },
-    {
-      "callId": "CALL-145",
-      "leadId": "LEAD-171",
-      "phone": "+919926070439",
-      "agent": "Animesh",
-      "durationSeconds": 146,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-08T14:47:21.306Z")
-    },
-    {
-      "callId": "CALL-146",
-      "leadId": "LEAD-047",
-      "phone": "+919421973221",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 81,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-17T19:58:34.480Z")
-    },
-    {
-      "callId": "CALL-147",
-      "leadId": "LEAD-221",
-      "phone": "+919734048590",
-      "agent": "Voice Agent",
-      "durationSeconds": 308,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-05T11:46:37.032Z")
-    },
-    {
-      "callId": "CALL-148",
-      "leadId": "LEAD-247",
-      "phone": "+919157059880",
-      "agent": "Voice Agent",
-      "durationSeconds": 181,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-28T13:53:08.538Z")
-    },
-    {
-      "callId": "CALL-149",
-      "leadId": "LEAD-271",
-      "phone": "+919306408633",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 534,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-04T07:56:21.602Z")
-    },
-    {
-      "callId": "CALL-150",
-      "leadId": "LEAD-079",
-      "phone": "+919888223138",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 97,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-14T01:48:18.172Z")
-    },
-    {
-      "callId": "CALL-151",
-      "leadId": "LEAD-138",
-      "phone": "+919331131786",
-      "agent": "Voice Agent",
-      "durationSeconds": 552,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-13T00:56:17.381Z")
-    },
-    {
-      "callId": "CALL-152",
-      "leadId": "LEAD-083",
-      "phone": "+919437873787",
-      "agent": "Voice Agent",
-      "durationSeconds": 289,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2025-10-25T17:08:22.253Z")
-    },
-    {
-      "callId": "CALL-153",
-      "leadId": "LEAD-244",
-      "phone": "+919426762748",
-      "agent": "Animesh",
-      "durationSeconds": 484,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-30T10:08:23.568Z")
-    },
-    {
-      "callId": "CALL-154",
-      "leadId": "LEAD-115",
-      "phone": "+919744515529",
-      "agent": "Voice Agent",
-      "durationSeconds": 513,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Positive",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Interested - Qualified. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-12T07:37:01.766Z")
-    },
-    {
-      "callId": "CALL-155",
-      "leadId": "LEAD-143",
-      "phone": "+919380713494",
-      "agent": "Animesh",
-      "durationSeconds": 23,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Follow-up Required. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-19T04:19:40.733Z")
-    },
-    {
-      "callId": "CALL-156",
-      "leadId": "LEAD-106",
-      "phone": "+919954775268",
-      "agent": "Animesh",
-      "durationSeconds": 261,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Crank Type Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-14T18:31:47.995Z")
-    },
-    {
-      "callId": "CALL-157",
-      "leadId": "LEAD-147",
-      "phone": "+919570504334",
-      "agent": "Animesh",
-      "durationSeconds": 17,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-04T03:02:55.133Z")
-    },
-    {
-      "callId": "CALL-158",
-      "leadId": "LEAD-017",
-      "phone": "+919396205313",
-      "agent": "Voice Agent",
-      "durationSeconds": 577,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-11T13:17:17.291Z")
-    },
-    {
-      "callId": "CALL-159",
-      "leadId": "LEAD-277",
-      "phone": "+919709466214",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 111,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-07T19:18:03.151Z")
-    },
-    {
-      "callId": "CALL-160",
-      "leadId": "LEAD-242",
-      "phone": "+919593146640",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 117,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-02-05T22:21:22.042Z")
-    },
-    {
-      "callId": "CALL-161",
-      "leadId": "LEAD-338",
-      "phone": "+919745350693",
-      "agent": "Voice Agent",
-      "durationSeconds": 146,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-30T14:39:19.655Z")
-    },
-    {
-      "callId": "CALL-162",
-      "leadId": "LEAD-213",
-      "phone": "+919133685247",
-      "agent": "Animesh",
-      "durationSeconds": 303,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2025-09-20T09:02:51.546Z")
-    },
-    {
-      "callId": "CALL-163",
-      "leadId": "LEAD-296",
-      "phone": "+919213303624",
-      "agent": "Animesh",
-      "durationSeconds": 536,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-06-13T23:31:21.548Z")
-    },
-    {
-      "callId": "CALL-164",
-      "leadId": "LEAD-097",
-      "phone": "+919123118542",
-      "agent": "Voice Agent",
-      "durationSeconds": 87,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2025-11-21T15:11:33.819Z")
-    },
-    {
-      "callId": "CALL-165",
-      "leadId": "LEAD-333",
-      "phone": "+919873985709",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 519,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-24T01:18:08.684Z")
-    },
-    {
-      "callId": "CALL-166",
-      "leadId": "LEAD-196",
-      "phone": "+919394455283",
-      "agent": "Voice Agent",
-      "durationSeconds": 424,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2025-09-22T06:48:14.398Z")
-    },
-    {
-      "callId": "CALL-167",
-      "leadId": "LEAD-120",
-      "phone": "+919814749486",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 588,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-21T14:17:56.466Z")
-    },
-    {
-      "callId": "CALL-168",
-      "leadId": "LEAD-229",
-      "phone": "+919289380937",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 122,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-06-15T23:13:23.850Z")
-    },
-    {
-      "callId": "CALL-169",
-      "leadId": "LEAD-078",
-      "phone": "+919992464739",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 569,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-05-05T06:21:35.908Z")
-    },
-    {
-      "callId": "CALL-170",
-      "leadId": "LEAD-031",
-      "phone": "+919447164016",
-      "agent": "Voice Agent",
-      "durationSeconds": 134,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-07-10T19:47:21.423Z")
-    },
-    {
-      "callId": "CALL-171",
-      "leadId": "LEAD-234",
-      "phone": "+919771748720",
-      "agent": "Voice Agent",
-      "durationSeconds": 381,
-      "callOutcome": "No Response",
-      "sentiment": "Negative",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: No Response. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-30T01:34:10.172Z")
-    },
-    {
-      "callId": "CALL-172",
-      "leadId": "LEAD-318",
-      "phone": "+919617917613",
-      "agent": "Voice Agent",
-      "durationSeconds": 386,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2025-10-08T22:05:14.548Z")
-    },
-    {
-      "callId": "CALL-173",
-      "leadId": "LEAD-054",
-      "phone": "+919375026904",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 168,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-09T11:48:54.059Z")
-    },
-    {
-      "callId": "CALL-174",
-      "leadId": "LEAD-240",
-      "phone": "+919318316454",
-      "agent": "Voice Agent",
-      "durationSeconds": 558,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-18T15:25:58.639Z")
-    },
-    {
-      "callId": "CALL-175",
-      "leadId": "LEAD-325",
-      "phone": "+919471714586",
-      "agent": "Animesh",
-      "durationSeconds": 87,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2025-12-17T13:12:47.730Z")
-    },
-    {
-      "callId": "CALL-176",
-      "leadId": "LEAD-075",
-      "phone": "+919225020246",
-      "agent": "Animesh",
-      "durationSeconds": 114,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-07T01:55:17.276Z")
-    },
-    {
-      "callId": "CALL-177",
-      "leadId": "LEAD-146",
-      "phone": "+919123052331",
-      "agent": "Voice Agent",
-      "durationSeconds": 89,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-08T19:26:30.165Z")
-    },
-    {
-      "callId": "CALL-178",
-      "leadId": "LEAD-164",
-      "phone": "+919168452443",
-      "agent": "Voice Agent",
-      "durationSeconds": 92,
-      "callOutcome": "Information Provided",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Hydraulic Dona Pattal Machine. Outcome: Information Provided. Sentiment: Neutral.",
-      "timestamp": new Date("2025-09-02T17:25:53.095Z")
-    },
-    {
-      "callId": "CALL-179",
-      "leadId": "LEAD-167",
-      "phone": "+919690726766",
-      "agent": "Animesh",
-      "durationSeconds": 17,
-      "callOutcome": "No Response",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Paper Bag Making Machine. Outcome: No Response. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-16T19:03:14.305Z")
-    },
-    {
-      "callId": "CALL-180",
-      "leadId": "LEAD-171",
-      "phone": "+919926070439",
-      "agent": "Voice Agent",
-      "durationSeconds": 201,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-09T06:22:38.239Z")
-    },
-    {
-      "callId": "CALL-181",
-      "leadId": "LEAD-263",
-      "phone": "+919682754436",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 29,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Buffet Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-24T17:15:52.458Z")
-    },
-    {
-      "callId": "CALL-182",
-      "leadId": "LEAD-234",
-      "phone": "+919771748720",
-      "agent": "Voice Agent",
-      "durationSeconds": 150,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Single Die Paper Plate Making Machine. Outcome: Interested - Qualified. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-30T21:40:34.424Z")
-    },
-    {
-      "callId": "CALL-183",
-      "leadId": "LEAD-239",
-      "phone": "+919143526244",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 199,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-03T12:16:31.126Z")
-    },
-    {
-      "callId": "CALL-184",
-      "leadId": "LEAD-099",
-      "phone": "+919899590116",
-      "agent": "Voice Agent",
-      "durationSeconds": 127,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Double Die Paper Plate Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-12T14:45:23.121Z")
-    },
-    {
-      "callId": "CALL-185",
-      "leadId": "LEAD-146",
-      "phone": "+919123052331",
-      "agent": "Animesh",
-      "durationSeconds": 305,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed Non-Woven Bag Making Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-08T13:41:49.362Z")
-    },
-    {
-      "callId": "CALL-186",
-      "leadId": "LEAD-154",
-      "phone": "+919194508107",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 181,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Negative",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Callback Requested. Sentiment: Negative.",
-      "timestamp": new Date("2026-07-30T04:43:40.061Z")
-    },
-    {
-      "callId": "CALL-187",
-      "leadId": "LEAD-145",
-      "phone": "+919397071240",
-      "agent": "Animesh",
-      "durationSeconds": 409,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Callback Requested. Sentiment: Positive.",
-      "timestamp": new Date("2026-08-13T10:10:04.159Z")
-    },
-    {
-      "callId": "CALL-188",
-      "leadId": "LEAD-093",
-      "phone": "+919606022501",
-      "agent": "Voice Agent",
-      "durationSeconds": 580,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Interested - High Intent. Sentiment: Positive.",
-      "timestamp": new Date("2025-09-14T08:50:27.882Z")
-    },
-    {
-      "callId": "CALL-189",
-      "leadId": "LEAD-274",
-      "phone": "+919633955925",
-      "agent": "Voice Agent",
-      "durationSeconds": 117,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Negative",
-      "transcript": "Discussed Raw Material (Silver Craft Paper Roll). Outcome: Interested - High Intent. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-01T20:36:13.912Z")
-    },
-    {
-      "callId": "CALL-190",
-      "leadId": "LEAD-052",
-      "phone": "+919986277225",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 267,
-      "callOutcome": "Information Provided",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Information Provided. Sentiment: Negative.",
-      "timestamp": new Date("2025-09-21T03:49:36.968Z")
-    },
-    {
-      "callId": "CALL-191",
-      "leadId": "LEAD-209",
-      "phone": "+919846216553",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 134,
-      "callOutcome": "Interested - Qualified",
-      "sentiment": "Negative",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Interested - Qualified. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-04T03:24:37.989Z")
-    },
-    {
-      "callId": "CALL-192",
-      "leadId": "LEAD-205",
-      "phone": "+919674572741",
-      "agent": "Animesh",
-      "durationSeconds": 379,
-      "callOutcome": "Callback Requested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Slipper Making Machine. Outcome: Callback Requested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-03-26T17:58:02.747Z")
-    },
-    {
-      "callId": "CALL-193",
-      "leadId": "LEAD-176",
-      "phone": "+919349316037",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 329,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Heavy Duty Hydraulic Paper Plate Press. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-01-14T20:32:02.632Z")
-    },
-    {
-      "callId": "CALL-194",
-      "leadId": "LEAD-230",
-      "phone": "+919377706818",
-      "agent": "Animesh",
-      "durationSeconds": 307,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-07-30T09:14:20.600Z")
-    },
-    {
-      "callId": "CALL-195",
-      "leadId": "LEAD-295",
-      "phone": "+919193471954",
-      "agent": "Pooja Sharma",
-      "durationSeconds": 111,
-      "callOutcome": "Not Interested",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Not Interested. Sentiment: Neutral.",
-      "timestamp": new Date("2026-06-18T06:10:52.010Z")
-    },
-    {
-      "callId": "CALL-196",
-      "leadId": "LEAD-271",
-      "phone": "+919306408633",
-      "agent": "Animesh",
-      "durationSeconds": 39,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Negative",
-      "transcript": "Discussed 4-Die Dona Pattal Machine. Outcome: Follow-up Required. Sentiment: Negative.",
-      "timestamp": new Date("2026-08-03T08:25:07.856Z")
-    },
-    {
-      "callId": "CALL-197",
-      "leadId": "LEAD-304",
-      "phone": "+919396196160",
-      "agent": "Animesh",
-      "durationSeconds": 557,
-      "callOutcome": "Interested - High Intent",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Wrinkle Paper Plate Machine. Outcome: Interested - High Intent. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-09T01:16:21.429Z")
-    },
-    {
-      "callId": "CALL-198",
-      "leadId": "LEAD-236",
-      "phone": "+919719693889",
-      "agent": "Animesh",
-      "durationSeconds": 528,
-      "callOutcome": "Follow-up Required",
-      "sentiment": "Neutral",
-      "transcript": "Discussed Agarbatti Making Machine. Outcome: Follow-up Required. Sentiment: Neutral.",
-      "timestamp": new Date("2026-08-10T06:48:17.048Z")
-    },
-    {
-      "callId": "CALL-199",
-      "leadId": "LEAD-203",
-      "phone": "+919780140889",
-      "agent": "Animesh",
-      "durationSeconds": 261,
-      "callOutcome": "Not Interested",
-      "sentiment": "Positive",
-      "transcript": "Discussed Semi-Automatic Dona Making Machine. Outcome: Not Interested. Sentiment: Positive.",
-      "timestamp": new Date("2026-04-08T16:19:53.259Z")
-    },
-    {
-      "callId": "CALL-200",
-      "leadId": "LEAD-122",
-      "phone": "+919852993888",
-      "agent": "Animesh",
-      "durationSeconds": 444,
-      "callOutcome": "Information Provided",
-      "sentiment": "Positive",
-      "transcript": "Discussed Paper Lamination Machine. Outcome: Information Provided. Sentiment: Positive.",
-      "timestamp": new Date("2025-11-21T07:16:11.502Z")
-    }
-  ],
-  "mockWhatsAppMessages": [
-    {
-      "messageId": "WA-001",
-      "leadId": "LEAD-004",
-      "leadName": "Global Tech",
-      "phone": "+91 99887 76655",
-      "template": "payment_reminder_advance_10pct",
-      "sequenceType": "PAYMENT_REMINDER",
-      "product": "Hydraulic Press 200T",
-      "advanceAmount": "4,200",
-      "totalBudget": "42,000",
-      "status": "Delivered",
-      "sentAt": new Date("2026-08-24T07:30:09.296Z"),
-      "preview": "Hello Global Tech, your booking for Hydraulic Press 200T (Total ₹42,000) is approved! To release your machine order to the manufacturing queue, please confirm the 10% advance payment of ₹4,200.",
-      "lastEvent": "Delivered to handset (✓✓)"
-    },
-    {
-      "messageId": "WA-002",
-      "leadId": "LEAD-005",
-      "leadName": "Elite Builders",
-      "phone": "+91 91234 56789",
-      "template": "order_confirmation_factory_release",
-      "sequenceType": "ORDER_CONFIRMATION",
-      "product": "CNC Router Pro 4-Axis",
-      "advanceAmount": "1,800",
-      "totalBudget": "18,000",
-      "status": "Read",
-      "sentAt": new Date("2026-08-24T08:00:09.296Z"),
-      "preview": "Congratulations Elite Builders! Your 10% advance payment for CNC Router Pro 4-Axis has been verified against our Tally ledger. Your order #APS-ORD-902 is now officially released to the factory floor.",
-      "lastEvent": "Read by recipient (✓✓ Blue)"
-    },
-    {
-      "messageId": "WA-003",
-      "leadId": "LEAD-006",
-      "leadName": "Precision Works",
-      "phone": "+91 98334 45566",
-      "template": "production_update_milestone",
-      "sequenceType": "PRODUCTION_UPDATE",
-      "product": "High-Def Plasma Cutter",
-      "advanceAmount": "3,500",
-      "totalBudget": "35,000",
-      "status": "Read",
-      "sentAt": new Date("2026-08-22T20:30:09.296Z"),
-      "preview": "Hello Precision Works, exciting news! Your High-Def Plasma Cutter has completed Milestone 2 (CNC Assembly) at our central manufacturing unit.",
-      "lastEvent": "Read by recipient (✓✓ Blue)"
-    },
-    {
-      "messageId": "WA-004",
-      "leadId": "LEAD-007",
-      "leadName": "ModernFab",
-      "phone": "+91 97123 41234",
-      "template": "dispatch_tracking_alert",
-      "sequenceType": "DISPATCH_NOTICE",
-      "product": "CNC Sheet Bender 120T",
-      "advanceAmount": "2,800",
-      "totalBudget": "28,000",
-      "status": "Delivered",
-      "sentAt": new Date("2026-08-23T03:42:09.296Z"),
-      "preview": "Dear ModernFab, your machinery CNC Sheet Bender 120T has been safely loaded and dispatched via V-Trans (Docket: #TRK-99210). Estimated delivery: 2 business days.",
-      "lastEvent": "Delivered to handset (✓✓)"
-    },
-    {
-      "messageId": "WA-005",
-      "leadId": "LEAD-002",
-      "leadName": "Jane Smith",
-      "phone": "+91 98234 56789",
-      "template": "qualified_lead_brochure_pack",
-      "sequenceType": "BROCHURE_NURTURE",
-      "product": "Laser Cutter Pro",
-      "advanceAmount": "2,500",
-      "totalBudget": "25,000",
-      "status": "Read",
-      "sentAt": new Date("2026-08-20T13:18:09.296Z"),
-      "preview": "Hi Jane Smith, thank you for speaking with our AI specialist about the Laser Cutter Pro. Attached is the full technical datasheet, tooling matrix, and ROI calculator.",
-      "lastEvent": "Read by recipient (✓✓ Blue)"
-    }
-  ],
-  "mockWhatsAppSequences": [
-    {
-      "id": "SEQ-01",
-      "name": "Confirmed Lead 10% Advance Payment Reminder",
-      "triggerStage": "Confirmed Lead",
-      "targetAudience": "Leads with approved booking awaiting Tally payment",
-      "delayHours": 24,
-      "templateId": "payment_reminder_advance_10pct",
-      "status": "Active",
-      "sentCount": 342,
-      "readRate": "94.2%",
-      "conversionRate": "41.8%",
-      "description": "Enforces Tally payment gate by auto-reminding confirmed leads to deposit 10% advance before cold-off."
-    },
-    {
-      "id": "SEQ-02",
-      "name": "Client (Paid) Order Confirmation & Factory Release",
-      "triggerStage": "Client (Paid)",
-      "targetAudience": "Clients whose payment is verified in Tally ledger",
-      "delayHours": 0,
-      "templateId": "order_confirmation_factory_release",
-      "status": "Active",
-      "sentCount": 218,
-      "readRate": "98.6%",
-      "conversionRate": "100%",
-      "description": "Switches messaging automatically to order confirmation & factory release upon verified payment."
-    },
-    {
-      "id": "SEQ-03",
-      "name": "In Production Milestone Updates",
-      "triggerStage": "In Production",
-      "targetAudience": "Orders currently on factory floor",
-      "delayHours": 48,
-      "templateId": "production_update_milestone",
-      "status": "Active",
-      "sentCount": 185,
-      "readRate": "92.0%",
-      "conversionRate": "85.4%",
-      "description": "Keeps buyers informed with automated progress updates to prevent customer anxiety during assembly."
-    },
-    {
-      "id": "SEQ-04",
-      "name": "Dispatched Logistics & Courier Tracking",
-      "triggerStage": "Dispatched",
-      "targetAudience": "Orders loaded and in transit",
-      "delayHours": 0,
-      "templateId": "dispatch_tracking_alert",
-      "status": "Active",
-      "sentCount": 146,
-      "readRate": "99.1%",
-      "conversionRate": "96.2%",
-      "description": "Dispatches freight LR docket and transporter link immediately upon dock exit."
-    },
-    {
-      "id": "SEQ-05",
-      "name": "Qualified Lead Brochure & Specs Deck",
-      "triggerStage": "Qualified",
-      "targetAudience": "Newly qualified leads from voice agent",
-      "delayHours": 1,
-      "templateId": "qualified_lead_brochure_pack",
-      "status": "Paused",
-      "sentCount": 420,
-      "readRate": "88.5%",
-      "conversionRate": "28.1%",
-      "description": "Nurtures warm leads qualified by AI voice with machine specification PDF."
-    }
-  ],
-  "mockWhatsAppTemplates": [
-    {
-      "id": "payment_reminder_advance_10pct",
-      "name": "Payment Reminder (10% Advance Gate)",
-      "category": "UTILITY",
-      "language": "en_US",
-      "status": "APPROVED",
-      "header": "APS Enterprise — Order Advance Notice",
-      "bodyText": "Hello {{1}}, your booking for {{2}} (Total ₹{{3}}) is approved! To release your machine order to the manufacturing queue, please confirm the 10% advance payment of ₹{{4}}. Click the payment link below or reply to this message.",
-      "buttons": [
-        "Verify & Pay Advance",
-        "Speak to Account Manager"
-      ],
-      "triggerStage": "Confirmed Lead",
-      "delayDescription": "Auto-triggered after 24h of booking approval if payment pending"
-    },
-    {
-      "id": "order_confirmation_factory_release",
-      "name": "Client Order Confirmation & Factory Release",
-      "category": "UTILITY",
-      "language": "en_US",
-      "status": "APPROVED",
-      "header": "APS Enterprise — Production Release Confirmed",
-      "bodyText": "Congratulations {{1}}! Your 10% advance payment for {{2}} has been verified against our Tally ledger. Your order #{{3}} is now officially released to the factory floor. Expected completion in 14 business days.",
-      "buttons": [
-        "Track Production Status",
-        "Download Tally Receipt"
-      ],
-      "triggerStage": "Client (Paid)",
-      "delayDescription": "Immediate trigger upon Tally payment verification"
-    },
-    {
-      "id": "production_update_milestone",
-      "name": "Manufacturing Milestone Progress Alert",
-      "category": "UTILITY",
-      "language": "en_US",
-      "status": "APPROVED",
-      "header": "APS Enterprise — Factory Floor Update",
-      "bodyText": "Hello {{1}}, exciting news! Your {{2}} has completed {{3}} at our central manufacturing unit. Factory testing & calibration will commence shortly.",
-      "buttons": [
-        "View Inspection Photos",
-        "Contact Factory Rep"
-      ],
-      "triggerStage": "In Production",
-      "delayDescription": "Triggered at 50% & 90% production milestones"
-    },
-    {
-      "id": "dispatch_tracking_alert",
-      "name": "Courier & Freight Dispatch Notice",
-      "category": "UTILITY",
-      "language": "en_US",
-      "status": "APPROVED",
-      "header": "APS Enterprise — Consignment Dispatched",
-      "bodyText": "Dear {{1}}, your machinery {{2}} has been safely loaded and dispatched via {{3}} (Docket/LR: {{4}}). Estimated delivery: {{5}}.",
-      "buttons": [
-        "Live Consignment Tracking",
-        "Installation Guide"
-      ],
-      "triggerStage": "Dispatched",
-      "delayDescription": "Triggered when dispatch paperwork is logged in ERP"
-    },
-    {
-      "id": "qualified_lead_brochure_pack",
-      "name": "Qualified Lead Brochure & Specs Deck",
-      "category": "MARKETING",
-      "language": "en_US",
-      "status": "APPROVED",
-      "header": "APS Enterprise — Machine Catalog",
-      "bodyText": "Hi {{1}}, thank you for speaking with our AI specialist about the {{2}}. Attached is the full technical datasheet, tooling matrix, and ROI calculator.",
-      "buttons": [
-        "Open PDF Specs",
-        "Book Video Demo"
-      ],
-      "triggerStage": "Qualified",
-      "delayDescription": "Triggered 1 hour after voice agent qualifies lead"
-    }
-  ],
-  "mockTimeInStage": [
-    {
-      "stage": "Enquiry",
-      "avgHours": 4.2,
-      "targetSlaHours": 6,
-      "dealsCount": 46,
-      "status": "On Target",
-      "healthScore": 98,
-      "stalledDeals": []
-    },
-    {
-      "stage": "Qualified",
-      "avgHours": 12.5,
-      "targetSlaHours": 16,
-      "dealsCount": 45,
-      "status": "On Target",
-      "healthScore": 92,
-      "stalledDeals": []
-    },
-    {
-      "stage": "Booked",
-      "avgHours": 8,
-      "targetSlaHours": 12,
-      "dealsCount": 54,
-      "status": "On Target",
-      "healthScore": 95,
-      "stalledDeals": []
-    },
-    {
-      "stage": "Confirmed Lead",
-      "avgHours": 48.5,
-      "targetSlaHours": 24,
-      "dealsCount": 57,
-      "status": "Critical Warning",
-      "healthScore": 42,
-      "warning": "Deals going cold while sitting unpaid awaiting 10% Tally advance gate",
-      "stalledDeals": []
-    },
-    {
-      "stage": "Client (Paid)",
-      "avgHours": 6,
-      "targetSlaHours": 8,
-      "dealsCount": 61,
-      "status": "On Target",
-      "healthScore": 96,
-      "stalledDeals": []
-    },
-    {
-      "stage": "In Production",
-      "avgHours": 72,
-      "targetSlaHours": 120,
-      "dealsCount": 48,
-      "status": "On Target",
-      "healthScore": 90,
-      "stalledDeals": []
-    },
-    {
-      "stage": "Dispatched",
-      "avgHours": 0,
-      "targetSlaHours": 0,
-      "dealsCount": 39,
-      "status": "Complete",
-      "healthScore": 100,
-      "stalledDeals": []
-    }
-  ],
-  "mockDocuments": [
-    {
-      "id": "DOC-APS-01",
-      "title": "APS Enterprises Official Catalog & Dona Pattal Machine Brochure",
-      "category": "Product Catalog",
-      "keywords": [
-        "aps",
-        "dona",
-        "pattal",
-        "paper plate",
-        "indore",
-        "machine",
-        "contact",
-        "address",
-        "website"
-      ],
-      "excerpt": "APS Enterprises (Indore, MP): Manufacturer of Fully Automatic Double Die Dona Pattal Machines, Hydraulic Paper Plate Machines, Paper Cup Makers & Roll Cutters. Contact: +91-7869755871, Address: 832 Old Loha Mandi, Indore.",
-      "pageRef": "Website Home & Contact Page",
-      "downloads": 320
-    },
-    {
-      "id": "DOC-001",
-      "title": "CNC Machine 500T Heavy Industrial Specification Manual",
-      "category": "Technical Specs",
-      "keywords": [
-        "cnc",
-        "500t",
-        "spindle",
-        "rpm",
-        "specification",
-        "manual",
-        "power"
-      ],
-      "excerpt": "CNC Machine 500T featuring dual-spindle 24,000 RPM water-cooled motor, 5-axis synchro control, automatic tool changer (24 slots), and heavy cast-iron frame vibration dampening.",
-      "pageRef": "Page 12, Section 3.2",
-      "downloads": 142
-    },
-    {
-      "id": "DOC-002",
-      "title": "Fiber Laser Cutter 6kW Operating Datasheet & Warranty Policy",
-      "category": "User Manuals & Warranty",
-      "keywords": [
-        "laser",
-        "fiber",
-        "6kw",
-        "warranty",
-        "cutting speed",
-        "sheet metal"
-      ],
-      "excerpt": "Fiber Laser Cutter 6kW handles stainless steel up to 25mm, mild steel 30mm, aluminium 20mm. Standard 3-year comprehensive warranty covering Raycus laser source and IPG optical head.",
-      "pageRef": "Page 4, Warranty Terms",
-      "downloads": 98
-    },
-    {
-      "id": "DOC-003",
-      "title": "APS Enterprise Standard Quotation & Payment Gate Terms",
-      "category": "Commercial Templates",
-      "keywords": [
-        "quotation",
-        "payment terms",
-        "10%",
-        "advance",
-        "tally",
-        "invoice"
-      ],
-      "excerpt": "All orders require a 10% advance deposit verified against Tally ledger before releasing job cards to shopfloor manufacturing. Balance 90% payable upon dispatch notification.",
-      "pageRef": "Terms & Conditions Annexure A",
-      "downloads": 215
     }
   ],
   "mockInventory": [
@@ -14833,35 +12274,35 @@ const data = {
     }
   ],
   "companyProfile": {
-    "name": "APS Enterprises",
-    "website": "https://www.apsenterprises.in",
-    "tagline": "Leading Dona Pattal & Paper Plate Machine Manufacturer in Madhya Pradesh",
-    "address": "832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001",
-    "phones": [
+      "name": "APS Enterprises",
+      "website": "https://www.apsenterprises.in",
+      "tagline": "Leading Dona Pattal & Paper Plate Machine Manufacturer in Madhya Pradesh",
+      "address": "832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001",
+      "phones": [
       "+91-7869755871",
       "+91-8827848099"
     ],
-    "emails": [
+      "emails": [
       "support.apsenterprises@gmail.com",
       "apsenterprisesdp.229@gmail.com"
     ],
-    "products": [
+      "products": [
       "Fully Automatic Double Die Dona Pattal Machine",
       "Hydraulic Paper Plate & Thali Making Machine",
       "Automatic High-Speed Paper Cup Making Machine",
       "Semi-Automatic Heavy Paper Cutter Machine",
       "Raw Material Paper Roll & Lamination Machine"
     ]
-  },
+    },
   "systemConfig": {
-    "approvalPolicy": "single-action",
-    "paymentGatePercentage": 10,
-    "autoSendPaymentReminders": true,
-    "reminderDelayHours": 24,
-    "whatsappProvider": "Meta Cloud API (WABA Live)",
-    "wabaPhoneNumber": "+91 99880 01122",
-    "webhookUrl": "https://api.aps-enterprise.com/webhooks/whatsapp"
-  }
+      "approvalPolicy": "single-action",
+      "paymentGatePercentage": 10,
+      "autoSendPaymentReminders": true,
+      "reminderDelayHours": 24,
+      "whatsappProvider": "Meta Cloud API (WABA Live)",
+      "wabaPhoneNumber": "+91 99880 01122",
+      "webhookUrl": "https://api.aps-enterprise.com/webhooks/whatsapp"
+    }
 };
 
 module.exports = data;

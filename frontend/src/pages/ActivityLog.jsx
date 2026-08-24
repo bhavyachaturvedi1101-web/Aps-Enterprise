@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MOCK_ACTIVITY_LOGS } from '../mockData';
+import { MOCK_ACTIVITY_LOGS, MOCK_EMPLOYEES } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
@@ -44,7 +44,12 @@ export default function ActivityLog() {
             </div>
             <div style={{ ...s.td, fontWeight: 700, color: '#09090b', display: 'flex', alignItems: 'center', gap: 5 }}>
               {ICONS[log.employeeId] || <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>}
-              <span>{log.employeeName || log.employeeId}</span>
+              <span>
+                {(() => {
+                  const emp = MOCK_EMPLOYEES.find(e => e.id === log.employeeId);
+                  return emp ? `${emp.name} (${emp.role})` : (log.employeeName || log.employeeId);
+                })()}
+              </span>
             </div>
             <div style={{ ...s.td, flex: 2, fontSize: '0.75rem', color: '#52525b' }}>{log.action}</div>
             <div style={s.td}>
