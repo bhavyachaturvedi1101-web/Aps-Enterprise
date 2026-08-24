@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { connectDB } = require('./config/db');
 const { authenticate } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -58,8 +59,9 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`
   ╔═════════════════════════════════════════════════════════════════╗
   ║          APS Enterprise — A2 Admin Backend System               ║
   ║               Week 1 Parallel Development Complete             ║
@@ -83,7 +85,11 @@ if (require.main === module) {
   ║   [A4 Time-in-stage] GET  /api/activity/time-in-stage           ║
   ║   [A5 WhatsApp]      POST /api/whatsapp/send-reminder           ║
   ╚═════════════════════════════════════════════════════════════════╝
-    `);
+      `);
+    });
+  }).catch(err => {
+    console.error('Failed to connect to database, server not started:', err);
+    process.exit(1);
   });
 }
 
