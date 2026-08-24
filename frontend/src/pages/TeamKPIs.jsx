@@ -914,52 +914,54 @@ export default function TeamKPIs() {
             <h3 style={s.sectionTitle}>High-Risk / Cold Deals Exceeding Stage Thresholds</h3>
             <p style={s.sectionSub}>Deals at risk of cold-off requiring immediate telecaller outreach or automated WhatsApp sequences</p>
 
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Lead / Customer</th>
-                  <th style={s.th}>Current Stage</th>
-                  <th style={s.th}>Hours in Dwell</th>
-                  <th style={s.th}>Total Deal Value</th>
-                  <th style={s.th}>10% Advance Required</th>
-                  <th style={s.th}>Assigned Rep</th>
-                  <th style={s.th}>Risk Level</th>
-                  <th style={s.th}>Automation Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={s.td}>
-                    <div style={s.dealName}>Global Tech</div>
-                    <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
-                  </td>
-                  <td style={s.td}>
-                    <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-                      Confirmed Lead
-                    </span>
-                  </td>
-                  <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
-                  <td style={s.td}>₹42,000</td>
-                  <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
-                  <td style={s.td}>Aaditya (Analytics)</td>
-                  <td style={s.td}>
-                    <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10" /></svg>
-                      <span>Critical Stalled</span>
-                    </span>
-                  </td>
-                  <td style={s.td}>
-                    <button
-                      onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
-                      style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                      <span>Send WhatsApp Reminder</span>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="responsive-table-container">
+              <table className="responsive-table-content" style={s.table}>
+                <thead>
+                  <tr>
+                    <th style={s.th}>Lead / Customer</th>
+                    <th style={s.th}>Current Stage</th>
+                    <th style={s.th}>Hours in Dwell</th>
+                    <th style={s.th}>Total Deal Value</th>
+                    <th style={s.th}>10% Advance Required</th>
+                    <th style={s.th}>Assigned Rep</th>
+                    <th style={s.th}>Risk Level</th>
+                    <th style={s.th}>Automation Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={s.td}>
+                      <div style={s.dealName}>Global Tech</div>
+                      <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
+                    </td>
+                    <td style={s.td}>
+                      <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                        Confirmed Lead
+                      </span>
+                    </td>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
+                    <td style={s.td}>₹42,000</td>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
+                    <td style={s.td}>Aaditya (Analytics)</td>
+                    <td style={s.td}>
+                      <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10" /></svg>
+                        <span>Critical Stalled</span>
+                      </span>
+                    </td>
+                    <td style={s.td}>
+                      <button
+                        onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
+                        style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                        <span>Send WhatsApp Reminder</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

@@ -303,4 +303,25 @@ select option {
   div[style*="width: 700"] {
     width: 92% !important;
   }
+
+  /* Phone views only: wrap responsive table container */
+  .responsive-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  .responsive-table-content {
+    min-width: 900px !important;
+  }
+
+  /* For the custom flex grid table in Users & Roles page */
+  .users-roles-table-card {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  .users-roles-table-header,
+  .users-roles-table-row {
+    min-width: 850px !important;
+  }
 }

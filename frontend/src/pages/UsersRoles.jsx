@@ -315,8 +315,8 @@ export default function UsersRoles() {
         )}
       </div>
 
-      <div style={s.card}>
-        <div style={s.tableHead}>
+      <div className="users-roles-table-card" style={s.card}>
+        <div className="users-roles-table-header" style={s.tableHead}>
           {['User', 'Email', 'Role', 'Module Scope', 'Last Login', 'Status', 'Actions'].map(h => (
             <div key={h} style={{ ...s.th, flex: h === 'Email' ? 1.4 : 1 }}>{h}</div>
           ))}
@@ -326,7 +326,7 @@ export default function UsersRoles() {
           const sStyle = STATUS_STYLES[u.status] || { color: '#64748b', bg: '#f1f5f9', dot: '#94a3b8', border: '#cbd5e1' };
           const avatarBg = AVATAR_GRADIENTS[idx % AVATAR_GRADIENTS.length];
           return (
-            <div key={u.id} className="table-row-hover" style={s.tableRow}>
+            <div key={u.id} className="table-row-hover users-roles-table-row" style={s.tableRow}>
               <div style={{ ...s.td, flex: 1 }}>
                 <div style={s.rowWrap}>
                   <div style={{ ...s.userAvatar, background: avatarBg }}>{u.name[0]}</div>
