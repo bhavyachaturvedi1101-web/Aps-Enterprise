@@ -3,10 +3,9 @@ const {
   mockWhatsAppMessages, 
   mockWhatsAppSequences, 
   mockWhatsAppTemplates, 
-  mockLeads, 
-  mockActivityLogs,
   systemConfig 
 } = require('../config/inMemoryStore');
+const { Lead, ActivityLog } = require('../models');
 
 class WhatsAppService {
   async getMessages() {
@@ -58,7 +57,8 @@ class WhatsAppService {
   }
 
   async sendPaymentReminder(leadId) {
-    const lead = mockLeads.find(l => l.id === leadId || l.id === `LEAD-${String(leadId).padStart(3, '0')}`);
+    let lead = await Lead.findByPk(leadId);
+    if (!lead) lead = await Lead.findByPk(`LEAD-${String(leadId).padStart(3, '0')}`);
     if (!lead) throw new Error('Lead not found');
 
     const advanceAmount = (parseFloat(lead.budget || 20000) * 0.10).toLocaleString('en-IN');
@@ -82,17 +82,13 @@ class WhatsAppService {
 
     mockWhatsAppMessages.unshift(msg);
 
-    mockActivityLogs.unshift({
+    await ActivityLog.create({
       id: `log-${Date.now()}`,
       employeeId: 'e3',
-      employeeName: 'Aaditya',
       leadId: lead.id,
-      leadName: lead.name,
       action: `Automated WhatsApp 10% advance reminder sent to ${lead.name}`,
       fromStage: lead.stage,
-      toStage: lead.stage,
-      details: `Dispatched payment_reminder_advance_10pct via WhatsApp Automation (Advance: ₹${advanceAmount})`,
-      createdAt: new Date()
+      toStage: lead.stage
     });
 
     console.log(`[WhatsApp Automation] Payment reminder sent to ${lead.name} (${msg.messageId}).`);
@@ -100,7 +96,12 @@ class WhatsAppService {
   }
 
   async sendCustomMessage({ leadId, phone, templateId, customText, recipientName, product, amount }) {
-    const lead = leadId ? mockLeads.find(l => l.id === leadId) : null;
+    let lead = null;
+    if (leadId) {
+      lead = await Lead.findByPk(leadId);
+      if (!lead) lead = await Lead.findByPk(`LEAD-${String(leadId).padStart(3, '0')}`);
+    }
+
     const targetName = recipientName || lead?.name || 'Valued Customer';
     const targetPhone = phone || lead?.phone || '+91 99880 00000';
     const template = mockWhatsAppTemplates.find(t => t.id === templateId) || mockWhatsAppTemplates[0];
@@ -134,23 +135,19 @@ class WhatsAppService {
 
     mockWhatsAppMessages.unshift(msg);
 
-    mockActivityLogs.unshift({
-      id: `log-${Date.now()}`,
-      employeeId: 'e3',
-      employeeName: 'Aaditya',
-      leadId: lead?.id || 'DIRECT',
-      leadName: targetName,
-      action: `WhatsApp message (${template.name}) sent to ${targetName}`,
-      fromStage: lead?.stage || 'None',
-      toStage: lead?.stage || 'None',
-      details: `Sent via WhatsApp Automation: ${template.id}`,
-      createdAt: new Date()
-    });
-
+    if (lead) {
+      await ActivityLog.create({
+        id: `log-${Date.now()}`,
+        employeeId: 'e3',
+        leadId: lead.id,
+        action: `WhatsApp message (${template.name}) sent to ${targetName}`,
+        fromStage: lead.stage || 'None',
+        toStage: lead.stage || 'None'
+      });
+    }
 
     return { success: true, message: msg };
   }
 }
 
 module.exports = new WhatsAppService();
-

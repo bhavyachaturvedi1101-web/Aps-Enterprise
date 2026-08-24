@@ -3,7 +3,7 @@ const { sequelize } = require('../config/db');
 
 const ActivityLog = sequelize.define('ActivityLog', {
   id: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
@@ -12,7 +12,7 @@ const ActivityLog = sequelize.define('ActivityLog', {
     allowNull: false
   },
   leadId: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
     allowNull: false
   },
   action: {

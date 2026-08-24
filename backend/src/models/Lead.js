@@ -3,7 +3,7 @@ const { sequelize } = require('../config/db');
 
 const Lead = sequelize.define('Lead', {
   id: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
