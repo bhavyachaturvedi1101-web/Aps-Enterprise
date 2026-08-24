@@ -132,7 +132,7 @@ export default function Dashboard() {
         const activityData = await activityRes.json();
 
         setLeads(leadsData.leads || []);
-        setActivityLogs(activityData.logs || []);
+        setActivityLogs(activityData.activityLogs || []);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -333,7 +333,7 @@ export default function Dashboard() {
         <div style={s.page}>
 
           {/* Hero Banner */}
-          <div style={s.heroCard}>
+          <div className="responsive-hero" style={s.heroCard}>
             <div style={s.heroLeft}>
               <h1 style={s.heroTitle}>Automated Lead Insights</h1>
               <div style={s.heroStatsRow}>
@@ -391,7 +391,7 @@ export default function Dashboard() {
           </div>
 
           {/* Integration Status Bar */}
-          <div style={s.intBar}>
+          <div className="grid-4col" style={s.intBar}>
             {INTEGRATIONS.map(int => {
               const routeMap = { CRM: '/crm', ERP: '/bookings', Dialer: '/dialer', Tally: '/tally' };
               return (
@@ -422,7 +422,7 @@ export default function Dashboard() {
           </div>
 
           {/* Three Card Grid */}
-          <div style={s.grid3}>
+          <div className="grid-3col" style={s.grid3}>
             {/* Card 1 — Lead Status Performance Bar Chart */}
             <div style={s.card}>
               <div style={s.cardTop}>
@@ -646,7 +646,7 @@ export default function Dashboard() {
           </div>
 
           {/* Bottom Two-Column: Activity + Alerts */}
-          <div style={s.grid2}>
+          <div className="grid-2col" style={s.grid2}>
             {/* Recent Activity */}
             <div style={s.card}>
               <div style={s.cardTop}>
