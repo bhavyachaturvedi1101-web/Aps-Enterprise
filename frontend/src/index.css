@@ -324,4 +324,13 @@ select option {
   .users-roles-table-row {
     min-width: 850px !important;
   }
+
+  /* Stack hero card vertically on mobile screens */
+  .responsive-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1.5rem !important;
+    padding: 1.5rem !important;
+    min-height: auto !important;
+  }
 }
