@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MOCK_LEADS } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
@@ -218,8 +219,8 @@ export default function CRMLeads() {
   const navigate = useNavigate();
   const boardRef = useRef(null);
 
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [leads, setLeads] = useState(MOCK_LEADS);
+  const [loading, setLoading] = useState(false);
   const [transitioning, setTransitioning] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedSource, setSelectedSource] = useState('All');

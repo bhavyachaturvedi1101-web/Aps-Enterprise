@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { MOCK_ACTIVITY_LOGS } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 export default function ActivityLog() {
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [logs, setLogs] = useState(MOCK_ACTIVITY_LOGS);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/activity`).then(r => r.json()).then(d => { setLogs(d.activityLogs || []); setLoading(false); }).catch(() => setLoading(false));
