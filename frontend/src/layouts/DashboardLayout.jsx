@@ -146,6 +146,23 @@ export default function DashboardLayout() {
   const [notifFilter, setNotifFilter] = useState('all');
   const [isSimulating, setIsSimulating] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   // Dynamic Navigation Groups based on active User Role
   const filteredNavGroups = useMemo(() => {
     const role = currentUser?.role || 'admin';
@@ -401,29 +418,60 @@ export default function DashboardLayout() {
 
   const roleTitleDisplay = currentUser?.role === 'admin' ? 'System Administrator' : currentUser?.role === 'manager' ? 'Operations Manager' : 'Sales Specialist';
 
+  const mobileSidebarStyle = isMobile ? {
+    position: 'fixed',
+    top: 0,
+    left: sidebarOpen ? 0 : -240,
+    width: 240,
+    height: '100vh',
+    boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
+    transition: 'left 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    zIndex: 1000
+  } : {};
+
   return (
     <div style={s.container}>
 
       {/* ─── TOP HEADER ─────────────────────────────────────────────────── */}
-      <header style={s.header}>
-        {/* Logo */}
-        <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
-          <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
+      <header style={{ ...s.header, padding: isMobile ? '0 1rem' : '0 1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 8px 8px 0', marginRight: 8, display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}
+              title="Toggle Menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.5">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          )}
+          {/* Logo */}
+          <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
+            <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: isMobile ? 36 : 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
+          </div>
         </div>
 
-        {/* Center Pills */}
-        <div style={s.pillContainer}>
-          {headerPills.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => handleTabChange(key)}
-              className={`header-pill-btn ${activeTab === key ? 'active' : ''}`}
-              style={{ ...s.pillButton, ...(activeTab === key ? s.pillActive : s.pillInactive) }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Center Pills (Desktop only) */}
+        {!isMobile && (
+          <div style={s.pillContainer}>
+            {headerPills.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleTabChange(key)}
+                className={`header-pill-btn ${activeTab === key ? 'active' : ''}`}
+                style={{ ...s.pillButton, ...(activeTab === key ? s.pillActive : s.pillInactive) }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Right Actions */}
         <div style={{ ...s.headerRight, position: 'relative' }}>
@@ -590,10 +638,12 @@ export default function DashboardLayout() {
             <div style={{ ...s.userAvatarInitial, backgroundColor: currentUser?.avatarBg || '#09090b' }}>
               {currentUser?.avatar || 'A'}
             </div>
-            <div style={s.userInfo}>
-              <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
-              <div style={s.userRole}>{roleTitleDisplay}</div>
-            </div>
+            {!isMobile && (
+              <div style={s.userInfo}>
+                <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
+                <div style={s.userRole}>{roleTitleDisplay}</div>
+              </div>
+            )}
             <svg style={s.dropdownIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -678,8 +728,26 @@ export default function DashboardLayout() {
       {/* ─── BODY: SIDEBAR + MAIN ───────────────────────────────────────── */}
       <div style={s.bodyWrapper}>
 
+        {/* Mobile Sidebar Backdrop */}
+        {isMobile && sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(9, 9, 11, 0.4)',
+              backdropFilter: 'blur(3px)',
+              zIndex: 999,
+              transition: 'opacity 0.25s ease'
+            }}
+          />
+        )}
+
         {/* ─── SIDEBAR ──────────────────────────────────────────────────── */}
-        <aside style={s.sidebar}>
+        <aside style={{ ...s.sidebar, ...mobileSidebarStyle }}>
 
           {/* Scrollable Nav */}
           <div style={s.sidebarScroll}>
