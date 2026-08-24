@@ -7,7 +7,22 @@ const MOCK_CALLS = [
   { id: 'C004', name: 'Gupta Disposables', phone: '+91 65432 10987', product: 'Silver Craft Paper Roll', status: 'Completed', priority: 'Low', agent: 'Animesh (Sales Lead)' },
   { id: 'C005', name: 'Mishra Polymers', phone: '+91 54321 09876', product: 'Single Die Paper Plate Machine', status: 'Failed', priority: 'High', agent: 'Voice AI' },
   { id: 'C006', name: 'Verma Plastics', phone: '+91 98989 12345', product: 'Agarbatti Making Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C007', name: 'Desai Traders', phone: '+91 99887 77665', product: 'Paper Lamination Machine', status: 'In Progress', priority: 'High', agent: 'Pooja (Telecaller)' }
+  { id: 'C007', name: 'Desai Traders', phone: '+91 99887 77665', product: 'Paper Lamination Machine', status: 'In Progress', priority: 'High', agent: 'Pooja (Telecaller)' },
+  { id: 'C008', name: 'Kapur Industries', phone: '+91 91234 56780', product: 'Double Die Paper Plate Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C009', name: 'Jain Packing Solutions', phone: '+91 88776 65544', product: '4-Die Dona Pattal Machine', status: 'Queued', priority: 'High', agent: 'Pooja (Telecaller)' },
+  { id: 'C010', name: 'Sinha Global', phone: '+91 99000 11223', product: 'Hydraulic Dona Pattal Machine', status: 'Completed', priority: 'Low', agent: 'Voice AI' },
+  { id: 'C011', name: 'Reddy Paper Products', phone: '+91 77665 54433', product: 'Fully Automatic Paper Cup Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C012', name: 'Malhotra Enterprises', phone: '+91 88990 01122', product: 'Single Die Paper Plate Machine', status: 'In Progress', priority: 'Normal', agent: 'Animesh (Sales Lead)' },
+  { id: 'C013', name: 'Patel Disposables', phone: '+91 90123 45678', product: 'Silver Craft Paper Roll', status: 'Failed', priority: 'High', agent: 'Pooja (Telecaller)' },
+  { id: 'C014', name: 'Singh Plastics', phone: '+91 95432 10987', product: 'Paper Bag Making Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
+  { id: 'C015', name: 'Shah Packers', phone: '+91 98765 00011', product: 'Agarbatti Making Machine', status: 'Completed', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C016', name: 'Tiwari Solutions', phone: '+91 87654 11122', product: 'Non-Woven Bag Making Machine', status: 'Queued', priority: 'Normal', agent: 'Pooja (Telecaller)' },
+  { id: 'C017', name: 'Chauhan Manufacturing', phone: '+91 76543 22233', product: 'Heavy Duty Hydraulic Paper Plate Press', status: 'Queued', priority: 'High', agent: 'Voice AI' },
+  { id: 'C018', name: 'Kumar Polymers', phone: '+91 65432 33344', product: 'Double Die Paper Plate Machine', status: 'In Progress', priority: 'Low', agent: 'Voice AI' },
+  { id: 'C019', name: 'Mehta Creations', phone: '+91 91234 44455', product: 'Hydraulic Dona Pattal Machine', status: 'Completed', priority: 'High', agent: 'Animesh (Sales Lead)' },
+  { id: 'C020', name: 'Nair Ventures', phone: '+91 99887 55566', product: 'Slipper Making Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
+  { id: 'C021', name: 'Yadav Traders', phone: '+91 88776 66677', product: 'Semi-Automatic Dona Making Machine', status: 'Failed', priority: 'High', agent: 'Voice AI' },
+  { id: 'C022', name: 'Rao Packaging', phone: '+91 99000 77788', product: 'Fully Automatic Paper Cup Machine', status: 'Queued', priority: 'Normal', agent: 'Pooja (Telecaller)' }
 ];
 
 const STATUS_CLR = { Queued:'#09090b', 'In Progress':'#27272a', Completed:'#52525b', Failed:'#71717a' };
