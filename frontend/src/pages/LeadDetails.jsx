@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { MOCK_EMPLOYEES } from '../mockData';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 export default function LeadDetails() {
   const { id } = useParams();
@@ -170,7 +171,12 @@ export default function LeadDetails() {
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>Assigned Staff:</span>
-              <span style={styles.infoValue}>{lead.assignedEmployeeId || 'Bhavya (Admin)'}</span>
+              <span style={styles.infoValue}>
+                {(() => {
+                  const emp = MOCK_EMPLOYEES.find(e => e.id === lead.assignedEmployeeId);
+                  return emp ? `${emp.name} (${emp.role})` : (lead.assignedEmployeeId || 'Sneha (Admin)');
+                })()}
+              </span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>Created Date & Time:</span>
@@ -217,7 +223,14 @@ export default function LeadDetails() {
                 <div key={a.id} style={styles.logCard}>
                   <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#08060d' }}>{a.action}</div>
                   <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: 2 }}>
-                    By Employee: {a.employeeId} {a.countersignedBy && `| Countersigned by: ${a.countersignedBy}`}
+                    By Employee: {(() => {
+                      const emp = MOCK_EMPLOYEES.find(e => e.id === a.employeeId);
+                      return emp ? `${emp.name} (${emp.role})` : (a.employeeName || a.employeeId);
+                    })()} {(() => {
+                      if (!a.countersignedBy) return '';
+                      const counterEmp = MOCK_EMPLOYEES.find(e => e.id === a.countersignedBy);
+                      return `| Countersigned by: ${counterEmp ? `${counterEmp.name} (${counterEmp.role})` : a.countersignedBy}`;
+                    })()}
                   </div>
                 </div>
               ))

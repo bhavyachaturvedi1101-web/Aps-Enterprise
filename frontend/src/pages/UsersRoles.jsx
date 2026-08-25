@@ -226,9 +226,9 @@ export default function UsersRoles() {
   const hasActiveFilters = searchQuery || roleFilter !== 'All Roles' || statusFilter !== 'All Statuses' || sortBy !== 'Name (A-Z)';
 
   return (
-    <div style={s.page}>
+    <div style={{ ...s.page, padding: undefined }} className="page-container">
       {/* Page Header */}
-      <div style={s.pageHead}>
+      <div style={s.pageHead} className="mobile-stack-header">
         <div>
           <h1 style={s.title}>Users & Roles</h1>
           <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
@@ -246,12 +246,11 @@ export default function UsersRoles() {
       </div>
 
       {/* ── Search, Filter & Sort Toolbar ───────────────────────────────── */}
-      <div style={s.toolbar}>
+      <div style={s.toolbar} className="mobile-filter-toolbar">
         {/* Search Bar */}
         <div style={s.searchWrap}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2.2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input
             type="text"
@@ -265,37 +264,40 @@ export default function UsersRoles() {
           )}
         </div>
 
-        {/* Filter by Role */}
-        <div style={s.filterGroup}>
-          <label style={s.filterLabel}>Role:</label>
-          <CustomSelect
-            value={roleFilter}
-            options={['All Roles', ...ROLES]}
-            onChange={val => setRoleFilter(val)}
-            minWidth={135}
-          />
-        </div>
+        {/* Filters — wrapped in mobile-filter-groups for 2-col grid on phone */}
+        <div className="mobile-filter-groups" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+          {/* Filter by Role */}
+          <div style={s.filterGroup} className="filter-group-row">
+            <label style={s.filterLabel}>Role:</label>
+            <CustomSelect
+              value={roleFilter}
+              options={['All Roles', ...ROLES]}
+              onChange={val => setRoleFilter(val)}
+              minWidth={135}
+            />
+          </div>
 
-        {/* Filter by Status */}
-        <div style={s.filterGroup}>
-          <label style={s.filterLabel}>Status:</label>
-          <CustomSelect
-            value={statusFilter}
-            options={['All Statuses', 'Online', 'Away', 'Offline']}
-            onChange={val => setStatusFilter(val)}
-            minWidth={135}
-          />
-        </div>
+          {/* Filter by Status */}
+          <div style={s.filterGroup} className="filter-group-row">
+            <label style={s.filterLabel}>Status:</label>
+            <CustomSelect
+              value={statusFilter}
+              options={['All Statuses', 'Online', 'Away', 'Offline']}
+              onChange={val => setStatusFilter(val)}
+              minWidth={135}
+            />
+          </div>
 
-        {/* Sort By */}
-        <div style={s.filterGroup}>
-          <label style={s.filterLabel}>Sort by:</label>
-          <CustomSelect
-            value={sortBy}
-            options={['Name (A-Z)', 'Name (Z-A)', 'Role', 'Status']}
-            onChange={val => setSortBy(val)}
-            minWidth={140}
-          />
+          {/* Sort By */}
+          <div style={s.filterGroup} className="filter-group-row">
+            <label style={s.filterLabel}>Sort by:</label>
+            <CustomSelect
+              value={sortBy}
+              options={['Name (A-Z)', 'Name (Z-A)', 'Role', 'Status']}
+              onChange={val => setSortBy(val)}
+              minWidth={140}
+            />
+          </div>
         </div>
 
         {/* Reset Filters */}
@@ -315,8 +317,8 @@ export default function UsersRoles() {
         )}
       </div>
 
-      <div style={s.card}>
-        <div style={s.tableHead}>
+      <div className="users-roles-table-card" style={s.card}>
+        <div className="users-roles-table-header" style={s.tableHead}>
           {['User', 'Email', 'Role', 'Module Scope', 'Last Login', 'Status', 'Actions'].map(h => (
             <div key={h} style={{ ...s.th, flex: h === 'Email' ? 1.4 : 1 }}>{h}</div>
           ))}
@@ -326,7 +328,7 @@ export default function UsersRoles() {
           const sStyle = STATUS_STYLES[u.status] || { color: '#64748b', bg: '#f1f5f9', dot: '#94a3b8', border: '#cbd5e1' };
           const avatarBg = AVATAR_GRADIENTS[idx % AVATAR_GRADIENTS.length];
           return (
-            <div key={u.id} className="table-row-hover" style={s.tableRow}>
+            <div key={u.id} className="table-row-hover users-roles-table-row" style={s.tableRow}>
               <div style={{ ...s.td, flex: 1 }}>
                 <div style={s.rowWrap}>
                   <div style={{ ...s.userAvatar, background: avatarBg }}>{u.name[0]}</div>

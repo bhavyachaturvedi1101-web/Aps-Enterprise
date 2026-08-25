@@ -190,7 +190,7 @@ function getStore() {
 // ─── Data Handlers ─────────────────────────────────────────────────────────────
 async function handleLeadsByStage(query) {
   const stage = detectStage(query);
-  const store = getStore();
+  const store = await getStore();
   let leads = store.mockLeads || [];
   if (stage) leads = leads.filter(l => l.stage === stage);
   return {
@@ -205,7 +205,7 @@ async function handleLeadsByStage(query) {
 }
 
 async function handleLeadCount() {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
   const counts = stages.map(s => leads.filter(l => l.stage === s).length);
@@ -222,7 +222,7 @@ async function handleLeadCount() {
 }
 
 async function handlePendingPayment() {
-  const store = getStore();
+  const store = await getStore();
   const leads = (store.mockLeads || []).filter(l => l.stage === 'Confirmed Lead');
   const empMap = (store.mockEmployees || []).reduce((acc, e) => {
     acc[e.id] = e.name;
@@ -242,7 +242,7 @@ async function handlePendingPayment() {
 }
 
 async function handleTopPerformer() {
-  const store = getStore();
+  const store = await getStore();
   const employees = store.mockEmployees || [];
   const ranked = employees.map(e => ({
     name: e.name, role: e.role,
@@ -266,7 +266,7 @@ async function handleTopPerformer() {
 }
 
 async function handleComparePeriod() {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const now = new Date();
   const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -294,7 +294,7 @@ async function handleComparePeriod() {
 }
 
 async function handleRecentActivity() {
-  const store = getStore();
+  const store = await getStore();
   const logs = (store.mockActivityLogs || []).slice(0, 10);
   return {
     text: `Here are the **${logs.length} most recent activities** logged in the system.`,
@@ -309,7 +309,7 @@ async function handleRecentActivity() {
 }
 
 async function handlePipelineSummary() {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
   const counts = stages.map(s => leads.filter(l => l.stage === s).length);
@@ -326,7 +326,7 @@ async function handlePipelineSummary() {
 }
 
 async function handleRevenueSummary() {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const closed = ['Client (Paid)', 'In Production', 'Dispatched'];
   const closedLeads = leads.filter(l => closed.includes(l.stage));
@@ -348,7 +348,7 @@ async function handleRevenueSummary() {
 }
 
 async function handleEmployeeList() {
-  const store = getStore();
+  const store = await getStore();
   const employees = store.mockEmployees || [];
   return {
     text: `**${employees.length} employees** are registered in the system.`,
@@ -358,7 +358,7 @@ async function handleEmployeeList() {
 }
 
 async function handleHotLeads() {
-  const store = getStore();
+  const store = await getStore();
   const leads = (store.mockLeads || []).filter(l => ['Qualified', 'Confirmed Lead'].includes(l.stage)).slice(0, 15);
   return {
     text: `**${leads.length} hot leads** require immediate follow-up (Qualified or Confirmed but not yet paid).`,
@@ -373,7 +373,7 @@ async function handleHotLeads() {
 }
 
 async function handleKpiStats() {
-  const store = getStore();
+  const store = await getStore();
   const employees = store.mockEmployees || [];
   const sorted = [...employees].sort((a, b) => (b.kpiScoreNum || 0) - (a.kpiScoreNum || 0));
   return {
@@ -388,7 +388,7 @@ async function handleKpiStats() {
 }
 
 async function handleDialer() {
-  const store = getStore();
+  const store = await getStore();
   const calls = store.mockCallLogs || [];
   return {
     text: `**${calls.length} calls** logged in the A1 Voice Agent dialer. Total call time: **${Math.round(calls.reduce((s, c) => s + (c.durationSeconds || 0), 0) / 60)} minutes**.`,
@@ -398,7 +398,7 @@ async function handleDialer() {
 }
 
 async function handleWhatsApp() {
-  const store = getStore();
+  const store = await getStore();
   const templates = store.mockWhatsAppTemplates || [];
   return {
     text: `**${templates.length} WhatsApp templates** configured for A5 automation. These are auto-triggered based on lead stage transitions.`,
@@ -408,7 +408,7 @@ async function handleWhatsApp() {
 }
 
 async function handleGenerateReport(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
 
@@ -674,7 +674,7 @@ function buildEmployeePerformanceExport(employeesData, format, dateStr) {
 }
 
 async function handleEmployeePerformance(query) {
-  const store = getStore();
+  const store = await getStore();
   const rawEmployees = store.mockEmployees || [];
   const format = detectRequestedFormat(query);
   const dateStr = new Date().toISOString().slice(0, 10);
@@ -744,7 +744,7 @@ async function handleEmployeePerformance(query) {
 }
 
 async function handleExportFile(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const inventory = store.mockInventory || [];
   const dateStr = new Date().toISOString().slice(0, 10);
@@ -803,7 +803,7 @@ async function handleExplainMetrics(query) {
 }
 
 async function handleTrendAnalysis(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const pending = leads.filter(l => l.stage === 'Confirmed Lead');
 
@@ -841,7 +841,7 @@ async function handleTrendAnalysis(query) {
 }
 
 async function handleDocSearch(query) {
-  const store = getStore();
+  const store = await getStore();
   const docs = store.mockDocuments || [];
   const qLower = query.toLowerCase();
 
@@ -862,7 +862,7 @@ async function handleDocSearch(query) {
 }
 
 async function handleActionSendEmail(query) {
-  const store = getStore();
+  const store = await getStore();
   const activityLogs = store.mockActivityLogs || [];
   const leads = store.mockLeads || [];
 
@@ -889,7 +889,7 @@ async function handleActionSendEmail(query) {
 }
 
 async function handleActionCheckInventory(query) {
-  const store = getStore();
+  const store = await getStore();
   const inventory = store.mockInventory || [];
   const format = detectRequestedFormat(query);
   const dateStr = new Date().toISOString().slice(0, 10);
@@ -918,7 +918,7 @@ async function handleActionCheckInventory(query) {
 }
 
 async function handlePredictiveForecast(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const closed = leads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
   const totalRevenue = closed.reduce((s, l) => s + (Number(l.budget) || 0), 0);
@@ -968,7 +968,7 @@ async function handlePredictiveForecast(query) {
 }
 
 async function handleChurnRisk(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const confirmed = leads.filter(l => l.stage === 'Confirmed Lead');
 
@@ -1075,7 +1075,7 @@ async function handleInvoiceGenerator(query) {
 }
 
 async function handleCallSentiment(query) {
-  const store = getStore();
+  const store = await getStore();
   const calls = store.mockCallLogs || [];
 
   return {
@@ -1120,7 +1120,7 @@ async function handleWhatsAppAnalytics(query) {
 }
 
 async function handleSalesLeaderboard(query) {
-  const store = getStore();
+  const store = await getStore();
   const employees = store.mockEmployees || [];
   const sorted = [...employees].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0));
 
@@ -1291,7 +1291,7 @@ async function handleDashboardInfo(query) {
 // ─── ADMIN ACTION HANDLERS (CRM, TALLY, ERP, DIALER, WHATSAPP) ────────────────
 
 async function handleActionCreateLead(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const activityLogs = store.mockActivityLogs || [];
 
@@ -1344,7 +1344,7 @@ async function handleActionCreateLead(query) {
 }
 
 async function handleActionTransitionLead(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const activityLogs = store.mockActivityLogs || [];
 
@@ -1388,7 +1388,7 @@ async function handleActionTransitionLead(query) {
 }
 
 async function handleActionPostTally(query) {
-  const store = getStore();
+  const store = await getStore();
   const activityLogs = store.mockActivityLogs || [];
 
   let amountMatch = query.match(/₹?\s*([0-9,]+)/);
@@ -1419,7 +1419,7 @@ async function handleActionPostTally(query) {
 }
 
 async function handleActionErpBooking(query) {
-  const store = getStore();
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const activityLogs = store.mockActivityLogs || [];
 
@@ -1448,7 +1448,7 @@ async function handleActionErpBooking(query) {
 }
 
 async function handleActionQueueDialer(query) {
-  const store = getStore();
+  const store = await getStore();
   const callLogs = store.mockCallLogs || [];
   const activityLogs = store.mockActivityLogs || [];
 
@@ -1485,7 +1485,7 @@ async function handleActionQueueDialer(query) {
 }
 
 async function handleScheduleCall(query) {
-  const store = getStore();
+  const store = await getStore();
   const activityLogs = store.mockActivityLogs || [];
   const callLogs = store.mockCallLogs || [];
   const leads = store.mockLeads || [];
@@ -1541,7 +1541,7 @@ async function handleScheduleCall(query) {
 }
 
 async function handleActionSendWhatsApp(query) {
-  const store = getStore();
+  const store = await getStore();
   const waMsgs = store.mockWhatsAppMessages || [];
   const activityLogs = store.mockActivityLogs || [];
 
@@ -1582,9 +1582,9 @@ async function handleActionSendWhatsApp(query) {
   };
 }
 
-// ─── Full context builder for LLM (High Density & Compact) ───────────────────
-function buildFullContext() {
-  const store = getStore();
+// ─── Full context builder for LLM (High Density & Compact to stay well under TPM limit) ──
+async function buildFullContext() {
+  const store = await getStore();
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
 
@@ -1760,7 +1760,7 @@ async function processWithLLM(query, history) {
   const provider = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
   if (provider === 'mock') return null;
 
-  const context = buildFullContext();
+  const context = await buildFullContext();
 
   const systemPrompt = `You are APS AI — a world-class, frontier-level AI Assistant and Enterprise Intelligence Copilot (engineered with the reasoning power, depth, versatility, and conversational fluency of ChatGPT-4o and Google Gemini 1.5 Pro).
 
@@ -1818,9 +1818,9 @@ ${context}`;
 }
 
 // ─── Intelligent Fallback Handler ─────────────────────────────────────────────
-function generateUniversalAnswer(query) {
+async function generateUniversalAnswer(query) {
   const qLower = (query || '').toLowerCase().trim();
-  const store = getStore();
+  const store = await getStore();
   const mockLeads = store.mockLeads || [];
   const mockEmployees = store.mockEmployees || [];
 
@@ -2110,7 +2110,7 @@ async function processQuery(query, conversationId) {
 
   // Fallback to Universal Answer Generator if result is missing
   if (!result || !result.text) {
-    result = generateUniversalAnswer(query);
+    result = await generateUniversalAnswer(query);
   }
 
   // Intelligently detect the exact format requested (CSV, XLSX, DOCX, JSON, PDF)

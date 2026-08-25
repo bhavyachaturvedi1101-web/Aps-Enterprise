@@ -1,15 +1,19 @@
-// Team KPIs & Performance Dashboard
+// Team KPIs & Performance Dashboard
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 const ROLE_OPTIONS = [
   { label: 'All Roles', value: 'ALL' },
-  { label: 'Voice / Telecaller', value: 'Voice' },
-  { label: 'System Architect', value: 'Architect' },
-  { label: 'Analytics & Automation Specialist', value: 'Analytics' },
-  { label: 'ERP / Dispatch', value: 'ERP' }
+  { label: 'Telecaller / Qualification', value: 'Telecaller' },
+  { label: 'Field & Direct Sales', value: 'Sales' },
+  { label: 'Manufacturing Assembly', value: 'Assembly' },
+  { label: 'Machine Fitter', value: 'Fitter' },
+  { label: 'Quality Testing', value: 'Testing' },
+  { label: 'ERP Dispatch & Logistics', value: 'Dispatch' },
+  { label: 'Accounts & ERP Admin', value: 'Admin' },
+  { label: 'Spare Parts & Service', value: 'Spare' }
 ];
 
 function CustomSelect({ value, options, onChange, minWidth = 160 }) {
@@ -131,182 +135,3526 @@ function CustomSelect({ value, options, onChange, minWidth = 160 }) {
 }
 
 const DEFAULT_EMPLOYEES = [
-  { 
-    id: 'e1', 
-    name: 'Animesh', 
-    email: 'animesh@aps-enterprise.com',
-    phone: '+91 98201 11223',
-    role: 'Voice Operations & Sales Lead', 
-    department: 'Voice Operations & Telecalling',
-    kpiScore: '94%',
-    kpiScoreNum: 94,
-    status: 'Active',
-    currentActivity: 'Qualifying Inbound Voice Lead (Reliance Automation)',
-    tasksCompleted: 48, 
-    callsHandled: 124, 
-    salesClosed: 8,
-    totalRevenue: 248000,
-    targetSales: 10,
-    conversionRate: '36.8%',
-    avgCallDurationSec: 135,
-    avgResponseTimeMin: 4.2,
-    weeklyKpiHistory: [86, 89, 91, 94],
-    stageConversions: { enquiryToQualified: 42, qualifiedToBooked: 28, bookedToConfirmed: 18, confirmedToPaid: 8 },
-    activeTask: {
-      id: 'task-e1-1',
-      title: 'Outbound telecall follow-up for LEAD-008 (Reliance Automation)',
-      leadId: 'LEAD-008',
-      leadName: 'Reliance Automation',
-      priority: 'High',
-      type: 'Sales Qualification',
-      stage: 'Enquiry',
-      dueIn: '20 mins',
-      assignedAt: new Date(Date.now() - 1800000)
-    },
-    taskQueue: [
-      {
-        id: 'task-e1-2',
-        title: 'Voice Agent call analysis & qualification review for LEAD-002 (Jane Smith)',
-        leadId: 'LEAD-002',
-        leadName: 'Jane Smith',
-        priority: 'Normal',
-        type: 'Voice Review',
-        stage: 'Qualified'
-      }
-    ]
+{
+  "id": "e1",
+  "name": "Pooja Sharma",
+  "email": "pooja@aps-enterprise.com",
+  "phone": "+91 9816676744",
+  "role": "Senior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "95%",
+  "kpiScoreNum": 95,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 73,
+  "callsHandled": 135,
+  "salesClosed": 8,
+  "totalRevenue": 371630,
+  "targetSales": 15,
+  "conversionRate": "26%",
+  "avgCallDurationSec": 119,
+  "avgResponseTimeMin": "1.4",
+  "weeklyKpiHistory": [
+    92,
+    94,
+    95,
+    95
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
   },
-  { 
-    id: 'e2', 
-    name: 'Sneha', 
-    email: 'sneha@aps-enterprise.com',
-    phone: '+91 98202 22334',
-    role: 'Admin Cockpit Operator & Operations Lead', 
-    department: 'Central Operations & Admin',
-    kpiScore: '96%',
-    kpiScoreNum: 96,
-    status: 'Active',
-    currentActivity: 'Dual-Approval Review for LEAD-004 (Global Tech)',
-    tasksCompleted: 62, 
-    callsHandled: 88, 
-    salesClosed: 11,
-    totalRevenue: 385000,
-    targetSales: 12,
-    conversionRate: '41.2%',
-    avgCallDurationSec: 92,
-    avgResponseTimeMin: 2.8,
-    weeklyKpiHistory: [88, 90, 93, 96],
-    stageConversions: { enquiryToQualified: 55, qualifiedToBooked: 40, bookedToConfirmed: 26, confirmedToPaid: 11 },
-    activeTask: {
-      id: 'task-e2-1',
-      title: 'Countersign Dual-Approval Booking Sheet for LEAD-004 (Global Tech)',
-      leadId: 'LEAD-004',
-      leadName: 'Global Tech',
-      priority: 'Urgent',
-      type: 'Order Approval',
-      stage: 'Booked',
-      dueIn: '15 mins',
-      assignedAt: new Date(Date.now() - 900000)
-    },
-    taskQueue: [
-      {
-        id: 'task-e2-2',
-        title: 'Reconcile Tally 10% advance receipt ledger for LEAD-001 (Acme Machinery)',
-        leadId: 'LEAD-001',
-        leadName: 'Acme Machinery',
-        priority: 'Normal',
-        type: 'Payment Verification',
-        stage: 'Confirmed Lead'
-      }
-    ]
+  "activeTask": {
+    "id": "task-2-1",
+    "title": "Senior Telecaller assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
   },
-  { 
-    id: 'e3', 
-    name: 'Aaditya', 
-    email: 'aaditya@aps-enterprise.com',
-    phone: '+91 98203 33445',
-    role: 'Performance & Analytics Specialist', 
-    department: 'BI & Lifecycle Analytics',
-    kpiScore: '91%',
-    kpiScoreNum: 91,
-    status: 'Active',
-    currentActivity: 'Monitoring Confirmed Lead Dwell SLAs & Bottlenecks',
-    tasksCompleted: 41, 
-    callsHandled: 64, 
-    salesClosed: 6,
-    totalRevenue: 195000,
-    targetSales: 8,
-    conversionRate: '29.5%',
-    avgCallDurationSec: 110,
-    avgResponseTimeMin: 5.1,
-    weeklyKpiHistory: [82, 85, 88, 91],
-    stageConversions: { enquiryToQualified: 36, qualifiedToBooked: 22, bookedToConfirmed: 14, confirmedToPaid: 6 },
-    activeTask: {
-      id: 'task-e3-1',
-      title: 'Analyze dwell bottleneck on Confirmed Lead (48.5h dwell time alert)',
-      leadId: 'LEAD-004',
-      leadName: 'Global Tech',
-      priority: 'High',
-      type: 'Bottleneck Analytics',
-      stage: 'Confirmed Lead',
-      dueIn: '35 mins',
-      assignedAt: new Date(Date.now() - 2400000)
-    },
-    taskQueue: [
-      {
-        id: 'task-e3-2',
-        title: 'Audit WhatsApp payment reminder delivery & recovery conversion rate',
-        leadId: null,
-        leadName: 'Campaign BI',
-        priority: 'Normal',
-        type: 'A5 BI Report',
-        stage: 'Automated Outreach'
-      }
-    ]
+  "taskQueue": []
+},
+{
+  "id": "e2",
+  "name": "Animesh Shah",
+  "email": "animesh@aps-enterprise.com",
+  "phone": "+91 9822627994",
+  "role": "Senior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "98%",
+  "kpiScoreNum": 98,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 33,
+  "callsHandled": 59,
+  "salesClosed": 14,
+  "totalRevenue": 105427,
+  "targetSales": 15,
+  "conversionRate": "27%",
+  "avgCallDurationSec": 114,
+  "avgResponseTimeMin": "3.6",
+  "weeklyKpiHistory": [
+    95,
+    97,
+    98,
+    98
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
   },
-  { 
-    id: 'e4', 
-    name: 'Vikram Singhal', 
-    email: 'vikram.s@aps-enterprise.com',
-    phone: '+91 98204 44556',
-    role: 'ERP & Factory Dispatch Officer', 
-    department: 'Manufacturing & ERP Dispatch',
-    kpiScore: '89%',
-    kpiScoreNum: 89,
-    status: 'Active',
-    currentActivity: 'Dispatching Job Card for Manufacturing (Tata Motors)',
-    tasksCompleted: 35, 
-    callsHandled: 42, 
-    salesClosed: 5,
-    totalRevenue: 160000,
-    targetSales: 8,
-    conversionRate: '28.0%',
-    avgCallDurationSec: 85,
-    avgResponseTimeMin: 6.0,
-    weeklyKpiHistory: [80, 83, 86, 89],
-    stageConversions: { enquiryToQualified: 30, qualifiedToBooked: 18, bookedToConfirmed: 12, confirmedToPaid: 5 },
-    activeTask: {
-      id: 'task-e4-1',
-      title: 'Generate Production Job Card & ERP Batch #MFG-8821 for Tata Motors Vendor',
-      leadId: 'LEAD-003',
-      leadName: 'Tata Motors Vendor',
-      priority: 'High',
-      type: 'ERP Factory Release',
-      stage: 'In Production',
-      dueIn: '40 mins',
-      assignedAt: new Date(Date.now() - 3000000)
-    },
-    taskQueue: [
-      {
-        id: 'task-e4-2',
-        title: 'Verify raw material allocation for CNC Milling batch',
-        leadId: 'LEAD-001',
-        leadName: 'Acme Machinery',
-        priority: 'Normal',
-        type: 'Inventory Allocation',
-        stage: 'In Production'
-      }
-    ]
-  }
+  "activeTask": {
+    "id": "task-3-1",
+    "title": "Senior Telecaller assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e3",
+  "name": "Rahul Rao",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9825083720",
+  "role": "Senior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "92%",
+  "kpiScoreNum": 92,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 52,
+  "callsHandled": 119,
+  "salesClosed": 19,
+  "totalRevenue": 417706,
+  "targetSales": 15,
+  "conversionRate": "34%",
+  "avgCallDurationSec": 111,
+  "avgResponseTimeMin": "4.6",
+  "weeklyKpiHistory": [
+    89,
+    91,
+    92,
+    92
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-4-1",
+    "title": "Senior Telecaller assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e4",
+  "name": "Amit Patel",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9817905408",
+  "role": "Senior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 54,
+  "callsHandled": 123,
+  "salesClosed": 8,
+  "totalRevenue": 289237,
+  "targetSales": 15,
+  "conversionRate": "19%",
+  "avgCallDurationSec": 108,
+  "avgResponseTimeMin": "3.8",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-5-1",
+    "title": "Senior Telecaller assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e5",
+  "name": "Ajay Singh",
+  "email": "ajay@aps-enterprise.com",
+  "phone": "+91 9895710182",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "76%",
+  "kpiScoreNum": 76,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 50,
+  "callsHandled": 77,
+  "salesClosed": 3,
+  "totalRevenue": 365767,
+  "targetSales": 10,
+  "conversionRate": "30%",
+  "avgCallDurationSec": 88,
+  "avgResponseTimeMin": "4.0",
+  "weeklyKpiHistory": [
+    73,
+    75,
+    76,
+    76
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-6-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e6",
+  "name": "Sneha Kumar",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9842050145",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "79%",
+  "kpiScoreNum": 79,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 47,
+  "callsHandled": 95,
+  "salesClosed": 13,
+  "totalRevenue": 229255,
+  "targetSales": 10,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 78,
+  "avgResponseTimeMin": "3.3",
+  "weeklyKpiHistory": [
+    76,
+    78,
+    79,
+    79
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-7-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e7",
+  "name": "Siddharth Shah",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9862156942",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "77%",
+  "kpiScoreNum": 77,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 47,
+  "callsHandled": 100,
+  "salesClosed": 5,
+  "totalRevenue": 187545,
+  "targetSales": 10,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 79,
+  "avgResponseTimeMin": "3.9",
+  "weeklyKpiHistory": [
+    74,
+    76,
+    77,
+    77
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-8-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e8",
+  "name": "Pooja Singhal",
+  "email": "pooja@aps-enterprise.com",
+  "phone": "+91 9851709199",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "70%",
+  "kpiScoreNum": 70,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 12,
+  "callsHandled": 23,
+  "salesClosed": 9,
+  "totalRevenue": 389795,
+  "targetSales": 10,
+  "conversionRate": "29%",
+  "avgCallDurationSec": 86,
+  "avgResponseTimeMin": "5.8",
+  "weeklyKpiHistory": [
+    67,
+    69,
+    70,
+    70
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-9-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e9",
+  "name": "Aaditya Patel",
+  "email": "aaditya@aps-enterprise.com",
+  "phone": "+91 9892306322",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "84%",
+  "kpiScoreNum": 84,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 54,
+  "callsHandled": 53,
+  "salesClosed": 6,
+  "totalRevenue": 115225,
+  "targetSales": 10,
+  "conversionRate": "18%",
+  "avgCallDurationSec": 67,
+  "avgResponseTimeMin": "5.6",
+  "weeklyKpiHistory": [
+    81,
+    83,
+    84,
+    84
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-10-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e10",
+  "name": "Sneha Chauhan",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9882071665",
+  "role": "Junior Telecaller",
+  "department": "Voice Operations & Telecalling",
+  "kpiScore": "71%",
+  "kpiScoreNum": 71,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 19,
+  "callsHandled": 72,
+  "salesClosed": 5,
+  "totalRevenue": 308028,
+  "targetSales": 10,
+  "conversionRate": "33%",
+  "avgCallDurationSec": 85,
+  "avgResponseTimeMin": "3.9",
+  "weeklyKpiHistory": [
+    68,
+    70,
+    71,
+    71
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-11-1",
+    "title": "Junior Telecaller assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Enquiry",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.979Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e11",
+  "name": "Animesh",
+  "email": "animesh@aps-enterprise.com",
+  "phone": "+91 9815919437",
+  "role": "Senior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 78,
+  "callsHandled": 146,
+  "salesClosed": 11,
+  "totalRevenue": 324858,
+  "targetSales": 15,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 80,
+  "avgResponseTimeMin": "1.3",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-12-1",
+    "title": "Senior Sales Executive assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e12",
+  "name": "Rohan Das",
+  "email": "rohan@aps-enterprise.com",
+  "phone": "+91 9875632680",
+  "role": "Senior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 55,
+  "callsHandled": 54,
+  "salesClosed": 12,
+  "totalRevenue": 223930,
+  "targetSales": 15,
+  "conversionRate": "18%",
+  "avgCallDurationSec": 92,
+  "avgResponseTimeMin": "1.7",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-13-1",
+    "title": "Senior Sales Executive assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e13",
+  "name": "Priya Das",
+  "email": "priya@aps-enterprise.com",
+  "phone": "+91 9858872934",
+  "role": "Senior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "98%",
+  "kpiScoreNum": 98,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 46,
+  "callsHandled": 88,
+  "salesClosed": 7,
+  "totalRevenue": 595069,
+  "targetSales": 15,
+  "conversionRate": "26%",
+  "avgCallDurationSec": 105,
+  "avgResponseTimeMin": "2.8",
+  "weeklyKpiHistory": [
+    95,
+    97,
+    98,
+    98
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-14-1",
+    "title": "Senior Sales Executive assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e14",
+  "name": "Neha Das",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9829152846",
+  "role": "Senior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 57,
+  "callsHandled": 127,
+  "salesClosed": 5,
+  "totalRevenue": 293895,
+  "targetSales": 15,
+  "conversionRate": "33%",
+  "avgCallDurationSec": 98,
+  "avgResponseTimeMin": "1.5",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-15-1",
+    "title": "Senior Sales Executive assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e15",
+  "name": "Simran Jain",
+  "email": "simran@aps-enterprise.com",
+  "phone": "+91 9854005037",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "74%",
+  "kpiScoreNum": 74,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 42,
+  "callsHandled": 23,
+  "salesClosed": 7,
+  "totalRevenue": 232421,
+  "targetSales": 10,
+  "conversionRate": "22%",
+  "avgCallDurationSec": 113,
+  "avgResponseTimeMin": "1.3",
+  "weeklyKpiHistory": [
+    71,
+    73,
+    74,
+    74
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-16-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e16",
+  "name": "Ravi Yadav",
+  "email": "ravi@aps-enterprise.com",
+  "phone": "+91 9852443795",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "83%",
+  "kpiScoreNum": 83,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 40,
+  "callsHandled": 118,
+  "salesClosed": 4,
+  "totalRevenue": 440728,
+  "targetSales": 10,
+  "conversionRate": "25%",
+  "avgCallDurationSec": 101,
+  "avgResponseTimeMin": "3.4",
+  "weeklyKpiHistory": [
+    80,
+    82,
+    83,
+    83
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-17-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e17",
+  "name": "Ravi Reddy",
+  "email": "ravi@aps-enterprise.com",
+  "phone": "+91 9888522925",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "71%",
+  "kpiScoreNum": 71,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 14,
+  "callsHandled": 112,
+  "salesClosed": 3,
+  "totalRevenue": 304530,
+  "targetSales": 10,
+  "conversionRate": "30%",
+  "avgCallDurationSec": 71,
+  "avgResponseTimeMin": "5.4",
+  "weeklyKpiHistory": [
+    68,
+    70,
+    71,
+    71
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-18-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e18",
+  "name": "Animesh Rao",
+  "email": "animesh@aps-enterprise.com",
+  "phone": "+91 9829284264",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "75%",
+  "kpiScoreNum": 75,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 25,
+  "callsHandled": 92,
+  "salesClosed": 8,
+  "totalRevenue": 196232,
+  "targetSales": 10,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 75,
+  "avgResponseTimeMin": "2.6",
+  "weeklyKpiHistory": [
+    72,
+    74,
+    75,
+    75
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-19-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e19",
+  "name": "Rita Jain",
+  "email": "rita@aps-enterprise.com",
+  "phone": "+91 9876333875",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "81%",
+  "kpiScoreNum": 81,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 58,
+  "callsHandled": 109,
+  "salesClosed": 8,
+  "totalRevenue": 210054,
+  "targetSales": 10,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 106,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    78,
+    80,
+    81,
+    81
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-20-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e20",
+  "name": "Neha Das",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9839188306",
+  "role": "Junior Sales Executive",
+  "department": "Field & Direct Sales",
+  "kpiScore": "88%",
+  "kpiScoreNum": 88,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 52,
+  "callsHandled": 49,
+  "salesClosed": 2,
+  "totalRevenue": 179151,
+  "targetSales": 10,
+  "conversionRate": "19%",
+  "avgCallDurationSec": 74,
+  "avgResponseTimeMin": "3.3",
+  "weeklyKpiHistory": [
+    85,
+    87,
+    88,
+    88
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-21-1",
+    "title": "Junior Sales Executive assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Qualified",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e21",
+  "name": "Priya Patel",
+  "email": "priya@aps-enterprise.com",
+  "phone": "+91 9898455778",
+  "role": "Senior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "99%",
+  "kpiScoreNum": 99,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 57,
+  "callsHandled": 119,
+  "salesClosed": 10,
+  "totalRevenue": 267438,
+  "targetSales": 15,
+  "conversionRate": "30%",
+  "avgCallDurationSec": 110,
+  "avgResponseTimeMin": "5.4",
+  "weeklyKpiHistory": [
+    96,
+    98,
+    99,
+    99
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-22-1",
+    "title": "Senior Assembly Supervisor assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e22",
+  "name": "Manoj Singh",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9879306968",
+  "role": "Senior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "92%",
+  "kpiScoreNum": 92,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 39,
+  "callsHandled": 80,
+  "salesClosed": 12,
+  "totalRevenue": 123798,
+  "targetSales": 15,
+  "conversionRate": "20%",
+  "avgCallDurationSec": 102,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    89,
+    91,
+    92,
+    92
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-23-1",
+    "title": "Senior Assembly Supervisor assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e23",
+  "name": "Rita Gupta",
+  "email": "rita@aps-enterprise.com",
+  "phone": "+91 9884427074",
+  "role": "Senior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "95%",
+  "kpiScoreNum": 95,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 42,
+  "callsHandled": 128,
+  "salesClosed": 6,
+  "totalRevenue": 144549,
+  "targetSales": 15,
+  "conversionRate": "16%",
+  "avgCallDurationSec": 91,
+  "avgResponseTimeMin": "1.9",
+  "weeklyKpiHistory": [
+    92,
+    94,
+    95,
+    95
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-24-1",
+    "title": "Senior Assembly Supervisor assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e24",
+  "name": "Amit Chauhan",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9879617969",
+  "role": "Senior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "90%",
+  "kpiScoreNum": 90,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 34,
+  "callsHandled": 116,
+  "salesClosed": 19,
+  "totalRevenue": 447898,
+  "targetSales": 15,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 109,
+  "avgResponseTimeMin": "5.4",
+  "weeklyKpiHistory": [
+    87,
+    89,
+    90,
+    90
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-25-1",
+    "title": "Senior Assembly Supervisor assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e25",
+  "name": "Aaditya Jain",
+  "email": "aaditya@aps-enterprise.com",
+  "phone": "+91 9887921671",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "81%",
+  "kpiScoreNum": 81,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 27,
+  "callsHandled": 24,
+  "salesClosed": 4,
+  "totalRevenue": 137270,
+  "targetSales": 10,
+  "conversionRate": "27%",
+  "avgCallDurationSec": 79,
+  "avgResponseTimeMin": "2.0",
+  "weeklyKpiHistory": [
+    78,
+    80,
+    81,
+    81
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-26-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e26",
+  "name": "Sneha Kumar",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9868682039",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "70%",
+  "kpiScoreNum": 70,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 28,
+  "callsHandled": 26,
+  "salesClosed": 14,
+  "totalRevenue": 348844,
+  "targetSales": 10,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 96,
+  "avgResponseTimeMin": "1.3",
+  "weeklyKpiHistory": [
+    67,
+    69,
+    70,
+    70
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-27-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e27",
+  "name": "Siddharth Singh",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9835427378",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "77%",
+  "kpiScoreNum": 77,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 47,
+  "callsHandled": 109,
+  "salesClosed": 9,
+  "totalRevenue": 252113,
+  "targetSales": 10,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 86,
+  "avgResponseTimeMin": "2.6",
+  "weeklyKpiHistory": [
+    74,
+    76,
+    77,
+    77
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-28-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e28",
+  "name": "Animesh Patel",
+  "email": "animesh@aps-enterprise.com",
+  "phone": "+91 9810656567",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "83%",
+  "kpiScoreNum": 83,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 28,
+  "callsHandled": 27,
+  "salesClosed": 13,
+  "totalRevenue": 552178,
+  "targetSales": 10,
+  "conversionRate": "19%",
+  "avgCallDurationSec": 74,
+  "avgResponseTimeMin": "1.6",
+  "weeklyKpiHistory": [
+    80,
+    82,
+    83,
+    83
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-29-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e29",
+  "name": "Manoj Shah",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9841516169",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "73%",
+  "kpiScoreNum": 73,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 21,
+  "callsHandled": 81,
+  "salesClosed": 14,
+  "totalRevenue": 298136,
+  "targetSales": 10,
+  "conversionRate": "26%",
+  "avgCallDurationSec": 99,
+  "avgResponseTimeMin": "5.9",
+  "weeklyKpiHistory": [
+    70,
+    72,
+    73,
+    73
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-30-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e30",
+  "name": "Sneha Gupta",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9872075790",
+  "role": "Junior Assembly Supervisor",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "87%",
+  "kpiScoreNum": 87,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 44,
+  "callsHandled": 30,
+  "salesClosed": 6,
+  "totalRevenue": 569173,
+  "targetSales": 10,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 84,
+  "avgResponseTimeMin": "3.4",
+  "weeklyKpiHistory": [
+    84,
+    86,
+    87,
+    87
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-31-1",
+    "title": "Junior Assembly Supervisor assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e31",
+  "name": "Vikram Singhal",
+  "email": "vikram@aps-enterprise.com",
+  "phone": "+91 9899577346",
+  "role": "Senior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "93%",
+  "kpiScoreNum": 93,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 53,
+  "callsHandled": 74,
+  "salesClosed": 11,
+  "totalRevenue": 117226,
+  "targetSales": 15,
+  "conversionRate": "22%",
+  "avgCallDurationSec": 96,
+  "avgResponseTimeMin": "5.1",
+  "weeklyKpiHistory": [
+    90,
+    92,
+    93,
+    93
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-32-1",
+    "title": "Senior Machine Fitter assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e32",
+  "name": "Siddharth Kumar",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9886342111",
+  "role": "Senior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 69,
+  "callsHandled": 125,
+  "salesClosed": 9,
+  "totalRevenue": 477523,
+  "targetSales": 15,
+  "conversionRate": "21%",
+  "avgCallDurationSec": 114,
+  "avgResponseTimeMin": "4.6",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-33-1",
+    "title": "Senior Machine Fitter assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e33",
+  "name": "Ajay Yadav",
+  "email": "ajay@aps-enterprise.com",
+  "phone": "+91 9869772214",
+  "role": "Senior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "91%",
+  "kpiScoreNum": 91,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 39,
+  "callsHandled": 83,
+  "salesClosed": 18,
+  "totalRevenue": 368546,
+  "targetSales": 15,
+  "conversionRate": "18%",
+  "avgCallDurationSec": 64,
+  "avgResponseTimeMin": "2.4",
+  "weeklyKpiHistory": [
+    88,
+    90,
+    91,
+    91
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-34-1",
+    "title": "Senior Machine Fitter assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e34",
+  "name": "Rahul Sharma",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9875323374",
+  "role": "Senior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "93%",
+  "kpiScoreNum": 93,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 72,
+  "callsHandled": 85,
+  "salesClosed": 14,
+  "totalRevenue": 210595,
+  "targetSales": 15,
+  "conversionRate": "28%",
+  "avgCallDurationSec": 95,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    90,
+    92,
+    93,
+    93
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-35-1",
+    "title": "Senior Machine Fitter assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e35",
+  "name": "Rahul Jain",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9867290718",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "72%",
+  "kpiScoreNum": 72,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 53,
+  "callsHandled": 118,
+  "salesClosed": 13,
+  "totalRevenue": 235572,
+  "targetSales": 10,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 62,
+  "avgResponseTimeMin": "3.6",
+  "weeklyKpiHistory": [
+    69,
+    71,
+    72,
+    72
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-36-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e36",
+  "name": "Vikram Singh",
+  "email": "vikram@aps-enterprise.com",
+  "phone": "+91 9891154708",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "80%",
+  "kpiScoreNum": 80,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 16,
+  "callsHandled": 67,
+  "salesClosed": 6,
+  "totalRevenue": 394293,
+  "targetSales": 10,
+  "conversionRate": "34%",
+  "avgCallDurationSec": 118,
+  "avgResponseTimeMin": "5.3",
+  "weeklyKpiHistory": [
+    77,
+    79,
+    80,
+    80
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-37-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e37",
+  "name": "Neha Singh",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9823467248",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "89%",
+  "kpiScoreNum": 89,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 35,
+  "callsHandled": 59,
+  "salesClosed": 14,
+  "totalRevenue": 582891,
+  "targetSales": 10,
+  "conversionRate": "34%",
+  "avgCallDurationSec": 87,
+  "avgResponseTimeMin": "3.9",
+  "weeklyKpiHistory": [
+    86,
+    88,
+    89,
+    89
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-38-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e38",
+  "name": "Ravi Singhal",
+  "email": "ravi@aps-enterprise.com",
+  "phone": "+91 9878938148",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "82%",
+  "kpiScoreNum": 82,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 56,
+  "callsHandled": 45,
+  "salesClosed": 8,
+  "totalRevenue": 247451,
+  "targetSales": 10,
+  "conversionRate": "33%",
+  "avgCallDurationSec": 62,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    79,
+    81,
+    82,
+    82
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-39-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e39",
+  "name": "Rohan Gupta",
+  "email": "rohan@aps-enterprise.com",
+  "phone": "+91 9872563104",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "72%",
+  "kpiScoreNum": 72,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 17,
+  "callsHandled": 76,
+  "salesClosed": 7,
+  "totalRevenue": 256636,
+  "targetSales": 10,
+  "conversionRate": "27%",
+  "avgCallDurationSec": 88,
+  "avgResponseTimeMin": "2.6",
+  "weeklyKpiHistory": [
+    69,
+    71,
+    72,
+    72
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-40-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e40",
+  "name": "Aaditya Gupta",
+  "email": "aaditya@aps-enterprise.com",
+  "phone": "+91 9862521501",
+  "role": "Junior Machine Fitter",
+  "department": "Manufacturing & Assembly",
+  "kpiScore": "74%",
+  "kpiScoreNum": 74,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 37,
+  "callsHandled": 68,
+  "salesClosed": 12,
+  "totalRevenue": 302996,
+  "targetSales": 10,
+  "conversionRate": "20%",
+  "avgCallDurationSec": 107,
+  "avgResponseTimeMin": "1.5",
+  "weeklyKpiHistory": [
+    71,
+    73,
+    74,
+    74
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-41-1",
+    "title": "Junior Machine Fitter assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e41",
+  "name": "Rita Chauhan",
+  "email": "rita@aps-enterprise.com",
+  "phone": "+91 9876727139",
+  "role": "Senior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "93%",
+  "kpiScoreNum": 93,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 45,
+  "callsHandled": 92,
+  "salesClosed": 9,
+  "totalRevenue": 326808,
+  "targetSales": 15,
+  "conversionRate": "28%",
+  "avgCallDurationSec": 112,
+  "avgResponseTimeMin": "5.5",
+  "weeklyKpiHistory": [
+    90,
+    92,
+    93,
+    93
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-42-1",
+    "title": "Senior Quality Testing assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e42",
+  "name": "Manoj Verma",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9825588988",
+  "role": "Senior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "97%",
+  "kpiScoreNum": 97,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 49,
+  "callsHandled": 57,
+  "salesClosed": 10,
+  "totalRevenue": 444829,
+  "targetSales": 15,
+  "conversionRate": "30%",
+  "avgCallDurationSec": 62,
+  "avgResponseTimeMin": "1.5",
+  "weeklyKpiHistory": [
+    94,
+    96,
+    97,
+    97
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-43-1",
+    "title": "Senior Quality Testing assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e43",
+  "name": "Vikram Patel",
+  "email": "vikram@aps-enterprise.com",
+  "phone": "+91 9820312346",
+  "role": "Senior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 46,
+  "callsHandled": 123,
+  "salesClosed": 11,
+  "totalRevenue": 263619,
+  "targetSales": 15,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 92,
+  "avgResponseTimeMin": "4.2",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-44-1",
+    "title": "Senior Quality Testing assigned task",
+    "leadId": "LEAD-005",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e44",
+  "name": "Manoj Patel",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9838956617",
+  "role": "Senior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "91%",
+  "kpiScoreNum": 91,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 30,
+  "callsHandled": 98,
+  "salesClosed": 11,
+  "totalRevenue": 224118,
+  "targetSales": 15,
+  "conversionRate": "26%",
+  "avgCallDurationSec": 79,
+  "avgResponseTimeMin": "3.1",
+  "weeklyKpiHistory": [
+    88,
+    90,
+    91,
+    91
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-45-1",
+    "title": "Senior Quality Testing assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e45",
+  "name": "Sneha Kumar",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9859682762",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "83%",
+  "kpiScoreNum": 83,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 17,
+  "callsHandled": 29,
+  "salesClosed": 10,
+  "totalRevenue": 348630,
+  "targetSales": 10,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 119,
+  "avgResponseTimeMin": "4.1",
+  "weeklyKpiHistory": [
+    80,
+    82,
+    83,
+    83
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-46-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e46",
+  "name": "Pooja Yadav",
+  "email": "pooja@aps-enterprise.com",
+  "phone": "+91 9814095011",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "79%",
+  "kpiScoreNum": 79,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 49,
+  "callsHandled": 59,
+  "salesClosed": 10,
+  "totalRevenue": 237925,
+  "targetSales": 10,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 68,
+  "avgResponseTimeMin": "2.9",
+  "weeklyKpiHistory": [
+    76,
+    78,
+    79,
+    79
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-47-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e47",
+  "name": "Ajay Patel",
+  "email": "ajay@aps-enterprise.com",
+  "phone": "+91 9854943254",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "81%",
+  "kpiScoreNum": 81,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 37,
+  "callsHandled": 71,
+  "salesClosed": 7,
+  "totalRevenue": 507251,
+  "targetSales": 10,
+  "conversionRate": "21%",
+  "avgCallDurationSec": 114,
+  "avgResponseTimeMin": "2.3",
+  "weeklyKpiHistory": [
+    78,
+    80,
+    81,
+    81
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-48-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e48",
+  "name": "Priya Verma",
+  "email": "priya@aps-enterprise.com",
+  "phone": "+91 9891064468",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "78%",
+  "kpiScoreNum": 78,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 14,
+  "callsHandled": 46,
+  "salesClosed": 8,
+  "totalRevenue": 284712,
+  "targetSales": 10,
+  "conversionRate": "23%",
+  "avgCallDurationSec": 84,
+  "avgResponseTimeMin": "1.3",
+  "weeklyKpiHistory": [
+    75,
+    77,
+    78,
+    78
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-49-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e49",
+  "name": "Karan Chauhan",
+  "email": "karan@aps-enterprise.com",
+  "phone": "+91 9882405901",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "72%",
+  "kpiScoreNum": 72,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 58,
+  "callsHandled": 99,
+  "salesClosed": 6,
+  "totalRevenue": 416199,
+  "targetSales": 10,
+  "conversionRate": "23%",
+  "avgCallDurationSec": 97,
+  "avgResponseTimeMin": "2.6",
+  "weeklyKpiHistory": [
+    69,
+    71,
+    72,
+    72
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-50-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e50",
+  "name": "Vikram Verma",
+  "email": "vikram@aps-enterprise.com",
+  "phone": "+91 9891145799",
+  "role": "Junior Quality Testing",
+  "department": "Quality & Service",
+  "kpiScore": "86%",
+  "kpiScoreNum": 86,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 40,
+  "callsHandled": 85,
+  "salesClosed": 3,
+  "totalRevenue": 171398,
+  "targetSales": 10,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 79,
+  "avgResponseTimeMin": "5.4",
+  "weeklyKpiHistory": [
+    83,
+    85,
+    86,
+    86
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-51-1",
+    "title": "Junior Quality Testing assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "In Production",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e51",
+  "name": "Neha Sharma",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9848588693",
+  "role": "Senior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "96%",
+  "kpiScoreNum": 96,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 31,
+  "callsHandled": 64,
+  "salesClosed": 19,
+  "totalRevenue": 366110,
+  "targetSales": 15,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 66,
+  "avgResponseTimeMin": "1.9",
+  "weeklyKpiHistory": [
+    93,
+    95,
+    96,
+    96
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-52-1",
+    "title": "Senior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e52",
+  "name": "Karan Verma",
+  "email": "karan@aps-enterprise.com",
+  "phone": "+91 9821616760",
+  "role": "Senior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "90%",
+  "kpiScoreNum": 90,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 68,
+  "callsHandled": 97,
+  "salesClosed": 5,
+  "totalRevenue": 459304,
+  "targetSales": 15,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 108,
+  "avgResponseTimeMin": "5.8",
+  "weeklyKpiHistory": [
+    87,
+    89,
+    90,
+    90
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-53-1",
+    "title": "Senior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e53",
+  "name": "Siddharth Rao",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9842191843",
+  "role": "Senior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "98%",
+  "kpiScoreNum": 98,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 30,
+  "callsHandled": 107,
+  "salesClosed": 5,
+  "totalRevenue": 217436,
+  "targetSales": 15,
+  "conversionRate": "20%",
+  "avgCallDurationSec": 86,
+  "avgResponseTimeMin": "3.5",
+  "weeklyKpiHistory": [
+    95,
+    97,
+    98,
+    98
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-54-1",
+    "title": "Senior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e54",
+  "name": "Suresh Singhal",
+  "email": "suresh@aps-enterprise.com",
+  "phone": "+91 9872919569",
+  "role": "Senior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "90%",
+  "kpiScoreNum": 90,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 52,
+  "callsHandled": 54,
+  "salesClosed": 17,
+  "totalRevenue": 394832,
+  "targetSales": 15,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 72,
+  "avgResponseTimeMin": "3.7",
+  "weeklyKpiHistory": [
+    87,
+    89,
+    90,
+    90
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-55-1",
+    "title": "Senior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e55",
+  "name": "Ajay Gupta",
+  "email": "ajay@aps-enterprise.com",
+  "phone": "+91 9892757900",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "89%",
+  "kpiScoreNum": 89,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 16,
+  "callsHandled": 65,
+  "salesClosed": 7,
+  "totalRevenue": 362142,
+  "targetSales": 10,
+  "conversionRate": "27%",
+  "avgCallDurationSec": 101,
+  "avgResponseTimeMin": "2.7",
+  "weeklyKpiHistory": [
+    86,
+    88,
+    89,
+    89
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-56-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e56",
+  "name": "Ravi Chauhan",
+  "email": "ravi@aps-enterprise.com",
+  "phone": "+91 9839675794",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "89%",
+  "kpiScoreNum": 89,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 48,
+  "callsHandled": 67,
+  "salesClosed": 2,
+  "totalRevenue": 144009,
+  "targetSales": 10,
+  "conversionRate": "29%",
+  "avgCallDurationSec": 85,
+  "avgResponseTimeMin": "4.0",
+  "weeklyKpiHistory": [
+    86,
+    88,
+    89,
+    89
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-57-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e57",
+  "name": "Amit Rao",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9849437307",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "85%",
+  "kpiScoreNum": 85,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 34,
+  "callsHandled": 53,
+  "salesClosed": 8,
+  "totalRevenue": 224006,
+  "targetSales": 10,
+  "conversionRate": "26%",
+  "avgCallDurationSec": 119,
+  "avgResponseTimeMin": "2.0",
+  "weeklyKpiHistory": [
+    82,
+    84,
+    85,
+    85
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-58-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e58",
+  "name": "Suresh Singhal",
+  "email": "suresh@aps-enterprise.com",
+  "phone": "+91 9873798685",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "77%",
+  "kpiScoreNum": 77,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 27,
+  "callsHandled": 51,
+  "salesClosed": 11,
+  "totalRevenue": 436107,
+  "targetSales": 10,
+  "conversionRate": "32%",
+  "avgCallDurationSec": 101,
+  "avgResponseTimeMin": "5.0",
+  "weeklyKpiHistory": [
+    74,
+    76,
+    77,
+    77
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-59-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e59",
+  "name": "Ajay Shah",
+  "email": "ajay@aps-enterprise.com",
+  "phone": "+91 9841959735",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "88%",
+  "kpiScoreNum": 88,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 30,
+  "callsHandled": 48,
+  "salesClosed": 10,
+  "totalRevenue": 429187,
+  "targetSales": 10,
+  "conversionRate": "23%",
+  "avgCallDurationSec": 92,
+  "avgResponseTimeMin": "1.3",
+  "weeklyKpiHistory": [
+    85,
+    87,
+    88,
+    88
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-60-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e60",
+  "name": "Sneha Shah",
+  "email": "sneha@aps-enterprise.com",
+  "phone": "+91 9877882504",
+  "role": "Junior Dispatch & Logistics",
+  "department": "Logistics & Dispatch",
+  "kpiScore": "83%",
+  "kpiScoreNum": 83,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 17,
+  "callsHandled": 75,
+  "salesClosed": 7,
+  "totalRevenue": 545440,
+  "targetSales": 10,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 60,
+  "avgResponseTimeMin": "1.7",
+  "weeklyKpiHistory": [
+    80,
+    82,
+    83,
+    83
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-61-1",
+    "title": "Junior Dispatch & Logistics assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e61",
+  "name": "Priya Kumar",
+  "email": "priya@aps-enterprise.com",
+  "phone": "+91 9858821262",
+  "role": "Senior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "98%",
+  "kpiScoreNum": 98,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 67,
+  "callsHandled": 56,
+  "salesClosed": 14,
+  "totalRevenue": 307890,
+  "targetSales": 15,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 79,
+  "avgResponseTimeMin": "5.8",
+  "weeklyKpiHistory": [
+    95,
+    97,
+    98,
+    98
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-62-1",
+    "title": "Senior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-005",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e62",
+  "name": "Neha Chauhan",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9864083512",
+  "role": "Senior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "99%",
+  "kpiScoreNum": 99,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 54,
+  "callsHandled": 119,
+  "salesClosed": 6,
+  "totalRevenue": 173507,
+  "targetSales": 15,
+  "conversionRate": "22%",
+  "avgCallDurationSec": 103,
+  "avgResponseTimeMin": "4.3",
+  "weeklyKpiHistory": [
+    96,
+    98,
+    99,
+    99
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-63-1",
+    "title": "Senior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-004",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e63",
+  "name": "Rahul Rao",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9879500951",
+  "role": "Senior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "92%",
+  "kpiScoreNum": 92,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 65,
+  "callsHandled": 75,
+  "salesClosed": 14,
+  "totalRevenue": 223530,
+  "targetSales": 15,
+  "conversionRate": "31%",
+  "avgCallDurationSec": 116,
+  "avgResponseTimeMin": "1.8",
+  "weeklyKpiHistory": [
+    89,
+    91,
+    92,
+    92
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-64-1",
+    "title": "Senior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e64",
+  "name": "Manoj Patel",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9833054421",
+  "role": "Senior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "96%",
+  "kpiScoreNum": 96,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 40,
+  "callsHandled": 71,
+  "salesClosed": 19,
+  "totalRevenue": 148763,
+  "targetSales": 15,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 104,
+  "avgResponseTimeMin": "1.4",
+  "weeklyKpiHistory": [
+    93,
+    95,
+    96,
+    96
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-65-1",
+    "title": "Senior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e65",
+  "name": "Rahul Das",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9817898198",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "81%",
+  "kpiScoreNum": 81,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 57,
+  "callsHandled": 47,
+  "salesClosed": 3,
+  "totalRevenue": 513993,
+  "targetSales": 10,
+  "conversionRate": "23%",
+  "avgCallDurationSec": 107,
+  "avgResponseTimeMin": "2.5",
+  "weeklyKpiHistory": [
+    78,
+    80,
+    81,
+    81
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-66-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e66",
+  "name": "Siddharth Yadav",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9824153611",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "84%",
+  "kpiScoreNum": 84,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 22,
+  "callsHandled": 25,
+  "salesClosed": 6,
+  "totalRevenue": 298184,
+  "targetSales": 10,
+  "conversionRate": "16%",
+  "avgCallDurationSec": 112,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    81,
+    83,
+    84,
+    84
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-67-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e67",
+  "name": "Manoj Jain",
+  "email": "manoj@aps-enterprise.com",
+  "phone": "+91 9829503871",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "73%",
+  "kpiScoreNum": 73,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 37,
+  "callsHandled": 111,
+  "salesClosed": 11,
+  "totalRevenue": 378189,
+  "targetSales": 10,
+  "conversionRate": "16%",
+  "avgCallDurationSec": 60,
+  "avgResponseTimeMin": "1.7",
+  "weeklyKpiHistory": [
+    70,
+    72,
+    73,
+    73
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-68-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-006",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e68",
+  "name": "Rita Desai",
+  "email": "rita@aps-enterprise.com",
+  "phone": "+91 9840263133",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "77%",
+  "kpiScoreNum": 77,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 37,
+  "callsHandled": 117,
+  "salesClosed": 14,
+  "totalRevenue": 107729,
+  "targetSales": 10,
+  "conversionRate": "30%",
+  "avgCallDurationSec": 61,
+  "avgResponseTimeMin": "4.7",
+  "weeklyKpiHistory": [
+    74,
+    76,
+    77,
+    77
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-69-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e69",
+  "name": "Siddharth Patel",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9817105908",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "83%",
+  "kpiScoreNum": 83,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 11,
+  "callsHandled": 44,
+  "salesClosed": 13,
+  "totalRevenue": 486997,
+  "targetSales": 10,
+  "conversionRate": "21%",
+  "avgCallDurationSec": 82,
+  "avgResponseTimeMin": "2.4",
+  "weeklyKpiHistory": [
+    80,
+    82,
+    83,
+    83
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-70-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e70",
+  "name": "Amit Rao",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9841386640",
+  "role": "Junior Accounts & ERP Admin",
+  "department": "Accounts & Administration",
+  "kpiScore": "70%",
+  "kpiScoreNum": 70,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 58,
+  "callsHandled": 115,
+  "salesClosed": 0,
+  "totalRevenue": 115107,
+  "targetSales": 10,
+  "conversionRate": "24%",
+  "avgCallDurationSec": 76,
+  "avgResponseTimeMin": "6.0",
+  "weeklyKpiHistory": [
+    67,
+    69,
+    70,
+    70
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-71-1",
+    "title": "Junior Accounts & ERP Admin assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Confirmed Lead",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e71",
+  "name": "Rahul Desai",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9837354761",
+  "role": "Senior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "99%",
+  "kpiScoreNum": 99,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 72,
+  "callsHandled": 144,
+  "salesClosed": 9,
+  "totalRevenue": 536582,
+  "targetSales": 15,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 66,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    96,
+    98,
+    99,
+    99
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-72-1",
+    "title": "Senior Spare Parts & Service assigned task",
+    "leadId": "LEAD-002",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e72",
+  "name": "Ravi Patel",
+  "email": "ravi@aps-enterprise.com",
+  "phone": "+91 9863364877",
+  "role": "Senior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "96%",
+  "kpiScoreNum": 96,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 70,
+  "callsHandled": 56,
+  "salesClosed": 10,
+  "totalRevenue": 443266,
+  "targetSales": 15,
+  "conversionRate": "17%",
+  "avgCallDurationSec": 105,
+  "avgResponseTimeMin": "4.6",
+  "weeklyKpiHistory": [
+    93,
+    95,
+    96,
+    96
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-73-1",
+    "title": "Senior Spare Parts & Service assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e73",
+  "name": "Aaditya Reddy",
+  "email": "aaditya@aps-enterprise.com",
+  "phone": "+91 9869367698",
+  "role": "Senior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "97%",
+  "kpiScoreNum": 97,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 33,
+  "callsHandled": 65,
+  "salesClosed": 10,
+  "totalRevenue": 225528,
+  "targetSales": 15,
+  "conversionRate": "21%",
+  "avgCallDurationSec": 118,
+  "avgResponseTimeMin": "1.5",
+  "weeklyKpiHistory": [
+    94,
+    96,
+    97,
+    97
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-74-1",
+    "title": "Senior Spare Parts & Service assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e74",
+  "name": "Rita Gupta",
+  "email": "rita@aps-enterprise.com",
+  "phone": "+91 9899160296",
+  "role": "Senior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "94%",
+  "kpiScoreNum": 94,
+  "status": "Active",
+  "currentActivity": "Senior task in progress",
+  "tasksCompleted": 51,
+  "callsHandled": 65,
+  "salesClosed": 14,
+  "totalRevenue": 389637,
+  "targetSales": 15,
+  "conversionRate": "15%",
+  "avgCallDurationSec": 66,
+  "avgResponseTimeMin": "3.2",
+  "weeklyKpiHistory": [
+    91,
+    93,
+    94,
+    94
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-75-1",
+    "title": "Senior Spare Parts & Service assigned task",
+    "leadId": "LEAD-003",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e75",
+  "name": "Amit Jain",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9812328032",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "71%",
+  "kpiScoreNum": 71,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 46,
+  "callsHandled": 55,
+  "salesClosed": 1,
+  "totalRevenue": 143292,
+  "targetSales": 10,
+  "conversionRate": "20%",
+  "avgCallDurationSec": 62,
+  "avgResponseTimeMin": "4.4",
+  "weeklyKpiHistory": [
+    68,
+    70,
+    71,
+    71
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-76-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e76",
+  "name": "Neha Patel",
+  "email": "neha@aps-enterprise.com",
+  "phone": "+91 9870472111",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "88%",
+  "kpiScoreNum": 88,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 20,
+  "callsHandled": 65,
+  "salesClosed": 2,
+  "totalRevenue": 498830,
+  "targetSales": 10,
+  "conversionRate": "24%",
+  "avgCallDurationSec": 76,
+  "avgResponseTimeMin": "2.8",
+  "weeklyKpiHistory": [
+    85,
+    87,
+    88,
+    88
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-77-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-009",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e77",
+  "name": "Rohan Das",
+  "email": "rohan@aps-enterprise.com",
+  "phone": "+91 9888452431",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "84%",
+  "kpiScoreNum": 84,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 57,
+  "callsHandled": 62,
+  "salesClosed": 13,
+  "totalRevenue": 373743,
+  "targetSales": 10,
+  "conversionRate": "21%",
+  "avgCallDurationSec": 96,
+  "avgResponseTimeMin": "5.8",
+  "weeklyKpiHistory": [
+    81,
+    83,
+    84,
+    84
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-78-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-005",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e78",
+  "name": "Rahul Rao",
+  "email": "rahul@aps-enterprise.com",
+  "phone": "+91 9842232474",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "86%",
+  "kpiScoreNum": 86,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 51,
+  "callsHandled": 52,
+  "salesClosed": 2,
+  "totalRevenue": 394957,
+  "targetSales": 10,
+  "conversionRate": "32%",
+  "avgCallDurationSec": 85,
+  "avgResponseTimeMin": "2.1",
+  "weeklyKpiHistory": [
+    83,
+    85,
+    86,
+    86
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-79-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-001",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e79",
+  "name": "Amit Rao",
+  "email": "amit@aps-enterprise.com",
+  "phone": "+91 9836399576",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "76%",
+  "kpiScoreNum": 76,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 32,
+  "callsHandled": 119,
+  "salesClosed": 7,
+  "totalRevenue": 202353,
+  "targetSales": 10,
+  "conversionRate": "20%",
+  "avgCallDurationSec": 62,
+  "avgResponseTimeMin": "1.7",
+  "weeklyKpiHistory": [
+    73,
+    75,
+    76,
+    76
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-80-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-008",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+},
+{
+  "id": "e80",
+  "name": "Siddharth Rao",
+  "email": "siddharth@aps-enterprise.com",
+  "phone": "+91 9827909307",
+  "role": "Junior Spare Parts & Service",
+  "department": "Quality & Service",
+  "kpiScore": "80%",
+  "kpiScoreNum": 80,
+  "status": "Active",
+  "currentActivity": "Junior task in progress",
+  "tasksCompleted": 50,
+  "callsHandled": 100,
+  "salesClosed": 13,
+  "totalRevenue": 176291,
+  "targetSales": 10,
+  "conversionRate": "28%",
+  "avgCallDurationSec": 68,
+  "avgResponseTimeMin": "3.0",
+  "weeklyKpiHistory": [
+    77,
+    79,
+    80,
+    80
+  ],
+  "stageConversions": {
+    "enquiryToQualified": 40,
+    "qualifiedToBooked": 20,
+    "bookedToConfirmed": 10,
+    "confirmedToPaid": 5
+  },
+  "activeTask": {
+    "id": "task-81-1",
+    "title": "Junior Spare Parts & Service assigned task",
+    "leadId": "LEAD-007",
+    "leadName": "Generic Lead",
+    "priority": "Normal",
+    "type": "Routine",
+    "stage": "Dispatched",
+    "dueIn": "30 mins",
+    assignedAt: new Date("2026-08-25T04:49:08.980Z")
+  },
+  "taskQueue": []
+}
 ];
 
 const DEFAULT_TIME_IN_STAGE = [
@@ -910,52 +4258,54 @@ export default function TeamKPIs() {
             <h3 style={s.sectionTitle}>High-Risk / Cold Deals Exceeding Stage Thresholds</h3>
             <p style={s.sectionSub}>Deals at risk of cold-off requiring immediate telecaller outreach or automated WhatsApp sequences</p>
 
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Lead / Customer</th>
-                  <th style={s.th}>Current Stage</th>
-                  <th style={s.th}>Hours in Dwell</th>
-                  <th style={s.th}>Total Deal Value</th>
-                  <th style={s.th}>10% Advance Required</th>
-                  <th style={s.th}>Assigned Rep</th>
-                  <th style={s.th}>Risk Level</th>
-                  <th style={s.th}>Automation Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={s.td}>
-                    <div style={s.dealName}>Global Tech</div>
-                    <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
-                  </td>
-                  <td style={s.td}>
-                    <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-                      Confirmed Lead
-                    </span>
-                  </td>
-                  <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
-                  <td style={s.td}>₹42,000</td>
-                  <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
-                  <td style={s.td}>Aaditya (Analytics)</td>
-                  <td style={s.td}>
-                    <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10" /></svg>
-                      <span>Critical Stalled</span>
-                    </span>
-                  </td>
-                  <td style={s.td}>
-                    <button
-                      onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
-                      style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                      <span>Send WhatsApp Reminder</span>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="responsive-table-container">
+              <table className="responsive-table-content" style={s.table}>
+                <thead>
+                  <tr>
+                    <th style={s.th}>Lead / Customer</th>
+                    <th style={s.th}>Current Stage</th>
+                    <th style={s.th}>Hours in Dwell</th>
+                    <th style={s.th}>Total Deal Value</th>
+                    <th style={s.th}>10% Advance Required</th>
+                    <th style={s.th}>Assigned Rep</th>
+                    <th style={s.th}>Risk Level</th>
+                    <th style={s.th}>Automation Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={s.td}>
+                      <div style={s.dealName}>Global Tech</div>
+                      <div style={s.dealSub}>Hydraulic Press 200T • LEAD-004</div>
+                    </td>
+                    <td style={s.td}>
+                      <span style={{ ...s.badge, background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                        Confirmed Lead
+                      </span>
+                    </td>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#ef4444' }}>58.2 hrs (2.4x SLA)</td>
+                    <td style={s.td}>₹42,000</td>
+                    <td style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>₹4,200</td>
+                    <td style={s.td}>Aaditya (Analytics)</td>
+                    <td style={s.td}>
+                      <span style={{ ...s.badge, background: 'rgba(239,68,68,0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="10" /></svg>
+                        <span>Critical Stalled</span>
+                      </span>
+                    </td>
+                    <td style={s.td}>
+                      <button
+                        onClick={() => handleTriggerReminderFromA4('LEAD-004', 'Global Tech')}
+                        style={{ ...s.sendReminderBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                        <span>Send WhatsApp Reminder</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

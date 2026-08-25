@@ -1,0 +1,20 @@
+let _app = null;
+let _err = null;
+
+try {
+  _app = require('../backend/src/app.js');
+} catch (e) {
+  _err = e;
+  console.error('[Vercel] Failed to load app:', e.message, e.stack);
+}
+
+module.exports = (req, res) => {
+  if (_err) {
+    return res.status(500).json({
+      error: 'Server failed to initialize',
+      message: _err.message,
+      stack: _err.stack
+    });
+  }
+  return _app(req, res);
+};

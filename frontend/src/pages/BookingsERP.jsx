@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { MOCK_BOOKINGS } from '../mockData';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 const STATUS_STYLES = {
   'Booking Created': { color: '#1d4ed8', dot: '#3b82f6' },
@@ -139,8 +140,8 @@ function CustomSelect({ value, options, onChange, minWidth = 140, fullWidth = fa
 }
 
 export default function BookingsERP() {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState(MOCK_BOOKINGS.map((b,i) => ({ id: `BK${String(i+1).padStart(3,'0')}`, client: b.clientName, product: b.product, erpRef: b.erpRef, status: b.status, date: new Date(b.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), amount: `₹${b.amount.toLocaleString('en-IN')}`, rawAmount: b.amount })));
+  const [loading, setLoading] = useState(false);
 
   // Search & Filter State
   const [search, setSearch] = useState('');
@@ -205,9 +206,9 @@ export default function BookingsERP() {
   const pendingCount = bookings.filter(b => b.status === 'Booking Created').length;
 
   return (
-    <div style={s.page}>
+    <div style={{ ...s.page, padding: undefined }} className="page-container">
       {/* Header */}
-      <div style={s.pageHead}>
+      <div style={s.pageHead} className="mobile-stack-header">
         <div>
           <h1 style={s.title}>Bookings & ERP</h1>
           <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
@@ -224,7 +225,7 @@ export default function BookingsERP() {
       </div>
 
       {/* Clean Borderless Stat Cards */}
-      <div style={s.statsRow}>
+      <div style={s.statsRow} className="stat-chips-row">
         <div style={{ ...s.statCard, background: 'linear-gradient(180deg, #ffffff 0%, #eff6ff 100%)' }}>
           <div style={{ ...s.statNum, color: '#1d4ed8' }}>{bookings.length}</div>
           <div style={s.statLbl}>Total Active Bookings</div>
@@ -242,7 +243,7 @@ export default function BookingsERP() {
       </div>
 
       {/* Toolbar */}
-      <div style={s.toolbar}>
+      <div style={s.toolbar} className="mobile-filter-toolbar">
         <div style={s.searchWrap}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2.2">
             <circle cx="11" cy="11" r="8"/>
@@ -296,7 +297,8 @@ export default function BookingsERP() {
       </div>
 
       {/* Table Card */}
-      <div style={s.card}>
+      <div className="bookings-table-wrapper">
+        <div style={s.card} className="bookings-table-inner">
         <div style={s.tableHead}>
           {['Booking ID', 'Client', 'Product', 'ERP Reference', 'Date', 'Amount', 'Status'].map(h => (
             <div key={h} style={s.th}>{h}</div>
@@ -326,6 +328,7 @@ export default function BookingsERP() {
             No bookings found matching your search.
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -135,22 +135,32 @@ const INITIAL_NOTIFICATIONS = [
   }
 ];
 
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout, loginWithRole } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [notifFilter, setNotifFilter] = useState('all');
   const [isSimulating, setIsSimulating] = useState(false);
 
-  // Auto-close dropdowns and mobile drawer on route navigation
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
-    setMobileMenuOpen(false);
-    setNotifOpen(false);
-    setUserMenuOpen(false);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setSidebarOpen(false);
   }, [location.pathname]);
 
   // Dynamic Navigation Groups based on active User Role
@@ -227,7 +237,7 @@ export default function DashboardLayout() {
   // Fetch notifications from backend API
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/notifications');
+      const res = await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications');
       const data = await res.json();
       if (data.success && Array.isArray(data.notifications)) {
         setNotifications(data.notifications);
@@ -249,7 +259,7 @@ export default function DashboardLayout() {
     if (e) e.stopPropagation();
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', {
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -260,21 +270,21 @@ export default function DashboardLayout() {
   const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', { method: 'POST' });
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', { method: 'POST' });
     } catch (e) {}
   };
 
   const handleClearAll = async () => {
     setNotifications([]);
     try {
-      await fetch('http://localhost:5000/api/notifications/clear', { method: 'POST' });
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/clear', { method: 'POST' });
     } catch (e) {}
   };
 
   const handleSimulateAlert = async () => {
     setIsSimulating(true);
     try {
-      const res = await fetch('http://localhost:5000/api/notifications/simulate', { method: 'POST' });
+      const res = await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/simulate', { method: 'POST' });
       const data = await res.json();
       if (data.success && data.notification) {
         setNotifications(prev => [data.notification, ...prev]);
@@ -300,7 +310,7 @@ export default function DashboardLayout() {
   const handleNotifClick = async (notif) => {
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
     try {
-      await fetch('http://localhost:5000/api/notifications/mark-read', {
+      await fetch((import.meta.env.PROD ? '/api' : 'http://localhost:5000/api') + '/notifications/mark-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: notif.id })
@@ -408,45 +418,60 @@ export default function DashboardLayout() {
 
   const roleTitleDisplay = currentUser?.role === 'admin' ? 'System Administrator' : currentUser?.role === 'manager' ? 'Operations Manager' : 'Sales Specialist';
 
+  const mobileSidebarStyle = isMobile ? {
+    position: 'fixed',
+    top: 0,
+    left: sidebarOpen ? 0 : -240,
+    width: 240,
+    height: '100vh',
+    boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
+    transition: 'left 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    zIndex: 1000
+  } : {};
+
   return (
     <div style={s.container}>
 
       {/* ─── TOP HEADER ─────────────────────────────────────────────────── */}
-      <header style={s.header} className="app-header">
-        {/* Left: Mobile Hamburger & Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <button
-            type="button"
-            className="mobile-hamburger-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation drawer"
-            title="Toggle Menu"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-
+      <header style={{ ...s.header, padding: isMobile ? '0 1rem' : '0 1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 8px 8px 0', marginRight: 8, display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}
+              title="Toggle Menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" strokeWidth="2.5">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          )}
+          {/* Logo */}
           <div style={s.logoSection} onClick={() => navigate(currentUser?.defaultRoute || '/dashboard')}>
-            <img src="/aps-logo.png" alt="APS Enterprises" className="header-logo-img" style={{ height: 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
+            <img src="/aps-logo.png" alt="APS Enterprises" style={{ height: isMobile ? 36 : 44, width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
         </div>
 
-        {/* Center Pills */}
-        <div style={s.pillContainer} className="header-pills-container">
-          {headerPills.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => handleTabChange(key)}
-              className={`header-pill-btn ${activeTab === key ? 'active' : ''}`}
-              style={{ ...s.pillButton, ...(activeTab === key ? s.pillActive : s.pillInactive) }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Center Pills (Desktop only) */}
+        {!isMobile && (
+          <div style={s.pillContainer}>
+            {headerPills.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleTabChange(key)}
+                className={`header-pill-btn ${activeTab === key ? 'active' : ''}`}
+                style={{ ...s.pillButton, ...(activeTab === key ? s.pillActive : s.pillInactive) }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Right Actions */}
         <div style={{ ...s.headerRight, position: 'relative' }}>
@@ -460,7 +485,7 @@ export default function DashboardLayout() {
 
           {/* Notifications Dropdown */}
           {notifOpen && (
-            <div style={{ ...s.dropdownPanel, width: 340, maxWidth: 'calc(100vw - 24px)', right: 0, padding: '0.85rem' }}>
+            <div className="notif-dropdown-panel">
               {/* Header */}
               <div style={s.notifHeaderRow}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -483,39 +508,42 @@ export default function DashboardLayout() {
                 </div>
               </div>
 
-              {/* Notification Filter Chips */}
-              <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid #f1f5f9' }}>
-                {[
-                  { id: 'all', label: 'All' },
-                  { id: 'unread', label: 'Unread' },
-                  { id: 'ai', label: 'AI Alerts' },
-                  { id: 'ops', label: 'Ops' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setNotifFilter(tab.id)}
-                    style={{
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      border: 'none',
-                      backgroundColor: notifFilter === tab.id ? '#09090b' : '#f1f5f9',
-                      color: notifFilter === tab.id ? '#fff' : '#64748b',
-                      fontSize: '0.68rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              {/* Category Filter Pills & Simulate Trigger */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 2 }}>
+                  {[
+                    { key: 'all', label: `All (${notifications.length})` },
+                    { key: 'unread', label: `Unread (${unreadCount})` },
+                    { key: 'ai', label: 'AI & Queries' },
+                    { key: 'ops', label: 'Operations' }
+                  ].map(f => (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => setNotifFilter(f.key)}
+                      style={{
+                        padding: '3px 8px',
+                        borderRadius: 12,
+                        border: '1px solid',
+                        borderColor: notifFilter === f.key ? '#2563eb' : '#e2e8f0',
+                        backgroundColor: notifFilter === f.key ? '#eff6ff' : '#ffffff',
+                        color: notifFilter === f.key ? '#1d4ed8' : '#64748b',
+                        fontSize: '0.66rem',
+                        fontWeight: notifFilter === f.key ? 700 : 500,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
 
                 <button
                   type="button"
                   onClick={handleSimulateAlert}
                   disabled={isSimulating}
                   style={{
-                    marginLeft: 'auto',
                     padding: '3px 8px',
                     borderRadius: 8,
                     border: '1px solid #cbd5e1',
@@ -524,6 +552,7 @@ export default function DashboardLayout() {
                     fontSize: '0.64rem',
                     fontWeight: 700,
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
                     flexShrink: 0
                   }}
                   title="Simulate a live incoming query or event from backend"
@@ -609,10 +638,12 @@ export default function DashboardLayout() {
             <div style={{ ...s.userAvatarInitial, backgroundColor: currentUser?.avatarBg || '#09090b' }}>
               {currentUser?.avatar || 'A'}
             </div>
-            <div style={s.userInfo} className="header-user-info">
-              <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
-              <div style={s.userRole}>{roleTitleDisplay}</div>
-            </div>
+            {!isMobile && (
+              <div style={s.userInfo}>
+                <div style={s.userName}>{currentUser?.name || 'Admin'}</div>
+                <div style={s.userRole}>{roleTitleDisplay}</div>
+              </div>
+            )}
             <svg style={s.dropdownIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -620,7 +651,7 @@ export default function DashboardLayout() {
 
           {/* Profile Dropdown & Quick Switch */}
           {userMenuOpen && (
-            <div style={{ ...s.dropdownPanel, right: 0, width: 260, maxWidth: 'calc(100vw - 24px)' }}>
+            <div className="user-dropdown-panel">
               <div style={s.dropdownHeader}>
                 <div>Signed in as <strong>{currentUser?.name}</strong></div>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>{currentUser?.email}</div>
@@ -651,7 +682,6 @@ export default function DashboardLayout() {
                   {['admin', 'manager', 'employee'].map(r => (
                     <button
                       key={r}
-                      type="button"
                       onClick={() => handleSwitchRole(r)}
                       style={{
                         padding: '5px 2px',
@@ -698,14 +728,26 @@ export default function DashboardLayout() {
       {/* ─── BODY: SIDEBAR + MAIN ───────────────────────────────────────── */}
       <div style={s.bodyWrapper}>
 
-        {/* Mobile Backdrop Overlay */}
-        <div
-          className={`mobile-sidebar-backdrop ${mobileMenuOpen ? 'active' : ''}`}
-          onClick={() => setMobileMenuOpen(false)}
-        />
+        {/* Mobile Sidebar Backdrop */}
+        {isMobile && sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(9, 9, 11, 0.4)',
+              backdropFilter: 'blur(3px)',
+              zIndex: 999,
+              transition: 'opacity 0.25s ease'
+            }}
+          />
+        )}
 
         {/* ─── SIDEBAR ──────────────────────────────────────────────────── */}
-        <aside style={s.sidebar} className={`app-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <aside style={{ ...s.sidebar, ...mobileSidebarStyle }}>
 
           {/* Scrollable Nav */}
           <div style={s.sidebarScroll}>
@@ -717,11 +759,7 @@ export default function DashboardLayout() {
                   return (
                     <button
                       key={item.key}
-                      type="button"
-                      onClick={() => {
-                        handleTabChange(item.key);
-                        setMobileMenuOpen(false);
-                      }}
+                      onClick={() => handleTabChange(item.key)}
                       className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
                       style={isActive ? s.navItemActive : s.navItem}
                     >
@@ -755,7 +793,7 @@ export default function DashboardLayout() {
                 <div style={s.userCardName}>{currentUser?.name || 'admin'}</div>
                 <div style={s.userCardEmail}>{currentUser?.email || 'admin@aps.enterprise'}</div>
               </div>
-              <button type="button" onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
+              <button onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -767,10 +805,76 @@ export default function DashboardLayout() {
         </aside>
 
         {/* ─── MAIN CONTENT ─────────────────────────────────────────────── */}
-        <main style={s.mainContent} className="app-main-content">
+        <main style={s.mainContent}>
           <Outlet />
         </main>
       </div>
+
+      {/* ─── MOBILE BOTTOM NAV ───────────────────────────────────────────── */}
+      {isMobile && (
+        <nav className="mobile-bottom-nav">
+          {[
+            {
+              key: 'analytics',
+              label: 'Dashboard',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="14" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+              )
+            },
+            {
+              key: 'pipeline',
+              label: 'CRM',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                  <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
+                </svg>
+              )
+            },
+            {
+              key: 'ai',
+              label: 'AI',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
+                  <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3" />
+                </svg>
+              )
+            },
+            {
+              key: 'whatsapp',
+              label: 'WhatsApp',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              )
+            },
+            {
+              key: 'invoices',
+              label: 'Finance',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+              )
+            }
+          ].map(({ key, label, icon }) => (
+            <button
+              key={key}
+              onClick={() => handleTabChange(key)}
+              className={`mobile-bottom-nav-item ${activeTab === key ? 'active' : ''}`}
+            >
+              <span className="mobile-bottom-nav-icon">{icon}</span>
+              <span className="mobile-bottom-nav-label">{label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
 
       {/* Floating AI Assistant Chat Panel */}
       <APSAIChatPanel />
