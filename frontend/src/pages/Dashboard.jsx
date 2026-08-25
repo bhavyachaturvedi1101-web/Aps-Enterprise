@@ -326,7 +326,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={s.container}>
+    <div style={{ ...s.container, padding: undefined }} className="page-container" id="dashboard-page">
 
       {/* ─── ANALYTICS VIEW ────────────────────────────────────────────────── */}
       {activeTab === 'analytics' && (
@@ -334,8 +334,8 @@ export default function Dashboard() {
 
           {/* Hero Banner */}
           <div className="responsive-hero" style={s.heroCard}>
-            <div style={s.heroLeft}>
-              <h1 style={s.heroTitle}>Automated Lead Insights</h1>
+            <div style={s.heroLeft} className="hero-left">
+              <h1 style={s.heroTitle} className="hero-title-text">Automated Lead Insights</h1>
               <div style={s.heroStatsRow}>
                 <div style={s.heroStatChip}>
                   <span style={s.heroStatVal}>{leads.length}</span>
@@ -351,7 +351,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <div style={s.heroRight}>
+            <div style={s.heroRight} className="hero-circle-graphic">
               {/* Circle Graphic */}
               <div style={s.circleWrap}>
                 <div style={s.circleBig}/>
@@ -391,7 +391,7 @@ export default function Dashboard() {
           </div>
 
           {/* Integration Status Bar */}
-          <div className="grid-4col" style={s.intBar}>
+          <div className="grid-4col">
             {INTEGRATIONS.map(int => {
               const routeMap = { CRM: '/crm', ERP: '/bookings', Dialer: '/dialer', Tally: '/tally' };
               return (
@@ -422,7 +422,7 @@ export default function Dashboard() {
           </div>
 
           {/* Three Card Grid */}
-          <div className="grid-3col" style={s.grid3}>
+          <div className="grid-3col">
             {/* Card 1 — Lead Status Performance Bar Chart */}
             <div style={s.card}>
               <div style={s.cardTop}>
@@ -646,7 +646,7 @@ export default function Dashboard() {
           </div>
 
           {/* Bottom Two-Column: Activity + Alerts */}
-          <div className="grid-2col" style={s.grid2}>
+          <div className="grid-2col">
             {/* Recent Activity */}
             <div style={s.card}>
               <div style={s.cardTop}>
@@ -848,12 +848,12 @@ export default function Dashboard() {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const s = {
-  container: { padding:'2rem', fontFamily:'var(--font-body)', backgroundColor:'var(--bg-primary)', minHeight:'calc(100vh - 70px)', boxSizing:'border-box' },
+  container: { fontFamily:'var(--font-body)', backgroundColor:'var(--bg-primary)', minHeight:'calc(100vh - 70px)', boxSizing:'border-box' },
   page: { display:'flex', flexDirection:'column', gap:'1.5rem' },
 
   // Hero
   heroCard: { backgroundColor:'#fff', borderRadius:24, padding:'1.75rem 2.25rem', border:'1px solid #e2e8f0', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.04)', display:'flex', justifyContent:'space-between', alignItems:'center', minHeight:170, position:'relative', overflow:'hidden' },
-  heroLeft: { flex:'1 1 55%', display:'flex', flexDirection:'column', justifyContent:'center', gap:'1rem', zIndex:2 },
+  heroLeft: { flex:'1 1 55%', display:'flex', flexDirection:'column', justifyContent:'center', gap:'1rem', zIndex:2, maxWidth:'100%' },
   heroTitle: { fontSize:'2.2rem', fontWeight:800, fontFamily:'var(--font-heading)', letterSpacing:'-1px', color:'#08060d', margin:0 },
   heroStatsRow: { display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' },
   heroStatChip: { backgroundColor:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:12, padding:'8px 14px', display:'flex', flexDirection:'column', gap:2 },
