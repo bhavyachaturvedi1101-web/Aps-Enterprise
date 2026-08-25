@@ -298,10 +298,12 @@ const transitionLead = async (req, res) => {
       lead.erpBookingCreated = true;
     }
     
+    let activityEntry = null;
+
     if (!isMock) {
       try {
         await lead.save();
-        await ActivityLog.create({
+        activityEntry = await ActivityLog.create({
           id: `log${Date.now()}`,
           leadId: lead.id,
           employeeId: employeeId || req.user?.id || 'e1',
@@ -319,7 +321,7 @@ const transitionLead = async (req, res) => {
       // For mock leads, push to the in-memory ActivityLogs array
       const { mockActivityLogs } = require('../config/inMemoryStore');
       if (mockActivityLogs) {
-        mockActivityLogs.unshift({
+        activityEntry = {
           id: `log${Date.now()}`,
           leadId: lead.id,
           employeeId: employeeId || req.user?.id || 'e1',
@@ -328,7 +330,8 @@ const transitionLead = async (req, res) => {
             ? `Countersigned transition: ${oldStage} → ${toStage} by ${countersignedBy}`
             : `Transitioned Lead to ${toStage}`,
           createdAt: new Date().toISOString()
-        });
+        };
+        mockActivityLogs.unshift(activityEntry);
       }
     }
 
