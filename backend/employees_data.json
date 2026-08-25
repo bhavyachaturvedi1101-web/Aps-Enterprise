@@ -1,0 +1,1622 @@
+[
+  {
+    "id": "e1",
+    "name": "Animesh",
+    "email": "rahul.pathak@aps-enterprise.com",
+    "phone": "+91 9183073592",
+    "role": "Voice Operations & Sales Lead",
+    "department": "Sales",
+    "kpiScore": "98%",
+    "kpiScoreNum": 98,
+    "status": "Active",
+    "currentActivity": "Scheduling Demo",
+    "tasksCompleted": 25,
+    "callsHandled": 90,
+    "salesClosed": 8,
+    "totalRevenue": 679952,
+    "targetSales": 9,
+    "conversionRate": "8.9%",
+    "avgCallDurationSec": 144,
+    "avgResponseTimeMin": "4.0",
+    "weeklyKpiHistory": [
+      91,
+      91,
+      97,
+      98
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 50,
+      "qualifiedToBooked": 38,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 8
+    },
+    "activeTask": {
+      "id": "task-e1-1",
+      "title": "Follow up on field demo schedule for Kumar Traders",
+      "leadId": "LEAD-615",
+      "leadName": "Kumar Traders",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "11 mins",
+      "assignedAt": "2026-08-24T09:13:50.791Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e1-2",
+        "title": "Negotiate final pricing and discount for Kumar Traders",
+        "leadId": "LEAD-615",
+        "leadName": "Kumar Traders",
+        "priority": "High",
+        "type": "Sales Negotiation",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e2",
+    "name": "Sneha",
+    "email": "rakesh.bansal@aps-enterprise.com",
+    "phone": "+91 9605758384",
+    "role": "Core Systems Architect & Admin",
+    "department": "Operations & Administration",
+    "kpiScore": "93%",
+    "kpiScoreNum": 93,
+    "status": "Active",
+    "currentActivity": "Scheduling Demo",
+    "tasksCompleted": 24,
+    "callsHandled": 129,
+    "salesClosed": 11,
+    "totalRevenue": 618310,
+    "targetSales": 15,
+    "conversionRate": "8.5%",
+    "avgCallDurationSec": 181,
+    "avgResponseTimeMin": "5.7",
+    "weeklyKpiHistory": [
+      92,
+      97,
+      90,
+      93
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 28,
+      "qualifiedToBooked": 28,
+      "bookedToConfirmed": 11,
+      "confirmedToPaid": 11
+    },
+    "activeTask": {
+      "id": "task-e2-1",
+      "title": "Follow up on field demo schedule for Iyer Packers",
+      "leadId": "LEAD-910",
+      "leadName": "Iyer Packers",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "23 mins",
+      "assignedAt": "2026-08-24T09:03:21.618Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e2-2",
+        "title": "Follow up on field demo schedule for Iyer Packers",
+        "leadId": "LEAD-910",
+        "leadName": "Iyer Packers",
+        "priority": "Normal",
+        "type": "Field Sales",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e3",
+    "name": "Aaditya",
+    "email": "suresh.verma@aps-enterprise.com",
+    "phone": "+91 9141026894",
+    "role": "Analytics & WhatsApp Lead",
+    "department": "Operations & Administration",
+    "kpiScore": "90%",
+    "kpiScoreNum": 90,
+    "status": "Active",
+    "currentActivity": "Drafting Quotation",
+    "tasksCompleted": 19,
+    "callsHandled": 122,
+    "salesClosed": 10,
+    "totalRevenue": 371760,
+    "targetSales": 14,
+    "conversionRate": "8.2%",
+    "avgCallDurationSec": 123,
+    "avgResponseTimeMin": "6.5",
+    "weeklyKpiHistory": [
+      98,
+      93,
+      91,
+      90
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 29,
+      "qualifiedToBooked": 32,
+      "bookedToConfirmed": 14,
+      "confirmedToPaid": 10
+    },
+    "activeTask": {
+      "id": "task-e3-1",
+      "title": "Share quotation and ROI video for Dona Pattal setup with Bose Polymers",
+      "leadId": "LEAD-763",
+      "leadName": "Bose Polymers",
+      "priority": "Normal",
+      "type": "Sales Follow-up",
+      "stage": "Qualified",
+      "dueIn": "37 mins",
+      "assignedAt": "2026-08-24T09:00:38.211Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e3-2",
+        "title": "Follow up on field demo schedule for Bose Polymers",
+        "leadId": "LEAD-763",
+        "leadName": "Bose Polymers",
+        "priority": "Normal",
+        "type": "Field Sales",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e4",
+    "name": "Pooja Sharma",
+    "email": "kunal.sen@aps-enterprise.com",
+    "phone": "+91 9475613762",
+    "role": "Senior Telecaller & Conversion Spec",
+    "department": "Sales",
+    "kpiScore": "67%",
+    "kpiScoreNum": 67,
+    "status": "Active",
+    "currentActivity": "Scheduling Demo",
+    "tasksCompleted": 67,
+    "callsHandled": 74,
+    "salesClosed": 4,
+    "totalRevenue": 341056,
+    "targetSales": 14,
+    "conversionRate": "5.4%",
+    "avgCallDurationSec": 151,
+    "avgResponseTimeMin": "8.5",
+    "weeklyKpiHistory": [
+      64,
+      66,
+      63,
+      67
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 52,
+      "qualifiedToBooked": 29,
+      "bookedToConfirmed": 13,
+      "confirmedToPaid": 4
+    },
+    "activeTask": {
+      "id": "task-e4-1",
+      "title": "Follow up on field demo schedule for Das Global",
+      "leadId": "LEAD-115",
+      "leadName": "Das Global",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "17 mins",
+      "assignedAt": "2026-08-24T08:35:27.945Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e4-2",
+        "title": "Negotiate final pricing and discount for Das Global",
+        "leadId": "LEAD-115",
+        "leadName": "Das Global",
+        "priority": "High",
+        "type": "Sales Negotiation",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e5",
+    "name": "Rohan Mehta",
+    "email": "harsh.dixit@aps-enterprise.com",
+    "phone": "+91 9716940960",
+    "role": "ERP & Factory Dispatch Officer",
+    "department": "Operations & Administration",
+    "kpiScore": "64%",
+    "kpiScoreNum": 64,
+    "status": "Active",
+    "currentActivity": "Packing Spare Parts",
+    "tasksCompleted": 99,
+    "callsHandled": 152,
+    "salesClosed": 9,
+    "totalRevenue": 405234,
+    "targetSales": 10,
+    "conversionRate": "5.9%",
+    "avgCallDurationSec": 138,
+    "avgResponseTimeMin": "1.2",
+    "weeklyKpiHistory": [
+      65,
+      63,
+      64,
+      64
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 44,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 9
+    },
+    "activeTask": {
+      "id": "task-e5-1",
+      "title": "Pack spare parts kit (dies and heaters) for Bose Solutions",
+      "leadId": "LEAD-930",
+      "leadName": "Bose Solutions",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "37 mins",
+      "assignedAt": "2026-08-24T09:00:55.370Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e5-2",
+        "title": "Test and calibrate hydraulics for Double Die Machine for Bose Solutions",
+        "leadId": "LEAD-930",
+        "leadName": "Bose Solutions",
+        "priority": "Normal",
+        "type": "Quality Testing",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e6",
+    "name": "Dhruv Bhatia",
+    "email": "dhruv.bhatia@aps-enterprise.com",
+    "phone": "+91 9312518082",
+    "role": "Machine Fitter",
+    "department": "Production & Assembly",
+    "kpiScore": "82%",
+    "kpiScoreNum": 82,
+    "status": "Offline",
+    "currentActivity": "Booking Transport",
+    "tasksCompleted": 70,
+    "callsHandled": 233,
+    "salesClosed": 19,
+    "totalRevenue": 642105,
+    "targetSales": 29,
+    "conversionRate": "8.2%",
+    "avgCallDurationSec": 216,
+    "avgResponseTimeMin": "2.2",
+    "weeklyKpiHistory": [
+      82,
+      83,
+      75,
+      82
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 20,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 19
+    },
+    "activeTask": {
+      "id": "task-e6-1",
+      "title": "Coordinate with transport vendor for pickup for Nair Enterprises",
+      "leadId": "LEAD-136",
+      "leadName": "Nair Enterprises",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "33 mins",
+      "assignedAt": "2026-08-24T09:08:11.394Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e6-2",
+        "title": "Pack spare parts kit (dies and heaters) for Nair Enterprises",
+        "leadId": "LEAD-136",
+        "leadName": "Nair Enterprises",
+        "priority": "Normal",
+        "type": "Spare Parts Allocation",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e7",
+    "name": "Animesh Saini",
+    "email": "animesh.saini@aps-enterprise.com",
+    "phone": "+91 9768854464",
+    "role": "Quality Testing Engineer",
+    "department": "Production & Assembly",
+    "kpiScore": "75%",
+    "kpiScoreNum": 75,
+    "status": "Active",
+    "currentActivity": "Validating Assembly",
+    "tasksCompleted": 62,
+    "callsHandled": 197,
+    "salesClosed": 14,
+    "totalRevenue": 878976,
+    "targetSales": 22,
+    "conversionRate": "7.1%",
+    "avgCallDurationSec": 126,
+    "avgResponseTimeMin": "5.7",
+    "weeklyKpiHistory": [
+      76,
+      75,
+      78,
+      75
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 71,
+      "qualifiedToBooked": 37,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 14
+    },
+    "activeTask": {
+      "id": "task-e7-1",
+      "title": "Verify motor and heating coil assembly for Goel Solutions",
+      "leadId": "LEAD-135",
+      "leadName": "Goel Solutions",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "57 mins",
+      "assignedAt": "2026-08-24T08:49:38.099Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e7-2",
+        "title": "Test and calibrate hydraulics for Double Die Machine for Goel Solutions",
+        "leadId": "LEAD-135",
+        "leadName": "Goel Solutions",
+        "priority": "Normal",
+        "type": "Quality Testing",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e8",
+    "name": "Rahul Choudhary",
+    "email": "rahul.choudhary@aps-enterprise.com",
+    "phone": "+91 9969424283",
+    "role": "Dispatch Coordinator",
+    "department": "Logistics & Service",
+    "kpiScore": "95%",
+    "kpiScoreNum": 95,
+    "status": "Active",
+    "currentActivity": "Packing Spare Parts",
+    "tasksCompleted": 16,
+    "callsHandled": 135,
+    "salesClosed": 12,
+    "totalRevenue": 433644,
+    "targetSales": 14,
+    "conversionRate": "8.9%",
+    "avgCallDurationSec": 81,
+    "avgResponseTimeMin": "8.7",
+    "weeklyKpiHistory": [
+      95,
+      93,
+      99,
+      95
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 70,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 12
+    },
+    "activeTask": {
+      "id": "task-e8-1",
+      "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
+      "leadId": "LEAD-758",
+      "leadName": "Singh Polymers",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "14 mins",
+      "assignedAt": "2026-08-24T09:09:55.899Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e8-2",
+        "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
+        "leadId": "LEAD-758",
+        "leadName": "Singh Polymers",
+        "priority": "Normal",
+        "type": "Spare Parts Allocation",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e9",
+    "name": "Manish Mahajan",
+    "email": "manish.mahajan@aps-enterprise.com",
+    "phone": "+91 9606890406",
+    "role": "Inventory Clerk",
+    "department": "Logistics & Service",
+    "kpiScore": "77%",
+    "kpiScoreNum": 77,
+    "status": "Active",
+    "currentActivity": "Validating Assembly",
+    "tasksCompleted": 64,
+    "callsHandled": 91,
+    "salesClosed": 7,
+    "totalRevenue": 316512,
+    "targetSales": 6,
+    "conversionRate": "7.7%",
+    "avgCallDurationSec": 165,
+    "avgResponseTimeMin": "2.9",
+    "weeklyKpiHistory": [
+      81,
+      75,
+      81,
+      77
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 38,
+      "qualifiedToBooked": 40,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 7
+    },
+    "activeTask": {
+      "id": "task-e9-1",
+      "title": "Verify motor and heating coil assembly for Garg Packers",
+      "leadId": "LEAD-289",
+      "leadName": "Garg Packers",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "54 mins",
+      "assignedAt": "2026-08-24T08:37:42.316Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e9-2",
+        "title": "Dispatch fully automatic machine via transport for Garg Packers",
+        "leadId": "LEAD-289",
+        "leadName": "Garg Packers",
+        "priority": "High",
+        "type": "Factory Dispatch",
+        "stage": "Dispatched"
+      }
+    ]
+  },
+  {
+    "id": "e10",
+    "name": "Dev Patel",
+    "email": "dev.patel@aps-enterprise.com",
+    "phone": "+91 9434695766",
+    "role": "Accounts Executive",
+    "department": "Operations & Administration",
+    "kpiScore": "75%",
+    "kpiScoreNum": 75,
+    "status": "Active",
+    "currentActivity": "Creating Tax Invoice",
+    "tasksCompleted": 57,
+    "callsHandled": 284,
+    "salesClosed": 21,
+    "totalRevenue": 1530984,
+    "targetSales": 29,
+    "conversionRate": "7.4%",
+    "avgCallDurationSec": 177,
+    "avgResponseTimeMin": "1.1",
+    "weeklyKpiHistory": [
+      82,
+      84,
+      76,
+      75
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 50,
+      "qualifiedToBooked": 38,
+      "bookedToConfirmed": 16,
+      "confirmedToPaid": 21
+    },
+    "activeTask": {
+      "id": "task-e10-1",
+      "title": "Generate GST Tax Invoice for Chaturvedi Creations",
+      "leadId": "LEAD-694",
+      "leadName": "Chaturvedi Creations",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "9 mins",
+      "assignedAt": "2026-08-24T08:49:01.275Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e10-2",
+        "title": "Approve final dispatch invoice & transport LR for Chaturvedi Creations",
+        "leadId": "LEAD-694",
+        "leadName": "Chaturvedi Creations",
+        "priority": "Normal",
+        "type": "Factory Release Authorization",
+        "stage": "Client (Paid)"
+      }
+    ]
+  },
+  {
+    "id": "e11",
+    "name": "Kabir Mahajan",
+    "email": "kabir.mahajan@aps-enterprise.com",
+    "phone": "+91 9875417161",
+    "role": "ERP Operations Admin",
+    "department": "Operations & Administration",
+    "kpiScore": "68%",
+    "kpiScoreNum": 68,
+    "status": "Active",
+    "currentActivity": "Verifying Invoices",
+    "tasksCompleted": 59,
+    "callsHandled": 100,
+    "salesClosed": 6,
+    "totalRevenue": 458970,
+    "targetSales": 13,
+    "conversionRate": "6.0%",
+    "avgCallDurationSec": 122,
+    "avgResponseTimeMin": "0.1",
+    "weeklyKpiHistory": [
+      63,
+      65,
+      65,
+      68
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 34,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 6
+    },
+    "activeTask": {
+      "id": "task-e11-1",
+      "title": "Approve final dispatch invoice & transport LR for Choudhary Paper Products",
+      "leadId": "LEAD-689",
+      "leadName": "Choudhary Paper Products",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)",
+      "dueIn": "50 mins",
+      "assignedAt": "2026-08-24T09:08:07.225Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e11-2",
+        "title": "Review Booking Specs & Dual-Approval Countersign for Choudhary Paper Products",
+        "leadId": "LEAD-689",
+        "leadName": "Choudhary Paper Products",
+        "priority": "Urgent",
+        "type": "Admin Dual-Approval",
+        "stage": "Booked"
+      }
+    ]
+  },
+  {
+    "id": "e12",
+    "name": "Bhumika Rao",
+    "email": "bhumika.rao@aps-enterprise.com",
+    "phone": "+91 9670349626",
+    "role": "Spare Parts Manager",
+    "department": "Logistics & Service",
+    "kpiScore": "60%",
+    "kpiScoreNum": 60,
+    "status": "Active",
+    "currentActivity": "Creating Tax Invoice",
+    "tasksCompleted": 46,
+    "callsHandled": 254,
+    "salesClosed": 15,
+    "totalRevenue": 552585,
+    "targetSales": 13,
+    "conversionRate": "5.9%",
+    "avgCallDurationSec": 191,
+    "avgResponseTimeMin": "8.8",
+    "weeklyKpiHistory": [
+      60,
+      67,
+      61,
+      60
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 74,
+      "qualifiedToBooked": 33,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 15
+    },
+    "activeTask": {
+      "id": "task-e12-1",
+      "title": "Generate GST Tax Invoice for Dixit Disposables",
+      "leadId": "LEAD-308",
+      "leadName": "Dixit Disposables",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "45 mins",
+      "assignedAt": "2026-08-24T08:56:10.749Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e12-2",
+        "title": "Review Booking Specs & Dual-Approval Countersign for Dixit Disposables",
+        "leadId": "LEAD-308",
+        "leadName": "Dixit Disposables",
+        "priority": "Urgent",
+        "type": "Admin Dual-Approval",
+        "stage": "Booked"
+      }
+    ]
+  },
+  {
+    "id": "e13",
+    "name": "Rajesh Khatri",
+    "email": "rajesh.khatri@aps-enterprise.com",
+    "phone": "+91 9410859666",
+    "role": "Field Sales Manager",
+    "department": "Sales",
+    "kpiScore": "84%",
+    "kpiScoreNum": 84,
+    "status": "Active",
+    "currentActivity": "Negotiating Pricing",
+    "tasksCompleted": 64,
+    "callsHandled": 206,
+    "salesClosed": 17,
+    "totalRevenue": 795940,
+    "targetSales": 25,
+    "conversionRate": "8.3%",
+    "avgCallDurationSec": 169,
+    "avgResponseTimeMin": "1.3",
+    "weeklyKpiHistory": [
+      75,
+      77,
+      76,
+      84
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 80,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 17
+    },
+    "activeTask": {
+      "id": "task-e13-1",
+      "title": "Negotiate final pricing and discount for Patel Industries",
+      "leadId": "LEAD-380",
+      "leadName": "Patel Industries",
+      "priority": "High",
+      "type": "Sales Negotiation",
+      "stage": "Qualified",
+      "dueIn": "25 mins",
+      "assignedAt": "2026-08-24T08:46:27.399Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e13-2",
+        "title": "Negotiate final pricing and discount for Patel Industries",
+        "leadId": "LEAD-380",
+        "leadName": "Patel Industries",
+        "priority": "High",
+        "type": "Sales Negotiation",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e14",
+    "name": "Bhavya Chauhan",
+    "email": "bhavya.chauhan@aps-enterprise.com",
+    "phone": "+91 9686985337",
+    "role": "Direct Sales Executive",
+    "department": "Sales",
+    "kpiScore": "98%",
+    "kpiScoreNum": 98,
+    "status": "Active",
+    "currentActivity": "Handling Operations",
+    "tasksCompleted": 26,
+    "callsHandled": 199,
+    "salesClosed": 19,
+    "totalRevenue": 647577,
+    "targetSales": 25,
+    "conversionRate": "9.5%",
+    "avgCallDurationSec": 121,
+    "avgResponseTimeMin": "7.9",
+    "weeklyKpiHistory": [
+      95,
+      96,
+      92,
+      98
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 54,
+      "qualifiedToBooked": 25,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 19
+    },
+    "activeTask": {
+      "id": "task-e14-1",
+      "title": "Conduct secondary telecaller qualification for Pandey Global",
+      "leadId": "LEAD-258",
+      "leadName": "Pandey Global",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "28 mins",
+      "assignedAt": "2026-08-24T09:01:58.778Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e14-2",
+        "title": "Share quotation and ROI video for Dona Pattal setup with Pandey Global",
+        "leadId": "LEAD-258",
+        "leadName": "Pandey Global",
+        "priority": "Normal",
+        "type": "Sales Follow-up",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e15",
+    "name": "Ravi Reddy",
+    "email": "ravi.reddy@aps-enterprise.com",
+    "phone": "+91 9270888073",
+    "role": "Lead Qualification Specialist",
+    "department": "Operations & Administration",
+    "kpiScore": "80%",
+    "kpiScoreNum": 80,
+    "status": "Active",
+    "currentActivity": "Handling Operations",
+    "tasksCompleted": 18,
+    "callsHandled": 213,
+    "salesClosed": 17,
+    "totalRevenue": 1129701,
+    "targetSales": 15,
+    "conversionRate": "8.0%",
+    "avgCallDurationSec": 191,
+    "avgResponseTimeMin": "8.1",
+    "weeklyKpiHistory": [
+      82,
+      83,
+      77,
+      80
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 49,
+      "qualifiedToBooked": 12,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 17
+    },
+    "activeTask": {
+      "id": "task-e15-1",
+      "title": "Conduct secondary telecaller qualification for Pathak Paper Products",
+      "leadId": "LEAD-785",
+      "leadName": "Pathak Paper Products",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "31 mins",
+      "assignedAt": "2026-08-24T08:37:38.226Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e15-2",
+        "title": "Outbound follow-up for Double Die Machine enquiry from Pathak Paper Products",
+        "leadId": "LEAD-785",
+        "leadName": "Pathak Paper Products",
+        "priority": "High",
+        "type": "Sales Qualification",
+        "stage": "Enquiry"
+      }
+    ]
+  },
+  {
+    "id": "e16",
+    "name": "Karan Bose",
+    "email": "karan.bose@aps-enterprise.com",
+    "phone": "+91 9152734797",
+    "role": "Lead Qualification Specialist",
+    "department": "Operations & Administration",
+    "kpiScore": "60%",
+    "kpiScoreNum": 60,
+    "status": "Active",
+    "currentActivity": "Live Outbound Telecall",
+    "tasksCompleted": 39,
+    "callsHandled": 192,
+    "salesClosed": 11,
+    "totalRevenue": 589105,
+    "targetSales": 10,
+    "conversionRate": "5.7%",
+    "avgCallDurationSec": 83,
+    "avgResponseTimeMin": "9.6",
+    "weeklyKpiHistory": [
+      66,
+      67,
+      69,
+      60
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 32,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 11
+    },
+    "activeTask": {
+      "id": "task-e16-1",
+      "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
+      "leadId": "LEAD-977",
+      "leadName": "Thakur Packaging",
+      "priority": "High",
+      "type": "Sales Qualification",
+      "stage": "Enquiry",
+      "dueIn": "45 mins",
+      "assignedAt": "2026-08-24T08:51:02.182Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e16-2",
+        "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
+        "leadId": "LEAD-977",
+        "leadName": "Thakur Packaging",
+        "priority": "High",
+        "type": "Sales Qualification",
+        "stage": "Enquiry"
+      }
+    ]
+  },
+  {
+    "id": "e17",
+    "name": "Suresh Soni",
+    "email": "suresh.soni@aps-enterprise.com",
+    "phone": "+91 9852033735",
+    "role": "Assembly Supervisor",
+    "department": "Production & Assembly",
+    "kpiScore": "99%",
+    "kpiScoreNum": 99,
+    "status": "Active",
+    "currentActivity": "Packing Spare Parts",
+    "tasksCompleted": 65,
+    "callsHandled": 172,
+    "salesClosed": 17,
+    "totalRevenue": 1663705,
+    "targetSales": 18,
+    "conversionRate": "9.9%",
+    "avgCallDurationSec": 159,
+    "avgResponseTimeMin": "9.0",
+    "weeklyKpiHistory": [
+      98,
+      91,
+      99,
+      99
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 27,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 11,
+      "confirmedToPaid": 17
+    },
+    "activeTask": {
+      "id": "task-e17-1",
+      "title": "Pack spare parts kit (dies and heaters) for Mehta Solutions",
+      "leadId": "LEAD-462",
+      "leadName": "Mehta Solutions",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "57 mins",
+      "assignedAt": "2026-08-24T09:08:50.177Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e17-2",
+        "title": "Generate Production Job Card for Hydraulic Press Machine for Mehta Solutions",
+        "leadId": "LEAD-462",
+        "leadName": "Mehta Solutions",
+        "priority": "High",
+        "type": "ERP Factory Release",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e18",
+    "name": "Nikhil Patel",
+    "email": "nikhil.patel@aps-enterprise.com",
+    "phone": "+91 9998795437",
+    "role": "Quality Testing Engineer",
+    "department": "Production & Assembly",
+    "kpiScore": "98%",
+    "kpiScoreNum": 98,
+    "status": "Active",
+    "currentActivity": "Booking Transport",
+    "tasksCompleted": 99,
+    "callsHandled": 151,
+    "salesClosed": 14,
+    "totalRevenue": 961926,
+    "targetSales": 13,
+    "conversionRate": "9.3%",
+    "avgCallDurationSec": 199,
+    "avgResponseTimeMin": "3.6",
+    "weeklyKpiHistory": [
+      94,
+      94,
+      94,
+      98
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 37,
+      "qualifiedToBooked": 18,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 14
+    },
+    "activeTask": {
+      "id": "task-e18-1",
+      "title": "Coordinate with transport vendor for pickup for Soni Ventures",
+      "leadId": "LEAD-560",
+      "leadName": "Soni Ventures",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "21 mins",
+      "assignedAt": "2026-08-24T09:03:29.589Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e18-2",
+        "title": "Pack spare parts kit (dies and heaters) for Soni Ventures",
+        "leadId": "LEAD-560",
+        "leadName": "Soni Ventures",
+        "priority": "Normal",
+        "type": "Spare Parts Allocation",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e19",
+    "name": "Karthik Verma",
+    "email": "karthik.verma@aps-enterprise.com",
+    "phone": "+91 9180426475",
+    "role": "Accounts Executive",
+    "department": "Operations & Administration",
+    "kpiScore": "83%",
+    "kpiScoreNum": 83,
+    "status": "Offline",
+    "currentActivity": "Creating Tax Invoice",
+    "tasksCompleted": 32,
+    "callsHandled": 50,
+    "salesClosed": 4,
+    "totalRevenue": 165472,
+    "targetSales": 8,
+    "conversionRate": "8.0%",
+    "avgCallDurationSec": 194,
+    "avgResponseTimeMin": "2.4",
+    "weeklyKpiHistory": [
+      81,
+      77,
+      80,
+      83
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 46,
+      "qualifiedToBooked": 24,
+      "bookedToConfirmed": 19,
+      "confirmedToPaid": 4
+    },
+    "activeTask": {
+      "id": "task-e19-1",
+      "title": "Generate GST Tax Invoice for Chaturvedi Manufacturing",
+      "leadId": "LEAD-596",
+      "leadName": "Chaturvedi Manufacturing",
+      "priority": "High",
+      "type": "Invoicing",
+      "stage": "Client (Paid)",
+      "dueIn": "41 mins",
+      "assignedAt": "2026-08-24T08:45:35.475Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e19-2",
+        "title": "Approve final dispatch invoice & transport LR for Chaturvedi Manufacturing",
+        "leadId": "LEAD-596",
+        "leadName": "Chaturvedi Manufacturing",
+        "priority": "Normal",
+        "type": "Factory Release Authorization",
+        "stage": "Client (Paid)"
+      }
+    ]
+  },
+  {
+    "id": "e20",
+    "name": "Ramesh Goel",
+    "email": "ramesh.goel@aps-enterprise.com",
+    "phone": "+91 9721462050",
+    "role": "Telecaller Executive",
+    "department": "Sales",
+    "kpiScore": "77%",
+    "kpiScoreNum": 77,
+    "status": "Active",
+    "currentActivity": "Scheduling Demo",
+    "tasksCompleted": 21,
+    "callsHandled": 107,
+    "salesClosed": 8,
+    "totalRevenue": 525968,
+    "targetSales": 11,
+    "conversionRate": "7.5%",
+    "avgCallDurationSec": 145,
+    "avgResponseTimeMin": "6.1",
+    "weeklyKpiHistory": [
+      78,
+      79,
+      81,
+      77
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 78,
+      "qualifiedToBooked": 29,
+      "bookedToConfirmed": 13,
+      "confirmedToPaid": 8
+    },
+    "activeTask": {
+      "id": "task-e20-1",
+      "title": "Follow up on field demo schedule for Pandey Paper Cups",
+      "leadId": "LEAD-715",
+      "leadName": "Pandey Paper Cups",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "26 mins",
+      "assignedAt": "2026-08-24T08:54:35.310Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e20-2",
+        "title": "Follow up on field demo schedule for Pandey Paper Cups",
+        "leadId": "LEAD-715",
+        "leadName": "Pandey Paper Cups",
+        "priority": "Normal",
+        "type": "Field Sales",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e21",
+    "name": "Nikhil Nair",
+    "email": "nikhil.nair@aps-enterprise.com",
+    "phone": "+91 9940046837",
+    "role": "Direct Sales Executive",
+    "department": "Sales",
+    "kpiScore": "78%",
+    "kpiScoreNum": 78,
+    "status": "Active",
+    "currentActivity": "Scheduling Demo",
+    "tasksCompleted": 22,
+    "callsHandled": 292,
+    "salesClosed": 22,
+    "totalRevenue": 1931864,
+    "targetSales": 17,
+    "conversionRate": "7.5%",
+    "avgCallDurationSec": 196,
+    "avgResponseTimeMin": "2.7",
+    "weeklyKpiHistory": [
+      79,
+      77,
+      79,
+      78
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 53,
+      "qualifiedToBooked": 12,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 22
+    },
+    "activeTask": {
+      "id": "task-e21-1",
+      "title": "Follow up on field demo schedule for Rao Creations",
+      "leadId": "LEAD-159",
+      "leadName": "Rao Creations",
+      "priority": "Normal",
+      "type": "Field Sales",
+      "stage": "Qualified",
+      "dueIn": "49 mins",
+      "assignedAt": "2026-08-24T08:33:41.837Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e21-2",
+        "title": "Conduct secondary telecaller qualification for Rao Creations",
+        "leadId": "LEAD-159",
+        "leadName": "Rao Creations",
+        "priority": "Normal",
+        "type": "Telecalling",
+        "stage": "Enquiry"
+      }
+    ]
+  },
+  {
+    "id": "e22",
+    "name": "Manish Mahajan",
+    "email": "manish.mahajan@aps-enterprise.com",
+    "phone": "+91 9549036488",
+    "role": "ERP Operations Admin",
+    "department": "Operations & Administration",
+    "kpiScore": "97%",
+    "kpiScoreNum": 97,
+    "status": "Active",
+    "currentActivity": "Reconciling Ledger",
+    "tasksCompleted": 89,
+    "callsHandled": 177,
+    "salesClosed": 17,
+    "totalRevenue": 1135668,
+    "targetSales": 27,
+    "conversionRate": "9.6%",
+    "avgCallDurationSec": 200,
+    "avgResponseTimeMin": "9.4",
+    "weeklyKpiHistory": [
+      90,
+      98,
+      97,
+      97
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 56,
+      "qualifiedToBooked": 35,
+      "bookedToConfirmed": 12,
+      "confirmedToPaid": 17
+    },
+    "activeTask": {
+      "id": "task-e22-1",
+      "title": "Verify Tally advance payment for machine booking by Shah Ventures",
+      "leadId": "LEAD-870",
+      "leadName": "Shah Ventures",
+      "priority": "High",
+      "type": "Payment Gate Verification",
+      "stage": "Confirmed Lead",
+      "dueIn": "21 mins",
+      "assignedAt": "2026-08-24T08:39:07.294Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e22-2",
+        "title": "Send WhatsApp payment reminder for pending dispatch to Shah Ventures",
+        "leadId": "LEAD-870",
+        "leadName": "Shah Ventures",
+        "priority": "High",
+        "type": "Payment Reminder",
+        "stage": "Confirmed Lead"
+      }
+    ]
+  },
+  {
+    "id": "e23",
+    "name": "Sneha Pillai",
+    "email": "sneha.pillai@aps-enterprise.com",
+    "phone": "+91 9690455053",
+    "role": "Dispatch Coordinator",
+    "department": "Logistics & Service",
+    "kpiScore": "79%",
+    "kpiScoreNum": 79,
+    "status": "Active",
+    "currentActivity": "Validating Assembly",
+    "tasksCompleted": 56,
+    "callsHandled": 105,
+    "salesClosed": 8,
+    "totalRevenue": 224024,
+    "targetSales": 6,
+    "conversionRate": "7.6%",
+    "avgCallDurationSec": 234,
+    "avgResponseTimeMin": "1.4",
+    "weeklyKpiHistory": [
+      82,
+      76,
+      80,
+      79
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 60,
+      "qualifiedToBooked": 25,
+      "bookedToConfirmed": 14,
+      "confirmedToPaid": 8
+    },
+    "activeTask": {
+      "id": "task-e23-1",
+      "title": "Verify motor and heating coil assembly for Bansal Paper Products",
+      "leadId": "LEAD-969",
+      "leadName": "Bansal Paper Products",
+      "priority": "Normal",
+      "type": "Assembly Check",
+      "stage": "In Production",
+      "dueIn": "40 mins",
+      "assignedAt": "2026-08-24T08:57:32.303Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e23-2",
+        "title": "Coordinate with transport vendor for pickup for Bansal Paper Products",
+        "leadId": "LEAD-969",
+        "leadName": "Bansal Paper Products",
+        "priority": "Normal",
+        "type": "Logistics",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e24",
+    "name": "Karan Kapoor",
+    "email": "karan.kapoor@aps-enterprise.com",
+    "phone": "+91 9756198198",
+    "role": "Assembly Supervisor",
+    "department": "Production & Assembly",
+    "kpiScore": "95%",
+    "kpiScoreNum": 95,
+    "status": "Active",
+    "currentActivity": "Booking Transport",
+    "tasksCompleted": 57,
+    "callsHandled": 80,
+    "salesClosed": 7,
+    "totalRevenue": 498512,
+    "targetSales": 10,
+    "conversionRate": "8.8%",
+    "avgCallDurationSec": 219,
+    "avgResponseTimeMin": "9.4",
+    "weeklyKpiHistory": [
+      92,
+      95,
+      99,
+      95
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 29,
+      "qualifiedToBooked": 23,
+      "bookedToConfirmed": 16,
+      "confirmedToPaid": 7
+    },
+    "activeTask": {
+      "id": "task-e24-1",
+      "title": "Coordinate with transport vendor for pickup for Saini Polymers",
+      "leadId": "LEAD-846",
+      "leadName": "Saini Polymers",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "20 mins",
+      "assignedAt": "2026-08-24T09:07:01.806Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e24-2",
+        "title": "Verify motor and heating coil assembly for Saini Polymers",
+        "leadId": "LEAD-846",
+        "leadName": "Saini Polymers",
+        "priority": "Normal",
+        "type": "Assembly Check",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e25",
+    "name": "Kunal Das",
+    "email": "kunal.das@aps-enterprise.com",
+    "phone": "+91 9731488013",
+    "role": "ERP Operations Admin",
+    "department": "Operations & Administration",
+    "kpiScore": "77%",
+    "kpiScoreNum": 77,
+    "status": "Active",
+    "currentActivity": "Verifying Invoices",
+    "tasksCompleted": 84,
+    "callsHandled": 173,
+    "salesClosed": 13,
+    "totalRevenue": 478972,
+    "targetSales": 10,
+    "conversionRate": "7.5%",
+    "avgCallDurationSec": 235,
+    "avgResponseTimeMin": "6.9",
+    "weeklyKpiHistory": [
+      77,
+      80,
+      76,
+      77
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 34,
+      "qualifiedToBooked": 14,
+      "bookedToConfirmed": 5,
+      "confirmedToPaid": 13
+    },
+    "activeTask": {
+      "id": "task-e25-1",
+      "title": "Approve final dispatch invoice & transport LR for Roy Packers",
+      "leadId": "LEAD-969",
+      "leadName": "Roy Packers",
+      "priority": "Normal",
+      "type": "Factory Release Authorization",
+      "stage": "Client (Paid)",
+      "dueIn": "37 mins",
+      "assignedAt": "2026-08-24T08:48:23.203Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e25-2",
+        "title": "Verify Tally advance payment for machine booking by Roy Packers",
+        "leadId": "LEAD-969",
+        "leadName": "Roy Packers",
+        "priority": "High",
+        "type": "Payment Gate Verification",
+        "stage": "Confirmed Lead"
+      }
+    ]
+  },
+  {
+    "id": "e26",
+    "name": "Rohan Kapoor",
+    "email": "rohan.kapoor@aps-enterprise.com",
+    "phone": "+91 9440809262",
+    "role": "Inventory Clerk",
+    "department": "Logistics & Service",
+    "kpiScore": "99%",
+    "kpiScoreNum": 99,
+    "status": "Active",
+    "currentActivity": "Booking Transport",
+    "tasksCompleted": 98,
+    "callsHandled": 292,
+    "salesClosed": 28,
+    "totalRevenue": 1660344,
+    "targetSales": 23,
+    "conversionRate": "9.6%",
+    "avgCallDurationSec": 168,
+    "avgResponseTimeMin": "7.8",
+    "weeklyKpiHistory": [
+      96,
+      90,
+      99,
+      99
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 71,
+      "qualifiedToBooked": 40,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 28
+    },
+    "activeTask": {
+      "id": "task-e26-1",
+      "title": "Coordinate with transport vendor for pickup for Mishra Manufacturing",
+      "leadId": "LEAD-465",
+      "leadName": "Mishra Manufacturing",
+      "priority": "Normal",
+      "type": "Logistics",
+      "stage": "In Production",
+      "dueIn": "36 mins",
+      "assignedAt": "2026-08-24T09:03:16.553Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e26-2",
+        "title": "Pack spare parts kit (dies and heaters) for Mishra Manufacturing",
+        "leadId": "LEAD-465",
+        "leadName": "Mishra Manufacturing",
+        "priority": "Normal",
+        "type": "Spare Parts Allocation",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e27",
+    "name": "Meera Rathore",
+    "email": "meera.rathore@aps-enterprise.com",
+    "phone": "+91 9536112922",
+    "role": "Inventory Clerk",
+    "department": "Logistics & Service",
+    "kpiScore": "81%",
+    "kpiScoreNum": 81,
+    "status": "Active",
+    "currentActivity": "Testing Machinery",
+    "tasksCompleted": 93,
+    "callsHandled": 193,
+    "salesClosed": 15,
+    "totalRevenue": 452955,
+    "targetSales": 20,
+    "conversionRate": "7.8%",
+    "avgCallDurationSec": 70,
+    "avgResponseTimeMin": "0.0",
+    "weeklyKpiHistory": [
+      81,
+      77,
+      83,
+      81
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 57,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 17,
+      "confirmedToPaid": 15
+    },
+    "activeTask": {
+      "id": "task-e27-1",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
+      "leadId": "LEAD-416",
+      "leadName": "Tiwari Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production",
+      "dueIn": "10 mins",
+      "assignedAt": "2026-08-24T09:02:55.752Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e27-2",
+        "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
+        "leadId": "LEAD-416",
+        "leadName": "Tiwari Enterprises",
+        "priority": "Normal",
+        "type": "Quality Testing",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e28",
+    "name": "Ramesh Chauhan",
+    "email": "ramesh.chauhan@aps-enterprise.com",
+    "phone": "+91 9507516396",
+    "role": "Inventory Clerk",
+    "department": "Logistics & Service",
+    "kpiScore": "98%",
+    "kpiScoreNum": 98,
+    "status": "Active",
+    "currentActivity": "Testing Machinery",
+    "tasksCompleted": 20,
+    "callsHandled": 174,
+    "salesClosed": 17,
+    "totalRevenue": 422875,
+    "targetSales": 26,
+    "conversionRate": "9.8%",
+    "avgCallDurationSec": 96,
+    "avgResponseTimeMin": "3.0",
+    "weeklyKpiHistory": [
+      94,
+      93,
+      91,
+      98
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 58,
+      "qualifiedToBooked": 34,
+      "bookedToConfirmed": 18,
+      "confirmedToPaid": 17
+    },
+    "activeTask": {
+      "id": "task-e28-1",
+      "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
+      "leadId": "LEAD-357",
+      "leadName": "Patel Enterprises",
+      "priority": "Normal",
+      "type": "Quality Testing",
+      "stage": "In Production",
+      "dueIn": "33 mins",
+      "assignedAt": "2026-08-24T08:36:30.556Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e28-2",
+        "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
+        "leadId": "LEAD-357",
+        "leadName": "Patel Enterprises",
+        "priority": "Normal",
+        "type": "Quality Testing",
+        "stage": "In Production"
+      }
+    ]
+  },
+  {
+    "id": "e29",
+    "name": "Akshay Thakur",
+    "email": "akshay.thakur@aps-enterprise.com",
+    "phone": "+91 9246769411",
+    "role": "Lead Qualification Specialist",
+    "department": "Operations & Administration",
+    "kpiScore": "97%",
+    "kpiScoreNum": 97,
+    "status": "Active",
+    "currentActivity": "Handling Operations",
+    "tasksCompleted": 66,
+    "callsHandled": 224,
+    "salesClosed": 21,
+    "totalRevenue": 1493604,
+    "targetSales": 22,
+    "conversionRate": "9.4%",
+    "avgCallDurationSec": 182,
+    "avgResponseTimeMin": "5.4",
+    "weeklyKpiHistory": [
+      96,
+      93,
+      94,
+      97
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 49,
+      "qualifiedToBooked": 13,
+      "bookedToConfirmed": 9,
+      "confirmedToPaid": 21
+    },
+    "activeTask": {
+      "id": "task-e29-1",
+      "title": "Conduct secondary telecaller qualification for Shah Plastics",
+      "leadId": "LEAD-485",
+      "leadName": "Shah Plastics",
+      "priority": "Normal",
+      "type": "Telecalling",
+      "stage": "Enquiry",
+      "dueIn": "48 mins",
+      "assignedAt": "2026-08-24T08:43:16.889Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e29-2",
+        "title": "Share quotation and ROI video for Dona Pattal setup with Shah Plastics",
+        "leadId": "LEAD-485",
+        "leadName": "Shah Plastics",
+        "priority": "Normal",
+        "type": "Sales Follow-up",
+        "stage": "Qualified"
+      }
+    ]
+  },
+  {
+    "id": "e30",
+    "name": "Siddharth Desai",
+    "email": "siddharth.desai@aps-enterprise.com",
+    "phone": "+91 9539433776",
+    "role": "Quality Testing Engineer",
+    "department": "Production & Assembly",
+    "kpiScore": "91%",
+    "kpiScoreNum": 91,
+    "status": "Active",
+    "currentActivity": "Packing Spare Parts",
+    "tasksCompleted": 51,
+    "callsHandled": 234,
+    "salesClosed": 21,
+    "totalRevenue": 1878429,
+    "targetSales": 23,
+    "conversionRate": "9.0%",
+    "avgCallDurationSec": 149,
+    "avgResponseTimeMin": "5.0",
+    "weeklyKpiHistory": [
+      90,
+      93,
+      98,
+      91
+    ],
+    "stageConversions": {
+      "enquiryToQualified": 48,
+      "qualifiedToBooked": 30,
+      "bookedToConfirmed": 7,
+      "confirmedToPaid": 21
+    },
+    "activeTask": {
+      "id": "task-e30-1",
+      "title": "Pack spare parts kit (dies and heaters) for Kapoor Paper Cups",
+      "leadId": "LEAD-887",
+      "leadName": "Kapoor Paper Cups",
+      "priority": "Normal",
+      "type": "Spare Parts Allocation",
+      "stage": "In Production",
+      "dueIn": "56 mins",
+      "assignedAt": "2026-08-24T09:05:54.295Z"
+    },
+    "taskQueue": [
+      {
+        "id": "task-e30-2",
+        "title": "Coordinate with transport vendor for pickup for Kapoor Paper Cups",
+        "leadId": "LEAD-887",
+        "leadName": "Kapoor Paper Cups",
+        "priority": "Normal",
+        "type": "Logistics",
+        "stage": "In Production"
+      }
+    ]
+  }
+]

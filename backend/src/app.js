@@ -2,15 +2,48 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { connectDB } = require('./config/db');
 const { authenticate } = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ─── DB Init (runs on module load — works for both Vercel serverless & local server) ───
+// Cache the promise so we only connect once per cold start
+let _dbReady = null;
+const ensureDB = () => {
+  if (!_dbReady) _dbReady = connectDB().catch(err => {
+    console.error('[DB] Connection failed:', err.message);
+    _dbReady = null; // reset so next request retries
+    throw err;
+  });
+  return _dbReady;
+};
+
 // Core Middleware
 app.use(cors());
 app.use(express.json());
 app.use(authenticate);
+
+// Wait for DB before handling any request
+app.use(async (req, res, next) => {
+  try {
+    await ensureDB();
+    next();
+  } catch (err) {
+    console.warn('[Warning] Proceeding without Postgres database. Relying on inMemoryStore. Reason:', err.message);
+    next();
+  }
+});
+
+// Disable caching for API responses
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
@@ -50,31 +83,10 @@ app.use((err, req, res, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`
-  ╔═════════════════════════════════════════════════════════════════╗
-  ║          APS Enterprise — A2 Admin Backend System               ║
-  ║               Week 1 Parallel Development Complete             ║
-  ╠═════════════════════════════════════════════════════════════════╣
-  ║  Integration Layer (Mock Mode):                      ║
-║   ✓ CRM   — Lead sync                               ║
-║   ✓ ERP   — Booking & Factory release               ║
-║   ✓ Dialer — Call queue status                      ║
-║   ✓ Tally  — Payment verification (Hard Gate)       ║
-║                                                      ║
-║  API Routes:                                         ║
-║   GET    /api/health                                ║
-║   GET    /api/leads                                 ║
-║   GET    /api/leads/:id                             ║
-║   POST   /api/leads/:id/transition                  ║
-║   GET    /api/employees                             ║
-║   GET    /api/activity                              ║
-║   POST   /api/a3/query     (A3 AI Chatbot)          ║
-║   GET    /api/a3/suggestions                        ║
-  ║   [A4 Performance]   GET  /api/employees/:id/performance        ║
-  ║   [A4 Time-in-stage] GET  /api/activity/time-in-stage           ║
-  ║   [A5 WhatsApp]      POST /api/whatsapp/send-reminder           ║
-  ╚═════════════════════════════════════════════════════════════════╝
-    `);
+    console.log(`APS Enterprise backend running on port ${PORT}`);
+  });
+  ensureDB().catch(err => {
+    console.warn('DB connection failed on startup, using in-memory store:', err.message);
   });
 }
 

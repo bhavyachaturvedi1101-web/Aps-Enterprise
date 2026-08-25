@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+require('pg'); // Force Vercel to bundle the PostgreSQL driver
 require('dotenv').config();
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -10,10 +11,10 @@ if (databaseUrl) {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
-      ssl: process.env.DATABASE_SSL === 'true' ? {
+      ssl: {
         require: true,
         rejectUnauthorized: false
-      } : false
+      }
     }
   });
 } else {
@@ -34,15 +35,19 @@ const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('PostgreSQL database connection has been established successfully.');
-    
-    // Sync models in development mode
+
     if (process.env.NODE_ENV === 'development') {
+      // In dev: alter tables to reflect model changes
       await sequelize.sync({ alter: true });
-      console.log('Database schemas synced successfully.');
+      console.log('Database schemas synced (alter) successfully.');
+    } else {
+      // In production: only create tables if they don't exist — never drop data
+      await sequelize.sync({ force: false, alter: false });
+      console.log('Database schemas synced (safe) successfully.');
     }
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    process.exit(1);
+    throw error; // Let caller handle it (don't call process.exit here so Vercel serverless works)
   }
 };
 
