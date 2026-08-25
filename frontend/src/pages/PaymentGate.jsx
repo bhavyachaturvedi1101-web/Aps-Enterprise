@@ -102,15 +102,15 @@ export default function PaymentGate() {
   const pendingPayments = payments.filter(p => p.status === 'Pending Verification');
 
   return (
-    <div style={s.page}>
-      <div style={s.pageHead}>
+    <div style={{ ...s.page, padding: undefined }} className="page-container">
+      <div style={s.pageHead} className="mobile-stack-header">
         <div>
           <h1 style={s.title}>Payment Gate</h1>
         </div>
       </div>
 
       {pendingPayments.length > 0 ? (
-        <div style={{ ...s.alertBox, backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
+        <div style={{ ...s.alertBox, backgroundColor: '#fffbeb', borderColor: '#fde68a' }} className="mobile-alert-wrap">
           <div style={s.alertIcon}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
@@ -125,7 +125,7 @@ export default function PaymentGate() {
           </button>
         </div>
       ) : (
-        <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}}>
+        <div style={{...s.alertBox, backgroundColor: '#ecfdf5', borderColor: '#a7f3d0'}} className="mobile-alert-wrap">
           <div style={s.alertIcon}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
@@ -136,7 +136,8 @@ export default function PaymentGate() {
         </div>
       )}
 
-      <div style={s.card}>
+      <div className="payment-table-wrapper">
+        <div style={s.card} className="payment-table-inner">
         <div style={s.tableHead}>
           {['Payment ID', 'Lead / Client', 'Amount (10% Advance)', 'Due Date', 'Status'].map(h => (
             <div key={h} style={{...s.th, flex: h === 'Amount (10% Advance)' || h === 'Lead / Client' ? 2 : 1}}>{h}</div>
@@ -173,6 +174,7 @@ export default function PaymentGate() {
         {payments.length === 0 && (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#71717a', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
         )}
+        </div>
       </div>
     </div>
   );
