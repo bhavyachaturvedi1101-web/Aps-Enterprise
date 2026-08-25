@@ -31,7 +31,8 @@ app.use(async (req, res, next) => {
     await ensureDB();
     next();
   } catch (err) {
-    res.status(503).json({ error: 'Database not ready', message: err.message });
+    console.warn('[Warning] Proceeding without Postgres database. Relying on inMemoryStore. Reason:', err.message);
+    next();
   }
 });
 
@@ -81,15 +82,11 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  // ensureDB() will be called on first request via middleware
-  // Pre-warm the connection when starting locally
-  ensureDB().then(() => {
-    app.listen(PORT, () => {
-      console.log(`APS Enterprise backend running on port ${PORT}`);
-    });
-  }).catch(err => {
-    console.error('Failed to connect to database:', err.message);
-    process.exit(1);
+  app.listen(PORT, () => {
+    console.log(`APS Enterprise backend running on port ${PORT}`);
+  });
+  ensureDB().catch(err => {
+    console.warn('DB connection failed on startup, using in-memory store:', err.message);
   });
 }
 
