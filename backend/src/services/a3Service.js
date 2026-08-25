@@ -1582,68 +1582,148 @@ async function handleActionSendWhatsApp(query) {
   };
 }
 
-// ─── Full context builder for LLM (High Density & Compact to stay well under TPM limit) ──
+// ─── Full context builder for LLM (Ultra-Dense Real-Time Enterprise State) ────
 async function buildFullContext() {
   const store = await getStore();
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
+  const actLogs = store.mockActivityLogs || [];
+  const callLogs = store.mockCallLogs || [];
 
-  // Concise breakdown of all team members and their exact active/queued tasks
+  // ── Financial KPIs ──────────────────────────────────────────────────────────
+  const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
+  const closedLeads = leads.filter(l => closedStages.includes(l.stage));
+  const totalPipeline = leads.reduce((s, l) => s + (Number(l.budget || l.dealValue || l.value) || 0), 0);
+  const totalRevenueLocked = closedLeads.reduce((s, l) => s + (Number(l.budget || l.dealValue || l.value) || 0), 0);
+  const advanceCollected = totalRevenueLocked * 0.1;
+  const pendingBalance = totalRevenueLocked * 0.9;
+  const confirmedLeads = leads.filter(l => l.stage === 'Confirmed Lead');
+  const advancePending = confirmedLeads.reduce((s, l) => s + (Number(l.budget || l.dealValue || l.value) || 0) * 0.1, 0);
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonthLeads = leads.filter(l => new Date(l.createdAt || Date.now()) >= startOfMonth);
+
+  // ── Employee ultra-detailed breakdown ──────────────────────────────────────
   const empDetails = employees.map(e => {
-    const active = e.activeTask 
-      ? `Active Task: "${e.activeTask.title}" [Priority: ${e.activeTask.priority}, Lead: ${e.activeTask.leadName || 'N/A'}, Stage: ${e.activeTask.stage || 'N/A'}, Due in: ${e.activeTask.dueIn || 'N/A'}]` 
-      : 'No active task';
-    const queue = Array.isArray(e.taskQueue) && e.taskQueue.length > 0 
-      ? `Queued: ` + e.taskQueue.map((t, idx) => `${idx + 1}. "${t.title}" (${t.priority})`).join('; ')
-      : 'Queued: None';
-    return `• **${e.name}** (${e.role} — ${e.department}):
-  - Status: ${e.status} | KPI Score: ${e.kpiScore} | ${e.salesClosed} Closed Deals (₹${(e.totalRevenue || 0).toLocaleString('en-IN')})
-  - ${active}
-  - ${queue}`;
+    const active = e.activeTask
+      ? `Active: "${e.activeTask.title}" [P:${e.activeTask.priority}, Lead: ${e.activeTask.leadName || 'N/A'}, Due: ${e.activeTask.dueIn || 'N/A'}]`
+      : 'Active: None';
+    const queued = Array.isArray(e.taskQueue) && e.taskQueue.length > 0
+      ? 'Queue: ' + e.taskQueue.map((t, i) => `${i + 1}."${t.title}"(${t.priority})`).join(' | ')
+      : 'Queue: Empty';
+    const convRate = e.conversionRate || (e.salesClosed && e.leadsAssigned ? `${Math.round((e.salesClosed / e.leadsAssigned) * 100)}%` : 'N/A');
+    return `• ${e.name} [${e.role} / ${e.department}] KPI=${e.kpiScore} Sales=${e.salesClosed} Rev=₹${(e.totalRevenue || 0).toLocaleString('en-IN')} Conv=${convRate} Calls=${e.callsHandled || 0}
+  ${active} | ${queued}`;
   }).join('\n');
 
-  // Key leads summary
-  const sampleLeads = leads.slice(0, 10).map(l => 
-    `- ${l.id || l.name}: ${l.name} | Stage: ${l.stage} | Product: ${l.product || l.machineRequired || 'Machinery'} | Value: ₹${(l.value || l.dealValue || 0).toLocaleString('en-IN')} | Owner: ${l.assignedTo || l.owner || 'Unassigned'}`
+  // ── All Leads detailed snapshot (up to 20) ──────────────────────────────
+  const leadDetails = leads.slice(0, 20).map(l =>
+    `[${l.stage}] ${l.name} | ₹${(Number(l.budget || l.dealValue || l.value) || 0).toLocaleString('en-IN')} | Prod:${l.product || l.machineRequired || 'N/A'} | Owner:${l.assignedTo || l.assignedEmployeeId || 'Unassigned'} | City:${l.city || l.location || 'N/A'}`
   ).join('\n');
 
-  return `APS ENTERPRISE REAL-TIME INDUSTRIAL & SYSTEM STATE:
+  // ── Recent Activity Log (last 5) ─────────────────────────────────────────
+  const recentActivity = actLogs.slice(0, 5).map(a =>
+    `[${new Date(a.timestamp || a.createdAt || Date.now()).toLocaleDateString('en-IN')}] ${a.action || a.type} | Lead:${a.leadName || a.leadId || '?'} | By:${a.employeeName || 'System'}`
+  ).join('\n') || 'No recent activity logged.';
 
-1. COMPANY HEADQUARTERS & MANUFACTURING FACILITIES:
-   - Head Office & Main Works: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, Madhya Pradesh - 452001, India.
-   - Manufacturing Plants: 
-     • Indore Main Plant: Paper Converting Machinery (Dona Pattal, Paper Cup, Paper Plate, Thali).
-     • Pune Unit 1: Industrial Automation, CNC Milling Centers, 6kW Fiber Laser Cutters, Heavy Hydraulic Tooling.
-   - Helplines / Contacts: +91-7869755871, +91-8827848099 | Email: info@apsenterprises.in | Web: https://www.apsenterprises.in
+  // ── Call Log Summary ────────────────────────────────────────────────────
+  const totalCalls = callLogs.length;
+  const avgCallDuration = totalCalls > 0 ? Math.round(callLogs.reduce((s, c) => s + (c.durationSeconds || 0), 0) / totalCalls) : 0;
+  const sentimentBreakdown = { positive: 0, neutral: 0, negative: 0 };
+  callLogs.forEach(c => {
+    const s = (c.sentiment || '').toLowerCase();
+    if (s.includes('positive')) sentimentBreakdown.positive++;
+    else if (s.includes('negative')) sentimentBreakdown.negative++;
+    else sentimentBreakdown.neutral++;
+  });
 
-2. MACHINERY CATALOGUE & TECHNICAL SPECIFICATIONS:
-   - Double Die Automatic Dona Pattal Machine: Output 2,500 - 4,500 pcs/hr, 80-400 GSM paper roll, 2.0 kW motor (Single/Three Phase), Die 4" to 14", Auto temperature PID controller. Approx Price: ₹65,000 - ₹1,45,000.
-   - High-Speed Paper Cup Machine: Output 70-90 cups/min, Cup size 45ml - 330ml, Ultrasonic side sealing + hot air bottom heater, 140-350 GSM single/double PE paper. Approx Price: ₹6,50,000 - ₹9,50,000.
-   - Heavy Hydraulic Paper Plate & Thali Machine: 2-Die / 4-Die Hydraulic, Pressure 5 Ton to 10 Ton, Motor 2 HP - 5 HP, Oil Grade ISO VG 68. Approx Price: ₹85,000 - ₹2,20,000.
-   - Industrial CNC Milling & 6kW Fiber Laser Systems: 1kW - 6kW Fiber Laser Source (Raycus/IPG), CypCut CNC controller, heavy gantry frame, sheet bed 1500x3000mm. Approx Price: ₹18,00,000 - ₹45,00,000+.
-   - Hydraulic Stamping Press 200T / 500T: Heavy deep-draw industrial stamping with PLC automated safety sensors.
+  return `═══ APS ENTERPRISE — LIVE INTELLIGENCE STATE [${new Date().toLocaleString('en-IN')}] ═══
 
-3. 5-TIER AI ARCHITECTURE (A1 TO A5):
-   - A1 (Voice AI Calling Agent): Exotel + ElevenLabs/Deepgram speech AI. Inbound inquiry handling, outbound lead qualification, multilingual (Gujarati, Hindi, English), sentiment audit. Routes: /voice & /dialer.
-   - A2 (Executive Cockpit & Admin Dashboard): Real-time KPI cockpit, cross-module sync, live sales pipeline, financial health, activity timeline. Routes: /, /crm, /payments.
-   - A3 (AI Query Assistant & Copilot): Natural language Q&A, SQL-like data lookup, interactive charts, automated exports (PDF, Excel, CSV), trigger business actions. Route: /ai.
-   - A4 (Team Performance & Gamification): Real-time KPI scoring, live task assignment, queued backlogs, sales leaderboards, revenue tracking. Routes: /employees & /kpis.
-   - A5 (WhatsApp Business Automation): WABA Cloud API integration, 10% advance reminders, dispatch notifications, invoice delivery, interactive product catalogs. Route: /whatsapp.
+━━━ [1] COMPANY IDENTITY & LOCATIONS ━━━
+• Full Name: APS Enterprise — Lead Industrial Manufacturer, Indore MP
+• Head Office: 832, Old Loha Mandi, Opp. Devshree Cinema, Near Khambati Pipes, Indore, MP 452001
+• Plant A — Indore: Paper Converting Machinery (Dona Pattal, Paper Cup, Thali Machine lines)
+• Plant B — Pune Unit 1: CNC Milling, 6kW Fiber Laser Cutting, Hydraulic Stamping Press
+• Contact: +91-7869755871 | +91-8827848099 | info@apsenterprises.in | www.apsenterprises.in
+• GST: Registered | MSME: Registered | ISO: Certified Manufacturer
 
-4. CORE BUSINESS & PAYMENT RULES:
-   - 10% Advance Gate: Production NEVER starts without 10% advance payment confirmed in Tally ERP. When advance is verified, lead moves from 'Confirmed' to 'Client (Paid)', and Job Card is sent to Indore factory.
-   - 100% Clearance for Dispatch: Machinery is dispatched with transporter e-Waybill only when 100% balance or approved invoice terms are fulfilled.
+━━━ [2] COMPLETE MACHINERY CATALOGUE & TECHNICAL SPECS ━━━
+1. Double Die Automatic Dona/Pattal Machine
+   — Output: 2,500–4,500 pcs/hr | Paper: 80–400 GSM roll stock
+   — Motor: 2.0 kW Single/Three Phase | Die Size: 4" to 14"
+   — Features: Auto PID temperature controller, cam-drive mechanism, automatic feeding
+   — Power: 220V/440V | Weight: 280–350 kg | Dimensions: 48"×32"×56"
+   — Price Range: ₹65,000 – ₹1,45,000 (ex-works Indore)
 
-5. DASHBOARD NAVIGATION ROUTES:
-   - CRM Pipeline: /crm | Tally Payments Gate: /payments | WhatsApp: /whatsapp | Voice Dialer: /voice | Employees/KPIs: /employees | GST Invoices: /invoices | Factory Job Cards: /factory | System Logs: /activity | AI Assistant: /ai
+2. High-Speed Paper Cup Making Machine
+   — Output: 70–90 cups/min | Cup Volume: 45ml – 330ml
+   — Paper: 140–350 GSM Single/Double PE coated
+   — Sealing: Ultrasonic side seal + hot-air bottom heater + knurling
+   — Motor: 3 HP servo drive | Control: PLC + HMI touchscreen
+   — Price Range: ₹6,50,000 – ₹9,50,000
 
-6. LIVE TEAM MEMBERS & ASSIGNED TASKS:
-${empDetails}
+3. Heavy Hydraulic Paper Plate & Thali Machine
+   — Type: 2-Die / 4-Die Hydraulic Press
+   — Pressure: 5 Ton – 10 Ton hydraulic | Motor: 2 HP – 5 HP
+   — Hydraulic Oil: ISO VG 68 | Stroke: 50mm–120mm
+   — Output: 800–1,500 plates/hr (2-die) | Up to 3,000/hr (4-die)
+   — Price Range: ₹85,000 – ₹2,20,000
 
-7. LIVE CRM PIPELINE SUMMARY:
-   - Total Leads: ${leads.length} | Enquiry: ${leads.filter(l => l.stage === 'Enquiry').length} | Confirmed: ${leads.filter(l => l.stage === 'Confirmed Lead').length} | Paid: ${leads.filter(l => l.stage === 'Client (Paid)').length} | In Production: ${leads.filter(l => l.stage === 'In Production').length} | Dispatched: ${leads.filter(l => l.stage === 'Dispatched').length}
-Sample Active Leads:
-${sampleLeads}`;
+4. Industrial CNC Milling Center & 6kW Fiber Laser Cutter
+   — Laser Source: Raycus / IPG 1kW – 6kW Fiber
+   — Controller: CypCut CNC (professional grade)
+   — Cutting Bed: 1500×3000mm heavy-duty gantry frame
+   — Cuts: MS, SS, Aluminium, Brass, Copper sheets (up to 20mm MS)
+   — CNC Milling: 3-axis / 4-axis, BT40/BT50 spindle, 8000–12000 RPM
+   — Price Range: ₹18,00,000 – ₹45,00,000+
+
+5. Hydraulic Stamping Press (200T / 500T)
+   — Application: Deep-draw industrial stamping, metal forming
+   — Safety: PLC automated with dual-hand safety sensors
+   — Stroke Control: Programmable via servo hydraulic control
+   — Frame: C-frame / H-frame heavy-duty welded steel
+   — Price Range: ₹12,00,000 – ₹35,00,000
+
+━━━ [3] 5-TIER AI ARCHITECTURE (A1–A5) ━━━
+• A1 — Voice AI Agent: Exotel cloud telephony + ElevenLabs voice synthesis + Deepgram ASR. Handles inbound inquiries, qualifies leads in Hindi/English/Gujarati, runs sentiment analysis. Route: /voice /dialer
+• A2 — Admin Cockpit: Executive KPI dashboard, real-time pipeline, financial health tracker, integrated with Tally ERP sync. Route: / /crm /payments
+• A3 — AI Copilot (THIS MODULE): NL query engine, data charts, automated file export, business action triggers. Route: /ai
+• A4 — Team KPIs & Gamification: Live KPI scoring engine, task assignment, backlog management, sales leaderboard with badges. Route: /employees /kpis
+• A5 — WhatsApp Automation: WABA Cloud API, automated template sequences (10% advance, dispatch, invoice), interactive product catalogs. Route: /whatsapp
+
+━━━ [4] CRITICAL BUSINESS RULES & COMPLIANCE ━━━
+• RULE 1 — 10% Advance Gate (NON-NEGOTIABLE): Production order release to Indore factory ONLY after 10% advance amount verified in Tally ERP ledger. Lead status auto-transitions: Confirmed Lead → Client (Paid) → Job Card issued.
+• RULE 2 — 100% Clearance Before Dispatch: Goods can be dispatched with transporter e-Waybill ONLY after 100% payment cleared or approved credit terms documented.
+• RULE 3 — GST Compliance: All GST Tax Invoices must include GSTIN, HSN code, IGST/CGST/SGST split at 18%, e-invoice IRN for orders above ₹5L.
+• RULE 4 — Tally ERP Integration: All payment receipts must be posted as Receipt Vouchers in Tally. Proforma invoices are non-GST; Tax Invoices are issued only post-advance confirmation.
+• RULE 5 — WhatsApp Advance Reminders: Automated WhatsApp messages sent 24h after quotation if advance not received. Escalation to voice call via A1 if no response in 48h.
+
+━━━ [5] FINANCIAL HEALTH SNAPSHOT ━━━
+• Total Pipeline Value: ₹${totalPipeline.toLocaleString('en-IN')} (${leads.length} Leads)
+• Revenue Locked (Closed Stages): ₹${totalRevenueLocked.toLocaleString('en-IN')} (${closedLeads.length} Deals)
+• Advance Collected (10% of Locked): ₹${advanceCollected.toLocaleString('en-IN')}
+• Balance Pending (90% of Locked): ₹${pendingBalance.toLocaleString('en-IN')}
+• Advance Pending (Confirmed but Unpaid): ₹${advancePending.toLocaleString('en-IN')} from ${confirmedLeads.length} leads
+• New Leads This Month: ${thisMonthLeads.length} leads
+
+━━━ [6] VOICE CALL INTELLIGENCE (A1 AUDIT) ━━━
+• Total Calls Logged: ${totalCalls}
+• Avg Call Duration: ${avgCallDuration}s
+• Sentiment: Positive=${sentimentBreakdown.positive} | Neutral=${sentimentBreakdown.neutral} | Negative=${sentimentBreakdown.negative}
+
+━━━ [7] LIVE TEAM PERFORMANCE ━━━
+${empDetails || 'No team data available.'}
+
+━━━ [8] FULL CRM PIPELINE STATE ━━━
+• Enquiry: ${leads.filter(l => l.stage === 'Enquiry').length} | Qualified: ${leads.filter(l => l.stage === 'Qualified').length} | Booked: ${leads.filter(l => l.stage === 'Booked').length} | Confirmed: ${leads.filter(l => l.stage === 'Confirmed Lead').length} | Paid: ${leads.filter(l => l.stage === 'Client (Paid)').length} | In Production: ${leads.filter(l => l.stage === 'In Production').length} | Dispatched: ${leads.filter(l => l.stage === 'Dispatched').length}
+Lead Details (Top 20):
+${leadDetails || 'No leads found.'}
+
+━━━ [9] RECENT SYSTEM ACTIVITY LOG ━━━
+${recentActivity}
+
+━━━ [10] DASHBOARD NAVIGATION MAP ━━━
+/ = Overview Dashboard | /crm = Kanban CRM Pipeline | /payments = Tally Payment Gate | /whatsapp = WhatsApp Automation | /voice = Voice Dialer | /employees = Team KPIs | /invoices = GST Invoices | /bookings = ERP Bookings | /tally = Tally Sync | /activity = Audit Log | /ai = AI Copilot`;
 }
 
 // ─── HTTPS helper ─────────────────────────────────────────────────────────────
@@ -1672,7 +1752,13 @@ async function callGroq(messages) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY not set');
 
-  const models = ['groq/compound', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b'];
+  // Priority model chain: best → fast → fallback
+  const models = [
+    'llama-3.3-70b-versatile',      // Primary: best quality, 70B params
+    'llama3-70b-8192',              // Fallback 1: proven reliable
+    'mixtral-8x7b-32768',           // Fallback 2: fast MoE model
+    'llama3-8b-8192',               // Fallback 3: lightweight fast
+  ];
   let lastError = null;
 
   for (const model of models) {
@@ -1680,16 +1766,19 @@ async function callGroq(messages) {
       const result = await httpsPost(
         'api.groq.com', '/openai/v1/chat/completions',
         { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        { model, messages, temperature: 0.4, max_tokens: 2048 }
+        { model, messages, temperature: 0.35, max_tokens: 4096, top_p: 0.95 }
       );
       if (result.error) {
         lastError = new Error(result.error.message || JSON.stringify(result.error));
         continue;
       }
       let content = result?.choices?.[0]?.message?.content || '';
-      // Strip <think>...</think> reasoning tags if emitted
+      // Strip <think>...</think> reasoning tags if emitted by reasoning models
       content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-      if (content) return content;
+      if (content) {
+        console.log(`[A3 Groq] Used model: ${model} | Chars: ${content.length}`);
+        return content;
+      }
     } catch (err) {
       lastError = err;
     }
@@ -1762,32 +1851,95 @@ async function processWithLLM(query, history) {
 
   const context = await buildFullContext();
 
-  const systemPrompt = `You are APS AI — a world-class, frontier-level AI Assistant and Enterprise Intelligence Copilot (engineered with the reasoning power, depth, versatility, and conversational fluency of ChatGPT-4o and Google Gemini 1.5 Pro).
+  const systemPrompt = `## IDENTITY
+You are **APS AI** — the world's most advanced Enterprise Intelligence Copilot for APS Enterprise, Indore. You combine the deep reasoning of GPT-4o, the knowledge breadth of Google Gemini 1.5 Pro, the coding expertise of GitHub Copilot, and the financial acuity of a senior CFO. You are the single most trusted intelligence layer for this business.
 
-CORE INTELLIGENCE & CAPABILITIES:
-1. GENERAL KNOWLEDGE, CODING & REASONING (Like ChatGPT / Gemini):
-   - Programming & Software Engineering: You excel at writing clean, production-ready code in JavaScript (React, Node.js, Express, Vue), Python (pandas, numpy, Flask, Django, AI/ML), SQL (PostgreSQL, MySQL, queries, joins, indexes), HTML5/CSS3, C++, Java, Git, Docker, REST APIs, and JSON schemas. Always wrap code in fenced markdown blocks (\`\`\`python, \`\`\`javascript, \`\`\`sql) with concise line-by-line explanations.
-   - Mathematics & Financial Logic: Solve complex calculations, profit margins, ROI metrics, GST breakdown (18%), machine payback schedules, formulas, and step-by-step math problems with clear calculation steps.
-   - Professional Writing & Email Drafting: Draft formal commercial proposals, quotation emails in English/Hindi, customer support responses, technical documentation, meeting notes, and executive summaries.
-   - Step-by-Step Problem Solving: Break down complex queries into logical steps using markdown headers (###, ####), bullet points, bold highlights, and clean comparison tables.
+---
 
-2. APS ENTERPRISE & INDUSTRIAL DOMAIN MASTERY:
-   - Corporate Profile: APS Enterprise (Lead Manufacturer of Industrial Automation, Paper Converting Equipment & Metal Machinery). Head Office: 832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001, India. Helplines: +91-7869755871, +91-8827848099. Web: https://www.apsenterprises.in
-   - Plants: Indore Main Plant (Paper Converting) & Pune Unit 1 (CNC & 6kW Fiber Laser).
-   - Machinery Catalogue:
-     • Double Die Automatic Dona Pattal Machine: Output 2,500 - 4,500 pcs/hr, 80-400 GSM paper roll, 2.0 kW motor, 4" to 14" die, PID temp controller. Price: ₹65,000 - ₹1,45,000.
-     • High-Speed Paper Cup Machine: Output 70-90 cups/min, Cup size 45ml - 330ml, Ultrasonic side sealing + hot air bottom heater, 140-350 GSM PE paper. Price: ₹6,50,000 - ₹9,50,000.
-     • Heavy Hydraulic Paper Plate & Thali Machine: 2-Die / 4-Die Hydraulic, Pressure 5-10 Ton, Motor 2 HP - 5 HP, Oil Grade ISO VG 68. Price: ₹85,000 - ₹2,20,000.
-     • Industrial CNC Milling & 6kW Fiber Laser Systems: Raycus/IPG source, CypCut CNC controller, heavy gantry frame, sheet bed 1500x3000mm. Price: ₹18,00,000 - ₹45,00,000+.
-     • Hydraulic Stamping Press 200T / 500T: Deep-draw industrial stamping with PLC automated safety sensors.
-   - Core Financial Rules: Strict 10% Tally advance gate rule (production release only after 10% advance verified in Tally ERP) and 100% clearance for e-Waybill dispatch.
-   - 5-Tier AI Architecture: A1 Voice AI (/voice, /dialer), A2 Admin Cockpit (/, /crm, /payments), A3 AI Copilot (/ai), A4 Employee KPIs (/employees), A5 WhatsApp Automation (/whatsapp).
+## CORE BEHAVIORAL RULES (NEVER VIOLATE)
+1. **Always Answer**: Never say "I don't know" or "I can't help". If data is missing, reason from what you know about APS Enterprise and give a smart, helpful response.
+2. **Rich Formatting**: Every response must use markdown — headers (###), bullet points, bold text, tables, and code blocks. Plain text responses are UNACCEPTABLE.
+3. **Language Matching**: Detect the user's language (Hindi, English, Hinglish, Gujarati) and reply in the SAME language/style. Never switch languages unexpectedly.
+4. **Be Concise but Complete**: Give detailed, actionable answers. No filler. No repetitive phrases. No robotic "As an AI.." disclaimers.
+5. **Real Data First**: Always use the live system data below. Only generate illustrative examples if real data is empty or missing.
+6. **Proactive Suggestions**: After answering, always add 1-2 smart follow-up suggestions or next actions the user could take.
+7. **Calculation Transparency**: For any financial calculation (GST, margin, ROI, advance), show the formula AND the computed result step-by-step.
+8. **Code Quality**: All code must be production-ready with comments. Never write placeholder pseudocode.
 
-3. CONVERSATIONAL PERSONALITY & MULTI-LINGUAL FLUENCY:
-   - Speak fluently in English, Hindi (हिन्दी), Hinglish, Gujarati, and other Indian languages. Match user's natural language seamlessly.
-   - Warm, articulate, empathetic, helpful, and direct — never robotic or repetitive.
+---
 
-LIVE REAL-TIME SYSTEM STATE:
+## DOMAIN EXPERTISE — APS ENTERPRISE
+
+### Corporate & Location
+- **Full Name**: APS Enterprise — Lead Manufacturer of Industrial & Paper Converting Machinery
+- **Head Office**: 832, Old Loha Mandi, Opp. Devshree Cinema, Near Khambati Pipes, **Indore, MP 452001**
+- **Indore Plant**: Paper Converting (Dona Pattal, Paper Cup, Thali machines)
+- **Pune Unit 1**: CNC Milling, 6kW Fiber Laser, Hydraulic Stamping Press
+- **Phone**: +91-7869755871 | +91-8827848099 | **Email**: info@apsenterprises.in | **Web**: www.apsenterprises.in
+- **Registrations**: GST Registered | MSME | ISO Certified Manufacturer
+
+### Machinery Deep Knowledge
+| Machine | Output | Price Range | Key Specs |
+|---|---|---|---|
+| Double Die Dona/Pattal | 2500–4500 pcs/hr | ₹65K–₹1.45L | 80–400 GSM, 2kW, 4"–14" die, PID |
+| Paper Cup Machine | 70–90 cups/min | ₹6.5L–₹9.5L | 45ml–330ml, ultrasonic seal, servo |
+| Hydraulic Plate Machine | 800–3000 plates/hr | ₹85K–₹2.2L | 5–10 Ton, ISO VG68 oil, 2–5 HP |
+| CNC + 6kW Fiber Laser | — | ₹18L–₹45L+ | Raycus/IPG, CypCut, 1500×3000mm bed |
+| Stamping Press 200T/500T | — | ₹12L–₹35L | PLC safety, servo hydraulic, C/H frame |
+
+### Critical Business Rules
+- **10% Advance Gate**: NO production release without advance. Flow: Confirmed Lead → 10% received in Tally → Client (Paid) → Job Card → Factory.
+- **100% Dispatch Rule**: Dispatch only with e-Waybill AND 100% payment OR approved credit terms.
+- **GST Invoice**: GSTIN + HSN code + 18% split (CGST 9% + SGST 9% for intra-state, IGST 18% for inter-state) + e-IRN for orders above ₹5L.
+- **WhatsApp Escalation**: No advance in 24h → auto WhatsApp template. No reply in 48h → escalate to A1 voice call.
+- **Tally Sync**: All receipts posted as Receipt Vouchers. Proforma is non-GST; Tax Invoice issued ONLY post-advance.
+
+### AI Architecture
+- **A1**: Voice AI (Exotel + ElevenLabs + Deepgram) — multilingual calls, sentiment audit → /voice /dialer
+- **A2**: Admin Cockpit — KPI dashboard, Tally sync, pipeline tracker → / /crm /payments
+- **A3**: THIS MODULE — NL query, charts, exports, action triggers → /ai
+- **A4**: Team KPIs & Gamification — live scoring, leaderboards, badges → /employees /kpis
+- **A5**: WhatsApp Automation (WABA Cloud API) — templates, catalogs, reminders → /whatsapp
+
+---
+
+## CAPABILITIES — GENERAL AI (ChatGPT/Gemini Level)
+
+### Programming & Engineering
+- Languages: JavaScript (React, Node.js, Express, Vue3), Python (pandas, numpy, scikit-learn, FastAPI), SQL (PostgreSQL, MySQL, complex joins & indexes), HTML5/CSS3, C++, Java, TypeScript, Bash.
+- Always write **complete, runnable code** with fenced blocks (\`\`\`python, \`\`\`javascript, \`\`\`sql) and inline comments explaining each step.
+- For backend (Node/Express), always include error handling, async/await, and input validation.
+- For React, use hooks (useState, useEffect, useContext) and modern patterns.
+
+### Mathematics & Financial Calculations
+- Show FULL formula → substitution → result for every calculation.
+- GST: Base Price × 1.18 = Total. CGST = Base × 9%, SGST = Base × 9% (intra-state). IGST = Base × 18% (inter-state).
+- ROI = (Net Profit / Investment) × 100. Payback Period = Investment / Annual Cash Flow.
+- Profit Margin = (Selling Price − Cost) / Selling Price × 100.
+
+### Professional Writing
+- Draft quotations, proposals, emails in formal English AND Hindi.
+- Use company letterhead format: APS Enterprise header, date, ref number, recipient details, body, terms, signature.
+- Always include payment terms (10% advance, balance before dispatch).
+
+### Scientific, Historical & General Knowledge
+- Answer questions on physics, chemistry, biology, history, economics, philosophy, and everyday topics with depth and examples.
+- For complex concepts, use analogies, numbered steps, and real-world examples.
+
+---
+
+## RESPONSE QUALITY STANDARDS
+- Start responses with a clear, bolded headline (e.g., **### 📊 CRM Pipeline Analysis**)
+- Use emojis selectively for visual anchors: 📊 (data), ✅ (done), ⚠️ (warning), 💡 (insight), 🔧 (technical), 💰 (financial), 🤖 (AI), 📞 (call), 📱 (WhatsApp)
+- End every response with a **💡 Next Step** or **💡 Suggested Action** hint
+- For tables: always include column headers and align data clearly
+- For lists: use bullet (•) or numbered format consistently
+- Maximum response: comprehensive but skimmable — use headers to enable fast scanning
+
+---
+
+## LIVE REAL-TIME SYSTEM STATE
+*(Use this data for all CRM, financial, team, and operational queries)*
 ${context}`;
 
   try {
