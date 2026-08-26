@@ -432,12 +432,12 @@ async function handleGenerateReport(query) {
   const todayStr = new Date().toLocaleDateString('en-IN', { dateStyle: 'full' });
 
   const qLower = (query || '').toLowerCase();
-  const wantsFile = /pdf|file|format|download|export|save|csv|excel|xlsx|docx|word/i.test(qLower);
+  const wantsFile = /pdf|file|format|download|export|save|csv|excel|xlsx|docx|doc|word/i.test(qLower);
 
   let fileFormat = 'PDF';
   if (qLower.includes('excel') || qLower.includes('xlsx')) fileFormat = 'XLSX';
   else if (qLower.includes('csv')) fileFormat = 'CSV';
-  else if (qLower.includes('docx') || qLower.includes('word')) fileFormat = 'DOCX';
+  else if (qLower.includes('docx') || qLower.includes('word') || qLower.includes('doc')) fileFormat = 'DOC';
   else if (qLower.includes('xml')) fileFormat = 'XML';
   else if (qLower.includes('json')) fileFormat = 'JSON';
 
@@ -482,7 +482,7 @@ function detectRequestedFormat(query) {
   if (/\b(excel|exel|excle|xlsx|xls|spreadsheet|sheet|sheets)\b/i.test(q)) return 'xlsx';
   if (/\b(csv|csv\s*file|csv\s*format)\b/i.test(q)) return 'csv';
   if (/\b(xml|xml\s*file)\b/i.test(q)) return 'xml';
-  if (/\b(docx|doc|word|word\s*doc)\b/i.test(q)) return 'docx';
+  if (/\b(docx|doc|word|word\s*doc)\b/i.test(q)) return 'doc';
   if (/\b(json|json\s*format|json\s*file)\b/i.test(q)) return 'json';
   if (/\b(export|download|downlod|dawnload|generate|geneate|genrate|genearte|create|file|format|sheet|banao|nikalo|chahiye|kisi\s*bhi)\b/i.test(q)) return 'pdf';
   return null;
@@ -524,8 +524,8 @@ function buildStockExport(inventory, format, dateStr) {
     content = `<?xml version="1.0" encoding="UTF-8"?>\n<inventory valuation="${totalVal}" totalUnits="${totalUnits}">\n` +
       inventory.map(i => `  <item id="${i.id}" sku="${i.sku || ''}">\n    <name>${i.name}</name>\n    <category>${i.category}</category>\n    <warehouse>${i.warehouse}</warehouse>\n    <available>${i.availableUnits}</available>\n    <total>${i.stockUnits}</total>\n    <unitPrice>${i.unitPrice}</unitPrice>\n  </item>`).join('\n') +
       `\n</inventory>`;
-  } else if (format === 'docx') {
-    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  } else if (format === 'doc') {
+    mimeType = 'application/msword';
     content = `APS Enterprise - Warehouse & Stock Inventory Report\nDate: ${dateStr}\n\nTotal Valuation: ₹${totalVal.toLocaleString('en-IN')} (${inventory.length} Product Lines)\n\n` +
       inventory.map((i, idx) => `${idx + 1}. [${i.sku || i.id}] ${i.name}\n   Warehouse: ${i.warehouse} | Avail: ${i.availableUnits}/${i.stockUnits} units | Price: ₹${Number(i.unitPrice || 0).toLocaleString('en-IN')} | Status: ${i.status}`).join('\n\n');
   } else {
@@ -648,8 +648,8 @@ function buildEmployeePerformanceExport(employeesData, format, dateStr) {
     content = `<?xml version="1.0" encoding="UTF-8"?>\n<employeesPerformance totalRevenue="${totalRev}" totalSpent="${totalCost}" netProfit="${totalProfit}">\n` +
       employeesData.map(e => `  <employee id="${e.id}">\n    <name>${e.name}</name>\n    <role>${e.role}</role>\n    <spent>${e.costSpent}</spent>\n    <revenue>${e.totalRevenue}</revenue>\n    <netProfit>${e.netProfit}</netProfit>\n    <roi>${e.roi}%</roi>\n    <kpi>${e.kpiScore}</kpi>\n  </employee>`).join('\n') +
       `\n</employeesPerformance>`;
-  } else if (format === 'docx') {
-    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  } else if (format === 'doc') {
+    mimeType = 'application/msword';
     content = `APS Enterprise - Employee Performance, Cost & Profit Audit Report\nDate: ${dateStr}\n\nTeam Revenue: ₹${totalRev.toLocaleString('en-IN')} | Total Spent: ₹${totalCost.toLocaleString('en-IN')} | Net Profit: ₹${totalProfit.toLocaleString('en-IN')}\n\n` +
       employeesData.map((e, i) => `${i + 1}. ${e.name} (${e.role})\n   Cost Spent: ₹${Number(e.costSpent).toLocaleString('en-IN')} | Revenue Closed: ₹${Number(e.totalRevenue).toLocaleString('en-IN')} | Net Profit Gained: ₹${Number(e.netProfit).toLocaleString('en-IN')} (ROI: ${e.roi}%) | Deals: ${e.salesClosed} | KPI: ${e.kpiScore}`).join('\n\n');
   } else {
@@ -2545,7 +2545,7 @@ async function processQuery(query, conversationId) {
 
   if (/\b(csv)\b/i.test(qClean)) requestedFormat = 'csv';
   else if (/\b(excel|xlsx|xls|spreadsheet)\b/i.test(qClean)) requestedFormat = 'xlsx';
-  else if (/\b(docx|word|doc)\b/i.test(qClean)) requestedFormat = 'docx';
+  else if (/\b(docx|word|doc)\b/i.test(qClean)) requestedFormat = 'doc';
   else if (/\b(json)\b/i.test(qClean)) requestedFormat = 'json';
   else if (/\b(pdf)\b/i.test(qClean)) requestedFormat = 'pdf';
   else if (/report|export|download|file|invoice|sheet|banao|nikalo|generate/i.test(qClean)) requestedFormat = 'pdf';
@@ -2575,7 +2575,7 @@ async function processQuery(query, conversationId) {
       csv: 'text/csv',
       xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       pdf: 'application/pdf',
-      docx: 'application/msword',
+      doc: 'application/msword',
       json: 'application/json'
     };
 
