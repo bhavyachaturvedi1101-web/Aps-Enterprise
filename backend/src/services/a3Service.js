@@ -2021,8 +2021,16 @@ async function callGroq(messages) {
         { model, messages, temperature: 0.35, max_tokens: 4096, top_p: 0.95 }
       );
       if (result.error) {
-        lastError = new Error(`[${model}] ${result.error.message || JSON.stringify(result.error)}`);
-        console.warn(`[A3 Groq] Model ${model} error — trying next:`, result.error.message);
+        const errMsg = result.error.message || '';
+        const errCode = result.error.code || '';
+        lastError = new Error(`[${model}] ${errMsg || JSON.stringify(result.error)}`);
+        console.warn(`[A3 Groq] Model ${model} error:`, errMsg);
+
+        // Fail fast: If it is an invalid API key or auth/rate limits, don't waste time trying fallbacks
+        if (errCode === 'invalid_api_key' || errMsg.includes('API key') || errMsg.includes('unauthorized') || errMsg.toLowerCase().includes('api key')) {
+          console.warn('[A3 Groq] Fail-fast triggered due to authentication/API key issue.');
+          break;
+        }
         continue;
       }
       let content = result?.choices?.[0]?.message?.content || '';
