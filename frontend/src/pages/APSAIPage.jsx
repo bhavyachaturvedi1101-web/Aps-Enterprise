@@ -5,7 +5,8 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-const API = import.meta.env.PROD ? '/api/a3' : 'http://localhost:5000/api/a3';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api/a3' : '/api/a3';
 
 // ─── Session Conversation ID ──────────────────────────────────────────────────
 function getConversationId() {
