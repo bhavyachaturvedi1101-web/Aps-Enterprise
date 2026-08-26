@@ -23,14 +23,19 @@ const HISTORY_KEY = 'apsai_chat_history';
 function loadHistory() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(m => !m.isWelcome);
+      }
+    }
   } catch { }
   return null;
 }
 
 function saveHistory(messages) {
   try {
-    const clean = messages.filter(m => !m.loading).slice(-40);
+    const clean = messages.filter(m => !m.loading && !m.isWelcome).slice(-40);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(clean));
   } catch { }
 }
