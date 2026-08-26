@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "node --watch src/app.js",
+    "dev": "node --watch-path=src src/app.js",
     "test": "jest --runInBand --forceExit",
     "test:watch": "jest --runInBand --watchAll",
     "test:coverage": "jest --runInBand --forceExit --coverage"
