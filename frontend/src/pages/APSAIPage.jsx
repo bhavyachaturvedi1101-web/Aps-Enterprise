@@ -273,8 +273,13 @@ function MiniTable({ rows }) {
 function RenderText({ text, isUser }) {
   if (!text) return null;
 
+  // Normalize special Unicode space variants and zero-width characters to standard ASCII characters
+  const normalizedText = String(text)
+    .replace(/[\u202F\u00A0\u2007\u2009\u200a]/g, ' ')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '');
+
   // Split text into code block segments and regular text
-  const blocks = text.split(/(```[\s\S]*?```)/g);
+  const blocks = normalizedText.split(/(```[\s\S]*?```)/g);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
