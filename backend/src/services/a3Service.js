@@ -2169,6 +2169,23 @@ async function handleAssignEmployeeTasks(query) {
   // Save the updated employees list back to inMemoryStore
   store.mockEmployees = employees;
 
+  // Sync tasksCompleted back to PostgreSQL database so the KPI page reflects the count instantly
+  try {
+    const { Employee } = require('../models');
+    if (Employee) {
+      Promise.all(employees.map(emp => {
+        return Employee.update(
+          { tasksCompleted: emp.tasksCompleted },
+          { where: { id: emp.id } }
+        ).catch(err => console.error(`[A3 DB Sync error for ${emp.id}]:`, err.message));
+      })).then(() => {
+        console.log('[A3 DB Sync] Synced tasksCompleted for all employees in PostgreSQL successfully');
+      });
+    }
+  } catch (err) {
+    console.error('[A3 DB Sync Error]', err.message);
+  }
+
   // Let's create a diverse table of representatives
   const tableRows = [...representatives];
   // Add some extra rows if needed to populate the table (up to 10)

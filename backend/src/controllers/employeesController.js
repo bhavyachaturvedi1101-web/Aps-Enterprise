@@ -1,10 +1,10 @@
 const { Employee, ActivityLog, Lead } = require('../models');
-const { mockTimeInStage, mockEmployees } = require('../config/inMemoryStore');
+const store = require('../config/inMemoryStore');
 
 // Helper to decorate employee with mock UI fields since DB only has basics
 const decorateEmployee = (e) => {
   const emp = e.toJSON ? e.toJSON() : e;
-  const mockEmp = (mockEmployees || []).find(me => me.id === emp.id) || {};
+  const mockEmp = ((store && store.mockEmployees) || []).find(me => me.id === emp.id) || {};
   
   const tasksCompleted = emp.tasksCompleted !== undefined ? emp.tasksCompleted : (mockEmp.tasksCompleted || 0);
   const kpiScoreNum = mockEmp.kpiScoreNum !== undefined ? mockEmp.kpiScoreNum : (tasksCompleted > 0 ? 85 + (tasksCompleted % 10) : 85);
@@ -24,8 +24,8 @@ const decorateEmployee = (e) => {
     avgResponseTimeMin: mockEmp.avgResponseTimeMin || 4.0,
     weeklyKpiHistory: mockEmp.weeklyKpiHistory || [85, 88, 90, 93],
     stageConversions: mockEmp.stageConversions || { enquiryToQualified: 10, qualifiedToBooked: 5, bookedToConfirmed: 3, confirmedToPaid: 2 },
-    activeTask: emp.activeTask || mockEmp.activeTask || null,
-    taskQueue: emp.taskQueue || mockEmp.taskQueue || []
+    activeTask: mockEmp.activeTask || emp.activeTask || null,
+    taskQueue: mockEmp.taskQueue || emp.taskQueue || []
   };
 };
 
@@ -155,7 +155,7 @@ const createEmployee = async (req, res) => {
     await ActivityLog.create({
       id: `log-${Date.now()}`,
       employeeId: newEmp.id,
-      leadId: null, // Depending on if it allows null, else just fake it. Wait, leadId in ActivityLog is required?
+      leadId: null,
       action: `Added new team member ${newEmp.name} (${newEmp.role})`,
       fromStage: 'None',
       toStage: 'None'
@@ -177,13 +177,14 @@ const completeTask = async (req, res) => {
       return res.status(404).json({ error: 'Employee not found', code: 'EMPLOYEE_NOT_FOUND' });
     }
 
-    // Increment tasks
+    // Increment tasks in database
     empData.tasksCompleted = (empData.tasksCompleted || 0) + 1;
     await empData.save();
 
-    const employee = decorateEmployee(empData);
-    const completedTask = { id: `task-${id}-${Date.now()}`, title: 'General Operational Follow-up' };
-    const nextTask = {
+    // Retrieve live mockEmp from inMemoryStore to manage activeTask and taskQueue
+    const mockEmp = ((store && store.mockEmployees) || []).find(me => me.id === id);
+    let completedTitle = 'General Operational Follow-up';
+    let nextTask = {
       id: `task-${id}-${Date.now()+1}`,
       title: `Auto-assigned pipeline task`,
       priority: 'Normal',
@@ -193,7 +194,31 @@ const completeTask = async (req, res) => {
       assignedAt: new Date()
     };
 
-    employee.activeTask = nextTask;
+    if (mockEmp) {
+      mockEmp.tasksCompleted = empData.tasksCompleted;
+      if (mockEmp.activeTask) {
+        completedTitle = mockEmp.activeTask.title;
+      }
+      
+      // Pull next task from taskQueue if assigned by chatbot
+      if (Array.isArray(mockEmp.taskQueue) && mockEmp.taskQueue.length > 0) {
+        const queued = mockEmp.taskQueue.shift();
+        nextTask = {
+          id: `task-${id}-${Date.now()+1}`,
+          title: queued.title,
+          priority: queued.priority || 'Normal',
+          type: queued.type || 'Automated Queue Assignment',
+          stage: 'In Progress',
+          dueIn: queued.dueIn || '30 mins',
+          assignedAt: new Date()
+        };
+      }
+      mockEmp.activeTask = nextTask;
+      mockEmp.currentActivity = `Working on: ${nextTask.title}`;
+    }
+
+    const employee = decorateEmployee(empData);
+    const completedTask = { id: `task-${id}-${Date.now()}`, title: completedTitle };
 
     const logEntry = await ActivityLog.create({
       id: `log-${Date.now()}`,
@@ -227,7 +252,6 @@ const assignTask = async (req, res) => {
     const empData = await Employee.findByPk(id);
     if (!empData) return res.status(404).json({ error: 'Employee not found' });
 
-    const employee = decorateEmployee(empData);
     const newTask = {
       id: `task-${id}-${Date.now()}`,
       title,
@@ -237,7 +261,14 @@ const assignTask = async (req, res) => {
       assignedAt: new Date()
     };
 
-    employee.activeTask = newTask;
+    // Retrieve mockEmp and update activeTask
+    const mockEmp = ((store && store.mockEmployees) || []).find(me => me.id === id);
+    if (mockEmp) {
+      mockEmp.activeTask = newTask;
+      mockEmp.currentActivity = `Working on: ${title}`;
+    }
+
+    const employee = decorateEmployee(empData);
 
     res.status(201).json({
       success: true,
