@@ -630,7 +630,15 @@ function ExportFileCard({ exportFile, tableData }) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName || `APS_Enterprise_Export.docx`;
+        
+        let outName = fileName || 'APS_Enterprise_Export.doc';
+        if (outName.toLowerCase().endsWith('.docx')) {
+          outName = outName.slice(0, -1); // Change .docx to .doc
+        } else if (!outName.toLowerCase().endsWith('.doc')) {
+          outName = `${outName}.doc`;
+        }
+        
+        a.download = outName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
