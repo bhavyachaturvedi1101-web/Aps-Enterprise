@@ -271,29 +271,182 @@ function MiniTable({ rows }) {
 
 // ─── Markdown Text Renderer ───────────────────────────────────────────────────
 function RenderText({ text, isUser }) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  if (!text) return null;
+
+  // Split text into code block segments and regular text
+  const blocks = text.split(/(```[\s\S]*?```)/g);
+
   return (
-    <span>
-      {parts.map((p, i) =>
-        p.startsWith('**') && p.endsWith('**')
-          ? <strong key={i} style={{ color: isUser ? '#fff' : '#0f172a', fontWeight: 700 }}>{p.slice(2, -2)}</strong>
-          : p.split('\n').map((line, j) => (
-            <React.Fragment key={`${i}-${j}`}>
-              {j > 0 && <br />}
-              {line.startsWith('• ') ? (
-                <span style={{ display: 'block', paddingLeft: 14, color: isUser ? 'rgba(255,255,255,0.9)' : '#475569', margin: '2px 0' }}>
-                  • {line.slice(2)}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {blocks.map((block, bIdx) => {
+        if (block.startsWith('```')) {
+          const match = block.match(/```(\w*)\n([\s\S]*?)```/);
+          const lang = match ? match[1] : '';
+          const code = match ? match[2] : block.slice(3, -3);
+
+          return (
+            <div key={bIdx} style={{
+              background: '#0f172a',
+              color: '#f8fafc',
+              borderRadius: 10,
+              overflow: 'hidden',
+              margin: '8px 0',
+              fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+              fontSize: '0.78rem',
+              border: '1px solid #1e293b',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.06)'
+            }}>
+              <div style={{
+                background: '#1e293b',
+                padding: '6px 14px',
+                fontSize: '0.66rem',
+                color: '#94a3b8',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid #334155',
+                userSelect: 'none'
+              }}>
+                <span>{lang || 'code'}</span>
+                <span 
+                  style={{ cursor: 'pointer', transition: 'color 0.1s' }} 
+                  onClick={(e) => {
+                    navigator.clipboard.writeText(code);
+                    const target = e.target;
+                    target.innerText = 'COPIED!';
+                    setTimeout(() => { target.innerText = 'COPY'; }, 2000);
+                  }}
+                  onMouseEnter={(e) => { e.target.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.target.style.color = '#94a3b8'; }}
+                >
+                  COPY
                 </span>
-              ) : line.startsWith('*') && line.endsWith('*') ? (
-                <em style={{ color: isUser ? 'rgba(255,255,255,0.85)' : '#2563eb', fontStyle: 'italic' }}>
-                  {line.slice(1, -1)}
-                </em>
-              ) : line}
-            </React.Fragment>
-          ))
-      )}
-    </span>
+              </div>
+              <pre style={{
+                margin: 0,
+                padding: 12,
+                overflowX: 'auto',
+                whiteSpace: 'pre',
+                lineHeight: 1.45
+              }}>{code}</pre>
+            </div>
+          );
+        }
+
+        // Parse regular text block lines
+        const lines = block.split('\n');
+        return (
+          <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {lines.map((line, lIdx) => {
+              const trimmed = line.trim();
+              if (trimmed === '---') {
+                return <hr key={lIdx} style={{ border: 0, borderTop: '1px solid #cbd5e1', margin: '8px 0', width: '100%' }} />;
+              }
+
+              // Handle markdown headings
+              let headingLevel = 0;
+              if (trimmed.startsWith('#### ')) headingLevel = 4;
+              else if (trimmed.startsWith('### ')) headingLevel = 3;
+              else if (trimmed.startsWith('## ')) headingLevel = 2;
+              else if (trimmed.startsWith('# ')) headingLevel = 1;
+
+              if (headingLevel > 0) {
+                const headerText = trimmed.replace(/^#+\s+/, '');
+                const HeaderTag = `h${headingLevel}`;
+                const sizes = { 1: '1.3rem', 2: '1.18rem', 3: '1.02rem', 4: '0.9rem' };
+                return (
+                  <HeaderTag key={lIdx} style={{
+                    fontSize: sizes[headingLevel],
+                    fontWeight: 800,
+                    color: isUser ? '#fff' : '#0f172a',
+                    margin: '10px 0 4px 0',
+                    letterSpacing: '-0.2px',
+                    lineHeight: 1.3
+                  }}>
+                    {parseInlineStyles(headerText, isUser)}
+                  </HeaderTag>
+                );
+              }
+
+              // Handle list items
+              const isBullet = trimmed.startsWith('• ') || trimmed.startsWith('- ') || trimmed.startsWith('* ');
+              if (isBullet) {
+                const content = trimmed.replace(/^(\u2022|\-|\*)\s+/, '');
+                return (
+                  <div key={lIdx} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 6,
+                    paddingLeft: 10,
+                    margin: '2px 0'
+                  }}>
+                    <span style={{ color: isUser ? '#fff' : '#2563eb', fontSize: '0.8rem', lineHeight: 1.5, userSelect: 'none' }}>•</span>
+                    <span style={{ flex: 1, fontSize: '0.86rem', lineHeight: 1.5, color: isUser ? 'rgba(255,255,255,0.95)' : '#334155' }}>
+                      {parseInlineStyles(content, isUser)}
+                    </span>
+                  </div>
+                );
+              }
+
+              if (!trimmed) return <div key={lIdx} style={{ height: 4 }} />;
+
+              return (
+                <div key={lIdx} style={{
+                  fontSize: '0.86rem',
+                  lineHeight: 1.5,
+                  color: isUser ? '#fff' : '#334155',
+                  margin: '1px 0'
+                }}>
+                  {parseInlineStyles(line, isUser)}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
   );
+}
+
+function parseInlineStyles(str, isUser) {
+  if (!str) return '';
+  const tokens = str.split(/(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*)/g);
+
+  return tokens.map((token, i) => {
+    if (token.startsWith('**') && token.endsWith('**')) {
+      return (
+        <strong key={i} style={{ color: isUser ? '#fff' : '#0f172a', fontWeight: 800 }}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (token.startsWith('`') && token.endsWith('`')) {
+      return (
+        <code key={i} style={{
+          background: isUser ? 'rgba(255,255,255,0.18)' : '#f1f5f9',
+          color: isUser ? '#fff' : '#0f172a',
+          padding: '2px 5px',
+          borderRadius: 4,
+          fontSize: '0.78rem',
+          fontFamily: 'Consolas, Monaco, monospace',
+          border: isUser ? 'none' : '1px solid #e2e8f0',
+          margin: '0 2px'
+        }}>
+          {token.slice(1, -1)}
+        </code>
+      );
+    }
+    if (token.startsWith('*') && token.endsWith('*')) {
+      return (
+        <em key={i} style={{ color: isUser ? 'rgba(255,255,255,0.9)' : '#475569', fontStyle: 'italic' }}>
+          {token.slice(1, -1)}
+        </em>
+      );
+    }
+    return token;
+  });
 }
 
 // ─── Report Card Component ───────────────────────────────────────────────────
