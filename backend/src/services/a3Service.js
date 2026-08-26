@@ -1871,16 +1871,25 @@ async function callGemini(systemPrompt, history, userQuery) {
 function parseLLMResponse(raw) {
   if (!raw || !raw.trim()) return null;
 
-  let cleaned = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  const trimmed = raw.trim();
 
-  // 1. Try full parse first if it's clean JSON
+  // 1. Try parsing directly if it is clean JSON
   try {
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(trimmed);
     if (parsed && typeof parsed.text === 'string' && parsed.text.trim()) return parsed;
   } catch {}
 
-  // 2. Try extracting JSON object with regex
-  const match = cleaned.match(/\{[\s\S]*"text"\s*:\s*"([\s\S]*?)"[\s\S]*\}/);
+  // 2. Try parsing if wrapped in code block ```json ... ```
+  if (trimmed.startsWith('```')) {
+    try {
+      const cleaned = trimmed.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      if (parsed && typeof parsed.text === 'string' && parsed.text.trim()) return parsed;
+    } catch {}
+  }
+
+  // 3. Try extracting JSON object with regex
+  const match = trimmed.match(/\{[\s\S]*"text"\s*:\s*"([\s\S]*?)"[\s\S]*\}/);
   if (match) {
     try {
       const parsed = JSON.parse(match[0]);
@@ -1888,8 +1897,8 @@ function parseLLMResponse(raw) {
     } catch {}
   }
 
-  // 3. Fallback: Return text directly
-  return { text: cleaned, table: null, chart: null };
+  // 4. Fallback: Return raw text with backticks preserved
+  return { text: trimmed, table: null, chart: null };
 }
 
 // ─── Main LLM processor ──────────────────────────────────────────────────────
