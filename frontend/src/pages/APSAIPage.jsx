@@ -236,7 +236,9 @@ function SmartChart({ chart }) {
 // ─── Data Table ───────────────────────────────────────────────────────────────
 function MiniTable({ rows }) {
   if (!rows || rows.length === 0) return null;
+  const [showAll, setShowAll] = React.useState(false);
   const headers = Object.keys(rows[0]);
+  const visibleRows = showAll ? rows : rows.slice(0, 10);
 
   return (
     <div style={s.tableContainer}>
@@ -249,7 +251,7 @@ function MiniTable({ rows }) {
           </tr>
         </thead>
         <tbody>
-          {rows.slice(0, 10).map((row, i) => (
+          {visibleRows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
               {headers.map(h => (
                 <td key={h} style={s.td}>{row[h]}</td>
@@ -258,8 +260,25 @@ function MiniTable({ rows }) {
           ))}
           {rows.length > 10 && (
             <tr>
-              <td colSpan={headers.length} style={{ padding: '6px 12px', color: '#94a3b8', fontSize: '0.7rem', textAlign: 'center', background: '#f8fafc' }}>
-                +{rows.length - 10} more rows
+              <td
+                colSpan={headers.length}
+                onClick={() => setShowAll(!showAll)}
+                style={{
+                  padding: '8px 12px',
+                  color: '#4f46e5',
+                  fontWeight: '600',
+                  fontSize: '0.72rem',
+                  textAlign: 'center',
+                  background: '#f8fafc',
+                  cursor: 'pointer',
+                  borderTop: '1px solid #e2e8f0',
+                  transition: 'background 0.2s',
+                  userSelect: 'none'
+                }}
+                onMouseOver={(e) => e.target.style.background = '#f1f5f9'}
+                onMouseOut={(e) => e.target.style.background = '#f8fafc'}
+              >
+                {showAll ? '🔼 Show Less' : `🔽 +${rows.length - 10} more rows (Click to expand)`}
               </td>
             </tr>
           )}
@@ -936,10 +955,45 @@ function MessageCard({ msg }) {
 }
 
 // ─── Welcome Message ──────────────────────────────────────────────────────────
+function buildWelcomeText() {
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+  const date = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const lines = [
+    `### ${greet}, Bhavya 👋`,
+    `**${date}** — APS Enterprise AI is fully online.`,
+    '',
+    '---',
+    '',
+    "I'm your **Autonomous Business Intelligence Co-Pilot** for APS Enterprise.",
+    'Ask me anything in **Hindi, English, or Hinglish** — I understand it all.',
+    '',
+    '**⚡ Try these right now:**',
+    '',
+    '| Capability | Say this |',
+    '|---|---|',
+    '| 📊 Full CRM leads table | *"Show all CRM leads"* |',
+    '| 📋 Assign tasks to team | *"Assign tasks to all employees"* |',
+    '| 👤 Target one employee | *"Assign task to Animesh"* |',
+    '| 💰 Revenue & pipeline | *"Show revenue summary"* |',
+    '| 🏆 Top performer | *"Who is the top performer?"* |',
+    '| 📞 Schedule a call | *"Schedule call for Priya Soni"* |',
+    '| 💬 WhatsApp reminder | *"Send WhatsApp to Global Tech"* |',
+    '| 🏭 Factory job cards | *"Track factory job card status"* |',
+    '| 🧾 GST Invoice | *"Generate GST invoice for 42000"* |',
+    '| 📈 AI Revenue Forecast | *"Predict September revenue"* |',
+    '| 📤 Export data | *"Export all leads as Excel"* |',
+    '',
+    '---',
+    '*💡 I remember our conversation for up to 2 hours — no need to repeat context.*'
+  ];
+  return lines.join('\n');
+}
+
 const WELCOME_MSG = {
   role: 'bot',
   isWelcome: true,
-  text: "Welcome to **APS Enterprise Autonomous AI Operations Assistant** 🤖\n\nMain aapka real-time operational co-pilot hoon jo pure system ke sabhi 11 features ko natural language (Hinglish / Hindi / English) me control kar sakta hai.\n\n### ⚡ What I Can Do For You in Real Time:\n• 📋 **Task Assignment**: *\"Bhavya ko urgent task assign kardo: Review Global Tech advance payment\"*\n• 📞 **Voice Dialer**: *\"Jane Smith ke liye call schedule kar do kal 11 baje\"*\n• 💬 **WhatsApp Automation**: *\"Global Tech ko 10% advance payment reminder bhejo\"*\n• 🎯 **CRM Operations**: *\"Naya lead create karo Rajesh Sharma budget 85000\"* & *\"Lead LEAD-004 ko In Production me move karo\"*\n• 💰 **Tally Payments Gate**: *\"Tally me 15000 ka advance receipt voucher banao\"*\n• 🏭 **Factory Shopfloor**: *\"Precision Works ka manufacturing job card release kar do\"*\n• 🧾 **GST Invoices**: *\"Dona Pattal machine ka GST tax invoice generate karo\"*\n• 📦 **Warehouse Stock**: *\"Add 5 units of Double Die Machine in stock\"*\n• 📊 **Analytics**: *\"Show all employees cost spent vs net profit ROI report\"*\n\nType your command in **Hinglish**, **Hindi**, or **English** below or select a quick action from the sidebar!",
+  text: buildWelcomeText(),
   table: null,
   chart: null
 };

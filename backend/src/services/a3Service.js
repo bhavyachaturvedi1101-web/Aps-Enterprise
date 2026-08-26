@@ -3,7 +3,7 @@
  * A3 Service — Internal NL Query Engine
  * ──────────────────────────────────────
  * LLM_PROVIDER = 'mock'   → rule-based engine (default)
- * LLM_PROVIDER = 'groq'   → Llama 3.3 70B via Groq (fast & free)
+ * LLM_PROVIDER = 'groq'   → GROQ_MODEL=groq/compounda Groq (fast & free)
  * LLM_PROVIDER = 'gemini' → Gemini 1.5 Flash
  * LLM_PROVIDER = 'openai' → GPT-4o-mini
  */
@@ -18,7 +18,8 @@ function getHistory(conversationId) {
   if (!conversationId) return [];
   const entry = conversationStore.get(conversationId);
   if (!entry) return [];
-  if (Date.now() - entry.lastAccess > 30 * 60 * 1000) {
+  // Extended timeout: 120 minutes for long working sessions
+  if (Date.now() - entry.lastAccess > 120 * 60 * 1000) {
     conversationStore.delete(conversationId);
     return [];
   }
@@ -29,15 +30,30 @@ function getHistory(conversationId) {
 function addToHistory(conversationId, userMsg, botMsg) {
   if (!conversationId) return;
   if (!conversationStore.has(conversationId)) {
-    conversationStore.set(conversationId, { messages: [], lastAccess: Date.now() });
+    conversationStore.set(conversationId, { messages: [], lastAccess: Date.now(), context: {} });
   }
   const entry = conversationStore.get(conversationId);
-  const cleanUser = (typeof userMsg === 'string' ? userMsg : '').slice(0, 800);
-  const cleanBot = (typeof botMsg === 'string' ? botMsg : (botMsg?.text || '')).slice(0, 1500);
+  const cleanUser = (typeof userMsg === 'string' ? userMsg : '').slice(0, 1200);
+  const cleanBot = (typeof botMsg === 'string' ? botMsg : (botMsg?.text || '')).slice(0, 2500);
   entry.messages.push({ role: 'user', content: cleanUser });
   entry.messages.push({ role: 'assistant', content: cleanBot });
-  if (entry.messages.length > 20) entry.messages = entry.messages.slice(-20);
+  // Extended memory: 40 messages (20 turns)
+  if (entry.messages.length > 40) entry.messages = entry.messages.slice(-40);
   entry.lastAccess = Date.now();
+}
+
+function setContextMeta(conversationId, key, value) {
+  if (!conversationId) return;
+  if (!conversationStore.has(conversationId)) {
+    conversationStore.set(conversationId, { messages: [], lastAccess: Date.now(), context: {} });
+  }
+  conversationStore.get(conversationId).context[key] = value;
+}
+
+function getContextMeta(conversationId, key) {
+  if (!conversationId) return undefined;
+  const entry = conversationStore.get(conversationId);
+  return entry?.context?.[key];
 }
 
 // ─── Intent Recognition ────────────────────────────────────────────────────────
@@ -154,6 +170,30 @@ const INTENTS = [
   { name: 'action_queue_dialer',    patterns: [/queue.*call/i, /add.*dialer/i, /trigger.*call/i, /call.*lead/i, /dialer me daalo/i, /call karo/i, /voice call/i] },
   { name: 'action_send_whatsapp',   patterns: [/send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i] },
   { name: 'leads_by_stage',   patterns: [/confirmed lead/i, /qualified lead/i, /enquir/i, /in production/i, /dispatched/i, /booked lead/i, /client.*paid/i, /paid.*client/i] },
+  { name: 'show_all_crm_leads', patterns: [
+    /show.*crm/i,
+    /show.*all.*lead/i,
+    /show.*lead/i,
+    /list.*all.*lead/i,
+    /list.*lead/i,
+    /all.*crm.*lead/i,
+    /crm.*lead/i,
+    /display.*lead/i,
+    /get.*all.*lead/i,
+    /view.*lead/i,
+    /see.*all.*lead/i,
+    /all lead/i,
+    /lead.*list/i,
+    /lead.*table/i,
+    /lead.*data/i,
+    /lead.*database/i,
+    /full.*lead/i,
+    /complete.*lead/i,
+    /saare lead/i,
+    /sab lead/i,
+    /lead dikhao/i,
+    /sabke lead/i
+  ] },
   { name: 'lead_count',       patterns: [/how many lead/i, /total lead/i, /count.*lead/i, /lead.*count/i, /number of lead/i, /kitne lead/i, /total kitne/i] },
   { name: 'pending_payment',  patterns: [/pending payment/i, /awaiting payment/i, /payment.*pending/i, /not.*paid/i, /unpaid/i, /due payment/i, /advance.*due/i, /kiska payment/i, /paise baki/i, /advance baaki/i] },
   { name: 'top_performer',    patterns: [/top perform/i, /top employee/i, /best.*employee/i, /highest.*sales/i, /most.*lead/i, /who.*sold/i, /best.*agent/i, /who.*best/i, /highest.*kpi/i, /sabse achha/i, /kaun top/i, /best seller/i] },
@@ -204,15 +244,62 @@ async function handleLeadsByStage(query) {
   const stage = detectStage(query);
   const store = await getStore();
   let leads = store.mockLeads || [];
+  const empMap = (store.mockEmployees || []).reduce((acc, e) => { acc[e.id] = e.name; return acc; }, {});
   if (stage) leads = leads.filter(l => l.stage === stage);
+  const total = leads.length;
   return {
-    text: `Found **${leads.length}** lead${leads.length !== 1 ? 's' : ''} ${stage ? `in stage: **${stage}**` : 'across all stages'}.`,
-    table: leads.slice(0, 20).map(l => ({
-      Name: l.name, Stage: l.stage,
+    text: `Found **${total}** lead${total !== 1 ? 's' : ''} ${stage ? `in stage: **${stage}**` : 'across all stages'}.`,
+    table: leads.map(l => ({
+      ID: l.id,
+      Name: l.name,
+      Company: l.company || '—',
+      Stage: l.stage,
       Budget: l.budget ? `₹${Number(l.budget).toLocaleString('en-IN')}` : '—',
-      Assigned: l.assignedEmployeeId || 'Unassigned'
+      Interest: l.interest || '—',
+      Source: l.source || '—',
+      Assigned: empMap[l.assignedEmployeeId] || l.assignedEmployeeId || 'Unassigned',
+      'Created': l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-IN') : '—'
     })),
     chart: null
+  };
+}
+
+// ─── Show ALL CRM Leads — Full Data, No Caps ───────────────────────────────────
+async function handleShowAllCrmLeads(query) {
+  const store = await getStore();
+  const leads = store.mockLeads || [];
+  const empMap = (store.mockEmployees || []).reduce((acc, e) => { acc[e.id] = e.name; return acc; }, {});
+
+  const stages = ['Enquiry','Qualified','Booked','Confirmed Lead','Client (Paid)','In Production','Dispatched'];
+  const stageCounts = stages.map(s => leads.filter(l => l.stage === s).length);
+  const closedLeads = leads.filter(l => ['Client (Paid)','In Production','Dispatched'].includes(l.stage));
+  const totalRevenue = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+
+  return {
+    text: `### 📊 Complete CRM Lead Database — ${leads.length} Total Records\n\n` +
+      `**Pipeline Breakdown:**\n` +
+      stages.map((s, i) => `• **${s}**: ${stageCounts[i]} leads`).join('\n') +
+      `\n\n**Closed Revenue**: ₹${totalRevenue.toLocaleString('en-IN')} from ${closedLeads.length} closed deals.`,
+    table: leads.map(l => ({
+      ID: l.id,
+      Name: l.name,
+      Company: l.company || '—',
+      Stage: l.stage,
+      Budget: l.budget ? `₹${Number(l.budget).toLocaleString('en-IN')}` : '—',
+      Interest: (l.interest || '—').slice(0, 35),
+      Phone: l.phone || '—',
+      Source: l.source || '—',
+      'Tally Verified': l.tallyPaymentVerified ? '✅ Yes' : '❌ No',
+      'ERP Booked': l.erpBookingCreated ? '✅ Yes' : '❌ No',
+      Assigned: empMap[l.assignedEmployeeId] || l.assignedEmployeeId || 'Unassigned',
+      'Created Date': l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-IN') : '—'
+    })),
+    chart: {
+      type: 'bar',
+      title: 'CRM Pipeline — All Leads by Stage',
+      labels: stages.map(s => s.replace('Client (Paid)', 'Paid').replace('Confirmed Lead', 'Confirmed').replace('In Production', 'Production')),
+      datasets: [{ label: 'Lead Count', data: stageCounts, color: '#6366f1' }]
+    }
   };
 }
 
@@ -359,11 +446,84 @@ async function handleRevenueSummary() {
   };
 }
 
-async function handleEmployeeList() {
+function filterEmployeesByQuery(employees, query) {
+  if (!query) return { employees, label: 'All Registered Employees' };
+  const qLower = query.toLowerCase();
+  
+  if (qLower.includes('telecaller') || qLower.includes('voice') || qLower.includes('dialer') || qLower.includes('calling') || qLower.includes('caller')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('telecaller') || r.includes('voice') || r.includes('dialer') || r.includes('calling') || d.includes('voice') || d.includes('telecalling');
+    });
+    return { employees: filtered, label: 'Telecaller & Voice Operations Team' };
+  }
+  
+  if (qLower.includes('sales') || qLower.includes('executive') || qLower.includes('bd') || qLower.includes('business development') || qLower.includes('champion')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('sales') || r.includes('executive') || r.includes('bd') || r.includes('business development') || r.includes('champion') || d.includes('sales');
+    });
+    return { employees: filtered, label: 'Sales & Business Development Team' };
+  }
+  
+  if (qLower.includes('account') || qLower.includes('finance') || qLower.includes('tax') || qLower.includes('gst') || qLower.includes('tally')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('account') || r.includes('finance') || r.includes('tax') || r.includes('gst') || r.includes('tally') || d.includes('finance') || d.includes('accounting');
+    });
+    return { employees: filtered, label: 'Finance, Accounts & GST Team' };
+  }
+  
+  if (qLower.includes('production') || qLower.includes('factory') || qLower.includes('shopfloor') || qLower.includes('assembly') || qLower.includes('supervisor') || qLower.includes('fitter') || qLower.includes('technician') || qLower.includes('qc') || qLower.includes('quality') || qLower.includes('testing')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('production') || r.includes('factory') || r.includes('shopfloor') || r.includes('assembly') || r.includes('supervisor') || r.includes('fitter') || r.includes('technician') || r.includes('qc') || r.includes('quality') || r.includes('testing') || d.includes('production') || d.includes('factory');
+    });
+    return { employees: filtered, label: 'Factory Shopfloor & Quality Control Team' };
+  }
+  
+  if (qLower.includes('dispatch') || qLower.includes('logistics') || qLower.includes('warehouse') || qLower.includes('shipping')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || r.includes('shipping') || d.includes('dispatch') || d.includes('logistics') || d.includes('warehouse');
+    });
+    return { employees: filtered, label: 'Logistics, Warehouse & Dispatch Team' };
+  }
+  
+  if (qLower.includes('whatsapp') || qLower.includes('marketing') || qLower.includes('automation') || qLower.includes('ninja')) {
+    const filtered = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('whatsapp') || r.includes('marketing') || r.includes('automation') || r.includes('ninja') || d.includes('marketing') || d.includes('automation');
+    });
+    return { employees: filtered, label: 'Marketing & WhatsApp Automation Team' };
+  }
+
+  // Check if a specific employee name is mentioned
+  const namedEmp = employees.find(e => {
+    const nameParts = (e.name || '').toLowerCase().split(' ');
+    return nameParts.some(part => part.length > 2 && qLower.includes(part));
+  });
+  if (namedEmp) {
+    const firstName = namedEmp.name.split(' ')[0].toLowerCase();
+    const filtered = employees.filter(e => e.name.toLowerCase().includes(firstName));
+    return { employees: filtered, label: `Performance Profile: ${namedEmp.name}` };
+  }
+
+  return { employees, label: 'All Registered Employees' };
+}
+
+async function handleEmployeeList(query) {
   const store = await getStore();
-  const employees = store.mockEmployees || [];
+  const rawEmployees = store.mockEmployees || [];
+  const { employees, label } = filterEmployeesByQuery(rawEmployees, query);
   return {
-    text: `**${employees.length} employees** are registered in the system.`,
+    text: `**${employees.length} employees** are listed under **${label}**.`,
     table: employees.map(e => ({ Name: e.name, Role: e.role || '—', KPI: e.kpiScore || '—', 'Sales Closed': e.salesClosed || 0, Revenue: `₹${(e.totalRevenue || 0).toLocaleString('en-IN')}`, Status: e.status || 'Active' })),
     chart: null
   };
@@ -690,6 +850,72 @@ async function handleEmployeePerformance(query) {
   const rawEmployees = store.mockEmployees || [];
   const format = detectRequestedFormat(query);
   const dateStr = new Date().toISOString().slice(0, 10);
+  const qLower = (query || '').toLowerCase();
+
+  // Specific role / department / name filtering based on query keywords
+  let employees = [...rawEmployees];
+  let categoryLabel = 'All Registered Employees';
+
+  if (qLower.includes('telecaller') || qLower.includes('voice') || qLower.includes('dialer') || qLower.includes('calling') || qLower.includes('caller')) {
+    categoryLabel = 'Telecaller & Voice Operations Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('telecaller') || r.includes('voice') || r.includes('dialer') || r.includes('calling') || d.includes('voice') || d.includes('telecalling');
+    });
+  } else if (qLower.includes('sales') || qLower.includes('executive') || qLower.includes('bd') || qLower.includes('business development') || qLower.includes('champion')) {
+    categoryLabel = 'Sales & Business Development Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('sales') || r.includes('executive') || r.includes('bd') || r.includes('business development') || r.includes('champion') || d.includes('sales');
+    });
+  } else if (qLower.includes('account') || qLower.includes('finance') || qLower.includes('tax') || qLower.includes('gst') || qLower.includes('tally')) {
+    categoryLabel = 'Finance, Accounts & GST Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('account') || r.includes('finance') || r.includes('tax') || r.includes('gst') || r.includes('tally') || d.includes('finance') || d.includes('accounting');
+    });
+  } else if (qLower.includes('production') || qLower.includes('factory') || qLower.includes('shopfloor') || qLower.includes('assembly') || qLower.includes('supervisor') || qLower.includes('fitter') || qLower.includes('technician') || qLower.includes('qc') || qLower.includes('quality') || qLower.includes('testing')) {
+    categoryLabel = 'Factory Shopfloor & Quality Control Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('production') || r.includes('factory') || r.includes('shopfloor') || r.includes('assembly') || r.includes('supervisor') || r.includes('fitter') || r.includes('technician') || r.includes('qc') || r.includes('quality') || r.includes('testing') || d.includes('production') || d.includes('factory');
+    });
+  } else if (qLower.includes('dispatch') || qLower.includes('logistics') || qLower.includes('warehouse') || qLower.includes('shipping')) {
+    categoryLabel = 'Logistics, Warehouse & Dispatch Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || r.includes('shipping') || d.includes('dispatch') || d.includes('logistics') || d.includes('warehouse');
+    });
+  } else if (qLower.includes('whatsapp') || qLower.includes('marketing') || qLower.includes('automation') || qLower.includes('ninja')) {
+    categoryLabel = 'Marketing & WhatsApp Automation Team';
+    employees = employees.filter(e => {
+      const r = (e.role || '').toLowerCase();
+      const d = (e.department || '').toLowerCase();
+      return r.includes('whatsapp') || r.includes('marketing') || r.includes('automation') || r.includes('ninja') || d.includes('marketing') || d.includes('automation');
+    });
+  } else {
+    // Check if a specific employee name is mentioned
+    const namedEmp = employees.find(e => {
+      const nameParts = (e.name || '').toLowerCase().split(' ');
+      return nameParts.some(part => part.length > 2 && qLower.includes(part));
+    });
+    if (namedEmp) {
+      const firstName = namedEmp.name.split(' ')[0].toLowerCase();
+      categoryLabel = `Performance Profile: ${namedEmp.name}`;
+      employees = employees.filter(e => e.name.toLowerCase().includes(firstName));
+    }
+  }
+
+  // Fallback to all if no filter matched or matched no one
+  if (employees.length === 0) {
+    employees = [...rawEmployees];
+    categoryLabel = 'All Registered Employees';
+  }
 
   // Operational base costs per employee (monthly salary + dialer + compute + travel overhead)
   const costMap = {
@@ -700,7 +926,7 @@ async function handleEmployeePerformance(query) {
     e5: 40000  // Rohan
   };
 
-  const employeesData = rawEmployees.map(e => {
+  const employeesData = employees.map(e => {
     const costSpent = costMap[e.id] || 35000;
     const totalRevenue = Number(e.totalRevenue || 0);
     // Estimated machine COGS & manufacturing cost ~ 50% of revenue
@@ -725,8 +951,8 @@ async function handleEmployeePerformance(query) {
   const exportObj = format ? buildEmployeePerformanceExport(employeesData, format, dateStr) : null;
 
   return {
-    text: `**APS Employee Performance, Operational Cost & Net Profit Analysis**:\n\n` +
-      `• **Total Team Closed Revenue**: **₹${totalRev.toLocaleString('en-IN')}** across **${totalDeals} closed deals**\n` +
+    text: `**APS Employee Performance, Cost & Profit Analysis — ${categoryLabel}**:\n\n` +
+      `• **Total Closed Revenue**: **₹${totalRev.toLocaleString('en-IN')}** across **${totalDeals} closed deals**\n` +
       `• **Total Operational Cost Spent**: **₹${totalCost.toLocaleString('en-IN')}** (Salaries, Dialer & Travel)\n` +
       `• **Net Profit Gained for APS**: **₹${totalProfit.toLocaleString('en-IN')}** (Average Team ROI: **${avgRoi}%**)\n\n` +
       employeesData.map(e => `• **${e.name}** (${e.role}): Spent **₹${e.costSpent.toLocaleString('en-IN')}** | Closed **₹${e.totalRevenue.toLocaleString('en-IN')}** (${e.salesClosed} deals) | Net Profit: **₹${e.netProfit.toLocaleString('en-IN')}** | ROI: **${e.roi}%** | KPI: **${e.kpiScore}**`).join('\n') +
@@ -744,12 +970,12 @@ async function handleEmployeePerformance(query) {
     })),
     chart: {
       type: 'bar',
-      title: 'Employee Performance: Cost Spent vs Net Profit Gained vs Revenue Closed',
-      labels: employeesData.map(e => e.name.split(' ')[0]),
+      title: `${categoryLabel} Performance: Cost Spent vs Net Profit vs Revenue`,
+      labels: employeesData.slice(0, 15).map(e => e.name.split(' ')[0]), // slice labels to prevent chart crowding
       datasets: [
-        { label: 'Cost Spent (₹)', data: employeesData.map(e => e.costSpent), color: '#ef4444' },
-        { label: 'Net Profit Gained (₹)', data: employeesData.map(e => e.netProfit), color: '#10b981' },
-        { label: 'Revenue Closed (₹)', data: employeesData.map(e => e.totalRevenue), color: '#2563eb' }
+        { label: 'Cost Spent (₹)', data: employeesData.slice(0, 15).map(e => e.costSpent), color: '#ef4444' },
+        { label: 'Net Profit Gained (₹)', data: employeesData.slice(0, 15).map(e => e.netProfit), color: '#10b981' },
+        { label: 'Revenue Closed (₹)', data: employeesData.slice(0, 15).map(e => e.totalRevenue), color: '#2563eb' }
       ]
     }
   };
@@ -1616,22 +1842,8 @@ async function buildFullContext(query) {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const thisMonthLeads = leads.filter(l => new Date(l.createdAt || Date.now()) >= startOfMonth);
 
-  // ── Smart Query-Aware Employee Filter (Prevents TPM limit errors) ──────────
-  const filteredEmployees = employees.filter(e => {
-    if (qLower.includes(e.name.toLowerCase())) return true;
-    return false;
-  });
-
-  // Supplement with top performers up to 8 max
-  const sortedByKpi = [...employees].sort((a, b) => (b.kpiScoreNum || 0) - (a.kpiScoreNum || 0));
-  for (const e of sortedByKpi) {
-    if (filteredEmployees.length >= 8) break;
-    if (!filteredEmployees.some(x => x.id === e.id)) {
-      filteredEmployees.push(e);
-    }
-  }
-
-  const empDetails = filteredEmployees.map(e => {
+  // ── ALL Employees (no cap — full team context for AI) ──────────────────────
+  const empDetails = employees.map(e => {
     const active = e.activeTask
       ? `Active: "${e.activeTask.title}" [P:${e.activeTask.priority}, Lead: ${e.activeTask.leadName || 'N/A'}, Due: ${e.activeTask.dueIn || 'N/A'}]`
       : 'Active: None';
@@ -1639,28 +1851,19 @@ async function buildFullContext(query) {
       ? 'Queue: ' + e.taskQueue.map((t, i) => `${i + 1}."${t.title}"(${t.priority})`).join(' | ')
       : 'Queue: Empty';
     const convRate = e.conversionRate || (e.salesClosed && e.leadsAssigned ? `${Math.round((e.salesClosed / e.leadsAssigned) * 100)}%` : 'N/A');
-    return `• ${e.name} [${e.role} / ${e.department}] KPI=${e.kpiScore} Sales=${e.salesClosed} Rev=₹${(e.totalRevenue || 0).toLocaleString('en-IN')} Conv=${convRate} Calls=${e.callsHandled || 0}
-  ${active} | ${queued}`;
+    return `• ${e.name} [${e.role} / ${e.department}] KPI=${e.kpiScore} Sales=${e.salesClosed} Rev=₹${(e.totalRevenue || 0).toLocaleString('en-IN')} Conv=${convRate} Calls=${e.callsHandled || 0}\n  ${active} | ${queued}`;
   }).join('\n');
 
-  // ── Smart Query-Aware Lead Filter ──────────────────────────────────────────
-  const filteredLeads = leads.filter(l => {
-    if (qLower.includes((l.name || '').toLowerCase())) return true;
-    if (qLower.includes((l.company || '').toLowerCase())) return true;
-    return false;
-  });
+  // ── ALL Leads (no cap — full pipeline for AI context) ──────────────────────
+  // Prioritise leads mentioned in query, then all others
+  const mentionedLeads = leads.filter(l =>
+    qLower.includes((l.name || '').toLowerCase()) || qLower.includes((l.company || '').toLowerCase())
+  );
+  const remainingLeads = leads.filter(l => !mentionedLeads.some(x => x.id === l.id));
+  const allLeadsOrdered = [...mentionedLeads, ...remainingLeads];
 
-  // Supplement with high value leads up to 8 max
-  const sortedLeads = [...leads].sort((a, b) => (Number(b.budget) || 0) - (Number(a.budget) || 0));
-  for (const l of sortedLeads) {
-    if (filteredLeads.length >= 8) break;
-    if (!filteredLeads.some(x => x.id === l.id)) {
-      filteredLeads.push(l);
-    }
-  }
-
-  const leadDetails = filteredLeads.map(l =>
-    `[${l.stage}] ${l.name} | ₹${(Number(l.budget || l.dealValue || l.value) || 0).toLocaleString('en-IN')} | Prod:${l.product || l.machineRequired || 'N/A'} | Owner:${l.assignedTo || l.assignedEmployeeId || 'Unassigned'} | City:${l.city || l.location || 'N/A'}`
+  const leadDetails = allLeadsOrdered.map(l =>
+    `[${l.stage}] ${l.id} | ${l.name} (${l.company || 'N/A'}) | ₹${(Number(l.budget || l.dealValue || l.value) || 0).toLocaleString('en-IN')} | Product:${l.interest || l.product || l.machineRequired || 'N/A'} | Owner:${l.assignedTo || l.assignedEmployeeId || 'Unassigned'} | Tally:${l.tallyPaymentVerified ? 'Verified' : 'Pending'} | ERP:${l.erpBookingCreated ? 'Booked' : 'Pending'} | Source:${l.source || 'N/A'} | City:${l.city || l.location || 'N/A'}`
   ).join('\n');
 
   // ── Recent Activity Log (last 5) ─────────────────────────────────────────
@@ -1794,14 +1997,15 @@ async function callGroq(messages) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY not set');
 
-  // Primary model from env (GROQ_MODEL), then fallback chain
+  // Valid active models on this Groq account (verified 2026-08-26 via /v1/models API)
   const envModel = process.env.GROQ_MODEL;
   const fallbackChain = [
-    'groq/compound',                // Fallback 1: Mixtral/Llama4 scout hybrid
-    'groq/compound-mini',           // Fallback 2: Llama 3.3 70B hybrid
-    'openai/gpt-oss-120b',          // Fallback 3: GPT-OSS 120B
-    'openai/gpt-oss-20b',           // Fallback 4: GPT-OSS 20B
-    'qwen/qwen3.6-27b',             // Fallback 5: Qwen 27B
+    'groq/compound',          // Primary: Groq Compound (Llama 4 Scout hybrid, 131k ctx)
+    'openai/gpt-oss-120b',    // Fallback 1: GPT-OSS 120B via Groq (131k ctx)
+    'qwen/qwen3.8-27b',       // Fallback 2: Qwen3.8 27B (fast, multilingual)
+    'qwen/qwen3.6-27b',       // Fallback 3: Qwen3.6 27B
+    'openai/gpt-oss-20b',     // Fallback 4: GPT-OSS 20B (lightest, fastest)
+    'groq/compound-mini',     // Fallback 5: Compound Mini
   ];
   // Put env model first (deduplicated), then the rest of the chain
   const models = envModel
@@ -1817,22 +2021,24 @@ async function callGroq(messages) {
         { model, messages, temperature: 0.35, max_tokens: 4096, top_p: 0.95 }
       );
       if (result.error) {
-        lastError = new Error(result.error.message || JSON.stringify(result.error));
+        lastError = new Error(`[${model}] ${result.error.message || JSON.stringify(result.error)}`);
+        console.warn(`[A3 Groq] Model ${model} error — trying next:`, result.error.message);
         continue;
       }
       let content = result?.choices?.[0]?.message?.content || '';
       // Strip <think>...</think> reasoning tags if emitted by reasoning models
       content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       if (content) {
-        console.log(`[A3 Groq] Used model: ${model} | Chars: ${content.length}`);
+        console.log(`[A3 Groq] ✅ Used model: ${model} | Chars: ${content.length}`);
         return content;
       }
     } catch (err) {
       lastError = err;
+      console.warn(`[A3 Groq] Model ${model} threw:`, err.message);
     }
   }
 
-  throw lastError || new Error('All Groq models failed');
+  throw lastError || new Error('All Groq models failed — check GROQ_API_KEY validity');
 }
 
 async function callOpenAI(messages) {
@@ -2031,6 +2237,7 @@ ${context}`;
 async function handleAssignEmployeeTasks(query) {
   const store = await getStore();
   let employees = store.mockEmployees || [];
+  const qLower = (query || '').toLowerCase();
 
   if (!employees || employees.length === 0) {
     employees = [
@@ -2042,95 +2249,206 @@ async function handleAssignEmployeeTasks(query) {
     ];
   }
 
-  // Dynamic role-based task generator covering all 16 roles in mock data
-  const getRoleTasks = (role) => {
+  // ── Individual vs Bulk Assignment ─────────────────────────────────────────
+  // Bulk keywords: if any of these appear, assign to EVERYONE (never single-target)
+  const isBulkAssign = /\b(every|all|everyone|team|sabhi|sab ko|har ek|entire|whole|poori team|sab employees|sab log)\b/i.test(qLower);
+
+  let targetedEmployee = null;
+  if (!isBulkAssign) {
+    // Use word-boundary regex to avoid "every" matching "Eve", "Roy" matching "Roy" inside "every" etc.
+    targetedEmployee = employees.find(e => {
+      const fullName = e.name.toLowerCase();
+      const firstName = e.name.split(' ')[0].toLowerCase();
+      // Only match if the name appears as a whole word (not as a substring of another word)
+      const fullNameMatch = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
+      const firstNameMatch = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
+      return fullNameMatch || firstNameMatch;
+    });
+  }
+
+  if (targetedEmployee) {
+    // Assign only to the named employee
+    employees = [targetedEmployee];
+  }
+
+  // Comprehensive role-based task generator — covers ALL roles in mock data
+  const getRoleTasks = (role, empName) => {
     const r = (role || '').toLowerCase();
-    
-    if (r.includes('telecaller')) {
+    const n = (empName || '').toLowerCase();
+
+    // ── Voice / Dialer / Telecaller roles ─────────────────────────────────────
+    if (r.includes('telecaller') || r.includes('voice') || r.includes('dialer') || r.includes('voice specialist') || r.includes('voice lead')) {
       return {
-        activeTask: { title: 'Call 15 high-priority IndiaMart inbound inquiries', priority: 'HIGH', dueIn: '25 mins', leadName: 'IndiaMart Inbound' },
+        activeTask: { title: 'Call 15 high-priority IndiaMart inbound inquiries & qualify machine interest', priority: 'HIGH', dueIn: '25 mins', leadName: 'IndiaMart Inbound Queue' },
         taskQueue: [
-          { title: 'Log customer speech outcomes in CRM call records', priority: 'MEDIUM' },
-          { title: 'Follow up on silent leads from last month', priority: 'LOW' }
+          { title: 'Log call outcomes & speech sentiments in CRM system', priority: 'MEDIUM' },
+          { title: 'Follow up with cold leads unresponsive for 3+ days via callback', priority: 'MEDIUM' },
+          { title: 'Brief team on top 5 objections heard in today\'s call batch', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('sales executive')) {
+
+    // ── Sales / Sales Executive / Sales Champion / Admin roles ────────────────
+    if (r.includes('sales champion') || r.includes('system admin') || r.includes('admin') || r.includes('sales executive') || r.includes('sales rep') || r.includes('business development')) {
       return {
-        activeTask: { title: 'Draft custom commercial quotes for Double Die Machine orders', priority: 'HIGH', dueIn: '40 mins', leadName: 'High Value Leads' },
+        activeTask: { title: 'Review all Confirmed Lead stage clients & trigger 10% advance payment follow-ups', priority: 'URGENT', dueIn: '20 mins', leadName: 'Confirmed Lead Pipeline' },
         taskQueue: [
-          { title: 'Conduct video demo of Slipper Making Machine for Gujarat clients', priority: 'HIGH' },
-          { title: 'Review outstanding payment follow-ups', priority: 'MEDIUM' }
+          { title: 'Draft custom commercial quotation for top 3 Qualified leads', priority: 'HIGH' },
+          { title: 'Update CRM pipeline stages for leads that have responded', priority: 'HIGH' },
+          { title: 'Conduct video demo of Dona Pattal machine for Gujarat prospects', priority: 'MEDIUM' },
+          { title: 'Review weekly sales KPI report & submit to management', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('assembly supervisor')) {
+
+    // ── WhatsApp / Marketing / Automation roles ───────────────────────────────
+    if (r.includes('whatsapp') || r.includes('automation') || r.includes('marketing') || r.includes('ninja') || r.includes('campaign')) {
       return {
-        activeTask: { title: 'Inspect Assembly Line B spindle alignment and unit speed', priority: 'HIGH', dueIn: '35 mins', leadName: 'Assembly Line B' },
+        activeTask: { title: 'Launch WhatsApp payment reminder sequence for 8 Confirmed-stage leads', priority: 'HIGH', dueIn: '15 mins', leadName: 'A5 WhatsApp Automation' },
         taskQueue: [
-          { title: 'Update shift rotation roster and verify operator check-ins', priority: 'MEDIUM' },
-          { title: 'Conduct safety audit of component storage racks', priority: 'MEDIUM' }
+          { title: 'Analyse open rate & click-through for last campaign batch', priority: 'HIGH' },
+          { title: 'Create new product broadcast template for Paper Cup Machine', priority: 'MEDIUM' },
+          { title: 'Trigger dispatch notification sequence for all Dispatched-stage leads', priority: 'MEDIUM' },
+          { title: 'Review WABA template approval status for new season catalogue', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('machine fitter')) {
+
+    // ── Finance / Tax / GST / Accounts / Tally roles ──────────────────────────
+    if (r.includes('tax') || r.includes('gst') || r.includes('accountant') || r.includes('finance') || r.includes('accounts') || r.includes('tally') || r.includes('billing')) {
       return {
-        activeTask: { title: 'Align hydraulic press cylinders on Machine ID: #MAC-4412', priority: 'HIGH', dueIn: '50 mins', leadName: 'Fitting Floor' },
+        activeTask: { title: 'Reconcile 10% Tally advance deposit vouchers for all Confirmed Lead orders', priority: 'URGENT', dueIn: '20 mins', leadName: 'Tally Advance Gate' },
+        taskQueue: [
+          { title: 'Generate GST Tax Invoices (HSN 8458) for 4 new Client (Paid) leads', priority: 'HIGH' },
+          { title: 'Verify CGST/SGST split in pending invoices above ₹5L for e-IRN', priority: 'HIGH' },
+          { title: 'Process travel & operational expense claims for this week', priority: 'MEDIUM' },
+          { title: 'Prepare monthly ledger reconciliation report for management', priority: 'LOW' }
+        ]
+      };
+    }
+
+    // ── Factory / Shopfloor / ERP / Production / Operations roles ─────────────
+    if (r.includes('shopfloor') || r.includes('factory') || r.includes('production') || r.includes('erp') || r.includes('operations') || r.includes('manufacturing') || r.includes('plant')) {
+      return {
+        activeTask: { title: 'Release ERP job card for Pune Unit 1 — Hydraulic Press 500T (Bosch Chassis)', priority: 'URGENT', dueIn: '30 mins', leadName: 'ERP Shopfloor Release' },
+        taskQueue: [
+          { title: 'Update In-Production milestone progress for 3 active job cards', priority: 'HIGH' },
+          { title: 'Verify raw material stock levels before next assembly batch', priority: 'HIGH' },
+          { title: 'Schedule next shift rotation & confirm operator availability', priority: 'MEDIUM' },
+          { title: 'Conduct safety audit of Indore plant component storage zone', priority: 'LOW' }
+        ]
+      };
+    }
+
+    // ── Assembly Supervisor / Line Supervisor roles ───────────────────────────
+    if (r.includes('assembly') || r.includes('supervisor') || r.includes('line lead')) {
+      return {
+        activeTask: { title: 'Inspect Assembly Line B spindle alignment & output speed verification', priority: 'HIGH', dueIn: '35 mins', leadName: 'Assembly Line B' },
+        taskQueue: [
+          { title: 'Update shift rotation roster & log operator check-ins', priority: 'MEDIUM' },
+          { title: 'Conduct safety audit of component storage racks at Line A', priority: 'MEDIUM' },
+          { title: 'Report line efficiency figures to factory manager', priority: 'LOW' }
+        ]
+      };
+    }
+
+    // ── Machine Fitter / Technician roles ─────────────────────────────────────
+    if (r.includes('fitter') || r.includes('technician') || r.includes('mechanic') || r.includes('fitting')) {
+      return {
+        activeTask: { title: 'Align hydraulic press cylinders & oil seal on Machine #MAC-4412', priority: 'HIGH', dueIn: '50 mins', leadName: 'Fitting Floor' },
         taskQueue: [
           { title: 'Replace bearing components on CNC assembly line 2', priority: 'MEDIUM' },
-          { title: 'Perform calibration checklist on newly arrived component batches', priority: 'LOW' }
+          { title: 'Calibration checklist for newly arrived component batches', priority: 'MEDIUM' },
+          { title: 'Archive maintenance log entries for completed machines', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('quality testing')) {
+
+    // ── Quality Control / Testing / QA roles ──────────────────────────────────
+    if (r.includes('quality') || r.includes('testing') || r.includes('qc') || r.includes('qa') || r.includes('inspection')) {
       return {
-        activeTask: { title: 'Perform pressure stress test on completed Hydraulic Press 500T', priority: 'URGENT', dueIn: '15 mins', leadName: 'QC Clearance' },
+        activeTask: { title: 'Run full pressure stress test on completed Hydraulic Press 500T for QC clearance', priority: 'URGENT', dueIn: '15 mins', leadName: 'QC Final Clearance' },
         taskQueue: [
-          { title: 'Issue signed testing certificate for dispatched single-die machines', priority: 'HIGH' },
-          { title: 'Verify metal thickness tolerances using micro-calipers', priority: 'MEDIUM' }
+          { title: 'Issue signed QC certificate for 2 dispatched single-die machines', priority: 'HIGH' },
+          { title: 'Verify metal thickness tolerances using micro-calipers on batch 47', priority: 'MEDIUM' },
+          { title: 'Log QC test results into factory ERP system', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('dispatch') || r.includes('logistics')) {
+
+    // ── Dispatch / Logistics / Warehouse roles ────────────────────────────────
+    if (r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || r.includes('shipping') || r.includes('transport')) {
       return {
-        activeTask: { title: 'Generate E-Way bills & dispatch invoices for Kolkata heavy cargo', priority: 'HIGH', dueIn: '30 mins', leadName: 'Logistics Hub' },
+        activeTask: { title: 'Generate E-Way bills & dispatch tax invoices for Kolkata heavy cargo shipment', priority: 'HIGH', dueIn: '30 mins', leadName: 'Logistics Hub' },
         taskQueue: [
-          { title: 'Coordinate truck boarding sequence with transport association', priority: 'MEDIUM' },
-          { title: 'Inspect packaging integrity of heavy-duty Dona Pattal units', priority: 'HIGH' }
+          { title: 'Coordinate truck boarding sequence with transport partners', priority: 'HIGH' },
+          { title: 'Inspect packaging integrity of heavy-duty Dona Pattal units', priority: 'MEDIUM' },
+          { title: 'Update dispatch tracking status for all In-Production leads', priority: 'MEDIUM' }
         ]
       };
     }
-    if (r.includes('accounts') || r.includes('erp') || r.includes('tax')) {
+
+    // ── Spare Parts / After-Sales / Customer Service roles ────────────────────
+    if (r.includes('spare') || r.includes('service') || r.includes('after') || r.includes('support') || r.includes('customer service')) {
       return {
-        activeTask: { title: 'Reconcile 10% Tally deposit vouchers & verify GST invoices', priority: 'HIGH', dueIn: '20 mins', leadName: 'Finance Gateway' },
+        activeTask: { title: 'Coordinate emergency field service dispatch for Indore client repair request', priority: 'HIGH', dueIn: '45 mins', leadName: 'Customer Support Portal' },
         taskQueue: [
-          { title: 'Verify pending tax ledgers for unit-wise GST returns', priority: 'MEDIUM' },
-          { title: 'Process internal travel and operational expense bills', priority: 'LOW' }
+          { title: 'Process spare part replacement requests — heater elements & die springs', priority: 'HIGH' },
+          { title: 'Archive resolved maintenance tickets in CRM & close service loop', priority: 'MEDIUM' },
+          { title: 'Follow up on 3 pending AMC renewal clients', priority: 'LOW' }
         ]
       };
     }
-    if (r.includes('spare') || r.includes('service')) {
+
+    // ── Design / CAD / Engineering roles ──────────────────────────────────────
+    if (r.includes('design') || r.includes('cad') || r.includes('engineer') || r.includes('r&d') || r.includes('drawing')) {
       return {
-        activeTask: { title: 'Coordinate field service dispatch for Indore repair request', priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Customer Support' },
+        activeTask: { title: 'Finalise CAD drawing revision for custom 4-die Hydraulic Press client spec', priority: 'HIGH', dueIn: '40 mins', leadName: 'Custom Order Engineering' },
         taskQueue: [
-          { title: 'Process request logs for spare part replacement heaters', priority: 'HIGH' },
-          { title: 'Archive resolved maintenance tickets in database', priority: 'LOW' }
+          { title: 'Update BOM (Bill of Materials) for next production batch', priority: 'HIGH' },
+          { title: 'Review structural load calculations for new press frame design', priority: 'MEDIUM' },
+          { title: 'Archive old revision drawings to document management system', priority: 'LOW' }
         ]
       };
     }
-    
-    // Default fallback task allocation
+
+    // ── Procurement / Purchase roles ──────────────────────────────────────────
+    if (r.includes('purchase') || r.includes('procurement') || r.includes('vendor') || r.includes('buyer') || r.includes('supply')) {
+      return {
+        activeTask: { title: 'Raise purchase orders for Raycus laser source & servo drives for Pune unit', priority: 'HIGH', dueIn: '35 mins', leadName: 'Procurement Gateway' },
+        taskQueue: [
+          { title: 'Compare 3 vendor quotes for hydraulic oil & seals', priority: 'MEDIUM' },
+          { title: 'Follow up on delayed motor delivery from Ahmedabad supplier', priority: 'HIGH' },
+          { title: 'Update approved vendor list in ERP system', priority: 'LOW' }
+        ]
+      };
+    }
+
+    // ── HR / Recruitment / Training roles ────────────────────────────────────
+    if (r.includes('hr') || r.includes('human resource') || r.includes('recruit') || r.includes('training') || r.includes('talent')) {
+      return {
+        activeTask: { title: 'Conduct onboarding session for 2 new telecaller hires joining today', priority: 'HIGH', dueIn: '30 mins', leadName: 'HR Onboarding' },
+        taskQueue: [
+          { title: 'Process monthly payroll inputs for all departments', priority: 'HIGH' },
+          { title: 'Schedule performance review calendar for Q3 2026', priority: 'MEDIUM' },
+          { title: 'Update employee attendance & leave balance records', priority: 'LOW' }
+        ]
+      };
+    }
+
+    // ── Default Fallback — smart general operational tasks ────────────────────
     return {
-      activeTask: { title: 'Audit assigned queue & execute operational routine check', priority: 'MEDIUM', dueIn: '60 mins', leadName: 'System General' },
+      activeTask: { title: `Review assigned CRM leads & execute role-specific operational tasks for ${empName || 'team'}`, priority: 'MEDIUM', dueIn: '60 mins', leadName: 'General Operations' },
       taskQueue: [
-        { title: 'Verify lead updates in CRM dashboard', priority: 'MEDIUM' },
-        { title: 'Prepare documentation reports for weekly meeting', priority: 'LOW' }
+        { title: 'Verify & update lead status changes in CRM dashboard', priority: 'MEDIUM' },
+        { title: 'Coordinate with adjacent department on pending cross-team items', priority: 'MEDIUM' },
+        { title: 'Prepare documentation & reports for weekly management review', priority: 'LOW' }
       ]
     };
   };
 
   const assignedList = employees.map((emp) => {
-    const roleMatch = getRoleTasks(emp.role);
+    const roleMatch = getRoleTasks(emp.role, emp.name);
 
     emp.activeTask = {
       id: `task-assign-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -2397,6 +2715,7 @@ async function processQuery(query, conversationId) {
       case 'action_send_email':      result = await handleActionSendEmail(query); break;
       case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
       case 'assign_employee_tasks':  result = await handleAssignEmployeeTasks(query); break;
+      case 'show_all_crm_leads':     result = await handleShowAllCrmLeads(query); break;
       case 'employee_performance':   result = await handleEmployeePerformance(query); break;
       case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
       case 'churn_risk':             result = await handleChurnRisk(query); break;
@@ -2420,7 +2739,7 @@ async function processQuery(query, conversationId) {
       case 'recent_activity':  result = await handleRecentActivity(); break;
       case 'pipeline_summary': result = await handlePipelineSummary(); break;
       case 'revenue_summary':  result = await handleRevenueSummary(); break;
-      case 'employee_list':    result = await handleEmployeeList(); break;
+      case 'employee_list':    result = await handleEmployeeList(query); break;
       case 'hot_leads':        result = await handleHotLeads(); break;
       case 'kpi_stats':        result = await handleKpiStats(); break;
       case 'dialer':           result = await handleDialer(); break;
@@ -2441,6 +2760,7 @@ async function processQuery(query, conversationId) {
         case 'action_send_email':      result = await handleActionSendEmail(query); break;
         case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
         case 'assign_employee_tasks':  result = await handleAssignEmployeeTasks(query); break;
+        case 'show_all_crm_leads':     result = await handleShowAllCrmLeads(query); break;
         case 'employee_performance':   result = await handleEmployeePerformance(query); break;
         case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
         case 'churn_risk':             result = await handleChurnRisk(query); break;
@@ -2463,7 +2783,7 @@ async function processQuery(query, conversationId) {
         case 'recent_activity':  result = await handleRecentActivity(); break;
         case 'pipeline_summary': result = await handlePipelineSummary(); break;
         case 'revenue_summary':  result = await handleRevenueSummary(); break;
-        case 'employee_list':    result = await handleEmployeeList(); break;
+        case 'employee_list':    result = await handleEmployeeList(query); break;
         case 'hot_leads':        result = await handleHotLeads(); break;
         case 'kpi_stats':        result = await handleKpiStats(); break;
         case 'dialer':           result = await handleDialer(); break;
