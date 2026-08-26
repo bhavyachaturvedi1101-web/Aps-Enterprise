@@ -8,16 +8,26 @@ const { authenticate } = require('./middleware/authMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ─── DB Init (runs on module load — works for both Vercel serverless & local server) ───
-// Cache the promise so we only connect once per cold start
-let _dbReady = null;
-const ensureDB = () => {
-  if (!_dbReady) _dbReady = connectDB().catch(err => {
-    console.error('[DB] Connection failed:', err.message);
-    _dbReady = null; // reset so next request retries
-    throw err;
-  });
-  return _dbReady;
+// ─── DB Init ───
+let _dbConnected = false;
+let _dbAttempted = false;
+
+const initDB = async () => {
+  if (_dbAttempted) return _dbConnected;
+  _dbAttempted = true;
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.log('[DB] No DATABASE_URL provided. Running in in-memory store mode.');
+      return false;
+    }
+    await connectDB();
+    _dbConnected = true;
+    return true;
+  } catch (err) {
+    console.warn(`[Warning] Database unavailable (${err.message}). Proceeding with in-memory store.`);
+    _dbConnected = false;
+    return false;
+  }
 };
 
 // Core Middleware
@@ -25,15 +35,12 @@ app.use(cors());
 app.use(express.json());
 app.use(authenticate);
 
-// Wait for DB before handling any request
+// Initialize DB on cold start without blocking requests on failure
 app.use(async (req, res, next) => {
-  try {
-    await ensureDB();
-    next();
-  } catch (err) {
-    console.warn('[Warning] Proceeding without Postgres database. Relying on inMemoryStore. Reason:', err.message);
-    next();
+  if (!_dbAttempted) {
+    await initDB();
   }
+  next();
 });
 
 // Disable caching for API responses
@@ -60,6 +67,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/employees', require('./routes/employees'));
 app.use('/api/activity', require('./routes/activity'));
+app.use('/api/inventory', require('./routes/inventory'));
 
 // A3 AI Chatbot — Internal NL Query Engine
 app.use('/api/a3', require('./routes/a3'));
@@ -69,6 +77,7 @@ app.use('/api/whatsapp', require('./routes/whatsapp'));
 app.use('/api/config', require('./routes/config'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/notifications', require('./routes/notifications'));
+
 
 
 // Safe Error handling middleware
@@ -85,7 +94,7 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`APS Enterprise backend running on port ${PORT}`);
   });
-  ensureDB().catch(err => {
+  initDB().catch(err => {
     console.warn('DB connection failed on startup, using in-memory store:', err.message);
   });
 }

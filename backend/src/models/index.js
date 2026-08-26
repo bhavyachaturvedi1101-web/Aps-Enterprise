@@ -3,6 +3,7 @@ const Lead = require('./Lead');
 const Booking = require('./Booking');
 const Payment = require('./Payment');
 const ActivityLog = require('./ActivityLog');
+const Inventory = require('./Inventory');
 
 // Establish associations
 
@@ -31,5 +32,7 @@ module.exports = {
   Lead,
   Booking,
   Payment,
-  ActivityLog
+  ActivityLog,
+  Inventory
 };
+
