@@ -994,9 +994,63 @@ export default function APSAIPage() {
 
         {/* Right Side: Chat Conversation Area */}
         <div style={s.chatContainer}>
+          <style>{`
+            .apsai-landing-card {
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .apsai-landing-card:hover {
+              border-color: #2563eb !important;
+              background-color: #f8fafc !important;
+              box-shadow: 0 4px 14px rgba(37,99,235,0.08) !important;
+              transform: translateY(-2px);
+            }
+          `}</style>
           {/* Messages scroll area */}
           <div style={s.messagesArea} id="apsai-page-messages">
-            {messages.map((msg, i) => <MessageCard key={i} msg={msg} />)}
+            {messages.length === 1 && messages[0].isWelcome ? (
+              <div style={s.welcomeLanding}>
+                <h1 style={s.welcomeHeader}>How can I help you today?</h1>
+                <p style={s.welcomeSub}>
+                  Your real-time operations co-pilot for **APS Enterprise**. Control tasks, dialers, CRM, invoices, and Tally in English, Hindi, or Hinglish.
+                </p>
+                
+                <div style={s.landingGrid}>
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("give tasks to every employee related to their role")}>
+                    <div style={s.cardIcon}>📋</div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>Assign Team Tasks</div>
+                      <div style={s.cardDesc}>Allocate role-based task backlogs to all staff members instantly.</div>
+                    </div>
+                  </div>
+                  
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("generate GST tax invoice for ₹3,49,000")}>
+                    <div style={s.cardIcon}>🧾</div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>Billing & Invoices</div>
+                      <div style={s.cardDesc}>Generate proforma or tax invoices with 18% GST splits.</div>
+                    </div>
+                  </div>
+                  
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("schedule Jane Smith follow up call tomorrow 11 am")}>
+                    <div style={s.cardIcon}>📞</div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>Voice Dialer</div>
+                      <div style={s.cardDesc}>Schedule follow-up calls or run sentiment audits on call logs.</div>
+                    </div>
+                  </div>
+                  
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("show factory assembly lines progress")}>
+                    <div style={s.cardIcon}>🏭</div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>Production Progress</div>
+                      <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              messages.map((msg, i) => <MessageCard key={i} msg={msg} />)
+            )}
             <div ref={bottomRef} />
           </div>
 
@@ -1085,6 +1139,83 @@ export default function APSAIPage() {
 
 // ─── STYLES (Light Professional Theme) ────────────────────────────────────────
 const s = {
+  // Welcome landing layout (like ChatGPT / Gemini)
+  welcomeLanding: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    minHeight: '85%',
+    padding: '2rem 1.5rem',
+    boxSizing: 'border-box'
+  },
+  welcomeHeader: {
+    fontSize: '2.4rem',
+    fontWeight: 800,
+    margin: '0 0 0.8rem 0',
+    letterSpacing: '-0.8px',
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #4f46e5 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontFamily: 'Inter, -apple-system, sans-serif'
+  },
+  welcomeSub: {
+    fontSize: '0.94rem',
+    color: '#64748b',
+    maxWidth: '540px',
+    margin: '0 0 2.8rem 0',
+    lineHeight: 1.6
+  },
+  landingGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '1.2rem',
+    width: '100%',
+    maxWidth: '680px',
+    boxSizing: 'border-box'
+  },
+  landingCard: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '14px',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '16px',
+    padding: '18px 20px',
+    cursor: 'pointer',
+    textAlign: 'left',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
+    boxSizing: 'border-box'
+  },
+  cardIcon: {
+    fontSize: '1.5rem',
+    width: 44,
+    height: 44,
+    background: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
+  },
+  cardContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px'
+  },
+  cardTitle: {
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    color: '#0f172a'
+  },
+  cardDesc: {
+    fontSize: '0.76rem',
+    color: '#64748b',
+    lineHeight: 1.45
+  },
+
   pageWrapper: {
     padding: '1.5rem 2rem 2rem',
     fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
