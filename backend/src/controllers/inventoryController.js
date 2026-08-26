@@ -16,9 +16,13 @@ const getInventory = async (req, res) => {
     const { category, status, search } = req.query;
 
     if (isDbAvailable()) {
-      const items = await Inventory.findAll({ order: [['name', 'ASC']] });
-      if (items && items.length > 0) {
-        return res.json({ success: true, count: items.length, inventory: items });
+      try {
+        const items = await Inventory.findAll({ order: [['name', 'ASC']] });
+        if (items && items.length > 0) {
+          return res.json({ success: true, count: items.length, inventory: items });
+        }
+      } catch (dbErr) {
+        console.warn('[Warning] Database query for inventory failed, falling back to mock:', dbErr.message);
       }
     }
 
@@ -73,21 +77,25 @@ const getInventorySummary = async (req, res) => {
     let inventory = [];
 
     if (isDbAvailable()) {
-      const dbItems = await Inventory.findAll();
-      if (dbItems && dbItems.length > 0) {
-        inventory = dbItems.map(item => ({
-          id: item.id,
-          sku: item.sku,
-          name: item.name,
-          category: item.category,
-          totalStock: item.totalStock,
-          bookedStock: item.bookedStock,
-          availableStock: Math.max(0, item.totalStock - item.bookedStock),
-          minStockThreshold: item.minStockThreshold,
-          unitPrice: Number(item.unitPrice),
-          status: item.status,
-          warehouse: item.location
-        }));
+      try {
+        const dbItems = await Inventory.findAll();
+        if (dbItems && dbItems.length > 0) {
+          inventory = dbItems.map(item => ({
+            id: item.id,
+            sku: item.sku,
+            name: item.name,
+            category: item.category,
+            totalStock: item.totalStock,
+            bookedStock: item.bookedStock,
+            availableStock: Math.max(0, item.totalStock - item.bookedStock),
+            minStockThreshold: item.minStockThreshold,
+            unitPrice: Number(item.unitPrice),
+            status: item.status,
+            warehouse: item.location
+          }));
+        }
+      } catch (dbErr) {
+        console.warn('[Warning] Database query for inventory summary failed, falling back to mock:', dbErr.message);
       }
     }
 
@@ -172,16 +180,20 @@ const createOrUpdateInventory = async (req, res) => {
     }
 
     if (isDbAvailable()) {
-      let item;
-      if (id) {
-        item = await Inventory.findByPk(id);
-        if (item) {
-          await item.update({ sku, name, category, totalStock, bookedStock, minStockThreshold, unitPrice, location });
-          return res.json({ success: true, message: 'Inventory updated', item });
+      try {
+        let item;
+        if (id) {
+          item = await Inventory.findByPk(id);
+          if (item) {
+            await item.update({ sku, name, category, totalStock, bookedStock, minStockThreshold, unitPrice, location });
+            return res.json({ success: true, message: 'Inventory updated', item });
+          }
         }
+        item = await Inventory.create({ sku, name, category, totalStock, bookedStock, minStockThreshold, unitPrice, location });
+        return res.status(201).json({ success: true, message: 'Inventory created', item });
+      } catch (dbErr) {
+        console.warn('[Warning] Database write for inventory failed, falling back to mock:', dbErr.message);
       }
-      item = await Inventory.create({ sku, name, category, totalStock, bookedStock, minStockThreshold, unitPrice, location });
-      return res.status(201).json({ success: true, message: 'Inventory created', item });
     }
 
     // In-memory update
