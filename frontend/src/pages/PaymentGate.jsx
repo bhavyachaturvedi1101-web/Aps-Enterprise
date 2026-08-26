@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MOCK_PAYMENTS } from '../mockData';
 
-const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 export default function PaymentGate() {
   const [payments, setPayments] = useState(MOCK_PAYMENTS);

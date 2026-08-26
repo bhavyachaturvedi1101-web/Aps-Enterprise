@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import CRMLeads from './CRMLeads';
 import { MOCK_LEADS, MOCK_ACTIVITY_LOGS, MOCK_INVENTORY, MOCK_INVENTORY_SUMMARY } from '../mockData';
 
-const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 
 // ─── Data ────────────────────────────────────────────────────────────────────

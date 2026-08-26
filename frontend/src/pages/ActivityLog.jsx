@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { MOCK_ACTIVITY_LOGS, MOCK_EMPLOYEES } from '../mockData';
 
-const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 export default function ActivityLog() {
   const [logs, setLogs] = useState(MOCK_ACTIVITY_LOGS);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MOCK_BOOKINGS } from '../mockData';
 
-const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 const STATUS_STYLES = {
   'Booking Created': { color: '#1d4ed8', dot: '#3b82f6' },
