@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CRMLeads from './CRMLeads';
-import { MOCK_LEADS, MOCK_ACTIVITY_LOGS } from '../mockData';
+import { MOCK_LEADS, MOCK_ACTIVITY_LOGS, MOCK_INVENTORY, MOCK_INVENTORY_SUMMARY } from '../mockData';
 
 const API = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 const PIPELINE_STAGES = [
@@ -79,6 +80,8 @@ export default function Dashboard() {
 
   const [leads, setLeads] = useState(MOCK_LEADS);
   const [activityLogs, setActivityLogs] = useState(MOCK_ACTIVITY_LOGS);
+  const [inventorySummary, setInventorySummary] = useState(MOCK_INVENTORY_SUMMARY);
+  const [inventoryItems, setInventoryItems] = useState(MOCK_INVENTORY);
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newLead, setNewLead] = useState({ name: '', interest: 'CNC Router Pro', budget: '25000', source: 'Meta Ads', notes: '' });
@@ -121,18 +124,33 @@ export default function Dashboard() {
     { id: 1, text: 'How Can I Assist You Today', sender: 'ai', isHeader: true }
   ]);
 
-  // Fetch leads and activities
+  // Fetch leads, activities, and inventory summary
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const leadsRes = await fetch(`${API}/leads`);
-        const leadsData = await leadsRes.json();
-        
-        const activityRes = await fetch(`${API}/activity`);
-        const activityData = await activityRes.json();
+        const [leadsRes, activityRes, invSummaryRes, invItemsRes] = await Promise.allSettled([
+          fetch(`${API}/leads`),
+          fetch(`${API}/activity`),
+          fetch(`${API}/inventory/summary`),
+          fetch(`${API}/inventory`)
+        ]);
 
-        setLeads(leadsData.leads || []);
-        setActivityLogs(activityData.activityLogs || []);
+        if (leadsRes.status === 'fulfilled' && leadsRes.value.ok) {
+          const data = await leadsRes.value.json();
+          setLeads(data.leads || []);
+        }
+        if (activityRes.status === 'fulfilled' && activityRes.value.ok) {
+          const data = await activityRes.value.json();
+          setActivityLogs(data.activityLogs || []);
+        }
+        if (invSummaryRes.status === 'fulfilled' && invSummaryRes.value.ok) {
+          const data = await invSummaryRes.value.json();
+          if (data.summary) setInventorySummary(data.summary);
+          if (data.topItems) setInventoryItems(data.topItems);
+        } else if (invItemsRes.status === 'fulfilled' && invItemsRes.value.ok) {
+          const data = await invItemsRes.value.json();
+          if (data.inventory) setInventoryItems(data.inventory);
+        }
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -141,6 +159,7 @@ export default function Dashboard() {
     };
     fetchData();
   }, [activeTab]);
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -415,11 +434,220 @@ export default function Dashboard() {
               );
             })}
           </div>
+          {/* ─── INVENTORY & STOCK TRACKER SECTION ──────────────────────────────── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+            <div style={s.secHead}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 10px #10b981' }} />
+                  <h2 style={{ ...s.secTitle, fontSize: '1.4rem' }}>Machinery Stock & Available Inventory</h2>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>
+                  Live plant inventory balance: Available = Total Units − ERP Booked Units
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#047857', background: '#ecfdf5', padding: '4px 10px', borderRadius: 20, border: '1px solid #a7f3d0' }}>
+                  {inventorySummary.inStockCount || 0} In-Stock SKUs
+                </span>
+                {(inventorySummary.lowStockCount > 0 || inventorySummary.outOfStockCount > 0) && (
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b45309', background: '#fffbeb', padding: '4px 10px', borderRadius: 20, border: '1px solid #fde68a' }}>
+                    {(inventorySummary.lowStockCount || 0) + (inventorySummary.outOfStockCount || 0)} Stock Alerts
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* 4 Stock KPI Metric Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              {/* Total Stock */}
+              <div style={{ ...s.card, padding: '1.25rem 1.4rem', borderLeft: '4px solid #3b82f6', background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Stock</span>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#09090b', marginTop: '0.4rem', fontFamily: 'var(--font-heading)' }}>
+                  {inventorySummary.totalStock || 0} <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>Units</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#3b82f6', fontWeight: 600, marginTop: 4 }}>
+                  Across {inventorySummary.totalSKUs || inventoryItems.length} Machine Lines
+                </div>
+              </div>
+
+              {/* Available Stock */}
+              <div style={{ ...s.card, padding: '1.25rem 1.4rem', borderLeft: '4px solid #10b981', background: 'linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Available Stock</span>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#065f46', marginTop: '0.4rem', fontFamily: 'var(--font-heading)' }}>
+                  {inventorySummary.totalAvailable || 0} <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#047857' }}>Units</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, marginTop: 4 }}>
+                  {inventorySummary.totalStock > 0 ? `${Math.round((inventorySummary.totalAvailable / inventorySummary.totalStock) * 100)}% Live Available to Dispatch` : 'Ready to Sell'}
+                </div>
+              </div>
+
+              {/* Booked / Committed */}
+              <div style={{ ...s.card, padding: '1.25rem 1.4rem', borderLeft: '4px solid #a855f7', background: 'linear-gradient(180deg, #ffffff 0%, #faf5ff 100%)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#6b21a8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Booked in Pipeline</span>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a855f7' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#581c87', marginTop: '0.4rem', fontFamily: 'var(--font-heading)' }}>
+                  {inventorySummary.totalBooked || 0} <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#7e22ce' }}>Units</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#9333ea', fontWeight: 600, marginTop: 4 }}>
+                  Locked in Confirmed & Paid Orders
+                </div>
+              </div>
+
+              {/* Stock Alerts */}
+              <div style={{ ...s.card, padding: '1.25rem 1.4rem', borderLeft: '4px solid #f59e0b', background: 'linear-gradient(180deg, #ffffff 0%, #fffbeb 100%)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Low Stock / Reorder</span>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#78350f', marginTop: '0.4rem', fontFamily: 'var(--font-heading)' }}>
+                  {(inventorySummary.lowStockCount || 0) + (inventorySummary.outOfStockCount || 0)} <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#b45309' }}>Items</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#d97706', fontWeight: 600, marginTop: 4 }}>
+                  {inventorySummary.outOfStockCount > 0 ? `${inventorySummary.outOfStockCount} item(s) sold out` : 'Near threshold limit'}
+                </div>
+              </div>
+            </div>
+
+            {/* Machinery Stock Breakdown & Live Status List */}
+            <div style={{ ...s.card, padding: '1.5rem', background: '#fff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
+                <div>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b', fontFamily: 'var(--font-heading)' }}>
+                    Current Machinery Stock & Availability Breakdown
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>
+                    Real-time stock quantities across product catalog
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: 2, background: '#10b981' }} /> Available
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: 2, background: '#a855f7' }} /> Booked
+                  </div>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                {inventoryItems.slice(0, 6).map(item => {
+                  const total = item.totalStock || item.stockUnits || 0;
+                  const booked = item.bookedStock || item.reservedUnits || 0;
+                  const available = item.availableStock !== undefined ? item.availableStock : Math.max(0, total - booked);
+                  const availPct = total > 0 ? Math.round((available / total) * 100) : 0;
+                  const bookedPct = 100 - availPct;
+
+                  const isOutOfStock = available === 0;
+                  const isLowStock = available > 0 && available <= (item.minStockThreshold || item.minThreshold || 4);
+
+                  const badgeBg = isOutOfStock ? '#fef2f2' : isLowStock ? '#fffbeb' : '#ecfdf5';
+                  const badgeColor = isOutOfStock ? '#ef4444' : isLowStock ? '#d97706' : '#10b981';
+                  const badgeBorder = isOutOfStock ? '#fecaca' : isLowStock ? '#fde68a' : '#a7f3d0';
+                  const badgeText = isOutOfStock ? 'Sold Out' : isLowStock ? 'Low Stock' : 'In Stock';
+
+                  return (
+                    <div
+                      key={item.id || item.sku}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(220px, 1.8fr) minmax(140px, 1fr) minmax(180px, 1.4fr) minmax(130px, 0.8fr) 100px',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '0.85rem 1rem',
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 14,
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {/* Product Name & SKU */}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#09090b', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>
+                            {item.sku}
+                          </span>
+                          <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#09090b' }}>
+                            {item.name}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: 2 }}>
+                          {item.category} • {item.warehouse || 'Indore Main Plant'}
+                        </div>
+                      </div>
+
+                      {/* Unit Price */}
+                      <div>
+                        <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>Standard Unit Price</div>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>
+                          ₹{Number(item.unitPrice || 0).toLocaleString('en-IN')}
+                        </div>
+                      </div>
+
+                      {/* Visual Stock Progress Bar */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, marginBottom: 4 }}>
+                          <span style={{ color: '#047857' }}>{available} Avail ({availPct}%)</span>
+                          <span style={{ color: '#7e22ce' }}>{booked} Booked ({bookedPct}%)</span>
+                        </div>
+                        <div style={{ width: '100%', height: 8, backgroundColor: '#e2e8f0', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
+                          <div style={{ width: `${availPct}%`, backgroundColor: '#10b981', transition: 'width 0.4s ease' }} title={`Available: ${available}`} />
+                          <div style={{ width: `${bookedPct}%`, backgroundColor: '#c084fc', transition: 'width 0.4s ease' }} title={`Booked: ${booked}`} />
+                        </div>
+                      </div>
+
+                      {/* Stock Quantity Breakdown */}
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>Available / Total</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: available > 0 ? '#047857' : '#ef4444' }}>
+                          {available} <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>/ {total} Units</span>
+                        </div>
+                      </div>
+
+                      {/* Status Badge */}
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          padding: '3px 9px',
+                          borderRadius: 20,
+                          backgroundColor: badgeBg,
+                          color: badgeColor,
+                          border: `1px solid ${badgeBorder}`
+                        }}>
+                          {badgeText}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
 
           {/* Overview Header */}
           <div style={s.secHead}>
             <h2 style={s.secTitle}>Overview</h2>
           </div>
+
 
           {/* Three Card Grid */}
           <div className="grid-3col">

@@ -13592,3 +13592,96 @@ export const MOCK_PAYMENTS = [
     "daysOverdue": 0
   }
 ];
+
+export const MOCK_INVENTORY = [
+  {
+    id: "INV-101",
+    sku: "APS-DD-01",
+    name: "Fully Automatic Double Die Dona Pattal Machine",
+    category: "Paper Plate Machines",
+    totalStock: 18,
+    bookedStock: 12,
+    availableStock: 6,
+    minStockThreshold: 5,
+    unitPrice: 85000,
+    status: "In Stock",
+    warehouse: "Indore Main Plant"
+  },
+  {
+    id: "INV-102",
+    sku: "APS-HYD-02",
+    name: "Heavy-Duty Hydraulic 2-Cylinder Paper Plate Machine",
+    category: "Hydraulic Machinery",
+    totalStock: 14,
+    bookedStock: 11,
+    availableStock: 3,
+    minStockThreshold: 4,
+    unitPrice: 125000,
+    status: "Low Stock",
+    warehouse: "Indore Main Plant"
+  },
+  {
+    id: "INV-103",
+    sku: "APS-CUP-03",
+    name: "Automatic High-Speed Paper Cup Making Machine",
+    category: "Paper Cup Machines",
+    totalStock: 8,
+    bookedStock: 6,
+    availableStock: 2,
+    minStockThreshold: 3,
+    unitPrice: 320000,
+    status: "Low Stock",
+    warehouse: "Indore Main Plant"
+  },
+  {
+    id: "INV-104",
+    sku: "APS-CUT-04",
+    name: "Semi-Automatic Heavy Paper Reel Cutter Machine",
+    category: "Cutting & Lamination",
+    totalStock: 12,
+    bookedStock: 5,
+    availableStock: 7,
+    minStockThreshold: 3,
+    unitPrice: 95000,
+    status: "In Stock",
+    warehouse: "Chakan Unit 2"
+  },
+  {
+    id: "INV-105",
+    sku: "APS-CNC-05",
+    name: "Industrial 3-Axis CNC Router Pro (Wood & Plastic)",
+    category: "CNC Machinery",
+    totalStock: 6,
+    bookedStock: 4,
+    availableStock: 2,
+    minStockThreshold: 2,
+    unitPrice: 275000,
+    status: "In Stock",
+    warehouse: "Pune Unit 1"
+  },
+  {
+    id: "INV-106",
+    sku: "APS-PLS-06",
+    name: "Industrial CNC Plasma Cutting Table (3000x1500mm)",
+    category: "CNC Machinery",
+    totalStock: 4,
+    bookedStock: 4,
+    availableStock: 0,
+    minStockThreshold: 2,
+    unitPrice: 410000,
+    status: "Out of Stock",
+    warehouse: "Chakan Unit 2"
+  }
+];
+
+export const MOCK_INVENTORY_SUMMARY = {
+  totalStock: 62,
+  totalBooked: 42,
+  totalAvailable: 20,
+  totalInventoryValue: 8650000,
+  lowStockCount: 2,
+  outOfStockCount: 1,
+  inStockCount: 3,
+  totalSKUs: 6
+};
+

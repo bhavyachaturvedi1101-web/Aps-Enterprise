@@ -46,7 +46,7 @@ const connectDB = async () => {
       console.log('Database schemas synced (safe) successfully.');
     }
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Unable to connect to the database:', error.message || error);
     throw error; // Let caller handle it (don't call process.exit here so Vercel serverless works)
   }
 };
