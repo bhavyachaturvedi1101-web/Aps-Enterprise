@@ -85,6 +85,12 @@ function getLastResult(conversationId) {
 
 // ─── Intent Recognition ────────────────────────────────────────────────────────
 const INTENTS = [
+  // ── Options Flow Intents ──
+  { name: 'landing_assign_tasks_options', patterns: [/assign team tasks options/i] },
+  { name: 'landing_invoices_options',     patterns: [/billing & invoices options/i] },
+  { name: 'landing_voice_dialer_options', patterns: [/voice dialer options/i] },
+  { name: 'landing_factory_options',      patterns: [/production progress options/i] },
+  
   { name: 'company_info',        patterns: [
     /where.*(is|located|situated|based|hq|office|aps|company)/i,
     /where is aps/i,
@@ -2861,9 +2867,59 @@ async function processQuery(query, conversationId) {
 
   let result;
 
+  // ── Options Handlers ──
+  function handleAssignTasksOptions() {
+    return {
+      text: "### 📋 Team Tasks Options\n\nWhat would you like me to do with team tasks?",
+      options: [
+        "Give tasks to every employee related to their role",
+        "Assign urgent tasks to all available staff",
+        "Show current team task leaderboard"
+      ]
+    };
+  }
+
+  function handleInvoicesOptions() {
+    return {
+      text: "### 🧾 Billing & Invoices Options\n\nHow can I help you with billing?",
+      options: [
+        "Generate GST tax invoice for ₹3,49,000",
+        "Show all recent invoices",
+        "Verify Tally 10% advance payments"
+      ]
+    };
+  }
+
+  function handleVoiceDialerOptions() {
+    return {
+      text: "### 📞 Voice Dialer Options\n\nWhat would you like to do with the Voice Dialer?",
+      options: [
+        "Schedule Jane Smith follow up call tomorrow 11 am",
+        "Run sentiment analysis on recent calls",
+        "Show recent call logs"
+      ]
+    };
+  }
+
+  function handleFactoryOptions() {
+    return {
+      text: "### 🏭 Production Progress Options\n\nWhat factory data do you need?",
+      options: [
+        "Show factory assembly lines progress",
+        "Check current inventory levels",
+        "View delayed production job cards"
+      ]
+    };
+  }
+
   // Shared handler dispatch — used in both mock and LLM-fallback paths
   async function dispatchIntent(intentName) {
     switch (intentName) {
+      case 'landing_assign_tasks_options': return handleAssignTasksOptions();
+      case 'landing_invoices_options':     return handleInvoicesOptions();
+      case 'landing_voice_dialer_options': return handleVoiceDialerOptions();
+      case 'landing_factory_options':      return handleFactoryOptions();
+      
       case 'company_info':           return handleCompanyInfo(query);
       case 'dashboard_info':         return handleDashboardInfo(query);
       case 'normal_chat':            return handleNormalChat(query);

@@ -939,6 +939,15 @@ function MessageCard({ msg }) {
             <div style={{ fontSize: '0.88rem', lineHeight: 1.65, color: isUser ? '#fff' : '#334155' }}>
               <RenderText text={msg.text} isUser={isUser} />
             </div>
+            {msg.options && msg.options.length > 0 && (
+              <div style={s.optionsContainer}>
+                {msg.options.map((opt, i) => (
+                  <button key={i} className="apsai-option-chip" style={s.optionChip} onClick={() => sendQuery(opt)}>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
             {msg.exportFile && <ExportFileCard exportFile={msg.exportFile} tableData={msg.table} />}
             {msg.report && <ReportCard report={msg.report} />}
             {msg.table && <MiniTable rows={msg.table} />}
@@ -1222,6 +1231,11 @@ export default function APSAIPage() {
               box-shadow: 0 4px 14px rgba(37,99,235,0.08) !important;
               transform: translateY(-2px);
             }
+            .apsai-option-chip:hover {
+              background-color: #f8fafc !important;
+              border-color: #2563eb !important;
+              color: #2563eb !important;
+            }
           `}</style>
           {/* Messages scroll area */}
           <div style={s.messagesArea} id="apsai-page-messages">
@@ -1229,11 +1243,11 @@ export default function APSAIPage() {
               <div style={s.welcomeLanding}>
                 <h1 style={s.welcomeHeader}>How can I help you today?</h1>
                 <p style={s.welcomeSub}>
-                  Your real-time operations co-pilot for **APS Enterprise**. Control tasks, dialers, CRM, invoices, and Tally in English, Hindi, or Hinglish.
+                  Your real-time operations co-pilot for <strong>APS Enterprise</strong>. Control tasks, dialers, CRM, invoices, and Tally in English, Hindi, or Hinglish.
                 </p>
                 
                 <div style={s.landingGrid}>
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("give tasks to every employee related to their role")}>
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("assign team tasks options")}>
                     <div style={s.cardIcon}>📋</div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Assign Team Tasks</div>
@@ -1241,7 +1255,7 @@ export default function APSAIPage() {
                     </div>
                   </div>
                   
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("generate GST tax invoice for ₹3,49,000")}>
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("billing & invoices options")}>
                     <div style={s.cardIcon}>🧾</div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Billing & Invoices</div>
@@ -1249,7 +1263,7 @@ export default function APSAIPage() {
                     </div>
                   </div>
                   
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("schedule Jane Smith follow up call tomorrow 11 am")}>
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("voice dialer options")}>
                     <div style={s.cardIcon}>📞</div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Voice Dialer</div>
@@ -1257,7 +1271,7 @@ export default function APSAIPage() {
                     </div>
                   </div>
                   
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("show factory assembly lines progress")}>
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("production progress options")}>
                     <div style={s.cardIcon}>🏭</div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Production Progress</div>
@@ -1891,5 +1905,30 @@ const s = {
     cursor: 'pointer',
     boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
     transition: 'transform 0.1s, opacity 0.15s'
+  },
+  
+  // Options Flow Styles
+  optionsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '12px',
+    marginBottom: '8px'
+  },
+  optionChip: {
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    padding: '10px 14px',
+    color: '#334155',
+    fontSize: '0.84rem',
+    fontWeight: 600,
+    textAlign: 'left',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+    display: 'block',
+    width: '100%',
+    fontFamily: 'inherit'
   }
 };
