@@ -528,7 +528,7 @@ export default function Dashboard() {
 
             {/* Machinery Stock Breakdown & Live Status List */}
             <div style={{ ...s.card, padding: '1.5rem', background: '#fff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
+              <div className="machinery-stock-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#09090b', fontFamily: 'var(--font-heading)' }}>
                     Current Machinery Stock & Availability Breakdown
@@ -567,6 +567,7 @@ export default function Dashboard() {
                   return (
                     <div
                       key={item.id || item.sku}
+                      className="machinery-stock-item"
                       style={{
                         display: 'grid',
                         gridTemplateColumns: 'minmax(220px, 1.8fr) minmax(140px, 1fr) minmax(180px, 1.4fr) minmax(130px, 0.8fr) 100px',
@@ -580,8 +581,8 @@ export default function Dashboard() {
                       }}
                     >
                       {/* Product Name & SKU */}
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div className="machinery-stock-title">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                           <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#09090b', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>
                             {item.sku}
                           </span>
@@ -595,7 +596,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Unit Price */}
-                      <div>
+                      <div className="machinery-stock-price">
                         <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>Standard Unit Price</div>
                         <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>
                           ₹{Number(item.unitPrice || 0).toLocaleString('en-IN')}
@@ -603,7 +604,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Visual Stock Progress Bar */}
-                      <div>
+                      <div className="machinery-stock-progress">
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, marginBottom: 4 }}>
                           <span style={{ color: '#047857' }}>{available} Avail ({availPct}%)</span>
                           <span style={{ color: '#7e22ce' }}>{booked} Booked ({bookedPct}%)</span>
@@ -615,7 +616,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Stock Quantity Breakdown */}
-                      <div style={{ textAlign: 'right' }}>
+                      <div className="machinery-stock-qty" style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>Available / Total</div>
                         <div style={{ fontSize: '0.85rem', fontWeight: 800, color: available > 0 ? '#047857' : '#ef4444' }}>
                           {available} <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>/ {total} Units</span>
@@ -623,7 +624,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Status Badge */}
-                      <div style={{ textAlign: 'right' }}>
+                      <div className="machinery-stock-status" style={{ textAlign: 'right' }}>
                         <span style={{
                           display: 'inline-block',
                           fontSize: '0.7rem',
