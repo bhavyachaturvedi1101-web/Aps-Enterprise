@@ -60,6 +60,14 @@ export default function APSAIChatPanel() {
         #apsai-chat-launcher:active {
           transform: translateY(-1px) scale(0.98);
         }
+        @media (max-width: 768px) {
+          #apsai-chat-launcher {
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+            right: 14px !important;
+            padding: 7px 14px 7px 10px !important;
+            font-size: 0.78rem !important;
+          }
+        }
       `}</style>
     </>
   );
