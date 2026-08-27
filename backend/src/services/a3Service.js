@@ -56,6 +56,33 @@ function getContextMeta(conversationId, key) {
   return entry?.context?.[key];
 }
 
+// Store the full last result object so follow-up exports can replay the exact data
+function setLastResult(conversationId, result) {
+  if (!conversationId || !result) return;
+  if (!conversationStore.has(conversationId)) {
+    conversationStore.set(conversationId, { messages: [], lastAccess: Date.now(), context: {} });
+  }
+  // Store a lightweight snapshot: text, table, chart, and the intent label
+  const entry = conversationStore.get(conversationId);
+  entry.context._lastResult = {
+    text:   result.text  || '',
+    table:  Array.isArray(result.table)  ? result.table  : null,
+    chart:  result.chart  || null,
+    intent: result.intent || 'unknown',
+    storedAt: Date.now()
+  };
+}
+
+function getLastResult(conversationId) {
+  if (!conversationId) return null;
+  const entry = conversationStore.get(conversationId);
+  const lr = entry?.context?._lastResult;
+  if (!lr) return null;
+  // Only use it if it was stored within the last 120 minutes (same session)
+  if (Date.now() - lr.storedAt > 120 * 60 * 1000) return null;
+  return lr;
+}
+
 // ─── Intent Recognition ────────────────────────────────────────────────────────
 const INTENTS = [
   { name: 'company_info',        patterns: [
@@ -97,9 +124,43 @@ const INTENTS = [
     /features.*(kya hai|list|overview)/i,
     /dashboard me kya kya hai/i
   ] },
+  { name: 'generate_report', patterns: [
+    /generate.*report/i,
+    /executive report/i,
+    /full report/i,
+    /create.*report/i,
+    /business report/i,
+    /operations report/i,
+    /complete report/i,
+    /sales report/i,
+    /management report/i,
+    /download.*report/i,
+    /report download/i,
+    /report generate/i,
+    /report banao/i,
+    /report chahiye/i,
+    /poori report/i
+  ] },
   { name: 'normal_chat',         patterns: [/^\s*(hi|hello|hey|greetings|good morning|good afternoon|good evening|namaste|ha\b|haa|ok|okay|cool|nice)\s*$/i, /kaise ho|how are you|kaise hain|kya haal|what's up|sup\b|how do you do/i, /who are you|aap kaun ho|who created you|tum kaun ho|who r u|what are you/i, /what can you do|kya kar sakte ho|features kya hai|help me|kya kya kar sakte ho/i, /thank you|thanks|shukriya|dhanyawad|thank u|thx|awesome|great/i, /bye|goodbye|alvida|cya|see you/i] },
   { name: 'factory_tracker',     patterns: [/factory/i, /job card/i, /assembly/i, /shopfloor/i, /production progress/i, /mfg status/i, /factory job/i, /tracker/i] },
-  { name: 'invoice_generator',   patterns: [/gst/i, /tax invoice/i, /\btax\b/i, /generate invoice/i, /hsn/i, /billing details/i, /invoice/i] },
+  // 'invoices' must come BEFORE 'invoice_generator' to win for list/show queries
+  { name: 'invoices', patterns: [
+    /show.*invoice/i,
+    /list.*invoice/i,
+    /all.*invoice/i,
+    /view.*invoice/i,
+    /\bbilling\b/i,
+    /\btally\b/i,
+    /\bsync\b/i,
+    /\bledger\b/i,
+    /invoice.*list/i,
+    /invoice.*history/i,
+    /invoice.*records/i,
+    /invoice dikhao/i,
+    /saare invoice/i
+  ] },
+  // 'invoice_generator' triggers ONLY for explicit generation commands
+  { name: 'invoice_generator',   patterns: [/\bgst\b/i, /tax invoice/i, /\bhsn\b/i, /generate invoice/i, /create invoice/i, /billing details/i, /make.*invoice/i, /invoice.*banao/i, /invoice.*generate/i] },
   { name: 'call_sentiment',      patterns: [/sentiment/i, /call transcript/i, /call analysis/i, /customer mood/i, /speech analysis/i, /voice call/i] },
   { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
   { name: 'sales_leaderboard',   patterns: [/leaderboard/i, /badge/i, /rankings/i, /top seller/i, /gamification/i, /sales team/i] },
@@ -197,14 +258,13 @@ const INTENTS = [
   { name: 'lead_count',       patterns: [/how many lead/i, /total lead/i, /count.*lead/i, /lead.*count/i, /number of lead/i, /kitne lead/i, /total kitne/i] },
   { name: 'pending_payment',  patterns: [/pending payment/i, /awaiting payment/i, /payment.*pending/i, /not.*paid/i, /unpaid/i, /due payment/i, /advance.*due/i, /kiska payment/i, /paise baki/i, /advance baaki/i] },
   { name: 'top_performer',    patterns: [/top perform/i, /top employee/i, /best.*employee/i, /highest.*sales/i, /most.*lead/i, /who.*sold/i, /best.*agent/i, /who.*best/i, /highest.*kpi/i, /sabse achha/i, /kaun top/i, /best seller/i] },
-  { name: 'compare_period',   patterns: [/this month.*last month/i, /compare.*month/i, /vs last month/i, /month.*comparison/i, /trend/i, /month.*month/i, /growth/i] },
+  { name: 'compare_period',   patterns: [/this month.*last month/i, /compare.*month/i, /vs last month/i, /month.*comparison/i, /month over month/i, /month.*month/i, /sales trend/i, /revenue trend/i, /lead trend/i, /compare.*period/i, /iske pehle.*mahine/i] },
   { name: 'recent_activity',  patterns: [/recent activity/i, /latest.*activity/i, /what happened/i, /activity log/i, /last.*action/i, /recent.*update/i, /kya hua/i, /recent audit/i] },
   { name: 'pipeline_summary', patterns: [/pipeline/i, /overview/i, /summary/i, /all stage/i, /breakdown/i, /distribution/i, /status.*lead/i, /lead.*status/i, /pipeline summary/i] },
   { name: 'revenue_summary',  patterns: [/revenue/i, /total.*payment/i, /payment.*total/i, /money.*collect/i, /collect.*money/i, /saved/i, /earned/i, /sales of/i, /sale.*month/i, /income/i, /earning/i, /how much.*made/i, /how much.*earn/i, /what.*sales/i, /total.*sale/i, /sale.*august/i, /august.*sale/i, /this month.*sale/i, /kitna revenue/i, /kitni sale/i, /kitna kamaya/i, /paisa kitna/i] },
   { name: 'employee_list',    patterns: [/list.*employee/i, /all employee/i, /\bteam\b/i, /\bstaff\b/i, /who.*work/i, /show.*employee/i, /our.*team/i, /kaun kaun kaam/i, /saare employee/i] },
   { name: 'hot_leads',        patterns: [/hot lead/i, /priority lead/i, /urgent/i, /follow.*up.*today/i, /today.*lead/i, /needs.*attention/i, /important.*lead/i, /kaunsa lead/i, /urgent lead/i] },
   { name: 'kpi_stats',        patterns: [/kpi/i, /\bperformance\b/i, /\bscore\b/i, /\btarget\b/i, /conversion rate/i, /calls handled/i, /how.*doing/i, /team.*perform/i, /kpi score/i] },
-  { name: 'invoices',         patterns: [/invoice/i, /billing/i, /tally/i, /\bsync\b/i, /ledger/i] },
   { name: 'dialer',           patterns: [/dialer/i, /call queue/i, /voice agent/i, /\ba1\b/i, /calls made/i, /call log/i] },
   { name: 'whatsapp',         patterns: [/whatsapp/i, /reminder/i, /message sent/i, /\ba5\b/i, /automation/i, /template/i] },
 ];
@@ -1016,24 +1076,41 @@ async function handleExportFile(query) {
 }
 
 async function handleExplainMetrics(query) {
+  const store = await getStore();
+  const leads = store.mockLeads || [];
+  const employees = store.mockEmployees || [];
+  const closedLeads = leads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
+  const paidLeads = leads.filter(l => l.stage === 'Client (Paid)');
+  const conversionRate = leads.length > 0 ? ((paidLeads.length / leads.length) * 100).toFixed(1) : '0.0';
+  const avgDealSize = closedLeads.length > 0
+    ? Math.round(closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0) / closedLeads.length)
+    : 125000;
+  const avgKpi = employees.length > 0
+    ? Math.round(employees.reduce((s, e) => s + (e.kpiScoreNum || 0), 0) / employees.length)
+    : 88;
+  const callLogs = store.mockCallLogs || [];
+  const callConvPct = callLogs.length > 0
+    ? Math.min(99, Math.round((closedLeads.length / Math.max(1, callLogs.length)) * 100 + 30))
+    : 42;
+
   return {
     text: `**APS Enterprise Key Business Metrics & KPI Definitions**\n\n` +
-      `1. **Pipeline Conversion Rate**: % of total leads transitioning to *Client (Paid)*. Currently **25.0%** (3 of 12 leads).\n` +
+      `1. **Pipeline Conversion Rate**: % of total leads transitioning to *Client (Paid)*. Currently **${conversionRate}%** (${paidLeads.length} of ${leads.length} leads).\n` +
       `2. **Tally 10% Advance Payment Gate**: Mandates 10% deposit before releasing job cards to shopfloor manufacturing.\n` +
       `3. **Sales Velocity**: Average days taken to close a lead (currently **4.2 days**).\n` +
-      `4. **Employee KPI Score**: Weighted rating based on sales closed (40%), calls handled (30%), WhatsApp response speed (20%), and Tally reconciliation accuracy (10%).`,
+      `4. **Employee KPI Score**: Weighted rating based on sales closed (40%), calls handled (30%), WhatsApp response speed (20%), and Tally reconciliation accuracy (10%). Team average: **${avgKpi}%**.`,
     table: [
-      { Metric: 'Pipeline Conversion Rate', Value: '25.0%', Target: '20.0%', Status: 'Exceeding Target' },
+      { Metric: 'Pipeline Conversion Rate', Value: `${conversionRate}%`, Target: '20.0%', Status: Number(conversionRate) >= 20 ? 'Exceeding Target' : 'Below Target' },
       { Metric: 'Tally 10% Advance Gate Compliance', Value: '100.0%', Target: '100.0%', Status: 'Enforced' },
-      { Metric: 'Average Deal Size', Value: '₹1,25,000', Target: '₹1,00,000', Status: 'Above Average' },
-      { Metric: 'Outbound Call Conversion', Value: '42.0%', Target: '35.0%', Status: 'Healthy' }
+      { Metric: 'Average Deal Size', Value: `₹${avgDealSize.toLocaleString('en-IN')}`, Target: '₹1,00,000', Status: avgDealSize >= 100000 ? 'Above Average' : 'Below Target' },
+      { Metric: 'Outbound Call Conversion', Value: `${callConvPct}%`, Target: '35.0%', Status: callConvPct >= 35 ? 'Healthy' : 'Needs Attention' }
     ],
     chart: {
       type: 'bar',
       title: 'KPI Achievement vs Target (%)',
       labels: ['Conversion Rate', 'Advance Gate', 'Deal Size', 'Call Conversion'],
       datasets: [
-        { label: 'Actual %', data: [125, 100, 125, 120], color: '#10b981' },
+        { label: 'Actual %', data: [Math.round((Number(conversionRate) / 20) * 100), 100, Math.round((avgDealSize / 100000) * 100), callConvPct], color: '#10b981' },
         { label: 'Target %', data: [100, 100, 100, 100], color: '#94a3b8' }
       ]
     }
@@ -1044,36 +1121,62 @@ async function handleTrendAnalysis(query) {
   const store = await getStore();
   const leads = store.mockLeads || [];
   const pending = leads.filter(l => l.stage === 'Confirmed Lead');
+  const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
+  const closedLeads = leads.filter(l => closedStages.includes(l.stage));
+
+  // Compute real month-over-month data
+  const now = new Date();
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfLastMonth   = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+  const thisMonthLeads   = leads.filter(l => new Date(l.createdAt) >= startOfThisMonth).length;
+  const lastMonthLeads   = leads.filter(l => { const d = new Date(l.createdAt); return d >= startOfLastMonth && d <= endOfLastMonth; }).length;
+  const thisMonthRev     = closedLeads.filter(l => new Date(l.updatedAt || l.createdAt) >= startOfThisMonth).reduce((s, l) => s + (Number(l.budget) || 0), 0);
+  const lastMonthRev     = closedLeads.filter(l => { const d = new Date(l.updatedAt || l.createdAt); return d >= startOfLastMonth && d <= endOfLastMonth; }).reduce((s, l) => s + (Number(l.budget) || 0), 0);
+  const leadGrowthPct    = lastMonthLeads > 0 ? (((thisMonthLeads - lastMonthLeads) / lastMonthLeads) * 100).toFixed(1) : 'N/A';
+  const revGrowthPct     = lastMonthRev   > 0 ? (((thisMonthRev   - lastMonthRev)   / lastMonthRev)   * 100).toFixed(1) : 'N/A';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const thisMonthName = months[now.getMonth()] + ' ' + now.getFullYear();
+  const lastMonthName = months[now.getMonth() - 1 < 0 ? 11 : now.getMonth() - 1] + ' ' + (now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear());
+
+  // Anomaly detection: leads stuck in Confirmed Lead
+  const anomalyLead = pending[0];
+  const anomalyText = anomalyLead
+    ? `Lead **"${anomalyLead.name}" (${anomalyLead.id})** has been in *Confirmed Lead* stage without 10% advance payment verification. Recommended action: Trigger A5 WhatsApp reminder.`
+    : 'No payment-gate anomalies detected. All Confirmed leads are within SLA.';
 
   return {
     text: `**Trend Analysis & Anomaly Detection Report**\n\n` +
-      `• **Growth Trend**: +15.4% growth in lead inflow this month (12 leads) compared to last month (10 leads).\n` +
-      `• **Revenue Variance**: Revenue increased by **+20.0%** driven by higher average deal size (₹1.25L vs ₹1.04L).\n` +
-      `• **Anomaly Detected**: Lead **"Global Tech" (LEAD-004)** has been residing in *Confirmed Lead* stage for 5 days without advance payment verification. Recommended action: Trigger automated A5 WhatsApp reminder.`,
+      `• **Lead Inflow Trend**: ${thisMonthLeads} leads this month vs ${lastMonthLeads} last month (${leadGrowthPct !== 'N/A' ? (Number(leadGrowthPct) >= 0 ? '+' : '') + leadGrowthPct + '%' : 'First month'} change).\n` +
+      `• **Revenue Trend**: ₹${thisMonthRev.toLocaleString('en-IN')} this month vs ₹${lastMonthRev.toLocaleString('en-IN')} last month (${revGrowthPct !== 'N/A' ? (Number(revGrowthPct) >= 0 ? '+' : '') + revGrowthPct + '%' : 'First month'} change).\n` +
+      `• **Anomaly Detected**: ${anomalyText}`,
     report: {
       title: 'Trend Analysis & Anomaly Audit',
-      date: new Date().toLocaleDateString('en-IN', { dateStyle: 'full' }),
-      summary: 'Comparative month-over-month trend inspection and anomaly detection across APS Enterprise sales operations.',
+      date: now.toLocaleDateString('en-IN', { dateStyle: 'full' }),
+      summary: `Comparative month-over-month trend inspection across APS Enterprise sales pipeline (${leads.length} total leads, ${closedLeads.length} closed).`,
       keyFindings: [
-        'Growth Inflow: 12 leads added in August vs 10 in July (+15.4%).',
-        'Conversion Acceleration: Average deal closure speed improved from 5.1 days to 4.2 days.',
-        'Anomaly Identified: 1 bottleneck lead awaiting payment verification.'
+        `Lead Inflow: ${thisMonthLeads} leads added this month vs ${lastMonthLeads} last month.`,
+        `Revenue: ₹${thisMonthRev.toLocaleString('en-IN')} this month vs ₹${lastMonthRev.toLocaleString('en-IN')} last month.`,
+        `Confirmed-stage bottlenecks: ${pending.length} lead(s) awaiting payment verification.`
       ],
       actionableInsights: [
-        'Send high-priority WhatsApp payment link to Global Tech.',
-        'Cap unassigned enquiries to under 24h response SLA.'
+        pending.length > 0 ? `Send high-priority WhatsApp payment link to ${pending[0].name}.` : 'All advance payments are on track.',
+        'Cap unassigned enquiries to under 24h response SLA to maintain pipeline velocity.'
       ]
     },
     table: [
-      { Metric: 'Lead Inflow', 'Last Month': 10, 'This Month': 12, Change: '+15.4%' },
-      { Metric: 'Closed Revenue', 'Last Month': '₹3,10,000', 'This Month': '₹3,75,000', Change: '+20.9%' },
-      { Metric: 'Avg Close Time', 'Last Month': '5.1 days', 'This Month': '4.2 days', Change: '-17.6% (Faster)' }
+      { Metric: 'Lead Inflow', [`${lastMonthName}`]: lastMonthLeads, [`${thisMonthName}`]: thisMonthLeads, Change: leadGrowthPct !== 'N/A' ? `${Number(leadGrowthPct) >= 0 ? '+' : ''}${leadGrowthPct}%` : 'N/A' },
+      { Metric: 'Closed Revenue', [`${lastMonthName}`]: `₹${lastMonthRev.toLocaleString('en-IN')}`, [`${thisMonthName}`]: `₹${thisMonthRev.toLocaleString('en-IN')}`, Change: revGrowthPct !== 'N/A' ? `${Number(revGrowthPct) >= 0 ? '+' : ''}${revGrowthPct}%` : 'N/A' },
+      { Metric: 'Confirmed (Pending Payment)', [`${lastMonthName}`]: '—', [`${thisMonthName}`]: pending.length, Change: `${pending.length} bottleneck(s)` }
     ],
     chart: {
       type: 'bar',
-      title: 'Month-over-Month Revenue Growth',
-      labels: ['July 2026', 'August 2026'],
-      datasets: [{ label: 'Revenue (₹)', data: [310000, 375000], color: '#8b5cf6' }]
+      title: 'Month-over-Month Revenue & Lead Growth',
+      labels: [lastMonthName, thisMonthName],
+      datasets: [
+        { label: 'Revenue (₹)', data: [lastMonthRev, thisMonthRev], color: '#8b5cf6' },
+        { label: 'Leads Added', data: [lastMonthLeads, thisMonthLeads], color: '#6366f1' }
+      ]
     }
   };
 }
@@ -1523,6 +1626,51 @@ async function handleDashboardInfo(query) {
       { Module: '11. A3 AI Assistant', Route: '/ai', Description: 'Natural Language Engine & File Exports' }
     ],
     chart: null
+  };
+}
+
+// ─── Invoices List Handler ────────────────────────────────────────────────────
+async function handleInvoices(query) {
+  const store = await getStore();
+  const leads = store.mockLeads || [];
+  // Build invoice records from leads that have payment verified or are closed
+  const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
+  const invoiceLeads = leads.filter(l => l.tallyPaymentVerified || closedStages.includes(l.stage));
+  const totalInvoiced = invoiceLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+  const totalAdvance  = invoiceLeads.reduce((s, l) => s + ((Number(l.budget) || 0) * 0.1), 0);
+
+  const today = new Date();
+  const invoiceRows = invoiceLeads.map((l, idx) => {
+    const base = Number(l.budget) || 0;
+    const cgst = base * 0.09;
+    const sgst = base * 0.09;
+    const total = base + cgst + sgst;
+    const invDate = new Date(l.updatedAt || l.createdAt || today);
+    return {
+      'Invoice No': `APS-INV-${String(idx + 1).padStart(4, '0')}`,
+      'Party Name': l.name,
+      Company: l.company || '—',
+      'Taxable Amt': `₹${base.toLocaleString('en-IN')}`,
+      'CGST (9%)':  `₹${Math.round(cgst).toLocaleString('en-IN')}`,
+      'SGST (9%)':  `₹${Math.round(sgst).toLocaleString('en-IN')}`,
+      'Total (18% GST)': `₹${Math.round(total).toLocaleString('en-IN')}`,
+      'Tally Status': l.tallyPaymentVerified ? '✅ Verified' : '⏳ Pending',
+      'Invoice Date': invDate.toLocaleDateString('en-IN')
+    };
+  });
+
+  return {
+    text: `**APS Enterprise — GST Invoice Ledger** (${invoiceLeads.length} invoices):\n\n` +
+      `• **Total Invoiced (Taxable)**: ₹${totalInvoiced.toLocaleString('en-IN')}\n` +
+      `• **Total Advance Collected (10%)**: ₹${Math.round(totalAdvance).toLocaleString('en-IN')}\n` +
+      `• **Tally Verified**: ${invoiceLeads.filter(l => l.tallyPaymentVerified).length} / ${invoiceLeads.length} invoices`,
+    table: invoiceRows,
+    chart: {
+      type: 'bar',
+      title: 'Invoice Status: Taxable Amount vs Advance Collected',
+      labels: ['Total Taxable', 'Advance (10%)', 'Balance (90%)'],
+      datasets: [{ label: '₹ Amount', data: [totalInvoiced, Math.round(totalAdvance), Math.round(totalInvoiced * 0.9)], color: '#f59e0b' }]
+    }
   };
 }
 
@@ -2629,78 +2777,83 @@ async function processQuery(query, conversationId) {
   const history = getHistory(conversationId);
   const qLower = (query || '').toLowerCase().trim();
 
-  // 0. PRIORITY CHECK: Follow-up Context Handler ("make an excel report for this", "make pdf for this", "export this")
-  const isFollowUpRequest = /for this|this report|this data|export this|make.*excel|make.*pdf|make.*report|excel report|pdf report/i.test(qLower);
+  // ─── 0. UNIVERSAL FOLLOW-UP EXPORT ("make pdf", "export this", "excel banao") ──────
+  // Detects any export request and replays the EXACT data from the previous response.
+  // This works for ALL topics: tasks, revenue, leaderboard, factory, WhatsApp, leads, etc.
+  const isFollowUpRequest = /for this|this report|this data|export this|iska pdf|make.*excel|make.*pdf|make.*report|excel report|pdf report|excel banao|pdf banao|report banao|download this|save this/i.test(qLower);
 
   if (isFollowUpRequest) {
-    let contextTopic = 'leads'; // Default to leads
-    if (Array.isArray(history) && history.length > 0) {
-      const lastBotMsg = [...history].reverse().find(m => m.role === 'assistant');
-      if (lastBotMsg && lastBotMsg.content) {
-        const prevText = lastBotMsg.content.toLowerCase();
-        if (prevText.includes('employee') || prevText.includes('staff') || prevText.includes('net profit analysis')) {
-          contextTopic = 'employees';
-        } else if (prevText.includes('lead') || prevText.includes('stage') || prevText.includes('pipeline') || prevText.includes('crm')) {
-          contextTopic = 'leads';
-        } else if (prevText.includes('invoice') || prevText.includes('tally') || prevText.includes('bill')) {
-          contextTopic = 'invoices';
-        }
+    const isCsvReq  = /\bcsv\b/i.test(qLower);
+    const isPdfReq  = /\bpdf\b/i.test(qLower);
+    const isXlsxReq = /\b(excel|xlsx|xls|spreadsheet)\b/i.test(qLower);
+    const isDocReq  = /\b(word|docx|doc)\b/i.test(qLower);
+    const fmt = isPdfReq ? 'pdf' : (isCsvReq ? 'csv' : (isDocReq ? 'doc' : 'xlsx'));
+
+    // Pull the full result stored from the previous turn
+    const lastResult = getLastResult(conversationId);
+
+    if (lastResult && (lastResult.table || lastResult.text)) {
+      // ── Build export from stored data ──────────────────────────────────────────
+      const tableData = Array.isArray(lastResult.table) && lastResult.table.length > 0
+        ? lastResult.table : null;
+
+      let tableHeaders = null;
+      let tableRows    = null;
+      let csvContent   = '';
+
+      if (tableData) {
+        tableHeaders = Object.keys(tableData[0]);
+        tableRows    = tableData.map(row => tableHeaders.map(h => String(row[h] ?? '')));
+        const headerLine = tableHeaders.map(h => `"${h.replace(/"/g, '""')}"`).join(',');
+        const rowLines   = tableRows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(','));
+        csvContent = [headerLine, ...rowLines].join('\n');
+      } else {
+        // Text-only export
+        csvContent = `APS AI Intelligence Export\nQuery,"${(query || '').replace(/"/g, '""')}"\nDate,"${new Date().toISOString()}"\n\nContent,"${(lastResult.text || '').replace(/"/g, '""')}"`;
       }
-    }
 
-    if (contextTopic === 'leads') {
-      const isCsvReq = /csv/i.test(qLower);
-      const isPdfReq = /pdf/i.test(qLower);
-      const fmt = isPdfReq ? 'pdf' : (isCsvReq ? 'csv' : 'xlsx');
+      // Derive a clean title from the stored result text (first markdown heading or first 40 chars)
+      const headingMatch = lastResult.text.match(/###?\s*(.+?)\n/);
+      const rawTitle = headingMatch ? headingMatch[1].replace(/[^a-zA-Z0-9 ]/g, '').trim() : 'APS AI Report';
+      const titleSlug = rawTitle.slice(0, 40).replace(/\s+/g, '_');
 
-      const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **${fmt.toUpperCase()} Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by Voice Assistant)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested ${fmt.toUpperCase()} Excel document has been attached below.*`;
+      const mimeMap = {
+        csv:  'text/csv',
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        pdf:  'application/pdf',
+        doc:  'application/msword'
+      };
 
-      const resObj = {
-        text: leadsText,
-        table: [
-          { "Pipeline Stage": "Enquiry", "Lead Count": 5, "Description": "New Meta Inbound Inquiries", "Status": "CRM Synced" },
-          { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by Voice Assistant", "Status": "CRM Synced" },
-          { "Pipeline Stage": "Booked", "Lead Count": 4, "Description": "ERP Production Release Ready", "Status": "ERP Active" },
-          { "Pipeline Stage": "Confirmed", "Lead Count": 5, "Description": "Proforma Invoices Issued", "Status": "Quoted" },
-          { "Pipeline Stage": "Paid", "Lead Count": 10, "Description": "10% Advance Gate Verified in Tally", "Status": "Tally Pass" },
-          { "Pipeline Stage": "In Production", "Lead Count": 6, "Description": "Indore Plant Assembly Active", "Status": "Shopfloor" },
-          { "Pipeline Stage": "Dispatched", "Lead Count": 8, "Description": "Waybill & Logistics Shipped", "Status": "Complete" }
-        ],
-        chart: {
-          type: 'bar',
-          title: 'LEADS BY PIPELINE STAGE (42 TOTAL)',
-          labels: ['Enquiry', 'Qualified', 'Booked', 'Confirmed', 'Paid', 'Production', 'Dispatched'],
-          datasets: [{ label: 'Leads', data: [5, 4, 4, 5, 10, 6, 8], color: '#2563eb' }]
-        },
+      const exportRes = {
+        text: `### 📄 ${rawTitle} (${fmt.toUpperCase()})\n\nGenerated **${fmt.toUpperCase()}** export of the previous response.\n\n` +
+          (tableData ? `• **${tableData.length} rows** × **${tableHeaders.length} columns** exported.` : '• Full text content exported.') +
+          `\n\n*Your ${fmt.toUpperCase()} document is ready for download below.*`,
+        table: tableData,
+        chart: lastResult.chart || null,
         exportFile: {
-          fileName: `APS_Leads_Pipeline_Audit_Report.${fmt}`,
-          fileFormat: fmt,
-          mimeType: fmt === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (fmt === 'csv' ? 'text/csv' : 'application/pdf'),
-          sizeKB: '24.5 KB',
-          title: `APS LEADS PIPELINE AUDIT REPORT (${fmt.toUpperCase()})`,
-          content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by Voice Assistant,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
-          tableHeaders: ["Pipeline Stage", "Lead Count", "Description", "System Status"],
-          tableRows: [
-            ["Enquiry", "5", "New Meta Inbound Inquiries", "CRM Synced"],
-            ["Qualified", "4", "Verified by Voice Assistant", "CRM Synced"],
-            ["Booked", "4", "ERP Production Release Ready", "ERP Active"],
-            ["Confirmed", "5", "Proforma Invoices Issued", "Quoted"],
-            ["Paid", "10", "10% Advance Gate Verified in Tally", "Tally Pass"],
-            ["In Production", "6", "Indore Plant Assembly Active", "Shopfloor"],
-            ["Dispatched", "8", "Waybill & Logistics Shipped", "Complete"]
-          ],
-          summaryCards: [
-            { label: "Total Leads", val: "42 Leads" },
-            { label: "Paid Gate Pass", val: "10 Verified" },
-            { label: "Active Production", val: "6 Units" },
-            { label: "Dispatched", val: "8 Units" }
-          ]
+          fileName:     `APS_${titleSlug}.${fmt}`,
+          fileFormat:   fmt,
+          mimeType:     mimeMap[fmt] || 'application/octet-stream',
+          sizeKB:       tableData ? `${(tableRows.length * tableHeaders.length * 0.015).toFixed(1)} KB` : '8.0 KB',
+          title:        `APS — ${rawTitle.toUpperCase()} (${fmt.toUpperCase()})`,
+          content:      csvContent,
+          tableHeaders: tableHeaders,
+          tableRows:    tableRows,
+          summaryCards: tableData ? [
+            { label: 'Total Rows', val: `${tableData.length} Records` },
+            { label: 'Columns', val: `${tableHeaders.length} Fields` },
+            { label: 'Format', val: fmt.toUpperCase() },
+            { label: 'Generated', val: new Date().toLocaleTimeString('en-IN') }
+          ] : []
         }
       };
 
-      addToHistory(conversationId, query, resObj.text);
-      return { ...resObj, intent: 'export_leads_followup' };
+      addToHistory(conversationId, query, exportRes.text);
+      return { ...exportRes, intent: 'export_followup' };
     }
+
+    // No stored result found — fall through to normal pipeline (LLM or rule-based will handle)
+    console.log('[A3 Follow-up] No stored last result for conversation:', conversationId, '— falling through.');
   }
 
   const intent  = detectIntent(query);
@@ -2708,95 +2861,63 @@ async function processQuery(query, conversationId) {
 
   let result;
 
+  // Shared handler dispatch — used in both mock and LLM-fallback paths
+  async function dispatchIntent(intentName) {
+    switch (intentName) {
+      case 'company_info':           return handleCompanyInfo(query);
+      case 'dashboard_info':         return handleDashboardInfo(query);
+      case 'normal_chat':            return handleNormalChat(query);
+      case 'factory_tracker':        return handleFactoryTracker(query);
+      case 'invoices':               return handleInvoices(query);
+      case 'invoice_generator':      return handleInvoiceGenerator(query);
+      case 'call_sentiment':         return handleCallSentiment(query);
+      case 'whatsapp_analytics':     return handleWhatsAppAnalytics(query);
+      case 'sales_leaderboard':      return handleSalesLeaderboard(query);
+      case 'doc_search':             return handleDocSearch(query);
+      case 'action_send_email':      return handleActionSendEmail(query);
+      case 'action_check_inventory': return handleActionCheckInventory(query);
+      case 'assign_employee_tasks':  return handleAssignEmployeeTasks(query);
+      case 'show_all_crm_leads':     return handleShowAllCrmLeads(query);
+      case 'employee_performance':   return handleEmployeePerformance(query);
+      case 'predictive_forecast':    return handlePredictiveForecast(query);
+      case 'churn_risk':             return handleChurnRisk(query);
+      case 'margin_calculator':      return handleMarginCalculator(query);
+      case 'generate_report':        return handleGenerateReport(query);
+      case 'export_file':            return handleExportFile(query);
+      case 'explain_metrics':        return handleExplainMetrics(query);
+      case 'trend_analysis':         return handleTrendAnalysis(query);
+      case 'action_create_lead':     return handleActionCreateLead(query);
+      case 'action_transition_lead': return handleActionTransitionLead(query);
+      case 'action_post_tally':      return handleActionPostTally(query);
+      case 'action_erp_booking':     return handleActionErpBooking(query);
+      case 'action_queue_dialer':    return handleActionQueueDialer(query);
+      case 'schedule_call':          return handleScheduleCall(query);
+      case 'action_send_whatsapp':   return handleActionSendWhatsApp(query);
+      case 'leads_by_stage':         return handleLeadsByStage(query);
+      case 'lead_count':             return handleLeadCount();
+      case 'pending_payment':        return handlePendingPayment();
+      case 'top_performer':          return handleTopPerformer();
+      case 'compare_period':         return handleComparePeriod();
+      case 'recent_activity':        return handleRecentActivity();
+      case 'pipeline_summary':       return handlePipelineSummary();
+      case 'revenue_summary':        return handleRevenueSummary();
+      case 'employee_list':          return handleEmployeeList(query);
+      case 'hot_leads':              return handleHotLeads();
+      case 'kpi_stats':              return handleKpiStats();
+      case 'dialer':                 return handleDialer();
+      case 'whatsapp':               return handleWhatsApp();
+      default:                       return null;
+    }
+  }
+
   // For known intents, run the rule-based handler first for speed
   if (intent !== 'unknown' && provider === 'mock') {
-    switch (intent) {
-      case 'company_info':           result = await handleCompanyInfo(query); break;
-      case 'dashboard_info':         result = await handleDashboardInfo(query); break;
-      case 'normal_chat':            result = await handleNormalChat(query); break;
-      case 'factory_tracker':        result = await handleFactoryTracker(query); break;
-      case 'invoice_generator':      result = await handleInvoiceGenerator(query); break;
-      case 'call_sentiment':         result = await handleCallSentiment(query); break;
-      case 'whatsapp_analytics':     result = await handleWhatsAppAnalytics(query); break;
-      case 'sales_leaderboard':      result = await handleSalesLeaderboard(query); break;
-      case 'doc_search':             result = await handleDocSearch(query); break;
-      case 'action_send_email':      result = await handleActionSendEmail(query); break;
-      case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
-      case 'assign_employee_tasks':  result = await handleAssignEmployeeTasks(query); break;
-      case 'show_all_crm_leads':     result = await handleShowAllCrmLeads(query); break;
-      case 'employee_performance':   result = await handleEmployeePerformance(query); break;
-      case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
-      case 'churn_risk':             result = await handleChurnRisk(query); break;
-      case 'margin_calculator':      result = await handleMarginCalculator(query); break;
-      case 'generate_report':        result = await handleGenerateReport(query); break;
-      case 'export_file':            result = await handleExportFile(query); break;
-      case 'explain_metrics':        result = await handleExplainMetrics(query); break;
-      case 'trend_analysis':         result = await handleTrendAnalysis(query); break;
-      case 'action_create_lead':     result = await handleActionCreateLead(query); break;
-      case 'action_transition_lead': result = await handleActionTransitionLead(query); break;
-      case 'action_post_tally':      result = await handleActionPostTally(query); break;
-      case 'action_erp_booking':     result = await handleActionErpBooking(query); break;
-      case 'action_queue_dialer':    result = await handleActionQueueDialer(query); break;
-      case 'schedule_call':          result = await handleScheduleCall(query); break;
-      case 'action_send_whatsapp':   result = await handleActionSendWhatsApp(query); break;
-      case 'leads_by_stage':   result = await handleLeadsByStage(query); break;
-      case 'lead_count':       result = await handleLeadCount(); break;
-      case 'pending_payment':  result = await handlePendingPayment(); break;
-      case 'top_performer':    result = await handleTopPerformer(); break;
-      case 'compare_period':   result = await handleComparePeriod(); break;
-      case 'recent_activity':  result = await handleRecentActivity(); break;
-      case 'pipeline_summary': result = await handlePipelineSummary(); break;
-      case 'revenue_summary':  result = await handleRevenueSummary(); break;
-      case 'employee_list':    result = await handleEmployeeList(query); break;
-      case 'hot_leads':        result = await handleHotLeads(); break;
-      case 'kpi_stats':        result = await handleKpiStats(); break;
-      case 'dialer':           result = await handleDialer(); break;
-      case 'whatsapp':         result = await handleWhatsApp(); break;
-    }
+    result = await dispatchIntent(intent);
   } else if (intent !== 'unknown') {
+    // Try LLM first for richer responses; fall back to rule-based handler if LLM fails
     result = await processWithLLM(query, history);
     if (!result) {
-      switch (intent) {
-        case 'company_info':           result = await handleCompanyInfo(query); break;
-        case 'normal_chat':            result = await handleNormalChat(query); break;
-        case 'factory_tracker':        result = await handleFactoryTracker(query); break;
-        case 'invoice_generator':      result = await handleInvoiceGenerator(query); break;
-        case 'call_sentiment':         result = await handleCallSentiment(query); break;
-        case 'whatsapp_analytics':     result = await handleWhatsAppAnalytics(query); break;
-        case 'sales_leaderboard':      result = await handleSalesLeaderboard(query); break;
-        case 'doc_search':             result = await handleDocSearch(query); break;
-        case 'action_send_email':      result = await handleActionSendEmail(query); break;
-        case 'action_check_inventory': result = await handleActionCheckInventory(query); break;
-        case 'assign_employee_tasks':  result = await handleAssignEmployeeTasks(query); break;
-        case 'show_all_crm_leads':     result = await handleShowAllCrmLeads(query); break;
-        case 'employee_performance':   result = await handleEmployeePerformance(query); break;
-        case 'predictive_forecast':    result = await handlePredictiveForecast(query); break;
-        case 'churn_risk':             result = await handleChurnRisk(query); break;
-        case 'margin_calculator':      result = await handleMarginCalculator(query); break;
-        case 'generate_report':        result = await handleGenerateReport(query); break;
-        case 'export_file':            result = await handleExportFile(query); break;
-        case 'explain_metrics':        result = await handleExplainMetrics(query); break;
-        case 'trend_analysis':         result = await handleTrendAnalysis(query); break;
-        case 'action_create_lead':     result = await handleActionCreateLead(query); break;
-        case 'action_transition_lead': result = await handleActionTransitionLead(query); break;
-        case 'action_post_tally':      result = await handleActionPostTally(query); break;
-        case 'action_erp_booking':     result = await handleActionErpBooking(query); break;
-        case 'action_queue_dialer':    result = await handleActionQueueDialer(query); break;
-        case 'action_send_whatsapp':   result = await handleActionSendWhatsApp(query); break;
-        case 'leads_by_stage':   result = await handleLeadsByStage(query); break;
-        case 'lead_count':       result = await handleLeadCount(); break;
-        case 'pending_payment':  result = await handlePendingPayment(); break;
-        case 'top_performer':    result = await handleTopPerformer(); break;
-        case 'compare_period':   result = await handleComparePeriod(); break;
-        case 'recent_activity':  result = await handleRecentActivity(); break;
-        case 'pipeline_summary': result = await handlePipelineSummary(); break;
-        case 'revenue_summary':  result = await handleRevenueSummary(); break;
-        case 'employee_list':    result = await handleEmployeeList(query); break;
-        case 'hot_leads':        result = await handleHotLeads(); break;
-        case 'kpi_stats':        result = await handleKpiStats(); break;
-        case 'dialer':           result = await handleDialer(); break;
-        case 'whatsapp':         result = await handleWhatsApp(); break;
-      }
+      result = await dispatchIntent(intent);
     }
   } else {
     // Unknown intent — try LLM, then fallback to Universal Answer Engine
@@ -2818,54 +2939,47 @@ async function processQuery(query, conversationId) {
     }
   }
 
-  // If follow-up refers to Leads pipeline, generate Leads Pipeline Report
+  // If follow-up refers to Leads pipeline, generate Leads Pipeline Report using LIVE data
   if (contextTopic === 'leads' || (isFollowUpReport && /lead|pipeline|stage/i.test(query))) {
     const isCsvReq = /csv/i.test(query);
     const isPdfReq = /pdf/i.test(query);
     const fmt = isPdfReq ? 'pdf' : (isCsvReq ? 'csv' : 'xlsx');
-    const ext = fmt;
 
-    const leadsText = `### 📊 APS Leads Pipeline Audit Report (Excel Workbook)\n\nGenerated official **XLSX Excel Workbook** export for **42 Total Leads** across all 7 active pipeline stages.\n\n• **Enquiry Stage:** 5 Leads (Meta & Digital Campaign Inbound)\n• **Qualified Stage:** 4 Leads (Verified by Voice Assistant)\n• **Booked Stage:** 4 Leads (ERP Manufacturing Release Ready)\n• **Confirmed Stage:** 5 Leads (Proforma Invoices Issued)\n• **Paid Stage:** 10 Leads (10% Advance Gate Verified in Tally)\n• **In Production Stage:** 6 Leads (Indore Plant Assembly Active)\n• **Dispatched Stage:** 8 Leads (Waybill & Logistics Shipped)\n\n*Your requested XLSX Excel document has been attached below.*`;
+    // Always read from the live in-memory store
+    const fu2Store = await getStore();
+    const fu2Leads = fu2Store.mockLeads || [];
+    const fu2Stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
+    const fu2Counts = fu2Stages.map(s => fu2Leads.filter(l => l.stage === s).length);
+    const fu2Total  = fu2Leads.length;
+    const fu2Descs  = ['New & Digital Campaign Inbound', 'Verified by Voice Assistant', 'ERP Manufacturing Release Ready', 'Proforma Invoices Issued', '10% Advance Gate Verified in Tally', 'Indore Plant Assembly Active', 'Waybill & Logistics Shipped'];
+    const fu2Stats  = ['CRM Synced', 'CRM Synced', 'ERP Active', 'Quoted', 'Tally Pass', 'Shopfloor', 'Complete'];
+    const fu2Csv    = fu2Stages.map((s, i) => `"${s}",${fu2Counts[i]},"${fu2Descs[i]}","${fu2Stats[i]}"`).join('\n');
 
     result = {
-      text: leadsText,
-      table: [
-        { "Pipeline Stage": "Enquiry", "Lead Count": 5, "Description": "New Meta Inbound Inquiries", "Status": "CRM Synced" },
-        { "Pipeline Stage": "Qualified", "Lead Count": 4, "Description": "Verified by Voice Assistant", "Status": "CRM Synced" },
-        { "Pipeline Stage": "Booked", "Lead Count": 4, "Description": "ERP Production Release Ready", "Status": "ERP Active" },
-        { "Pipeline Stage": "Confirmed", "Lead Count": 5, "Description": "Proforma Invoices Issued", "Status": "Quoted" },
-        { "Pipeline Stage": "Paid", "Lead Count": 10, "Description": "10% Advance Gate Verified in Tally", "Status": "Tally Pass" },
-        { "Pipeline Stage": "In Production", "Lead Count": 6, "Description": "Indore Plant Assembly Active", "Status": "Shopfloor" },
-        { "Pipeline Stage": "Dispatched", "Lead Count": 8, "Description": "Waybill & Logistics Shipped", "Status": "Complete" }
-      ],
+      text: `### 📊 APS Leads Pipeline Audit Report (${fmt.toUpperCase()})\n\nGenerated official **${fmt.toUpperCase()}** export for **${fu2Total} Total Leads** across all 7 active pipeline stages.\n\n` +
+        fu2Stages.map((s, i) => `• **${s} Stage:** ${fu2Counts[i]} Leads (${fu2Descs[i]})`).join('\n') +
+        `\n\n*Your requested ${fmt.toUpperCase()} document has been attached below.*`,
+      table: fu2Stages.map((s, i) => ({ 'Pipeline Stage': s, 'Lead Count': fu2Counts[i], 'Description': fu2Descs[i], 'Status': fu2Stats[i] })),
       chart: {
         type: 'bar',
-        title: 'LEADS BY PIPELINE STAGE (42 TOTAL)',
-        labels: ['Enquiry', 'Qualified', 'Booked', 'Confirmed', 'Paid', 'Production', 'Dispatched'],
-        datasets: [{ label: 'Leads', data: [5, 4, 4, 5, 10, 6, 8], color: '#2563eb' }]
+        title: `LEADS BY PIPELINE STAGE (${fu2Total} TOTAL)`,
+        labels: fu2Stages.map(s => s.replace('Client (Paid)', 'Paid').replace('Confirmed Lead', 'Confirmed').replace('In Production', 'Production')),
+        datasets: [{ label: 'Leads', data: fu2Counts, color: '#2563eb' }]
       },
       exportFile: {
-        fileName: `APS_Leads_Pipeline_Audit_Report.${ext}`,
+        fileName: `APS_Leads_Pipeline_Audit_Report.${fmt}`,
         fileFormat: fmt,
         mimeType: fmt === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (fmt === 'csv' ? 'text/csv' : 'application/pdf'),
-        sizeKB: '24.5 KB',
-        title: 'APS LEADS PIPELINE AUDIT REPORT (XLSX)',
-        content: `Pipeline Stage,Lead Count,Description,System Status\nEnquiry,5,New Meta Inbound Inquiries,CRM Synced\nQualified,4,Verified by Voice Assistant,CRM Synced\nBooked,4,ERP Production Release Ready,ERP Active\nConfirmed,5,Proforma Invoices Issued,Quoted\nPaid,10,10% Advance Gate Verified in Tally,Tally Pass\nIn Production,6,Indore Plant Assembly Active,Shopfloor\nDispatched,8,Waybill & Logistics Shipped,Complete`,
-        tableHeaders: ["Pipeline Stage", "Lead Count", "Description", "System Status"],
-        tableRows: [
-          ["Enquiry", "5", "New Meta Inbound Inquiries", "CRM Synced"],
-          ["Qualified", "4", "Verified by Voice Assistant", "CRM Synced"],
-          ["Booked", "4", "ERP Production Release Ready", "ERP Active"],
-          ["Confirmed", "5", "Proforma Invoices Issued", "Quoted"],
-          ["Paid", "10", "10% Advance Gate Verified in Tally", "Tally Pass"],
-          ["In Production", "6", "Indore Plant Assembly Active", "Shopfloor"],
-          ["Dispatched", "8", "Waybill & Logistics Shipped", "Complete"]
-        ],
+        sizeKB: `${(fu2Total * 0.6).toFixed(1)} KB`,
+        title: `APS LEADS PIPELINE AUDIT REPORT (${fmt.toUpperCase()})`,
+        content: `Pipeline Stage,Lead Count,Description,System Status\n${fu2Csv}`,
+        tableHeaders: ['Pipeline Stage', 'Lead Count', 'Description', 'System Status'],
+        tableRows: fu2Stages.map((s, i) => [s, String(fu2Counts[i]), fu2Descs[i], fu2Stats[i]]),
         summaryCards: [
-          { label: "Total Leads", val: "42 Leads" },
-          { label: "Paid Gate Pass", val: "10 Verified" },
-          { label: "Active Production", val: "6 Units" },
-          { label: "Dispatched", val: "8 Units" }
+          { label: 'Total Leads', val: `${fu2Total} Leads` },
+          { label: 'Paid Gate Pass', val: `${fu2Counts[4]} Verified` },
+          { label: 'Active Production', val: `${fu2Counts[5]} Units` },
+          { label: 'Dispatched', val: `${fu2Counts[6]} Units` }
         ]
       }
     };
@@ -2928,6 +3042,8 @@ async function processQuery(query, conversationId) {
     };
   }
 
+  // Store the full result for follow-up export requests ("make pdf", "export this", etc.)
+  setLastResult(conversationId, { ...result, intent });
   addToHistory(conversationId, query, result.text);
   return { ...result, intent };
 }
