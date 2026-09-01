@@ -175,10 +175,15 @@ const INTENTS = [
     /lead banao/i
   ] },
   { name: 'action_create_user',     patterns: [
-    /(create|generate|add|register|hire|insert|new)\s*(\d+)?\s*(new)?\s*(user|employee|staff|member|worker|telecaller|sales rep|executive|fitter|technician|supervisor|accountant)/i,
-    /(user|employee|staff|member|worker|telecaller|rep|fitter|supervisor).*?(create|add|generate|hire|banao|register|new)/i,
-    /new (user|employee|staff|worker|member)/i,
-    /add (user|employee|staff|worker|member)/i,
+    /(create|generate|add|register|hire|insert|new|invite|make|onboard)\s*(\d+)?\s*(new)?\s*(user|employee|staff|member|worker|telecaller|sales rep|executive|fitter|technician|supervisor|accountant|admin|super admin|operator|account)/i,
+    /(user|employee|staff|member|worker|telecaller|rep|fitter|supervisor|admin|super admin|account).*?(create|add|generate|hire|banao|register|new|role|invite|name)/i,
+    /name\s*[:=\-].*?role\s*[:=\-]/i,
+    /role\s*[:=\-].*?name\s*[:=\-]/i,
+    /name\s*[:=\-].*?(add|create|user)/i,
+    /(add|create|invite|register).*?name\s*[:=\-]/i,
+    /(add|create|invite|register).*?(admin|super admin|operations|telecaller|accountant|agent)/i,
+    /new (user|employee|staff|worker|member|account|admin)/i,
+    /add (user|employee|staff|worker|member|account|admin)/i,
     /hire (user|employee|staff|worker|telecaller|rep)/i
   ] },
   { name: 'action_erp_booking',     patterns: [
@@ -1880,43 +1885,96 @@ async function handleActionCreateUser(query) {
   const countMatch = query.match(/(?:create|generate|add|hire|insert)\s*(\d+)\s*(?:new)?\s*(?:users?|employees?|staff|members?)/i);
   const count = countMatch ? Math.min(parseInt(countMatch[1], 10), 10) : 1;
 
-  let nameMatch = query.match(/(?:user|employee|staff|member|named?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
-  if (!nameMatch) {
-    nameMatch = query.match(/(?:create|add|hire)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:as|in|role|department)/i);
+  // ─── 1. Robust Name Extraction ──────────────────────────────────────────
+  let extractedName = null;
+
+  // Pattern A: name: John Doe / user: John Doe / employee: John Doe / Name - John Doe / Name = John Doe
+  const explicitNameMatch = query.match(/(?:name|user\s*name|user|employee|account|staff)\s*[:=\-]\s*["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
+  if (explicitNameMatch && explicitNameMatch[1].trim()) {
+    const candidate = explicitNameMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
+    if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant)$/i.test(candidate)) {
+      extractedName = candidate;
+    }
   }
 
-  // Detect System Role & Module Scope
+  // Pattern B: with name John Doe / named John Doe / called John Doe / name is John Doe
+  if (!extractedName) {
+    const withNameMatch = query.match(/(?:with\s+name|named|called|name\s+is)\s+["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
+    if (withNameMatch && withNameMatch[1].trim()) {
+      const candidate = withNameMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
+      if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant)$/i.test(candidate)) {
+        extractedName = candidate;
+      }
+    }
+  }
+
+  // Pattern C: add/create user John Doe (with role Admin / as Admin / role: Admin)
+  if (!extractedName) {
+    const userRoleMatch = query.match(/(?:add|create|invite|register|hire|make)\s+(?:a\s+|an\s+|new\s+)?(?:user|employee|staff|member)?\s*["']?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)["']?\s+(?:as|with\s+role|role\s*[:=\-]?|in|for)\s+/i);
+    if (userRoleMatch && userRoleMatch[1].trim()) {
+      const candidate = userRoleMatch[1].trim();
+      if (!/^(user|employee|staff|member|new|a|an|admin|super\s*admin|operations|telecaller|agent|accountant)$/i.test(candidate)) {
+        extractedName = candidate;
+      }
+    }
+  }
+
+  // Pattern D: add user John Doe (simple)
+  if (!extractedName) {
+    const simpleUserMatch = query.match(/(?:user|employee|staff|member|named?)\s+["']?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)["']?/i);
+    if (simpleUserMatch && simpleUserMatch[1].trim()) {
+      const candidate = simpleUserMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
+      if (!/^(user|employee|staff|member|new|a|an|admin|super\s*admin|operations|telecaller|agent|accountant)$/i.test(candidate)) {
+        extractedName = candidate;
+      }
+    }
+  }
+
+  // Capitalize name cleanly
+  if (extractedName) {
+    extractedName = extractedName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+  }
+
+  // ─── 2. Robust Role & Scope Extraction ────────────────────────────────────
   let systemRole = 'Operations';
   let moduleScope = 'Operations & CRM';
   let role = 'Operations Specialist';
   let department = 'Operations & CRM';
 
-  if (qLower.includes('super admin') || qLower.includes('superadmin')) {
+  const explicitRoleMatch = query.match(/(?:role|designation|position|permissions?)\s*[:=\-]?\s*(?:of\s+|as\s+)?["']?([A-Za-z\s]+)["']?/i);
+  const roleText = (explicitRoleMatch ? explicitRoleMatch[1] : query).toLowerCase();
+
+  if (roleText.includes('super admin') || roleText.includes('superadmin')) {
     systemRole = 'Super Admin';
     moduleScope = 'Voice AI';
     role = 'Super Administrator';
     department = 'Executive Management';
-  } else if (qLower.includes('admin') || qLower.includes('administrator')) {
+  } else if (roleText.includes('admin') || roleText.includes('administrator')) {
     systemRole = 'Admin';
     moduleScope = 'Dashboard & Core';
     role = 'System Administrator';
     department = 'Executive Management';
-  } else if (qLower.includes('telecaller') || qLower.includes('caller') || qLower.includes('voice') || qLower.includes('dialer')) {
+  } else if (roleText.includes('telecaller') || roleText.includes('caller') || roleText.includes('voice') || roleText.includes('dialer')) {
     systemRole = 'Telecaller';
     moduleScope = 'Voice AI';
-    role = qLower.includes('senior') ? 'Senior Telecaller' : 'Lead Telecaller Executive';
+    role = roleText.includes('senior') ? 'Senior Telecaller' : 'Lead Telecaller Executive';
     department = 'Voice Operations & Telecalling';
-  } else if (qLower.includes('sales') || qLower.includes('executive') || qLower.includes('closer') || qLower.includes('rep')) {
+  } else if (roleText.includes('operations') || roleText.includes('ops') || roleText.includes('crm')) {
     systemRole = 'Operations';
     moduleScope = 'Operations & CRM';
-    role = qLower.includes('senior') ? 'Senior Sales Specialist' : 'Direct Sales Executive';
+    role = roleText.includes('senior') ? 'Senior Operations Lead' : 'Operations Specialist';
+    department = 'Operations & CRM';
+  } else if (roleText.includes('sales') || roleText.includes('executive') || roleText.includes('closer') || roleText.includes('rep')) {
+    systemRole = 'Operations';
+    moduleScope = 'Operations & CRM';
+    role = roleText.includes('senior') ? 'Senior Sales Specialist' : 'Direct Sales Executive';
     department = 'Sales & Field Operations';
-  } else if (qLower.includes('finance') || qLower.includes('account') || qLower.includes('tax') || qLower.includes('tally')) {
+  } else if (roleText.includes('finance') || roleText.includes('account') || roleText.includes('tax') || roleText.includes('tally')) {
     systemRole = 'Accountant';
     moduleScope = 'Dashboard & Core';
     role = 'Accounts & Tally Executive';
     department = 'Finance & Accounting';
-  } else if (qLower.includes('agent') || qLower.includes('whatsapp') || qLower.includes('marketing')) {
+  } else if (roleText.includes('agent') || roleText.includes('whatsapp') || roleText.includes('marketing')) {
     systemRole = 'Agent';
     moduleScope = 'WhatsApp & Analytics';
     role = 'WhatsApp Campaign Specialist';
@@ -1941,7 +1999,7 @@ async function handleActionCreateUser(query) {
 
   for (let i = 0; i < count; i++) {
     const defaultName = sampleNames[(employees.length + i) % sampleNames.length];
-    const name = (i === 0 && nameMatch) ? nameMatch[1].trim() : defaultName;
+    const name = (i === 0 && extractedName) ? extractedName : defaultName;
     const empId = `e${employees.length + 1}`;
     const userId = `u${store.mockUsers.length + 1}`;
     const cleanEmailName = name.toLowerCase().replace(/\s+/g, '.');
