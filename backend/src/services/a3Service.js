@@ -1877,41 +1877,50 @@ async function handleActionCreateUser(query) {
   const activityLogs = store.mockActivityLogs || [];
   const qLower = query.toLowerCase();
 
-  // Extract count if multiple users requested (e.g. "create 2 new users")
   const countMatch = query.match(/(?:create|generate|add|hire|insert)\s*(\d+)\s*(?:new)?\s*(?:users?|employees?|staff|members?)/i);
   const count = countMatch ? Math.min(parseInt(countMatch[1], 10), 10) : 1;
 
-  // Extract Name (e.g. "create user Rahul Sharma", "add employee Priya Patel")
   let nameMatch = query.match(/(?:user|employee|staff|member|named?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
   if (!nameMatch) {
     nameMatch = query.match(/(?:create|add|hire)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:as|in|role|department)/i);
   }
 
-  // Detect Role & Department
-  let role = 'Sales & Telecaller Specialist';
-  let department = 'Voice Operations & Telecalling';
+  // Detect System Role & Module Scope
+  let systemRole = 'Operations';
+  let moduleScope = 'Operations & CRM';
+  let role = 'Operations Specialist';
+  let department = 'Operations & CRM';
 
-  if (qLower.includes('telecaller') || qLower.includes('caller') || qLower.includes('voice') || qLower.includes('dialer')) {
+  if (qLower.includes('super admin') || qLower.includes('superadmin')) {
+    systemRole = 'Super Admin';
+    moduleScope = 'Voice AI';
+    role = 'Super Administrator';
+    department = 'Executive Management';
+  } else if (qLower.includes('admin') || qLower.includes('administrator')) {
+    systemRole = 'Admin';
+    moduleScope = 'Dashboard & Core';
+    role = 'System Administrator';
+    department = 'Executive Management';
+  } else if (qLower.includes('telecaller') || qLower.includes('caller') || qLower.includes('voice') || qLower.includes('dialer')) {
+    systemRole = 'Telecaller';
+    moduleScope = 'Voice AI';
     role = qLower.includes('senior') ? 'Senior Telecaller' : 'Lead Telecaller Executive';
     department = 'Voice Operations & Telecalling';
   } else if (qLower.includes('sales') || qLower.includes('executive') || qLower.includes('closer') || qLower.includes('rep')) {
+    systemRole = 'Operations';
+    moduleScope = 'Operations & CRM';
     role = qLower.includes('senior') ? 'Senior Sales Specialist' : 'Direct Sales Executive';
     department = 'Sales & Field Operations';
-  } else if (qLower.includes('fitter') || qLower.includes('technician') || qLower.includes('mechanic')) {
-    role = 'Senior Machine Fitter';
-    department = 'Production & Assembly';
-  } else if (qLower.includes('supervisor') || qLower.includes('assembly') || qLower.includes('shopfloor') || qLower.includes('factory')) {
-    role = 'Assembly Floor Supervisor';
-    department = 'Production & Assembly';
-  } else if (qLower.includes('qc') || qLower.includes('quality') || qLower.includes('testing')) {
-    role = 'Quality Testing Engineer';
-    department = 'Quality Assurance & QC';
-  } else if (qLower.includes('dispatch') || qLower.includes('logistics') || qLower.includes('warehouse')) {
-    role = 'Logistics & Dispatch Coordinator';
-    department = 'Logistics & Warehouse';
   } else if (qLower.includes('finance') || qLower.includes('account') || qLower.includes('tax') || qLower.includes('tally')) {
+    systemRole = 'Accountant';
+    moduleScope = 'Dashboard & Core';
     role = 'Accounts & Tally Executive';
     department = 'Finance & Accounting';
+  } else if (qLower.includes('agent') || qLower.includes('whatsapp') || qLower.includes('marketing')) {
+    systemRole = 'Agent';
+    moduleScope = 'WhatsApp & Analytics';
+    role = 'WhatsApp Campaign Specialist';
+    department = 'Marketing & Automation';
   }
 
   const sampleNames = [
@@ -1919,15 +1928,38 @@ async function handleActionCreateUser(query) {
     'Deepak Yadav', 'Ananya Gupta', 'Kavita Singhal', 'Vikram Rathore', 'Pooja Nair'
   ];
 
+  if (!store.mockUsers) {
+    store.mockUsers = [
+      { id: 'u1', name: 'Animesh J', email: 'animesh@aps.in', role: 'Super Admin', module: 'Voice AI', lastLogin: '5m ago', status: 'Online' },
+      { id: 'u2', name: 'Admin', email: 'admin@aps.enterprise', role: 'Admin', module: 'Dashboard & Core', lastLogin: 'Now', status: 'Online' },
+      { id: 'u3', name: 'Bhavya', email: 'bhavya@aps.in', role: 'Operations', module: 'Operations & CRM', lastLogin: '1h ago', status: 'Away' },
+      { id: 'u4', name: 'Aaditya', email: 'aaditya@aps.in', role: 'Agent', module: 'WhatsApp & Analytics', lastLogin: '2h ago', status: 'Offline' }
+    ];
+  }
+
   const createdUsers = [];
 
   for (let i = 0; i < count; i++) {
     const defaultName = sampleNames[(employees.length + i) % sampleNames.length];
     const name = (i === 0 && nameMatch) ? nameMatch[1].trim() : defaultName;
     const empId = `e${employees.length + 1}`;
+    const userId = `u${store.mockUsers.length + 1}`;
     const cleanEmailName = name.toLowerCase().replace(/\s+/g, '.');
     const email = `${cleanEmailName}@aps-enterprise.com`;
     const phone = `+91 ${Math.floor(9000000000 + Math.random() * 999999999)}`;
+
+    // Add to Users & Roles
+    const sysUser = {
+      id: userId,
+      name,
+      email,
+      role: systemRole,
+      module: moduleScope,
+      lastLogin: 'Just now',
+      status: 'Online',
+      createdAt: new Date().toISOString()
+    };
+    store.mockUsers.unshift(sysUser);
 
     const newEmp = {
       id: empId,
@@ -1936,10 +1968,12 @@ async function handleActionCreateUser(query) {
       phone,
       role,
       department,
+      systemRole,
+      moduleScope,
       kpiScore: '92%',
       kpiScoreNum: 92,
       status: 'Active',
-      currentActivity: 'System Onboarding & Task Setup',
+      currentActivity: `System Onboarding (${systemRole})`,
       tasksCompleted: 0,
       callsHandled: 0,
       salesClosed: 0,
@@ -1951,7 +1985,7 @@ async function handleActionCreateUser(query) {
       weeklyKpiHistory: [88, 90, 91, 92],
       activeTask: {
         id: `task-${empId}-1`,
-        title: `Complete system onboarding & initialize ${role} operational pipeline`,
+        title: `Initialize ${systemRole} permissions & ${moduleScope} operational workspace`,
         priority: 'HIGH',
         dueIn: '30 mins',
         leadName: 'System Setup',
@@ -1959,7 +1993,7 @@ async function handleActionCreateUser(query) {
       },
       taskQueue: [
         { title: `Review ${department} standard operating procedures (SOP)`, priority: 'MEDIUM' },
-        { title: 'Set up CRM credentials and phone extension', priority: 'HIGH' }
+        { title: `Configure ${moduleScope} module access credentials`, priority: 'HIGH' }
       ]
     };
 
@@ -1995,10 +2029,10 @@ async function handleActionCreateUser(query) {
       employeeName: 'Bhavya (Admin AI)',
       leadId: null,
       leadName: newEmp.name,
-      action: `Created new user/employee profile "${newEmp.name}" (${newEmp.role} - ${newEmp.department}) via A3 AI Assistant`,
+      action: `Created new account "${newEmp.name}" with role "${systemRole}" (${moduleScope}) via A3 AI Assistant`,
       fromStage: 'None',
       toStage: 'Active Member',
-      details: `Email: ${newEmp.email} | Extension ID: ${newEmp.id}`,
+      details: `Email: ${newEmp.email} | Scope: ${moduleScope}`,
       createdAt: new Date()
     });
   }

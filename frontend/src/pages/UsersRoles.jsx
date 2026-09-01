@@ -162,39 +162,86 @@ export default function UsersRoles() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [sortBy, setSortBy] = useState('Name (A-Z)');
 
+  const API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+
+  useEffect(() => {
+    fetch(`${API_URL}/users`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.users) && data.users.length > 0) {
+          setUsers(data.users);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Open Edit Modal
   const handleEditClick = (user) => {
     setEditingUser({ ...user });
   };
 
   // Save Edit Changes
-  const handleSaveEdit = (e) => {
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
+    if (!editingUser) return;
+    try {
+      await fetch(`${API_URL}/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingUser)
+      });
+    } catch {}
     setUsers(prev => prev.map(u => u.id === editingUser.id ? editingUser : u));
     setEditingUser(null);
   };
 
   // Save Invite User
-  const handleInviteSubmit = (e) => {
+  const handleInviteSubmit = async (e) => {
     e.preventDefault();
     if (!newUser.name || !newUser.email) return alert('Name and email are required');
-    const created = {
-      id: `u${users.length + 1}`,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      module: newUser.module,
-      lastLogin: 'Just now',
-      status: newUser.status
-    };
-    setUsers(prev => [created, ...prev]);
+    try {
+      const res = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser)
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        setUsers(prev => [data.user, ...prev]);
+      } else {
+        const created = {
+          id: `u${users.length + 1}`,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          module: newUser.module,
+          lastLogin: 'Just now',
+          status: newUser.status
+        };
+        setUsers(prev => [created, ...prev]);
+      }
+    } catch {
+      const created = {
+        id: `u${users.length + 1}`,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        module: newUser.module,
+        lastLogin: 'Just now',
+        status: newUser.status
+      };
+      setUsers(prev => [created, ...prev]);
+    }
     setShowInviteModal(false);
     setNewUser({ name: '', email: '', role: 'Operations', module: 'Dashboard & Core', status: 'Online' });
   };
 
   // Delete user
-  const handleDeleteUser = (id) => {
+  const handleDeleteUser = async (id) => {
     if (window.confirm('Are you sure you want to remove this user?')) {
+      try {
+        await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
+      } catch {}
       setUsers(prev => prev.filter(u => u.id !== id));
       setEditingUser(null);
     }

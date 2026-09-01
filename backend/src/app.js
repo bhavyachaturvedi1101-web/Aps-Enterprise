@@ -66,6 +66,7 @@ app.get('/api/health', (req, res) => {
 // A2 Admin API Routes
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/employees', require('./routes/employees'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/activity', require('./routes/activity'));
 app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/invoices', require('./routes/invoices'));
