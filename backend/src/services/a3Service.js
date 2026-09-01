@@ -3266,6 +3266,81 @@ async function processQuery(query, conversationId) {
     console.log('[A3 Follow-up] No stored last result for conversation:', conversationId, '— falling through.');
   }
 
+  // ─── 0.1 CONTEXTUAL OPTION & FOLLOW-UP RESOLVER ────────────────────────────
+  const isOptionFollowUp = /^(all|all of them|all data|everything|show all|sab|saara|sab dikhao|all options|both|both of them|1|2|3|option 1|option 2|option 3|first|second|third)$/i.test(qLower);
+
+  if (isOptionFollowUp && Array.isArray(history) && history.length > 0) {
+    const lastBotMsg = [...history].reverse().find(m => m.role === 'assistant');
+    if (lastBotMsg && lastBotMsg.content) {
+      const prev = lastBotMsg.content.toLowerCase();
+
+      // Case 1: Factory / Production Progress Options
+      if (prev.includes('production progress') || prev.includes('factory data') || prev.includes('factory assembly lines')) {
+        if (/^(2|second|option 2|inventory)$/i.test(qLower)) {
+          const invRes = await handleActionCheckInventory(query);
+          addToHistory(conversationId, query, invRes.text);
+          return { ...invRes, intent: 'action_check_inventory' };
+        }
+        const factRes = await handleFactoryTracker(query);
+        addToHistory(conversationId, query, factRes.text);
+        return { ...factRes, intent: 'factory_tracker' };
+      }
+
+      // Case 2: Billing & Invoices Options
+      if (prev.includes('billing & invoices') || prev.includes('billing') || prev.includes('help you with billing')) {
+        if (/^(1|first|option 1|generate)$/i.test(qLower)) {
+          const invGenRes = await handleInvoiceGenerator('generate gst tax invoice for 349000');
+          addToHistory(conversationId, query, invGenRes.text);
+          return { ...invGenRes, intent: 'invoice_generator' };
+        }
+        if (/^(3|third|option 3|advance|tally)$/i.test(qLower)) {
+          const revRes = await handleRevenueSummary();
+          addToHistory(conversationId, query, revRes.text);
+          return { ...revRes, intent: 'revenue_summary' };
+        }
+        const invRes = await handleInvoices(query);
+        addToHistory(conversationId, query, invRes.text);
+        return { ...invRes, intent: 'invoices' };
+      }
+
+      // Case 3: Team Tasks Options
+      if (prev.includes('team tasks') || prev.includes('do with team tasks') || prev.includes('assign tasks')) {
+        if (/^(3|third|option 3|leaderboard)$/i.test(qLower)) {
+          const lbRes = await handleSalesLeaderboard(query);
+          addToHistory(conversationId, query, lbRes.text);
+          return { ...lbRes, intent: 'sales_leaderboard' };
+        }
+        const taskRes = await handleAssignEmployeeTasks('give tasks to all employees');
+        addToHistory(conversationId, query, taskRes.text);
+        return { ...taskRes, intent: 'assign_employee_tasks' };
+      }
+
+      // Case 4: Voice Dialer Options
+      if (prev.includes('voice dialer') || prev.includes('with the voice dialer')) {
+        if (/^(1|first|option 1|schedule)$/i.test(qLower)) {
+          const schRes = await handleScheduleCall('schedule follow up call');
+          addToHistory(conversationId, query, schRes.text);
+          return { ...schRes, intent: 'schedule_call' };
+        }
+        if (/^(3|third|option 3|logs)$/i.test(qLower)) {
+          const dialRes = await handleDialer();
+          addToHistory(conversationId, query, dialRes.text);
+          return { ...dialRes, intent: 'dialer' };
+        }
+        const sentRes = await handleCallSentiment(query);
+        addToHistory(conversationId, query, sentRes.text);
+        return { ...sentRes, intent: 'call_sentiment' };
+      }
+
+      // Case 5: CRM / Leads
+      if (prev.includes('crm') || prev.includes('pipeline') || prev.includes('leads')) {
+        const crmRes = await handleShowAllCrmLeads(query);
+        addToHistory(conversationId, query, crmRes.text);
+        return { ...crmRes, intent: 'show_all_crm_leads' };
+      }
+    }
+  }
+
   const intent  = detectIntent(query);
   const provider = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
 
