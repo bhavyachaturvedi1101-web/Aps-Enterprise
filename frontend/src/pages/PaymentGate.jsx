@@ -9,6 +9,12 @@ export default function PaymentGate() {
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(null);
   const [sendingReminder, setSendingReminder] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4500);
+  };
 
   const fetchPayments = async () => {
     try {
@@ -27,7 +33,7 @@ export default function PaymentGate() {
           id: `PAY${String(index + 1).padStart(3, '0')}`,
           leadId: l.id,
           lead: l.name,
-          amount: `₹${parseFloat(l.budget * 0.10).toLocaleString('en-IN')}`,
+          amount: `₹${parseFloat((l.budget || 20000) * 0.10).toLocaleString('en-IN')}`,
           percent: '10%',
           status: isVerified ? 'Verified' : 'Pending Verification',
           tallyRef: isVerified ? `TALLY-2026-${2000 + parseInt(l.id || index)}` : null,
@@ -58,14 +64,14 @@ export default function PaymentGate() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('Payment verified against Tally ledger. Lead can now advance to Client (Paid).');
+        showToast(`Payment verified against Tally ledger for "${pay.lead}". Lead advanced to Client (Paid).`, 'success');
         await fetchPayments();
       } else {
-        alert(`Verification failed: ${data.error || 'Unknown error'}\n${data.reason || ''}`);
+        showToast(`Verification failed: ${data.error || 'Unknown error'}`, 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Connection error to backend API.');
+      showToast('Connection error to backend API.', 'error');
     } finally {
       setVerifying(null);
     }
@@ -84,13 +90,13 @@ export default function PaymentGate() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`WhatsApp payment reminder sequence triggered for "${pending.lead}"! Message ID: ${data.message.messageId}`);
+        showToast(`WhatsApp payment reminder sequence triggered for "${pending.lead}" (Message ID: ${data.message?.messageId || 'WA-001'})`, 'success');
       } else {
-        alert(`Reminder trigger failed: ${data.error || 'Unknown error'}`);
+        showToast(`Reminder trigger failed: ${data.error || 'Unknown error'}`, 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Connection error to backend API.');
+      showToast('Connection error to backend API.', 'error');
     } finally {
       setSendingReminder(false);
     }
@@ -102,8 +108,40 @@ export default function PaymentGate() {
 
   const pendingPayments = payments.filter(p => p.status === 'Pending Verification');
 
+  const pendingSummaryText = pendingPayments.length === 1
+    ? `${pendingPayments[0].lead} (${pendingPayments[0].amount})`
+    : pendingPayments.length <= 3
+      ? pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')
+      : `${pendingPayments.slice(0, 3).map(p => `${p.lead} (${p.amount})`).join(', ')} + ${pendingPayments.length - 3} other account(s)`;
+
   return (
     <div style={{ ...s.page, padding: undefined }} className="page-container">
+      {/* In-app Toast Banner */}
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          top: 24,
+          right: 24,
+          zIndex: 9999,
+          padding: '12px 20px',
+          borderRadius: 10,
+          background: toast.type === 'error' ? '#fee2e2' : '#ecfdf5',
+          border: `1px solid ${toast.type === 'error' ? '#fca5a5' : '#a7f3d0'}`,
+          color: toast.type === 'error' ? '#991b1b' : '#065f46',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          <span>{toast.msg}</span>
+          <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '1rem', marginLeft: 8 }}>×</button>
+        </div>
+      )}
+
       <div style={s.pageHead} className="mobile-stack-header">
         <div>
           <h1 style={s.title}>Payment Gate</h1>
@@ -118,7 +156,7 @@ export default function PaymentGate() {
           <div>
             <div style={{ ...s.alertTitle, color: '#b45309' }}>{pendingPayments.length} payment(s) pending verification</div>
             <div style={{ ...s.alertSub, color: '#92400e' }}>
-              {pendingPayments.map(p => `${p.lead} (${p.amount})`).join(', ')} advance payment is overdue. Send reminder via WhatsApp.
+              <strong>{pendingSummaryText}</strong> advance payment is overdue. Send reminder via WhatsApp.
             </div>
           </div>
           <button onClick={handleSendReminder} disabled={sendingReminder} className="btn-blue-primary" style={s.alertBtn}>
@@ -139,42 +177,42 @@ export default function PaymentGate() {
 
       <div className="payment-table-wrapper">
         <div style={s.card} className="payment-table-inner">
-        <div style={s.tableHead}>
-          {['Payment ID', 'Lead / Client', 'Amount (10% Advance)', 'Due Date', 'Status'].map(h => (
-            <div key={h} style={{...s.th, flex: h === 'Amount (10% Advance)' || h === 'Lead / Client' ? 2 : 1}}>{h}</div>
-          ))}
-        </div>
-        {payments.map(pay => (
-          <div key={pay.id} className="table-row-hover" style={s.payRow}>
-            <div style={{...s.payLeft, flex: 1}}>
-              <div style={s.payId}>{pay.id}</div>
-              <div style={s.payLead}>{pay.lead}</div>
-            </div>
-            <div style={{...s.payMid, flex: 2}}>
-              <div style={s.payAmount}>{pay.amount} <span style={s.payPct}>({pay.percent} advance)</span></div>
-              {pay.tallyRef && <div style={s.tallyRef}>Tally Ref: {pay.tallyRef}</div>}
-            </div>
-            <div style={{...s.payMid, flex: 1}}>
-              <div style={s.payDue}>Due: {pay.dueDate} {pay.daysOverdue > 0 && <span style={s.overdue}>{pay.daysOverdue} days overdue</span>}</div>
-            </div>
-            <div style={{...s.payRight, flex: 1}}>
-              {pay.status === 'Verified' ? (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#047857', fontWeight: 700, fontSize: '0.82rem' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#10b981' }}/>
-                  <span>Verified with Tally</span>
-                </div>
-              ) : (
-                <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} className="btn-blue-primary" style={{ ...s.verifyBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <span>{verifying === pay.leadId ? 'Verifying…' : 'Verify with Tally'}</span>
-                </button>
-              )}
-            </div>
+          <div style={s.tableHead}>
+            {['Payment ID', 'Lead / Client', 'Amount (10% Advance)', 'Due Date', 'Status'].map(h => (
+              <div key={h} style={{...s.th, flex: h === 'Amount (10% Advance)' || h === 'Lead / Client' ? 2 : 1}}>{h}</div>
+            ))}
           </div>
-        ))}
-        {payments.length === 0 && (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#71717a', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
-        )}
+          {payments.map(pay => (
+            <div key={pay.id} className="table-row-hover" style={s.payRow}>
+              <div style={{...s.payLeft, flex: 1}}>
+                <div style={s.payId}>{pay.id}</div>
+                <div style={s.payLead}>{pay.lead}</div>
+              </div>
+              <div style={{...s.payMid, flex: 2}}>
+                <div style={s.payAmount}>{pay.amount} <span style={s.payPct}>({pay.percent} advance)</span></div>
+                {pay.tallyRef && <div style={s.tallyRef}>Tally Ref: {pay.tallyRef}</div>}
+              </div>
+              <div style={{...s.payMid, flex: 1}}>
+                <div style={s.payDue}>Due: {pay.dueDate} {pay.daysOverdue > 0 && <span style={s.overdue}>{pay.daysOverdue} days overdue</span>}</div>
+              </div>
+              <div style={{...s.payRight, flex: 1}}>
+                {pay.status === 'Verified' ? (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#047857', fontWeight: 700, fontSize: '0.82rem' }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#10b981' }}/>
+                    <span>Verified with Tally</span>
+                  </div>
+                ) : (
+                  <button onClick={() => handleVerify(pay)} disabled={verifying === pay.leadId} className="btn-blue-primary" style={{ ...s.verifyBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>{verifying === pay.leadId ? 'Verifying…' : 'Verify with Tally'}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+          {payments.length === 0 && (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#71717a', fontSize: '0.85rem' }}>No leads tracked in Payment Gate.</div>
+          )}
         </div>
       </div>
     </div>
