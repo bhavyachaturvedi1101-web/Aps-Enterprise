@@ -162,9 +162,10 @@ export default function UsersRoles() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [sortBy, setSortBy] = useState('Name (A-Z)');
 
-  const API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
+  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const API_URL = isLocal ? 'http://localhost:5000/api' : '/api';
 
-  useEffect(() => {
+  const fetchUsers = () => {
     fetch(`${API_URL}/users`)
       .then(r => r.json())
       .then(data => {
@@ -173,6 +174,16 @@ export default function UsersRoles() {
         }
       })
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    window.addEventListener('focus', fetchUsers);
+    const interval = setInterval(fetchUsers, 3000);
+    return () => {
+      window.removeEventListener('focus', fetchUsers);
+      clearInterval(interval);
+    };
   }, []);
 
   // Open Edit Modal
