@@ -78,19 +78,22 @@ export default function PaymentGate() {
   };
 
   const handleSendReminder = async () => {
-    const pending = payments.find(p => p.status === 'Pending Verification');
-    if (!pending) return;
+    const pending = payments.filter(p => p.status === 'Pending Verification');
+    if (pending.length === 0) return;
 
     setSendingReminder(true);
     try {
       const res = await fetch(`${API}/whatsapp/send-reminder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId: pending.leadId })
+        body: JSON.stringify({
+          all: true,
+          leadIds: pending.map(p => p.leadId)
+        })
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`WhatsApp payment reminder sequence triggered for "${pending.lead}" (Message ID: ${data.message?.messageId || 'WA-001'})`, 'success');
+        showToast(`WhatsApp reminder sequence triggered for ALL ${data.count || pending.length} pending account(s)!`, 'success');
       } else {
         showToast(`Reminder trigger failed: ${data.error || 'Unknown error'}`, 'error');
       }
@@ -160,7 +163,7 @@ export default function PaymentGate() {
             </div>
           </div>
           <button onClick={handleSendReminder} disabled={sendingReminder} className="btn-blue-primary" style={s.alertBtn}>
-            {sendingReminder ? 'Sending…' : 'Send Reminder'}
+            {sendingReminder ? 'Sending…' : `Send All Reminders (${pendingPayments.length})`}
           </button>
         </div>
       ) : (

@@ -245,6 +245,38 @@ class WhatsAppService {
     return { success: true, message: msg };
   }
 
+  async sendAllPaymentReminders(leadIds = null) {
+    let targetLeads = [];
+    
+    if (Array.isArray(leadIds) && leadIds.length > 0) {
+      targetLeads = leadIds;
+    } else {
+      const storeLeads = store.mockLeads || [];
+      targetLeads = storeLeads.filter(l => l.stage === 'Confirmed Lead').map(l => l.id);
+    }
+
+    if (targetLeads.length === 0) {
+      targetLeads = ['LEAD-001'];
+    }
+
+    const results = [];
+    for (const id of targetLeads) {
+      try {
+        const res = await this.sendPaymentReminder(id);
+        if (res.success) results.push(res.message);
+      } catch (err) {
+        console.warn(`[WhatsApp Bulk] Failed for ${id}:`, err.message);
+      }
+    }
+
+    return {
+      success: true,
+      count: results.length,
+      totalTargeted: targetLeads.length,
+      messages: results
+    };
+  }
+
   async sendProductionUpdate(lead) {
     const phone = (typeof lead === 'object' ? lead.phone : null) || '+919988001122';
     const name = typeof lead === 'object' ? lead.name : String(lead);
