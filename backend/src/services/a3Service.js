@@ -223,7 +223,17 @@ const INTENTS = [
     /invoice dikhao/i,
     /saare invoice/i
   ] },
-  { name: 'factory_tracker',     patterns: [/factory/i, /job card/i, /assembly/i, /shopfloor/i, /production progress/i, /mfg status/i, /factory job/i, /tracker/i] },
+  { name: 'factory_tracker',     patterns: [
+    /track.*status/i,
+    /status.*track/i,
+    /\b(track|tracking|tracker|shopfloor|assembly|production|factory|mfg|manufacturing|job card|jobcard)\b/i,
+    /production.*(track|status|progress|update|data)/i,
+    /assembly.*(track|status|progress|update|data|line)/i,
+    /machine.*(track|status|progress|build)/i,
+    /order.*(status|progress|track)/i,
+    /milestone/i,
+    /progress/i
+  ] },
   { name: 'call_sentiment',      patterns: [/sentiment/i, /call transcript/i, /call analysis/i, /customer mood/i, /speech analysis/i, /voice call/i] },
   { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
   { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
@@ -3124,7 +3134,17 @@ async function generateUniversalAnswer(query) {
     return await handleAssignEmployeeTasks(query);
   }
 
-  // 2. Specific employee profile inquiry
+  // 1. Task assignment or task allocation query
+  if (qLower.includes('task') || qLower.includes('assign') || qLower.includes('give work') || qLower.includes('allocate') || qLower.includes('todo')) {
+    return await handleAssignEmployeeTasks(query);
+  }
+
+  // 2. Factory / Production / Job Cards / Tracking / Status
+  if (qLower.includes('track') || qLower.includes('status') || qLower.includes('progress') || qLower.includes('factory') || qLower.includes('production') || qLower.includes('assembly') || qLower.includes('shopfloor') || qLower.includes('job card') || qLower.includes('mfg')) {
+    return await handleFactoryTracker(query);
+  }
+
+  // 3. Specific employee profile inquiry
   const matchedEmp = mockEmployees.find(e => qLower.includes(e.name.toLowerCase()));
   if (matchedEmp) {
     const active = matchedEmp.activeTask 
@@ -3138,24 +3158,42 @@ async function generateUniversalAnswer(query) {
     };
   }
 
-  // 3. Tally sync / Payments / Advance / Revenue inquiry
+  // 4. Tally sync / Payments / Advance / Revenue inquiry
   if (qLower.includes('tally') || qLower.includes('advance') || qLower.includes('payment') || qLower.includes('deposit') || qLower.includes('paid') || qLower.includes('revenue') || qLower.includes('money') || qLower.includes('collection')) {
     return await handleRevenueSummary();
   }
 
-  // 4. CRM / Leads / Pipeline inquiry
-  if (qLower.includes('lead') || qLower.includes('crm') || qLower.includes('pipeline') || qLower.includes('deal') || qLower.includes('customer')) {
-    return {
-      text: `### 📊 APS CRM Lead Pipeline Overview\n\n• **Total Active Leads:** **${mockLeads.length} Leads**\n• **Pipeline Stages:** Enquiry (${mockLeads.filter(l => l.stage === 'Enquiry').length}), Confirmed (${mockLeads.filter(l => l.stage === 'Confirmed Lead').length}), Paid (${mockLeads.filter(l => l.stage === 'Client (Paid)').length}), In Production (${mockLeads.filter(l => l.stage === 'In Production').length})\n• **Direct Module Link:** Navigate to **\`/crm\`** to view the Kanban board.`
-    };
+  // 5. CRM / Leads / Pipeline / Sales inquiry
+  if (qLower.includes('lead') || qLower.includes('crm') || qLower.includes('pipeline') || qLower.includes('deal') || qLower.includes('customer') || qLower.includes('sales')) {
+    return await handleShowAllCrmLeads(query);
   }
 
-  // 5. Company / Products / Machine inquiry
+  // 6. Invoices / Billing / Tax inquiry
+  if (qLower.includes('invoice') || qLower.includes('billing') || qLower.includes('bill') || qLower.includes('gst') || qLower.includes('hsn')) {
+    return await handleInvoices(query);
+  }
+
+  // 7. Inventory / Stock inquiry
+  if (qLower.includes('stock') || qLower.includes('inventory') || qLower.includes('warehouse')) {
+    return await handleActionCheckInventory(query);
+  }
+
+  // 8. Voice / Call inquiry
+  if (qLower.includes('call') || qLower.includes('voice') || qLower.includes('dialer') || qLower.includes('sentiment')) {
+    return await handleCallSentiment(query);
+  }
+
+  // 9. WhatsApp inquiry
+  if (qLower.includes('whatsapp') || qLower.includes('waba') || qLower.includes('campaign') || qLower.includes('broadcast')) {
+    return await handleWhatsAppAnalytics(query);
+  }
+
+  // 10. Company / Products / Machine inquiry
   if (qLower.includes('aps') || qLower.includes('company') || qLower.includes('location') || qLower.includes('indore') || qLower.includes('machine') || qLower.includes('product') || qLower.includes('dona') || qLower.includes('pattal')) {
     return await handleCompanyInfo(query);
   }
 
-  // 6. Mathematical calculation / Numbers inquiry
+  // 11. Mathematical calculation / Numbers inquiry
   const mathMatch = query.match(/(\d+\s*[\+\-\*\/\%]\s*\d+)/);
   if (mathMatch) {
     try {
@@ -3168,20 +3206,8 @@ async function generateUniversalAnswer(query) {
     } catch {}
   }
 
-  // 7. Universal Smart Q&A Synthesizer (never refuse!)
-  return {
-    text: `### 🤖 APS AI Intelligence Answer\n\n` +
-      `• **Context & Scope**: Analyzed request against **APS Enterprise** CRM, ERP manufacturing, team KPI benchmarks, and business operations.\n` +
-      `• **Key Insight**: Operational efficiency across our Indore plant and Pune manufacturing facility relies on real-time data sync across all 11 dashboard modules.\n` +
-      `• **Recommended Action**: You can explore specific modules like **CRM Pipeline** (\`/crm\`), **Team KPIs** (\`/employees\`), **GST Invoices** (\`/invoices\`), or **Factory Job Cards** (\`/factory\`) for real-time live data.`,
-    table: [
-      { Module: 'CRM Leads & Pipeline', Route: '/crm', Status: 'Active' },
-      { Module: 'Team KPIs & Staff Tasks', Route: '/employees', Status: 'Active' },
-      { Module: 'GST Tax Invoices & Billing', Route: '/invoices', Status: 'Active' },
-      { Module: 'Factory Shopfloor Job Cards', Route: '/factory', Status: 'Active' }
-    ],
-    chart: null
-  };
+  // 12. Default Fallback: Show complete CRM & business operations overview
+  return await handleShowAllCrmLeads(query);
 }
 
 // ─── Main Query Processor ──────────────────────────────────────────────────────
@@ -3269,7 +3295,7 @@ async function processQuery(query, conversationId) {
   }
 
   // ─── 0.1 CONTEXTUAL OPTION & FOLLOW-UP RESOLVER ────────────────────────────
-  const isOptionFollowUp = /^(all|all of them|all data|everything|show all|sab|saara|sab dikhao|all options|both|both of them|1|2|3|option 1|option 2|option 3|first|second|third)$/i.test(qLower);
+  const isOptionFollowUp = /^(all|all of them|all data|everything|show all|sab|saara|sab dikhao|all options|both|both of them|1|2|3|option 1|option 2|option 3|first|second|third|track status|status|track|tracking|progress|delayed|assembly|inventory|stock|job card|invoices|bills|leaderboard|sentiment)$/i.test(qLower);
 
   if (isOptionFollowUp && Array.isArray(history) && history.length > 0) {
     const lastBotMsg = [...history].reverse().find(m => m.role === 'assistant');
