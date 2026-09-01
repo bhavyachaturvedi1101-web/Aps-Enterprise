@@ -68,6 +68,7 @@ app.use('/api/leads', require('./routes/leads'));
 app.use('/api/employees', require('./routes/employees'));
 app.use('/api/activity', require('./routes/activity'));
 app.use('/api/inventory', require('./routes/inventory'));
+app.use('/api/invoices', require('./routes/invoices'));
 
 // A3 AI Chatbot — Internal NL Query Engine
 app.use('/api/a3', require('./routes/a3'));
@@ -77,6 +78,15 @@ app.use('/api/whatsapp', require('./routes/whatsapp'));
 app.use('/api/config', require('./routes/config'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/notifications', require('./routes/notifications'));
+
+// Analytics & Reports
+app.use('/api/analytics', require('./routes/analytics'));
+
+// ERP — Job Cards & Production Milestones
+app.use('/api/jobcards', require('./routes/jobcards'));
+
+// Tally ERP Bridge
+app.use('/api/tally', require('./routes/tally'));
 
 
 

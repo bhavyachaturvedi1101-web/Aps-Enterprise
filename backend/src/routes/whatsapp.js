@@ -50,7 +50,6 @@ router.post('/sequences/:id/update', async (req, res) => {
 router.post('/send-reminder', async (req, res) => {
   const { leadId } = req.body;
   if (!leadId) return res.status(400).json({ error: 'leadId is required' });
-
   try {
     const result = await whatsappService.sendPaymentReminder(leadId);
     res.json(result);
@@ -69,5 +68,26 @@ router.post('/send-custom', async (req, res) => {
   }
 });
 
-module.exports = router;
+// ─── Meta Cloud API Webhook ───────────────────────────────────────────────────
+// GET /api/whatsapp/webhook — Meta webhook verification challenge
+router.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  const result = whatsappService.verifyWebhook(mode, token, challenge);
+  if (result !== null) {
+    res.status(200).send(result);
+  } else {
+    console.warn('[WhatsApp Webhook] Verification failed — wrong token');
+    res.sendStatus(403);
+  }
+});
 
+// POST /api/whatsapp/webhook — Receive incoming messages & delivery status updates
+router.post('/webhook', async (req, res) => {
+  // Must respond 200 immediately to Meta (within 5 sec)
+  res.sendStatus(200);
+  await whatsappService.processWebhookEvent(req.body);
+});
+
+module.exports = router;

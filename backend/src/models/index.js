@@ -4,6 +4,9 @@ const Booking = require('./Booking');
 const Payment = require('./Payment');
 const ActivityLog = require('./ActivityLog');
 const Inventory = require('./Inventory');
+const Invoice = require('./Invoice');
+const JobCard = require('./JobCard');
+const User = require('./User');
 
 // Establish associations
 
@@ -19,6 +22,14 @@ Payment.belongsTo(Lead, { foreignKey: 'leadId', as: 'lead' });
 Lead.hasMany(ActivityLog, { foreignKey: 'leadId', as: 'activities', onDelete: 'CASCADE' });
 ActivityLog.belongsTo(Lead, { foreignKey: 'leadId', as: 'lead' });
 
+// Lead <-> Invoice (1-to-many)
+Lead.hasMany(Invoice, { foreignKey: 'leadId', as: 'invoices', onDelete: 'SET NULL' });
+Invoice.belongsTo(Lead, { foreignKey: 'leadId', as: 'lead' });
+
+// Booking <-> JobCard (1-to-1)
+Booking.hasOne(JobCard, { foreignKey: 'bookingId', as: 'jobCard', onDelete: 'CASCADE' });
+JobCard.belongsTo(Booking, { foreignKey: 'bookingId', as: 'booking' });
+
 // Employee <-> Lead (1-to-many)
 Employee.hasMany(Lead, { foreignKey: 'assignedEmployeeId', as: 'leads' });
 Lead.belongsTo(Employee, { foreignKey: 'assignedEmployeeId', as: 'employee' });
@@ -33,6 +44,9 @@ module.exports = {
   Booking,
   Payment,
   ActivityLog,
-  Inventory
+  Inventory,
+  Invoice,
+  JobCard,
+  User
 };
 

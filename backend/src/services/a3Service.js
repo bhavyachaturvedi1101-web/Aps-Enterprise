@@ -10,6 +10,7 @@
 
 const https = require('https');
 const { mockLeads } = require('../config/inMemoryStore');
+const tallyService = require('./tallyService');
 
 // ─── In-Memory Conversation Store ─────────────────────────────────────────────
 const conversationStore = new Map();
@@ -148,42 +149,92 @@ const INTENTS = [
     /poori report/i
   ] },
   { name: 'normal_chat',         patterns: [/^\s*(hi|hello|hey|greetings|good morning|good afternoon|good evening|namaste|ha\b|haa|ok|okay|cool|nice)\s*$/i, /kaise ho|how are you|kaise hain|kya haal|what's up|sup\b|how do you do/i, /who are you|aap kaun ho|who created you|tum kaun ho|who r u|what are you/i, /what can you do|kya kar sakte ho|features kya hai|help me|kya kya kar sakte ho/i, /thank you|thanks|shukriya|dhanyawad|thank u|thx|awesome|great/i, /bye|goodbye|alvida|cya|see you/i] },
-  { name: 'factory_tracker',     patterns: [/factory/i, /job card/i, /assembly/i, /shopfloor/i, /production progress/i, /mfg status/i, /factory job/i, /tracker/i] },
-  // 'invoices' must come BEFORE 'invoice_generator' to win for list/show queries
-  { name: 'invoices', patterns: [
-    /show.*invoice/i,
-    /list.*invoice/i,
-    /all.*invoice/i,
-    /view.*invoice/i,
-    /\bbilling\b/i,
-    /\btally\b/i,
-    /\bsync\b/i,
-    /\bledger\b/i,
-    /invoice.*list/i,
-    /invoice.*history/i,
-    /invoice.*records/i,
-    /invoice dikhao/i,
-    /saare invoice/i
+  // ── Action Creation & Mutation Intents (Must be evaluated FIRST) ──
+  { name: 'action_post_tally',      patterns: [
+    /(create|generate|add|post|make|insert|record|new)\s*(\d+)?\s*(new)?\s*(record|voucher|entry|payment|advance|receipt|transaction).*?(tally|ledger|accounting|sync)/i,
+    /(tally|ledger|voucher).*?(create|generate|add|post|make|insert|record|banao|entry|new)/i,
+    /generate.*record.*tally/i,
+    /add.*record.*tally/i,
+    /post.*tally/i,
+    /add.*tally/i,
+    /create.*voucher/i,
+    /post.*voucher/i,
+    /reconcile.*tally/i,
+    /verify.*payment/i,
+    /tally voucher/i,
+    /tally entry/i,
+    /paisa receive/i
   ] },
-  // 'invoice_generator' triggers ONLY for explicit generation commands
-  { name: 'invoice_generator',   patterns: [/\bgst\b/i, /tax invoice/i, /\bhsn\b/i, /generate invoice/i, /create invoice/i, /billing details/i, /make.*invoice/i, /invoice.*banao/i, /invoice.*generate/i] },
-  { name: 'call_sentiment',      patterns: [/sentiment/i, /call transcript/i, /call analysis/i, /customer mood/i, /speech analysis/i, /voice call/i] },
-  { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
-  { name: 'sales_leaderboard',   patterns: [/leaderboard/i, /badge/i, /rankings/i, /top seller/i, /gamification/i, /sales team/i] },
-  { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
+  { name: 'action_create_lead',     patterns: [
+    /(create|generate|add|register|insert|make|new)\s*(\d+)?\s*(new)?\s*(lead|client|prospect|customer|inquiry|deal)/i,
+    /(lead|client|prospect|customer).*?(create|add|generate|register|banao|entry)/i,
+    /new lead/i,
+    /naya lead/i,
+    /lead add/i,
+    /nayi entry/i,
+    /lead banao/i
+  ] },
+  { name: 'action_create_user',     patterns: [
+    /(create|generate|add|register|hire|insert|new)\s*(\d+)?\s*(new)?\s*(user|employee|staff|member|worker|telecaller|sales rep|executive|fitter|technician|supervisor|accountant)/i,
+    /(user|employee|staff|member|worker|telecaller|rep|fitter|supervisor).*?(create|add|generate|hire|banao|register|new)/i,
+    /new (user|employee|staff|worker|member)/i,
+    /add (user|employee|staff|worker|member)/i,
+    /hire (user|employee|staff|worker|telecaller|rep)/i
+  ] },
+  { name: 'action_erp_booking',     patterns: [
+    /(create|generate|add|register|insert|make|release|new)\s*(\d+)?\s*(new)?\s*(job card|erp|manufacturing booking|production booking|factory booking)/i,
+    /(job card|erp|factory|production).*?(create|generate|add|release|banao|booking)/i,
+    /release.*(factory|production)/i,
+    /start.*production/i
+  ] },
+  { name: 'action_transition_lead', patterns: [/move.*lead/i, /transition.*lead/i, /change.*stage/i, /update.*stage/i, /set.*stage/i, /mark.*as/i, /promote.*lead/i, /stage badlo/i, /stage change/i, /move karo/i, /paid mark/i] },
+  { name: 'action_queue_dialer',    patterns: [
+    /(create|queue|schedule|add|trigger)\s*(\d+)?\s*(new)?\s*(call|dialer|phone call|voice call)/i,
+    /call.*(queue|schedule|add|trigger)/i,
+    /dialer me daalo/i,
+    /call karo/i
+  ] },
+  { name: 'action_send_whatsapp',   patterns: [/send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i] },
   { name: 'action_send_email',       patterns: [/send.*email/i, /email.*quotation/i, /mail/i, /send.*pdf.*email/i, /email bhejo/i, /send email/i] },
   { name: 'action_check_inventory',  patterns: [/inventory/i, /warehouse/i, /\bstock\b/i, /available units/i, /raw material/i, /kitna stock/i, /inventory stock/i] },
   { name: 'assign_employee_tasks', patterns: [
     /give.*task/i,
     /assign.*task/i,
-    /task.*(every|all|employee|role|staff|team|member|worker)/i,
-    /(employee|staff|team).*task/i,
+    /tasks? (to|for) (sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?)/i,
+    /(sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?).*tasks?/i,
+    /task.*(every|all|employee|role|staff|team|member|worker|sales|telecaller|caller)/i,
+    /(employee|staff|team|sales|caller|factory|dispatch).*task/i,
     /assign.*work/i,
     /give.*work/i,
     /distribute.*task/i,
     /allocate.*task/i,
     /role.*task/i,
     /work.*role/i
+  ] },
+  { name: 'invoice_generator',   patterns: [/\bgst\b/i, /tax invoice/i, /\bhsn\b/i, /generate invoice/i, /create invoice/i, /billing details/i, /make.*invoice/i, /invoice.*banao/i, /invoice.*generate/i] },
+
+  // ── Query & Reporting Intents ──
+  { name: 'invoices', patterns: [
+    /show.*(invoice|billing|ledger)/i,
+    /list.*(invoice|billing|ledger)/i,
+    /all.*(invoice|billing|ledger)/i,
+    /view.*(invoice|billing|ledger)/i,
+    /invoice.*(list|history|records|table|ledger)/i,
+    /invoice dikhao/i,
+    /saare invoice/i
+  ] },
+  { name: 'factory_tracker',     patterns: [/factory/i, /job card/i, /assembly/i, /shopfloor/i, /production progress/i, /mfg status/i, /factory job/i, /tracker/i] },
+  { name: 'call_sentiment',      patterns: [/sentiment/i, /call transcript/i, /call analysis/i, /customer mood/i, /speech analysis/i, /voice call/i] },
+  { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
+  { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
+  { name: 'sales_leaderboard',   patterns: [
+    /leaderboard/i,
+    /badge/i,
+    /rankings?/i,
+    /top seller/i,
+    /gamification/i,
+    /sales (leaderboard|ranking|top|performance|rank|reps|champion)/i,
+    /top (sales|rep|closer|seller|performer)/i
   ] },
   { name: 'employee_performance', patterns: [
     /(employee|employer|sales rep|team member|staff|worker).*?(perform|profit|spent|revenue|gain|roi|kpi|cost|figures|graph|report)/i,
@@ -230,12 +281,6 @@ const INTENTS = [
   ] },
   { name: 'explain_metrics',  patterns: [/explain.*kpi/i, /explain.*metric/i, /explain.*formula/i, /what is kpi/i, /how is.*calculated/i, /business metrics/i, /definition of/i] },
   { name: 'trend_analysis',   patterns: [/trend analysis/i, /anomaly/i, /anomalies/i, /growth rate/i, /decline/i, /variance/i, /sales velocity/i, /pipeline health/i] },
-  { name: 'action_create_lead',     patterns: [/add.*lead/i, /create.*lead/i, /new lead/i, /register lead/i, /naya lead/i, /lead add/i, /nayi entry/i, /lead banao/i] },
-  { name: 'action_transition_lead', patterns: [/move.*lead/i, /transition.*lead/i, /change.*stage/i, /update.*stage/i, /set.*stage/i, /mark.*as/i, /promote.*lead/i, /stage badlo/i, /stage change/i, /move karo/i, /paid mark/i] },
-  { name: 'action_post_tally',      patterns: [/post.*tally/i, /add.*tally/i, /create.*voucher/i, /post.*voucher/i, /reconcile.*tally/i, /verify.*payment/i, /tally voucher/i, /tally entry/i, /paisa receive/i] },
-  { name: 'action_erp_booking',     patterns: [/create.*erp/i, /erp.*booking/i, /release.*factory/i, /release.*production/i, /start.*production/i, /factory release/i, /job card/i, /production queue/i] },
-  { name: 'action_queue_dialer',    patterns: [/queue.*call/i, /add.*dialer/i, /trigger.*call/i, /call.*lead/i, /dialer me daalo/i, /call karo/i, /voice call/i] },
-  { name: 'action_send_whatsapp',   patterns: [/send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i] },
   { name: 'leads_by_stage',   patterns: [/confirmed lead/i, /qualified lead/i, /enquir/i, /in production/i, /dispatched/i, /booked lead/i, /client.*paid/i, /paid.*client/i] },
   { name: 'show_all_crm_leads', patterns: [
     /show.*crm/i,
@@ -1468,20 +1513,42 @@ async function handleWhatsAppAnalytics(query) {
 
 async function handleSalesLeaderboard(query) {
   const store = await getStore();
-  const employees = store.mockEmployees || [];
-  const sorted = [...employees].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0));
+  const allEmployees = store.mockEmployees || [];
+  
+  // Filter strictly to Sales, Telecalling, and Business Development representatives
+  const salesEmployees = allEmployees.filter(e => {
+    const r = (e.role || '').toLowerCase();
+    const d = (e.department || '').toLowerCase();
+    return r.includes('sales') || r.includes('executive') || r.includes('champion') || 
+           r.includes('telecaller') || r.includes('qualification') || r.includes('representative') || 
+           r.includes('rep') || r.includes('bd') || d.includes('sales') || d.includes('telecalling') || d.includes('voice');
+  });
+
+  const targetList = salesEmployees.length > 0 ? salesEmployees : allEmployees;
+  const sorted = [...targetList].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0) || (b.totalRevenue || 0) - (a.totalRevenue || 0));
+
+  // Cap chart strictly to top 8 sales reps so bars and labels remain clean, uncluttered, and readable
+  const topForChart = sorted.slice(0, 8);
 
   return {
-    text: `**Sales Representative Leaderboard** (August 2026):\n\n` +
-      `1. **${sorted[0]?.name || 'Bhavya'}** — ${sorted[0]?.salesClosed || 3} Deals Closed (₹${(sorted[0]?.totalRevenue || 180000).toLocaleString('en-IN')}) | *Role: Sales Champion & Tally Gate Master*\n` +
-      `2. **${sorted[1]?.name || 'Animesh'}** — ${sorted[1]?.salesClosed || 2} Deals Closed (₹${(sorted[1]?.totalRevenue || 120000).toLocaleString('en-IN')}) | *Role: Voice Agent Specialist*\n` +
-      `3. **${sorted[2]?.name || 'Aaditya'}** — ${sorted[2]?.salesClosed || 1} Deals Closed (₹${(sorted[2]?.totalRevenue || 75000).toLocaleString('en-IN')}) | *Role: WhatsApp Automation Ninja*\n`,
-    table: sorted.map((e, i) => ({ Rank: `#${i + 1}`, Name: e.name, Role: e.role, 'Deals Closed': e.salesClosed || 0, Revenue: `₹${(e.totalRevenue || 0).toLocaleString('en-IN')}`, 'KPI Score': e.kpiScore || '—', Badge: i === 0 ? 'Champion' : i === 1 ? 'Speed Specialist' : 'Specialist' })),
+    text: `### 🏆 Sales Representative Leaderboard (August 2026)\n\n` +
+      `**Top Sales Closers:**\n` +
+      sorted.slice(0, 3).map((e, idx) => `${idx + 1}. **${e.name}** (${e.role}) — **${e.salesClosed || 0} Deals Closed** (₹${(e.totalRevenue || 0).toLocaleString('en-IN')}) | KPI: **${e.kpiScore || '—'}**`).join('\n') +
+      `\n\n*Displaying performance ranking for **${sorted.length} Sales & Telecalling Representatives**.*`,
+    table: sorted.map((e, i) => ({
+      Rank: `#${i + 1}`,
+      Name: e.name,
+      Role: e.role,
+      'Deals Closed': e.salesClosed || 0,
+      Revenue: `₹${(e.totalRevenue || 0).toLocaleString('en-IN')}`,
+      'KPI Score': e.kpiScore || '—',
+      Badge: i === 0 ? 'Champion' : i === 1 ? 'Top Closer' : i === 2 ? 'Speed Specialist' : 'Specialist'
+    })),
     chart: {
       type: 'bar',
-      title: 'Leaderboard Revenue by Representative (₹)',
-      labels: sorted.map(e => e.name.split(' ')[0]),
-      datasets: [{ label: 'Revenue (₹)', data: sorted.map(e => e.totalRevenue || 0), color: '#f59e0b' }]
+      title: 'Top Sales Representatives by Revenue (₹)',
+      labels: topForChart.map(e => e.name.split(' ')[0]),
+      datasets: [{ label: 'Revenue (₹)', data: topForChart.map(e => e.totalRevenue || 0), color: '#f59e0b' }]
     }
   };
 }
@@ -1735,6 +1802,174 @@ async function handleActionCreateLead(query) {
   };
 }
 
+async function handleActionCreateUser(query) {
+  const store = await getStore();
+  const employees = store.mockEmployees || [];
+  const activityLogs = store.mockActivityLogs || [];
+  const qLower = query.toLowerCase();
+
+  // Extract count if multiple users requested (e.g. "create 2 new users")
+  const countMatch = query.match(/(?:create|generate|add|hire|insert)\s*(\d+)\s*(?:new)?\s*(?:users?|employees?|staff|members?)/i);
+  const count = countMatch ? Math.min(parseInt(countMatch[1], 10), 10) : 1;
+
+  // Extract Name (e.g. "create user Rahul Sharma", "add employee Priya Patel")
+  let nameMatch = query.match(/(?:user|employee|staff|member|named?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
+  if (!nameMatch) {
+    nameMatch = query.match(/(?:create|add|hire)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:as|in|role|department)/i);
+  }
+
+  // Detect Role & Department
+  let role = 'Sales & Telecaller Specialist';
+  let department = 'Voice Operations & Telecalling';
+
+  if (qLower.includes('telecaller') || qLower.includes('caller') || qLower.includes('voice') || qLower.includes('dialer')) {
+    role = qLower.includes('senior') ? 'Senior Telecaller' : 'Lead Telecaller Executive';
+    department = 'Voice Operations & Telecalling';
+  } else if (qLower.includes('sales') || qLower.includes('executive') || qLower.includes('closer') || qLower.includes('rep')) {
+    role = qLower.includes('senior') ? 'Senior Sales Specialist' : 'Direct Sales Executive';
+    department = 'Sales & Field Operations';
+  } else if (qLower.includes('fitter') || qLower.includes('technician') || qLower.includes('mechanic')) {
+    role = 'Senior Machine Fitter';
+    department = 'Production & Assembly';
+  } else if (qLower.includes('supervisor') || qLower.includes('assembly') || qLower.includes('shopfloor') || qLower.includes('factory')) {
+    role = 'Assembly Floor Supervisor';
+    department = 'Production & Assembly';
+  } else if (qLower.includes('qc') || qLower.includes('quality') || qLower.includes('testing')) {
+    role = 'Quality Testing Engineer';
+    department = 'Quality Assurance & QC';
+  } else if (qLower.includes('dispatch') || qLower.includes('logistics') || qLower.includes('warehouse')) {
+    role = 'Logistics & Dispatch Coordinator';
+    department = 'Logistics & Warehouse';
+  } else if (qLower.includes('finance') || qLower.includes('account') || qLower.includes('tax') || qLower.includes('tally')) {
+    role = 'Accounts & Tally Executive';
+    department = 'Finance & Accounting';
+  }
+
+  const sampleNames = [
+    'Rahul Sharma', 'Priya Patel', 'Aman Verma', 'Neha Joshi', 'Siddharth Roy',
+    'Deepak Yadav', 'Ananya Gupta', 'Kavita Singhal', 'Vikram Rathore', 'Pooja Nair'
+  ];
+
+  const createdUsers = [];
+
+  for (let i = 0; i < count; i++) {
+    const defaultName = sampleNames[(employees.length + i) % sampleNames.length];
+    const name = (i === 0 && nameMatch) ? nameMatch[1].trim() : defaultName;
+    const empId = `e${employees.length + 1}`;
+    const cleanEmailName = name.toLowerCase().replace(/\s+/g, '.');
+    const email = `${cleanEmailName}@aps-enterprise.com`;
+    const phone = `+91 ${Math.floor(9000000000 + Math.random() * 999999999)}`;
+
+    const newEmp = {
+      id: empId,
+      name,
+      email,
+      phone,
+      role,
+      department,
+      kpiScore: '92%',
+      kpiScoreNum: 92,
+      status: 'Active',
+      currentActivity: 'System Onboarding & Task Setup',
+      tasksCompleted: 0,
+      callsHandled: 0,
+      salesClosed: 0,
+      totalRevenue: 0,
+      targetSales: 10,
+      conversionRate: '28%',
+      avgCallDurationSec: 105,
+      avgResponseTimeMin: '1.8',
+      weeklyKpiHistory: [88, 90, 91, 92],
+      activeTask: {
+        id: `task-${empId}-1`,
+        title: `Complete system onboarding & initialize ${role} operational pipeline`,
+        priority: 'HIGH',
+        dueIn: '30 mins',
+        leadName: 'System Setup',
+        assignedAt: new Date().toISOString()
+      },
+      taskQueue: [
+        { title: `Review ${department} standard operating procedures (SOP)`, priority: 'MEDIUM' },
+        { title: 'Set up CRM credentials and phone extension', priority: 'HIGH' }
+      ]
+    };
+
+    employees.unshift(newEmp);
+    createdUsers.push(newEmp);
+
+    // Persist to PostgreSQL database
+    try {
+      const { Employee } = require('../models');
+      if (Employee) {
+        Employee.create({
+          id: newEmp.id,
+          name: newEmp.name,
+          email: newEmp.email,
+          phone: newEmp.phone,
+          role: newEmp.role,
+          department: newEmp.department,
+          status: newEmp.status,
+          kpiScore: newEmp.kpiScore,
+          tasksCompleted: 0,
+          callsHandled: 0,
+          salesClosed: 0,
+          totalRevenue: 0
+        }).catch(err => console.log('[A3 User DB Insert Warn]:', err.message));
+      }
+    } catch (err) {
+      console.error('[A3 User DB Error]:', err.message);
+    }
+
+    activityLogs.unshift({
+      id: `log-${Date.now()}-${i}`,
+      employeeId: 'e2',
+      employeeName: 'Bhavya (Admin AI)',
+      leadId: null,
+      leadName: newEmp.name,
+      action: `Created new user/employee profile "${newEmp.name}" (${newEmp.role} - ${newEmp.department}) via A3 AI Assistant`,
+      fromStage: 'None',
+      toStage: 'Active Member',
+      details: `Email: ${newEmp.email} | Extension ID: ${newEmp.id}`,
+      createdAt: new Date()
+    });
+  }
+
+  // Update store
+  store.mockEmployees = employees;
+
+  const titleText = count === 1 
+    ? `### 👤 New User / Employee Profile Created & Activated\n\nSuccessfully registered and onboarded **${createdUsers[0].name}** into the APS Enterprise platform.\n\n`
+    : `### 👥 ${count} New Users / Employees Created & Activated\n\nSuccessfully registered and onboarded **${count} team members** into the APS Enterprise platform.\n\n`;
+
+  const detailsText = createdUsers.map(u => 
+    `• **${u.name}** (\`${u.id}\`)\n` +
+    `  - **Role & Department**: **${u.role}** (*${u.department}*)\n` +
+    `  - **Email / Phone**: \`${u.email}\` | \`${u.phone}\`\n` +
+    `  - **Initial Active Task**: **${u.activeTask.title}** (${u.activeTask.priority} Priority, Due: ${u.activeTask.dueIn})\n` +
+    `  - **Account Status**: **Active** (Initial KPI: **${u.kpiScore}**)`
+  ).join('\n\n');
+
+  return {
+    text: titleText + detailsText + `\n\n*This profile is live and active across **\`/employees\`** and **\`/kpis\`**.*`,
+    table: createdUsers.map(u => ({
+      ID: u.id,
+      Name: u.name,
+      Role: u.role,
+      Department: u.department,
+      Email: u.email,
+      'Active Task': u.activeTask.title,
+      Status: u.status,
+      KPI: u.kpiScore
+    })),
+    chart: {
+      type: 'bar',
+      title: 'New User Department Allocation',
+      labels: [createdUsers[0].department.split(' ')[0], 'Total Active Staff'],
+      datasets: [{ label: 'Members', data: [createdUsers.length, employees.length], color: '#10b981' }]
+    }
+  };
+}
+
 async function handleActionTransitionLead(query) {
   const store = await getStore();
   const leads = store.mockLeads || [];
@@ -1782,30 +2017,76 @@ async function handleActionTransitionLead(query) {
 async function handleActionPostTally(query) {
   const store = await getStore();
   const activityLogs = store.mockActivityLogs || [];
+  const leads = store.mockLeads || [];
 
-  let amountMatch = query.match(/₹?\s*([0-9,]+)/);
-  let amount = amountMatch ? Number(amountMatch[1].replace(/,/g, '')) : 28000;
-  let partyMatch = query.match(/(?:for|party|client)\s+([a-zA-Z0-9\s]+?)(?=\s+amount|\s+rs|\s+₹|$)/i);
-  let partyName = partyMatch ? partyMatch[1].trim() : 'Kirloskar Forge & Stampings';
+  // Parse amount carefully (avoid mistaking "1 record" or "2 vouchers" for amount)
+  let amountMatch = query.match(/(?:amount|rs\.?|inr|₹|worth|of|deposit)\s*([0-9,]+)/i) || query.match(/₹\s*([0-9,]+)/);
+  let amount = 35000;
+  if (amountMatch) {
+    const parsed = Number(amountMatch[1].replace(/,/g, ''));
+    if (parsed > 100) amount = parsed;
+  }
+  let partyMatch = query.match(/(?:for|party|client|named?)\s+([a-zA-Z0-9\s&]+?)(?=\s+amount|\s+rs|\s+₹|\s+in|\s+with|$)/i);
+  
+  // If no party name was parsed, find if any CRM lead is mentioned in the query
+  let matchedLead = leads.find(l => l && query.toLowerCase().includes((l.name || '').toLowerCase()) || query.toLowerCase().includes((l.company || '').toLowerCase()));
+  let partyName = partyMatch ? partyMatch[1].trim() : (matchedLead ? matchedLead.name : 'Kirloskar Forge & Stampings');
 
+  // Generate the voucher
   const vchNo = `VCH-2026-0${Math.floor(100 + Math.random() * 900)}`;
+  const utrNo = `UTR-HDFC${Math.floor(100000 + Math.random() * 900000)}`;
+  
+  const createdVoucher = tallyService.addVoucher({
+    voucherNo: vchNo,
+    partyName: partyName,
+    amount: amount,
+    voucherType: 'Advance Receipt (10%)',
+    particulars: 'HDFC Bank Main A/c (#5020)',
+    utrNo: utrNo,
+    narration: `10% advance deposit for ${partyName} order processed via A3 AI Assistant`
+  });
+
+  // If a lead in CRM matches, verify its payment
+  if (matchedLead) {
+    matchedLead.tallyPaymentVerified = true;
+    if (matchedLead.stage === 'Confirmed Lead' || matchedLead.stage === 'Enquiry' || matchedLead.stage === 'Qualified') {
+      matchedLead.stage = 'Client (Paid)';
+    }
+  }
 
   activityLogs.unshift({
     id: `log-${Date.now()}`,
     employeeId: 'e2',
     employeeName: 'Bhavya (Admin AI)',
-    leadId: 'TALLY-SYNC',
+    leadId: matchedLead ? matchedLead.id : 'TALLY-SYNC',
     leadName: partyName,
-    action: `Posted Tally ERP 9 Voucher ${vchNo} for ₹${amount.toLocaleString('en-IN')}`,
+    action: `Created & Synchronized Tally ERP 9 Voucher ${vchNo} for ₹${amount.toLocaleString('en-IN')}`,
     fromStage: 'Tally',
     toStage: 'Reconciled',
-    details: `Voucher Type: Advance Receipt (10% Gate)`,
+    details: `Voucher Type: Advance Receipt (10% Gate) | UTR: ${utrNo}`,
     createdAt: new Date()
   });
 
   return {
-    text: `**Action Executed**: Posted Tally ERP 9 Voucher **${vchNo}** for **${partyName}**.\n\n• **Amount**: ₹${amount.toLocaleString('en-IN')}\n• **Voucher Type**: Advance Receipt (10% Gate)\n• **Status**: Synchronized with Tally Ledger`,
-    table: [{ 'Voucher No': vchNo, 'Party Name': partyName, Type: 'Advance Receipt (10%)', Amount: `₹${amount.toLocaleString('en-IN')}`, Status: 'Posted to Tally' }],
+    text: `### ⚡ Tally ERP 9 / Prime Voucher Record Created & Synced\n\n` +
+      `Successfully generated and posted new voucher record **${vchNo}** into the Tally Ledger.\n\n` +
+      `• **Voucher No**: \`${vchNo}\`\n` +
+      `• **Party / Client**: **${partyName}**\n` +
+      `• **Voucher Type**: Advance Receipt (10% Gate)\n` +
+      `• **Amount Received**: **₹${amount.toLocaleString('en-IN')}** (GST Output: ₹${Math.round(amount * 0.18).toLocaleString('en-IN')})\n` +
+      `• **Bank Ref / UTR**: \`${utrNo}\`\n` +
+      `• **Reconciliation Status**: **Reconciled (Live)**\n\n` +
+      `*This voucher record is now live in **\`/tally\`** and reconciled against the bank feed.*`,
+    table: [{
+      'Voucher No': vchNo,
+      Date: createdVoucher.date,
+      'Party / Client': partyName,
+      'Voucher Type': 'Advance Receipt (10%)',
+      'Particulars': 'HDFC Bank Main A/c (#5020)',
+      'Amount (₹)': `+₹${amount.toLocaleString('en-IN')}`,
+      'Bank Ref / UTR': utrNo,
+      'Status': 'Reconciled'
+    }],
     chart: null
   };
 }
@@ -2411,53 +2692,135 @@ async function handleAssignEmployeeTasks(query) {
     ];
   }
 
-  // ── Individual vs Bulk Assignment ─────────────────────────────────────────
-  // Bulk keywords: if any of these appear, assign to EVERYONE (never single-target)
-  const isBulkAssign = /\b(every|all|everyone|team|sabhi|sab ko|har ek|entire|whole|poori team|sab employees|sab log)\b/i.test(qLower);
+  // ── 1. Check for single named employee target ─────────────────────────────
+  let targetedEmployee = employees.find(e => {
+    const fullName = e.name.toLowerCase();
+    const firstName = e.name.split(' ')[0].toLowerCase();
+    const fullNameMatch = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
+    const firstNameMatch = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
+    return fullNameMatch || firstNameMatch;
+  });
 
-  let targetedEmployee = null;
-  if (!isBulkAssign) {
-    // Use word-boundary regex to avoid "every" matching "Eve", "Roy" matching "Roy" inside "every" etc.
-    targetedEmployee = employees.find(e => {
-      const fullName = e.name.toLowerCase();
-      const firstName = e.name.split(' ')[0].toLowerCase();
-      // Only match if the name appears as a whole word (not as a substring of another word)
-      const fullNameMatch = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
-      const firstNameMatch = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
-      return fullNameMatch || firstNameMatch;
-    });
-  }
+  let targetTeamLabel = 'All Departments';
 
-  if (targetedEmployee) {
-    // Assign only to the named employee
+  if (targetedEmployee && !/\b(team|all|everyone|every|entire|whole|sabhi|sab)\b/i.test(qLower)) {
+    // Single employee target
     employees = [targetedEmployee];
+    targetTeamLabel = `${targetedEmployee.name} (${targetedEmployee.role})`;
+  } else {
+    // ── 2. Check for Team / Department Targeting ──────────────────────────────
+    const isSales = /\b(sales|bd|business development|telecaller|caller|calling|dialer|closer|sales rep|sales representative|representatives?)\b/i.test(qLower);
+    const isFactory = /\b(factory|shopfloor|assembly|production|fitter|mechanic|operator|line supervisor)\b/i.test(qLower);
+    const isDispatch = /\b(dispatch|logistics|warehouse|shipping|transport)\b/i.test(qLower);
+    const isFinance = /\b(finance|accountant|accounts|tax|gst|tally|billing)\b/i.test(qLower);
+    const isQC = /\b(qc|quality|testing|qa|inspection)\b/i.test(qLower);
+
+    if (isSales && !isFactory && !isDispatch && !isFinance && !isQC) {
+      targetTeamLabel = 'Sales & Telecalling Team';
+      employees = employees.filter(e => {
+        const r = (e.role || '').toLowerCase();
+        const d = (e.department || '').toLowerCase();
+        return r.includes('sales') || r.includes('executive') || r.includes('champion') || 
+               r.includes('telecaller') || r.includes('qualification') || r.includes('representative') || 
+               r.includes('rep') || r.includes('bd') || d.includes('sales') || d.includes('telecalling') || d.includes('voice');
+      });
+    } else if (isFactory) {
+      targetTeamLabel = 'Factory Shopfloor & Assembly Team';
+      employees = employees.filter(e => {
+        const r = (e.role || '').toLowerCase();
+        const d = (e.department || '').toLowerCase();
+        return r.includes('production') || r.includes('factory') || r.includes('shopfloor') || 
+               r.includes('assembly') || r.includes('supervisor') || r.includes('fitter') || 
+               r.includes('technician') || d.includes('production') || d.includes('factory');
+      });
+    } else if (isDispatch) {
+      targetTeamLabel = 'Logistics & Dispatch Team';
+      employees = employees.filter(e => {
+        const r = (e.role || '').toLowerCase();
+        const d = (e.department || '').toLowerCase();
+        return r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || 
+               r.includes('shipping') || d.includes('dispatch') || d.includes('logistics') || d.includes('warehouse');
+      });
+    } else if (isFinance) {
+      targetTeamLabel = 'Finance & Accounts Team';
+      employees = employees.filter(e => {
+        const r = (e.role || '').toLowerCase();
+        const d = (e.department || '').toLowerCase();
+        return r.includes('account') || r.includes('finance') || r.includes('tax') || 
+               r.includes('gst') || r.includes('tally') || d.includes('finance') || d.includes('accounting');
+      });
+    } else if (isQC) {
+      targetTeamLabel = 'Quality Control & Testing Team';
+      employees = employees.filter(e => {
+        const r = (e.role || '').toLowerCase();
+        const d = (e.department || '').toLowerCase();
+        return r.includes('qc') || r.includes('quality') || r.includes('testing') || r.includes('inspection');
+      });
+    }
   }
 
-  // Comprehensive role-based task generator — covers ALL roles in mock data
-  const getRoleTasks = (role, empName) => {
+  // Fallback if filtering resulted in 0 matches
+  if (!employees || employees.length === 0) {
+    employees = store.mockEmployees || [];
+    targetTeamLabel = 'All Departments';
+  }
+
+  // ── Dynamic & Diversified Role-Based Task Generator ───────────────────────────
+  const getRoleTasks = (role, empName, idx = 0, empId = '') => {
     const r = (role || '').toLowerCase();
     const n = (empName || '').toLowerCase();
+    const numericId = parseInt((empId || '').replace(/\D/g, '')) || 0;
+    const seed = idx + numericId;
 
-    // ── Voice / Dialer / Telecaller roles ─────────────────────────────────────
+    // ── Voice / Telecaller / Dialer roles ─────────────────────────────────────
     if (r.includes('telecaller') || r.includes('voice') || r.includes('dialer') || r.includes('voice specialist') || r.includes('voice lead')) {
+      const telecallerTasks = [
+        { title: 'Call 12 high-priority IndiaMart inquiries for Double Die Dona Pattal Machine', priority: 'HIGH', dueIn: '25 mins', leadName: 'IndiaMart Inbound Queue' },
+        { title: 'Follow up with 8 warm prospects for Hydraulic Slipper Making Machine (Bhopal & Jabalpur)', priority: 'URGENT', dueIn: '20 mins', leadName: 'MP Region Warm Leads' },
+        { title: 'Outbound qualification calls for 15 TradeIndia leads interested in Paper Cup Making Units', priority: 'HIGH', dueIn: '35 mins', leadName: 'TradeIndia Cup Portal' },
+        { title: 'Re-engage 10 stalled enquiries from Gujarat region requesting machinery catalogs', priority: 'MEDIUM', dueIn: '40 mins', leadName: 'Gujarat Re-engagement' },
+        { title: 'Conduct discovery calls with 6 high-budget prospects for Automatic Dona Making Plant', priority: 'URGENT', dueIn: '15 mins', leadName: 'High Budget Commercial' },
+        { title: 'Dial 14 newly registered web leads for Heavy-Duty Single Die Paper Plate Press', priority: 'HIGH', dueIn: '30 mins', leadName: 'Direct Web Inbound' },
+        { title: 'Schedule machine video demo callbacks with 8 qualified buyers in Maharashtra', priority: 'HIGH', dueIn: '25 mins', leadName: 'Demo Callback Batch' },
+        { title: 'Verify technical electricity & space requirements with 10 inbound prospects', priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Technical Qualification' },
+        { title: 'Call 12 pending trade leads for Cam-Type Paper Cup Machine & log sentiments', priority: 'HIGH', dueIn: '30 mins', leadName: 'Cam-Type Inquiries' },
+        { title: 'Perform cold-lead reactivation calls for 15 prospects unresponsive for 5+ days', priority: 'MEDIUM', dueIn: '50 mins', leadName: 'Cold Recovery Batch' },
+        { title: 'Follow up on pricing quotation queries with 9 prospective factory owners in UP & Bihar', priority: 'HIGH', dueIn: '20 mins', leadName: 'North India Factory Queue' },
+        { title: 'Qualify 11 urgent inquiries for Double Cylinder Hydraulic Thali Press Machine', priority: 'URGENT', dueIn: '15 mins', leadName: 'Thali Press Fast-track' },
+        { title: 'Outbound connect with 14 IndiaMart inquiries for Roll-Feed Dona Making Unit', priority: 'HIGH', dueIn: '35 mins', leadName: 'Roll-Feed Portal' },
+        { title: 'Call back 8 priority leads requesting video demonstrations of plate making machinery', priority: 'HIGH', dueIn: '25 mins', leadName: 'Demo Request Queue' }
+      ];
+      const selected = telecallerTasks[seed % telecallerTasks.length];
       return {
-        activeTask: { title: 'Call 15 high-priority IndiaMart inbound inquiries & qualify machine interest', priority: 'HIGH', dueIn: '25 mins', leadName: 'IndiaMart Inbound Queue' },
+        activeTask: selected,
         taskQueue: [
           { title: 'Log call outcomes & speech sentiments in CRM system', priority: 'MEDIUM' },
           { title: 'Follow up with cold leads unresponsive for 3+ days via callback', priority: 'MEDIUM' },
-          { title: 'Brief team on top 5 objections heard in today\'s call batch', priority: 'LOW' }
+          { title: 'Brief team on top objections heard in today\'s call batch', priority: 'LOW' }
         ]
       };
     }
 
     // ── Sales / Sales Executive / Sales Champion / Admin roles ────────────────
-    if (r.includes('sales champion') || r.includes('system admin') || r.includes('admin') || r.includes('sales executive') || r.includes('sales rep') || r.includes('business development')) {
+    if (r.includes('sales champion') || r.includes('system admin') || r.includes('admin') || r.includes('sales executive') || r.includes('sales rep') || r.includes('business development') || r.includes('sales')) {
+      const salesTasks = [
+        { title: 'Review 6 Confirmed Lead stage clients & initiate 10% advance payment follow-ups', priority: 'URGENT', dueIn: '20 mins', leadName: 'Confirmed Pipeline Gate' },
+        { title: 'Draft commercial proposal & proforma invoice for Apex Metalcraft Works', priority: 'HIGH', dueIn: '25 mins', leadName: 'Apex Metalcraft Account' },
+        { title: 'Conduct video demonstration of Dona Pattal machine for Surat prospective client', priority: 'HIGH', dueIn: '30 mins', leadName: 'Surat Enterprise Demo' },
+        { title: 'Negotiate machine delivery timeline & payment terms with Royal Packaging Corp', priority: 'URGENT', dueIn: '15 mins', leadName: 'Royal Packaging Account' },
+        { title: 'Follow up on ₹6.8L contract closing with Reliance Heavy Machinery procurement team', priority: 'HIGH', dueIn: '35 mins', leadName: 'Reliance Procurement' },
+        { title: 'Draft custom multi-unit machine quotation for Bharat Forge industrial order', priority: 'HIGH', dueIn: '40 mins', leadName: 'Bharat Forge Systems' },
+        { title: 'Coordinate pre-dispatch payment clearance and tax invoice delivery for client', priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Dispatch Clearance Pipeline' },
+        { title: 'Prepare comparative ROI sheet & electricity consumption breakdown for buyer', priority: 'MEDIUM', dueIn: '50 mins', leadName: 'ROI Advisory Batch' },
+        { title: 'Finalize order specifications for 6kW Fiber Laser Cutter with Pune industrial client', priority: 'URGENT', dueIn: '20 mins', leadName: 'Laser Cutter Deal' },
+        { title: 'Conduct closing negotiation call with Bharat Engineering for 2 Dona units', priority: 'HIGH', dueIn: '30 mins', leadName: 'Bharat Engineering Account' }
+      ];
+      const selected = salesTasks[seed % salesTasks.length];
       return {
-        activeTask: { title: 'Review all Confirmed Lead stage clients & trigger 10% advance payment follow-ups', priority: 'URGENT', dueIn: '20 mins', leadName: 'Confirmed Lead Pipeline' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Draft custom commercial quotation for top 3 Qualified leads', priority: 'HIGH' },
           { title: 'Update CRM pipeline stages for leads that have responded', priority: 'HIGH' },
-          { title: 'Conduct video demo of Dona Pattal machine for Gujarat prospects', priority: 'MEDIUM' },
+          { title: 'Draft custom commercial quotation for top 3 Qualified leads', priority: 'HIGH' },
           { title: 'Review weekly sales KPI report & submit to management', priority: 'LOW' }
         ]
       };
@@ -2465,25 +2828,35 @@ async function handleAssignEmployeeTasks(query) {
 
     // ── WhatsApp / Marketing / Automation roles ───────────────────────────────
     if (r.includes('whatsapp') || r.includes('automation') || r.includes('marketing') || r.includes('ninja') || r.includes('campaign')) {
+      const waTasks = [
+        { title: 'Launch WhatsApp payment reminder sequence for 8 Confirmed-stage leads', priority: 'HIGH', dueIn: '15 mins', leadName: 'A5 WhatsApp Automation' },
+        { title: 'Create new product broadcast template for Paper Cup Machine catalog', priority: 'MEDIUM', dueIn: '30 mins', leadName: 'Catalog Broadcast' },
+        { title: 'Analyse open rate & click-through metrics for last IndiaMart campaign batch', priority: 'HIGH', dueIn: '25 mins', leadName: 'Analytics Engine' },
+        { title: 'Trigger dispatch notification sequence with e-Waybill details for Dispatched leads', priority: 'MEDIUM', dueIn: '35 mins', leadName: 'Dispatch Alerts' }
+      ];
+      const selected = waTasks[seed % waTasks.length];
       return {
-        activeTask: { title: 'Launch WhatsApp payment reminder sequence for 8 Confirmed-stage leads', priority: 'HIGH', dueIn: '15 mins', leadName: 'A5 WhatsApp Automation' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Analyse open rate & click-through for last campaign batch', priority: 'HIGH' },
-          { title: 'Create new product broadcast template for Paper Cup Machine', priority: 'MEDIUM' },
-          { title: 'Trigger dispatch notification sequence for all Dispatched-stage leads', priority: 'MEDIUM' },
-          { title: 'Review WABA template approval status for new season catalogue', priority: 'LOW' }
+          { title: 'Review WABA template approval status for new season catalogue', priority: 'LOW' },
+          { title: 'A/B test payment link CTAs on automated WhatsApp messages', priority: 'MEDIUM' }
         ]
       };
     }
 
     // ── Finance / Tax / GST / Accounts / Tally roles ──────────────────────────
     if (r.includes('tax') || r.includes('gst') || r.includes('accountant') || r.includes('finance') || r.includes('accounts') || r.includes('tally') || r.includes('billing')) {
+      const finTasks = [
+        { title: 'Reconcile 10% Tally advance deposit vouchers for 4 new Confirmed Lead orders', priority: 'URGENT', dueIn: '20 mins', leadName: 'Tally Advance Gate' },
+        { title: 'Generate GST Tax Invoices (HSN 8466) for 3 Client (Paid) orders above ₹5L', priority: 'HIGH', dueIn: '30 mins', leadName: 'GST Invoicing Desk' },
+        { title: 'Verify bank UTR transaction reference for ₹1.2L RTGS advance deposit', priority: 'HIGH', dueIn: '25 mins', leadName: 'Bank UTR Verification' },
+        { title: 'Process travel & operational expense claims for this week\'s field visits', priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Expense Claims' }
+      ];
+      const selected = finTasks[seed % finTasks.length];
       return {
-        activeTask: { title: 'Reconcile 10% Tally advance deposit vouchers for all Confirmed Lead orders', priority: 'URGENT', dueIn: '20 mins', leadName: 'Tally Advance Gate' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Generate GST Tax Invoices (HSN 8458) for 4 new Client (Paid) leads', priority: 'HIGH' },
           { title: 'Verify CGST/SGST split in pending invoices above ₹5L for e-IRN', priority: 'HIGH' },
-          { title: 'Process travel & operational expense claims for this week', priority: 'MEDIUM' },
           { title: 'Prepare monthly ledger reconciliation report for management', priority: 'LOW' }
         ]
       };
@@ -2491,24 +2864,35 @@ async function handleAssignEmployeeTasks(query) {
 
     // ── Factory / Shopfloor / ERP / Production / Operations roles ─────────────
     if (r.includes('shopfloor') || r.includes('factory') || r.includes('production') || r.includes('erp') || r.includes('operations') || r.includes('manufacturing') || r.includes('plant')) {
+      const prodTasks = [
+        { title: 'Release ERP job card for Pune Unit 1 — Hydraulic Press 500T (Bosch Chassis)', priority: 'URGENT', dueIn: '30 mins', leadName: 'ERP Shopfloor Release' },
+        { title: 'Update In-Production milestone progress for 3 active machinery job cards', priority: 'HIGH', dueIn: '25 mins', leadName: 'Milestone Tracking' },
+        { title: 'Verify raw material stock levels (steel sheets & copper coils) before next batch', priority: 'HIGH', dueIn: '35 mins', leadName: 'Stock Audit Floor' },
+        { title: 'Schedule next shift rotation & confirm operator availability on Line A & B', priority: 'MEDIUM', dueIn: '40 mins', leadName: 'Shift Management' }
+      ];
+      const selected = prodTasks[seed % prodTasks.length];
       return {
-        activeTask: { title: 'Release ERP job card for Pune Unit 1 — Hydraulic Press 500T (Bosch Chassis)', priority: 'URGENT', dueIn: '30 mins', leadName: 'ERP Shopfloor Release' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Update In-Production milestone progress for 3 active job cards', priority: 'HIGH' },
-          { title: 'Verify raw material stock levels before next assembly batch', priority: 'HIGH' },
-          { title: 'Schedule next shift rotation & confirm operator availability', priority: 'MEDIUM' },
-          { title: 'Conduct safety audit of Indore plant component storage zone', priority: 'LOW' }
+          { title: 'Conduct safety audit of Indore plant component storage zone', priority: 'LOW' },
+          { title: 'Log daily output metrics in manufacturing dashboard', priority: 'MEDIUM' }
         ]
       };
     }
 
     // ── Assembly Supervisor / Line Supervisor roles ───────────────────────────
     if (r.includes('assembly') || r.includes('supervisor') || r.includes('line lead')) {
+      const asmTasks = [
+        { title: 'Inspect Assembly Line B spindle alignment & verify RPM output on Machine #MAC-4412', priority: 'HIGH', dueIn: '35 mins', leadName: 'Assembly Line B' },
+        { title: 'Verify mechanical torque specifications on 4-Die Dona machine gearboxes', priority: 'HIGH', dueIn: '30 mins', leadName: 'Assembly Line A' },
+        { title: 'Audit bearing mounting tolerances & lubrication points on Line 2 chassis', priority: 'MEDIUM', dueIn: '40 mins', leadName: 'Assembly Line 2' },
+        { title: 'Inspect electrical panel wiring and emergency cutoff switch on hydraulic line', priority: 'URGENT', dueIn: '20 mins', leadName: 'Line Safety Unit' }
+      ];
+      const selected = asmTasks[seed % asmTasks.length];
       return {
-        activeTask: { title: 'Inspect Assembly Line B spindle alignment & output speed verification', priority: 'HIGH', dueIn: '35 mins', leadName: 'Assembly Line B' },
+        activeTask: selected,
         taskQueue: [
           { title: 'Update shift rotation roster & log operator check-ins', priority: 'MEDIUM' },
-          { title: 'Conduct safety audit of component storage racks at Line A', priority: 'MEDIUM' },
           { title: 'Report line efficiency figures to factory manager', priority: 'LOW' }
         ]
       };
@@ -2516,10 +2900,16 @@ async function handleAssignEmployeeTasks(query) {
 
     // ── Machine Fitter / Technician roles ─────────────────────────────────────
     if (r.includes('fitter') || r.includes('technician') || r.includes('mechanic') || r.includes('fitting')) {
+      const fitTasks = [
+        { title: 'Align hydraulic press cylinders & mount high-pressure oil seal on Machine #MAC-4412', priority: 'HIGH', dueIn: '45 mins', leadName: 'Fitting Floor Unit 1' },
+        { title: 'Mount precision tool dies and heating plates on Slipper Making Machine #JC-0992', priority: 'URGENT', dueIn: '30 mins', leadName: 'Fitting Floor Unit 2' },
+        { title: 'Replace bearing components and adjust drive belt tension on CNC assembly line', priority: 'HIGH', dueIn: '40 mins', leadName: 'Drive Mechanism Floor' },
+        { title: 'Calibrate automatic paper roll feeder mechanism on Paper Bag Machine #JC-0993', priority: 'MEDIUM', dueIn: '50 mins', leadName: 'Feeder Fitting Bay' }
+      ];
+      const selected = fitTasks[seed % fitTasks.length];
       return {
-        activeTask: { title: 'Align hydraulic press cylinders & oil seal on Machine #MAC-4412', priority: 'HIGH', dueIn: '50 mins', leadName: 'Fitting Floor' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Replace bearing components on CNC assembly line 2', priority: 'MEDIUM' },
           { title: 'Calibration checklist for newly arrived component batches', priority: 'MEDIUM' },
           { title: 'Archive maintenance log entries for completed machines', priority: 'LOW' }
         ]
@@ -2528,92 +2918,61 @@ async function handleAssignEmployeeTasks(query) {
 
     // ── Quality Control / Testing / QA roles ──────────────────────────────────
     if (r.includes('quality') || r.includes('testing') || r.includes('qc') || r.includes('qa') || r.includes('inspection')) {
+      const qcTasks = [
+        { title: 'Run 500-cycle continuous pressure stress test on Hydraulic Press 500T', priority: 'URGENT', dueIn: '15 mins', leadName: 'QC Final Clearance' },
+        { title: 'Verify metal thickness tolerances using digital micro-calipers on batch #QC-47', priority: 'HIGH', dueIn: '30 mins', leadName: 'Micro-caliper Inspection' },
+        { title: 'Issue signed QC certificate and test logs for 2 completed single-die machines', priority: 'HIGH', dueIn: '25 mins', leadName: 'QA Stamping Desk' },
+        { title: 'Verify thermal sensor accuracy and emergency stop circuits on Line 3', priority: 'MEDIUM', dueIn: '40 mins', leadName: 'Safety Audit Unit' }
+      ];
+      const selected = qcTasks[seed % qcTasks.length];
       return {
-        activeTask: { title: 'Run full pressure stress test on completed Hydraulic Press 500T for QC clearance', priority: 'URGENT', dueIn: '15 mins', leadName: 'QC Final Clearance' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Issue signed QC certificate for 2 dispatched single-die machines', priority: 'HIGH' },
-          { title: 'Verify metal thickness tolerances using micro-calipers on batch 47', priority: 'MEDIUM' },
-          { title: 'Log QC test results into factory ERP system', priority: 'LOW' }
+          { title: 'Log QC test results into factory ERP system', priority: 'LOW' },
+          { title: 'Calibrate digital pressure test gauges', priority: 'MEDIUM' }
         ]
       };
     }
 
     // ── Dispatch / Logistics / Warehouse roles ────────────────────────────────
     if (r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || r.includes('shipping') || r.includes('transport')) {
+      const dispTasks = [
+        { title: 'Generate E-Way bills & dispatch tax invoices for Kolkata heavy cargo shipment', priority: 'HIGH', dueIn: '30 mins', leadName: 'Logistics Hub' },
+        { title: 'Coordinate heavy container truck loading sequence with GATI transport partners', priority: 'URGENT', dueIn: '20 mins', leadName: 'Loading Dock A' },
+        { title: 'Inspect wooden pallet packaging and moisture barrier wrapping on Machine #JC-0994', priority: 'HIGH', dueIn: '35 mins', leadName: 'Export Packaging Bay' },
+        { title: 'Track live GPS transit status of 3 inter-state machine dispatches to Ahmedabad', priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Transit Tracking Desk' }
+      ];
+      const selected = dispTasks[seed % dispTasks.length];
       return {
-        activeTask: { title: 'Generate E-Way bills & dispatch tax invoices for Kolkata heavy cargo shipment', priority: 'HIGH', dueIn: '30 mins', leadName: 'Logistics Hub' },
+        activeTask: selected,
         taskQueue: [
-          { title: 'Coordinate truck boarding sequence with transport partners', priority: 'HIGH' },
-          { title: 'Inspect packaging integrity of heavy-duty Dona Pattal units', priority: 'MEDIUM' },
-          { title: 'Update dispatch tracking status for all In-Production leads', priority: 'MEDIUM' }
+          { title: 'Update dispatch tracking status for all In-Production leads', priority: 'MEDIUM' },
+          { title: 'Verify transport freight bills against rate contracts', priority: 'LOW' }
         ]
       };
     }
 
-    // ── Spare Parts / After-Sales / Customer Service roles ────────────────────
-    if (r.includes('spare') || r.includes('service') || r.includes('after') || r.includes('support') || r.includes('customer service')) {
-      return {
-        activeTask: { title: 'Coordinate emergency field service dispatch for Indore client repair request', priority: 'HIGH', dueIn: '45 mins', leadName: 'Customer Support Portal' },
-        taskQueue: [
-          { title: 'Process spare part replacement requests — heater elements & die springs', priority: 'HIGH' },
-          { title: 'Archive resolved maintenance tickets in CRM & close service loop', priority: 'MEDIUM' },
-          { title: 'Follow up on 3 pending AMC renewal clients', priority: 'LOW' }
-        ]
-      };
-    }
-
-    // ── Design / CAD / Engineering roles ──────────────────────────────────────
-    if (r.includes('design') || r.includes('cad') || r.includes('engineer') || r.includes('r&d') || r.includes('drawing')) {
-      return {
-        activeTask: { title: 'Finalise CAD drawing revision for custom 4-die Hydraulic Press client spec', priority: 'HIGH', dueIn: '40 mins', leadName: 'Custom Order Engineering' },
-        taskQueue: [
-          { title: 'Update BOM (Bill of Materials) for next production batch', priority: 'HIGH' },
-          { title: 'Review structural load calculations for new press frame design', priority: 'MEDIUM' },
-          { title: 'Archive old revision drawings to document management system', priority: 'LOW' }
-        ]
-      };
-    }
-
-    // ── Procurement / Purchase roles ──────────────────────────────────────────
-    if (r.includes('purchase') || r.includes('procurement') || r.includes('vendor') || r.includes('buyer') || r.includes('supply')) {
-      return {
-        activeTask: { title: 'Raise purchase orders for Raycus laser source & servo drives for Pune unit', priority: 'HIGH', dueIn: '35 mins', leadName: 'Procurement Gateway' },
-        taskQueue: [
-          { title: 'Compare 3 vendor quotes for hydraulic oil & seals', priority: 'MEDIUM' },
-          { title: 'Follow up on delayed motor delivery from Ahmedabad supplier', priority: 'HIGH' },
-          { title: 'Update approved vendor list in ERP system', priority: 'LOW' }
-        ]
-      };
-    }
-
-    // ── HR / Recruitment / Training roles ────────────────────────────────────
-    if (r.includes('hr') || r.includes('human resource') || r.includes('recruit') || r.includes('training') || r.includes('talent')) {
-      return {
-        activeTask: { title: 'Conduct onboarding session for 2 new telecaller hires joining today', priority: 'HIGH', dueIn: '30 mins', leadName: 'HR Onboarding' },
-        taskQueue: [
-          { title: 'Process monthly payroll inputs for all departments', priority: 'HIGH' },
-          { title: 'Schedule performance review calendar for Q3 2026', priority: 'MEDIUM' },
-          { title: 'Update employee attendance & leave balance records', priority: 'LOW' }
-        ]
-      };
-    }
-
-    // ── Default Fallback — smart general operational tasks ────────────────────
+    // ── Default Fallback ──────────────────────────────────────────────────────
+    const genericTasks = [
+      { title: `Review assigned CRM lead accounts & follow up on open actions for ${empName || 'team'}`, priority: 'MEDIUM', dueIn: '40 mins', leadName: 'Account Follow-up' },
+      { title: `Verify data accuracy and update operational milestones for ${empName || 'team'}`, priority: 'HIGH', dueIn: '30 mins', leadName: 'Milestone Update' },
+      { title: `Coordinate cross-department workflow handoffs and resolve pending tickets for ${empName || 'team'}`, priority: 'MEDIUM', dueIn: '45 mins', leadName: 'Workflow Coordination' }
+    ];
+    const selected = genericTasks[seed % genericTasks.length];
     return {
-      activeTask: { title: `Review assigned CRM leads & execute role-specific operational tasks for ${empName || 'team'}`, priority: 'MEDIUM', dueIn: '60 mins', leadName: 'General Operations' },
+      activeTask: selected,
       taskQueue: [
         { title: 'Verify & update lead status changes in CRM dashboard', priority: 'MEDIUM' },
-        { title: 'Coordinate with adjacent department on pending cross-team items', priority: 'MEDIUM' },
         { title: 'Prepare documentation & reports for weekly management review', priority: 'LOW' }
       ]
     };
   };
 
-  const assignedList = employees.map((emp) => {
-    const roleMatch = getRoleTasks(emp.role, emp.name);
+  const assignedList = employees.map((emp, index) => {
+    const roleMatch = getRoleTasks(emp.role, emp.name, index, emp.id);
 
     emp.activeTask = {
-      id: `task-assign-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: `task-assign-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
       title: roleMatch.activeTask.title,
       priority: roleMatch.activeTask.priority,
       dueIn: roleMatch.activeTask.dueIn,
@@ -2676,29 +3035,20 @@ async function handleAssignEmployeeTasks(query) {
     console.error('[A3 DB Sync Error]', err.message);
   }
 
-  // Let's create a diverse table of representatives
-  const tableRows = [...representatives];
-  // Add some extra rows if needed to populate the table (up to 10)
-  for (const emp of assignedList) {
-    if (tableRows.length >= 10) break;
-    if (!tableRows.some(x => x.Name === emp.Name)) {
-      tableRows.push(emp);
-    }
-  }
-
-  // Create the final returned table array which includes all items so that frontend lists the "+70 rows" banner properly
-  const fullTableList = tableRows.concat(assignedList.filter(emp => !tableRows.some(tr => tr.Name === emp.Name)));
+  const urgentCount = employees.filter(e => e.activeTask?.priority === 'URGENT').length;
+  const highCount = employees.filter(e => e.activeTask?.priority === 'HIGH').length;
+  const mediumCount = employees.filter(e => e.activeTask?.priority === 'MEDIUM').length;
 
   return {
-    text: `### 📋 Role-Based Task Allocation Complete\n\nSuccessfully generated and assigned role-tailored operational tasks to **all ${employees.length} team members** across **all departments** at APS Enterprise. Here is a representative sample of assignments:\n\n` +
-      representatives.slice(0, 8).map(e => `• **${e.Name}** (*${e.Role}* - *${e.Department}*):\n  - **Active Task:** **${e['Assigned Active Task']}**\n  - **Priority:** ${e.Priority} | **Due In:** ${e['Due In']}`).join('\n\n') +
-      `\n\n*All employee active tasks and task queues have been updated in real-time. Navigate to **\`/employees\`** or **\`/kpis\`** to view full details.*`,
-    table: fullTableList,
+    text: `### 📋 Role-Based Task Allocation — ${targetTeamLabel}\n\nSuccessfully generated and assigned role-tailored operational tasks to **${employees.length} team members** in **${targetTeamLabel}** at APS Enterprise:\n\n` +
+      assignedList.slice(0, 8).map(e => `• **${e.Name}** (*${e.Role}* - *${e.Department}*):\n  - **Active Task:** **${e['Assigned Active Task']}**\n  - **Priority:** ${e.Priority} | **Due In:** ${e['Due In']}`).join('\n\n') +
+      `\n\n*All assigned tasks and task queues have been updated in real-time. Navigate to **\`/employees\`** or **\`/kpis\`** to view full details.*`,
+    table: assignedList,
     chart: {
       type: 'bar',
-      title: 'Active Task Priority Distribution Across Team',
+      title: `Task Priority Breakdown — ${targetTeamLabel}`,
       labels: ['URGENT', 'HIGH Priority', 'MEDIUM Priority'],
-      datasets: [{ label: 'Tasks', data: [employees.filter(e => e.activeTask?.priority === 'URGENT').length || 1, employees.filter(e => e.activeTask?.priority === 'HIGH').length || 3, employees.filter(e => e.activeTask?.priority === 'MEDIUM').length || 1], color: '#6366f1' }]
+      datasets: [{ label: 'Assigned Tasks', data: [urgentCount, highCount, mediumCount], color: '#6366f1' }]
     }
   };
 }
@@ -2943,6 +3293,7 @@ async function processQuery(query, conversationId) {
       case 'explain_metrics':        return handleExplainMetrics(query);
       case 'trend_analysis':         return handleTrendAnalysis(query);
       case 'action_create_lead':     return handleActionCreateLead(query);
+      case 'action_create_user':     return handleActionCreateUser(query);
       case 'action_transition_lead': return handleActionTransitionLead(query);
       case 'action_post_tally':      return handleActionPostTally(query);
       case 'action_erp_booking':     return handleActionErpBooking(query);
