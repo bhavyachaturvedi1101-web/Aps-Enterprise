@@ -46,15 +46,19 @@ router.post('/sequences/:id/update', async (req, res) => {
   }
 });
 
-// POST /api/whatsapp/send-reminder — Trigger payment reminder sequence for a lead
+// POST /api/whatsapp/send-reminder — Trigger payment reminder sequence for one or all leads
 router.post('/send-reminder', async (req, res) => {
-  const { leadId } = req.body;
-  if (!leadId) return res.status(400).json({ error: 'leadId is required' });
+  const { leadId, leadIds, all } = req.body;
   try {
+    if (all || leadId === 'all' || (Array.isArray(leadIds) && leadIds.length > 0)) {
+      const result = await whatsappService.sendAllPaymentReminders(leadIds);
+      return res.json(result);
+    }
+    if (!leadId) return res.status(400).json({ error: 'leadId is required' });
     const result = await whatsappService.sendPaymentReminder(leadId);
-    res.json(result);
+    return res.json(result);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 });
 
