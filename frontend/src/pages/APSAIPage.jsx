@@ -1110,6 +1110,45 @@ export default function APSAIPage() {
         conversationId: convId.current
       });
 
+      // Synchronize created users to client storage (for cross-page & Vercel persistence)
+      if (data.createdSystemUsers && Array.isArray(data.createdSystemUsers) && data.createdSystemUsers.length > 0) {
+        try {
+          const raw = localStorage.getItem('aps_system_users');
+          let list = raw ? JSON.parse(raw) : [];
+          data.createdSystemUsers.forEach(u => {
+            if (!list.some(existing => existing.email === u.email || (existing.name === u.name && existing.role === u.role))) {
+              list.unshift(u);
+            }
+          });
+          localStorage.setItem('aps_system_users', JSON.stringify(list));
+          window.dispatchEvent(new CustomEvent('aps_users_updated', { detail: list }));
+        } catch {}
+      } else if (data.table && Array.isArray(data.table) && data.table.some(r => r.User || (r.Name && r.Role && !r.Stage))) {
+        try {
+          const raw = localStorage.getItem('aps_system_users');
+          let list = raw ? JSON.parse(raw) : [];
+          data.table.forEach(r => {
+            const name = r.User || r.Name;
+            const role = r['System Role'] || r.Role || 'Operations';
+            const email = r.Email || `${(name || 'user').toLowerCase().replace(/\s+/g, '.')}@aps-enterprise.com`;
+            const module = r['Module Scope'] || (role === 'Admin' ? 'Dashboard & Core' : (role === 'Super Admin' ? 'Voice AI' : (role === 'Telecaller' ? 'Voice AI' : (role === 'Agent' ? 'WhatsApp & Analytics' : 'Operations & CRM'))));
+            if (name && !list.some(existing => existing.email === email || (existing.name === name && existing.role === role))) {
+              list.unshift({
+                id: `u_${Date.now()}_${Math.floor(Math.random()*1000)}`,
+                name,
+                email,
+                role,
+                module,
+                lastLogin: 'Just now',
+                status: 'Online'
+              });
+            }
+          });
+          localStorage.setItem('aps_system_users', JSON.stringify(list));
+          window.dispatchEvent(new CustomEvent('aps_users_updated', { detail: list }));
+        } catch {}
+      }
+
       setMessages(prev => [
         ...prev.slice(0, -1),
         {

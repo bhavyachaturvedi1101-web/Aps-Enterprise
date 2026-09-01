@@ -151,7 +151,22 @@ function CustomSelect({ value, options, onChange, minWidth = 140, fullWidth = fa
 }
 
 export default function UsersRoles() {
-  const [users, setUsers] = useState(INITIAL_USERS);
+  const getInitialUsers = () => {
+    try {
+      const raw = localStorage.getItem('aps_system_users');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const setOfIds = new Set(parsed.map(u => u.id));
+          const missing = INITIAL_USERS.filter(u => !setOfIds.has(u.id));
+          return [...parsed, ...missing];
+        }
+      }
+    } catch {}
+    return INITIAL_USERS;
+  };
+
+  const [users, setUsers] = useState(getInitialUsers);
   const [editingUser, setEditingUser] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Operations', module: 'Dashboard & Core', status: 'Online' });
@@ -170,7 +185,23 @@ export default function UsersRoles() {
       .then(r => r.json())
       .then(data => {
         if (data.success && Array.isArray(data.users) && data.users.length > 0) {
-          setUsers(data.users);
+          setUsers(prev => {
+            const raw = localStorage.getItem('aps_system_users');
+            const localList = raw ? JSON.parse(raw) : prev;
+            const serverList = data.users;
+
+            // Merge server and local lists preserving unique users
+            const merged = [...localList];
+            serverList.forEach(su => {
+              if (!merged.some(m => m.email?.toLowerCase() === su.email?.toLowerCase() || m.id === su.id)) {
+                merged.push(su);
+              }
+            });
+            try {
+              localStorage.setItem('aps_system_users', JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
         }
       })
       .catch(() => {});
@@ -178,10 +209,27 @@ export default function UsersRoles() {
 
   useEffect(() => {
     fetchUsers();
+
+    const handleCustomUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setUsers(e.detail);
+      } else {
+        const raw = localStorage.getItem('aps_system_users');
+        if (raw) {
+          try { setUsers(JSON.parse(raw)); } catch {}
+        }
+      }
+    };
+
     window.addEventListener('focus', fetchUsers);
+    window.addEventListener('aps_users_updated', handleCustomUpdate);
+    window.addEventListener('storage', handleCustomUpdate);
     const interval = setInterval(fetchUsers, 3000);
+
     return () => {
       window.removeEventListener('focus', fetchUsers);
+      window.removeEventListener('aps_users_updated', handleCustomUpdate);
+      window.removeEventListener('storage', handleCustomUpdate);
       clearInterval(interval);
     };
   }, []);
@@ -195,6 +243,11 @@ export default function UsersRoles() {
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!editingUser) return;
+    setUsers(prev => {
+      const updated = prev.map(u => u.id === editingUser.id ? editingUser : u);
+      try { localStorage.setItem('aps_system_users', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
     try {
       await fetch(`${API_URL}/users/${editingUser.id}`, {
         method: 'PUT',
@@ -202,7 +255,6 @@ export default function UsersRoles() {
         body: JSON.stringify(editingUser)
       });
     } catch {}
-    setUsers(prev => prev.map(u => u.id === editingUser.id ? editingUser : u));
     setEditingUser(null);
   };
 
@@ -210,39 +262,27 @@ export default function UsersRoles() {
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
     if (!newUser.name || !newUser.email) return alert('Name and email are required');
+    const created = {
+      id: `u_${Date.now()}`,
+      name: newUser.name.trim(),
+      email: newUser.email.trim(),
+      role: newUser.role,
+      module: newUser.module,
+      lastLogin: 'Just now',
+      status: newUser.status
+    };
+    setUsers(prev => {
+      const updated = [created, ...prev];
+      try { localStorage.setItem('aps_system_users', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
     try {
-      const res = await fetch(`${API_URL}/users`, {
+      await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newUser)
       });
-      const data = await res.json();
-      if (data.success && data.user) {
-        setUsers(prev => [data.user, ...prev]);
-      } else {
-        const created = {
-          id: `u${users.length + 1}`,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role,
-          module: newUser.module,
-          lastLogin: 'Just now',
-          status: newUser.status
-        };
-        setUsers(prev => [created, ...prev]);
-      }
-    } catch {
-      const created = {
-        id: `u${users.length + 1}`,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        module: newUser.module,
-        lastLogin: 'Just now',
-        status: newUser.status
-      };
-      setUsers(prev => [created, ...prev]);
-    }
+    } catch {}
     setShowInviteModal(false);
     setNewUser({ name: '', email: '', role: 'Operations', module: 'Dashboard & Core', status: 'Online' });
   };
@@ -250,10 +290,14 @@ export default function UsersRoles() {
   // Delete user
   const handleDeleteUser = async (id) => {
     if (window.confirm('Are you sure you want to remove this user?')) {
+      setUsers(prev => {
+        const updated = prev.filter(u => u.id !== id);
+        try { localStorage.setItem('aps_system_users', JSON.stringify(updated)); } catch {}
+        return updated;
+      });
       try {
         await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
       } catch {}
-      setUsers(prev => prev.filter(u => u.id !== id));
       setEditingUser(null);
     }
   };

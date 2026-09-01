@@ -2127,7 +2127,8 @@ async function handleActionCreateUser(query) {
       title: 'New User Department Allocation',
       labels: [createdUsers[0].department.split(' ')[0], 'Total Active Staff'],
       datasets: [{ label: 'Members', data: [createdUsers.length, employees.length], color: '#10b981' }]
-    }
+    },
+    createdSystemUsers: store.mockUsers ? store.mockUsers.slice(0, count) : []
   };
 }
 
