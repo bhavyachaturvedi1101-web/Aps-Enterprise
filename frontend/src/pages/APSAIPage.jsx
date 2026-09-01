@@ -41,6 +41,15 @@ function saveHistory(messages) {
   } catch { }
 }
 
+// ─── Format helper for canvas numbers ─────────────────────────────────────────
+function formatChartNum(val) {
+  if (typeof val !== 'number') return val;
+  if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
+  if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+  if (val >= 1000) return `₹${(val / 1000).toFixed(0)}k`;
+  return String(val);
+}
+
 // ─── Bar Chart (Canvas) ───────────────────────────────────────────────────────
 function MiniBarChart({ chart }) {
   const canvasRef = useRef(null);
@@ -49,7 +58,17 @@ function MiniBarChart({ chart }) {
     if (!chart || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const { labels, datasets } = chart;
+    
+    // Intelligently cap to at most 10 items to prevent cramped/overlapping canvas bars
+    const maxItems = 10;
+    const rawLabels = chart.labels || [];
+    const isTruncated = rawLabels.length > maxItems;
+    const labels = isTruncated ? rawLabels.slice(0, maxItems) : rawLabels;
+    const datasets = (chart.datasets || []).map(ds => ({
+      ...ds,
+      data: isTruncated ? ds.data.slice(0, maxItems) : ds.data
+    }));
+
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = canvas.offsetWidth * dpr;
@@ -57,7 +76,7 @@ function MiniBarChart({ chart }) {
     ctx.scale(dpr, dpr);
 
     const W = canvas.offsetWidth, H = canvas.offsetHeight;
-    const PAD = { top: 28, right: 16, bottom: 40, left: 48 };
+    const PAD = { top: 32, right: 16, bottom: 44, left: 54 };
     const chartW = W - PAD.left - PAD.right;
     const chartH = H - PAD.top - PAD.bottom;
 
@@ -65,57 +84,22 @@ function MiniBarChart({ chart }) {
 
     const allVals = datasets.flatMap(d => d.data);
     const maxVal = Math.max(...allVals, 1);
-    const numGroups = labels.length;
-    const numSets = datasets.length;
-    const barGap = 4, groupGap = 12;
-    const barW = Math.max(12, (chartW - groupGap * (numGroups - 1)) / numGroups / numSets - barGap);
-    const COLORS = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8'];
-
-    datasets.forEach((ds, si) => {
-      ds.data.forEach((val, gi) => {
-        const groupX = PAD.left + gi * (chartW / numGroups);
-        const x = groupX + si * (barW + barGap) + groupGap / 2;
-        const barH = (val / maxVal) * chartH;
-        const y = PAD.top + chartH - barH;
-        const color = ds.color || COLORS[si % COLORS.length];
-
-        const grad = ctx.createLinearGradient(x, y, x, y + barH);
-        grad.addColorStop(0, color);
-        grad.addColorStop(1, color + '77');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.roundRect(x, y, barW, barH, [6, 6, 0, 0]);
-        ctx.fill();
-
-        if (barH > 16) {
-          ctx.fillStyle = '#1e293b';
-          ctx.font = `bold ${Math.min(11, barW - 2)}px Inter, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(val, x + barW / 2, y - 5);
-        }
-      });
-    });
-
-    ctx.fillStyle = '#64748b';
-    ctx.font = '9.5px Inter, sans-serif';
-    ctx.textAlign = 'center';
+    const numGroups = Math.max(labels.length, 1);
+    const numSets = Math.max(datasets.length, 1);
     const groupSlotW = chartW / numGroups;
+    const barGap = 4;
+    const barW = Math.max(12, Math.min(38, (groupSlotW - 14) / numSets - barGap));
+    const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
 
-    labels.forEach((label, gi) => {
-      const groupX = PAD.left + gi * groupSlotW + groupSlotW / 2;
-      const maxChars = groupSlotW < 50 ? 5 : (groupSlotW < 65 ? 6 : (groupSlotW < 80 ? 8 : 11));
-      const displayLabel = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
-      ctx.fillText(displayLabel, groupX, H - PAD.bottom + 16);
-    });
-
+    // Y-axis gridlines & ticks
     for (let t = 0; t <= 4; t++) {
       const val = Math.round((maxVal / 4) * t);
       const y = PAD.top + chartH - (val / maxVal) * chartH;
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '9px Inter, sans-serif';
+      ctx.font = '500 9px Inter, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(val, PAD.left - 6, y + 3);
-      ctx.strokeStyle = '#e2e8f0';
+      ctx.fillText(formatChartNum(val), PAD.left - 8, y + 3);
+      ctx.strokeStyle = '#f1f5f9';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(PAD.left, y);
@@ -123,6 +107,47 @@ function MiniBarChart({ chart }) {
       ctx.stroke();
     }
 
+    // Draw Bars
+    datasets.forEach((ds, si) => {
+      ds.data.forEach((val, gi) => {
+        const totalSetW = numSets * barW + (numSets - 1) * barGap;
+        const groupCenterX = PAD.left + gi * groupSlotW + groupSlotW / 2;
+        const x = groupCenterX - totalSetW / 2 + si * (barW + barGap);
+        const barH = Math.max(3, (val / maxVal) * chartH);
+        const y = PAD.top + chartH - barH;
+        const color = ds.color || COLORS[si % COLORS.length];
+
+        const grad = ctx.createLinearGradient(x, y, x, y + barH);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, color + 'aa');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0]);
+        ctx.fill();
+
+        // Data value label on top
+        if (barH > 8) {
+          ctx.fillStyle = '#334155';
+          ctx.font = '600 9px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(formatChartNum(val), x + barW / 2, y - 6);
+        }
+      });
+    });
+
+    // X-axis Labels
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 9.5px Inter, sans-serif';
+    ctx.textAlign = 'center';
+
+    labels.forEach((label, gi) => {
+      const groupX = PAD.left + gi * groupSlotW + groupSlotW / 2;
+      const maxChars = groupSlotW < 50 ? 6 : (groupSlotW < 75 ? 8 : 12);
+      const displayLabel = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
+      ctx.fillText(displayLabel, groupX, H - PAD.bottom + 18);
+    });
+
+    // Legend if multiple datasets
     if (datasets.length > 1) {
       let lx = PAD.left;
       datasets.forEach((ds, i) => {
@@ -130,10 +155,10 @@ function MiniBarChart({ chart }) {
         ctx.fillStyle = color;
         ctx.fillRect(lx, 10, 10, 10);
         ctx.fillStyle = '#475569';
-        ctx.font = '9px Inter, sans-serif';
+        ctx.font = '500 9px Inter, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(ds.label, lx + 14, 18);
-        lx += ctx.measureText(ds.label).width + 26;
+        lx += ctx.measureText(ds.label).width + 24;
       });
     }
   }, [chart]);
@@ -141,7 +166,7 @@ function MiniBarChart({ chart }) {
   return (
     <div style={s.chartBox}>
       {chart?.title && <div style={s.chartHeading}>{chart.title}</div>}
-      <canvas ref={canvasRef} style={{ width: '100%', height: 180, display: 'block' }} />
+      <canvas ref={canvasRef} style={{ width: '100%', height: 200, display: 'block' }} />
     </div>
   );
 }

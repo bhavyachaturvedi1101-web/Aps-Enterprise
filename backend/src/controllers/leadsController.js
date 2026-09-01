@@ -341,6 +341,14 @@ const transitionLead = async (req, res) => {
       integrationData: result.integrationData,
       activityLog: activityEntry
     });
+
+    // ── Auto-trigger WhatsApp on key stage changes (non-blocking) ──────────────
+    try {
+      const whatsappService = require('../services/whatsappService');
+      await whatsappService.onLeadStageChange(lead, toStage);
+    } catch (waErr) {
+      console.warn('[WhatsApp Auto-trigger] Failed silently:', waErr.message);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to transition lead' });
