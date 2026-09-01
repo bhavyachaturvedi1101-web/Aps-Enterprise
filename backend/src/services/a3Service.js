@@ -228,6 +228,8 @@ const INTENTS = [
   { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
   { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
   { name: 'sales_leaderboard',   patterns: [
+    /^\s*sales\s*$/i,
+    /^\s*sales (data|overview|summary|report|team|pipeline|reps|performance|ranking)\s*$/i,
     /leaderboard/i,
     /badge/i,
     /rankings?/i,
