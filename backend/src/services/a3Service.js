@@ -3558,14 +3558,19 @@ async function processQuery(query, conversationId) {
   const qClean = (query || '').toLowerCase();
   let requestedFormat = null;
 
-  if (/\b(csv)\b/i.test(qClean)) requestedFormat = 'csv';
-  else if (/\b(excel|xlsx|xls|spreadsheet)\b/i.test(qClean)) requestedFormat = 'xlsx';
-  else if (/\b(docx|word|doc)\b/i.test(qClean)) requestedFormat = 'doc';
-  else if (/\b(json)\b/i.test(qClean)) requestedFormat = 'json';
-  else if (/\b(pdf)\b/i.test(qClean)) requestedFormat = 'pdf';
-  else if (/report|export|download|file|invoice|sheet|banao|nikalo|generate/i.test(qClean)) requestedFormat = 'pdf';
+  // Options menus MUST NEVER have an exportFile attached
+  const isOptionsMenu = result && Array.isArray(result.options) && result.options.length > 0;
 
-  if (requestedFormat) {
+  if (!isOptionsMenu && !result.exportFile) {
+    if (/\b(csv)\b/i.test(qClean)) requestedFormat = 'csv';
+    else if (/\b(excel|xlsx|xls|spreadsheet)\b/i.test(qClean)) requestedFormat = 'xlsx';
+    else if (/\b(docx|word|doc)\b/i.test(qClean)) requestedFormat = 'doc';
+    else if (/\b(json)\b/i.test(qClean)) requestedFormat = 'json';
+    else if (/\b(pdf)\b/i.test(qClean)) requestedFormat = 'pdf';
+    else if (/\b(export|download|save as|make.*report|generate.*report|pdf report|excel report)\b/i.test(qClean)) requestedFormat = 'pdf';
+  }
+
+  if (requestedFormat && !isOptionsMenu) {
     const rawClean = (query || 'APS AI Response').replace(/[^a-zA-Z0-9 ]/g, '').trim();
     const titleSlug = (rawClean.slice(0, 35) || 'APS_AI_Report').replace(/\s+/g, '_');
     const fileName = `APS_AI_${titleSlug}.${requestedFormat}`;

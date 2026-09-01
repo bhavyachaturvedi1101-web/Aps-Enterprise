@@ -935,7 +935,7 @@ function ExportFileCard({ exportFile, tableData }) {
 }
 
 // ─── Message Component ────────────────────────────────────────────────────────
-function MessageCard({ msg }) {
+function MessageCard({ msg, onSelectOption }) {
   const isUser = msg.role === 'user';
 
   return (
@@ -967,7 +967,7 @@ function MessageCard({ msg }) {
             {msg.options && msg.options.length > 0 && (
               <div style={s.optionsContainer}>
                 {msg.options.map((opt, i) => (
-                  <button key={i} className="apsai-option-chip" style={s.optionChip} onClick={() => sendQuery(opt)}>
+                  <button key={i} className="apsai-option-chip" style={s.optionChip} onClick={() => onSelectOption ? onSelectOption(opt) : null}>
                     {opt}
                   </button>
                 ))}
@@ -1306,7 +1306,7 @@ export default function APSAIPage() {
                 </div>
               </div>
             ) : (
-              messages.map((msg, i) => <MessageCard key={i} msg={msg} />)
+              messages.map((msg, i) => <MessageCard key={i} msg={msg} onSelectOption={sendQuery} />)
             )}
             <div ref={bottomRef} />
           </div>
