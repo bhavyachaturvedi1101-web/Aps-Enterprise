@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getStore } = require('../config/inMemoryStore');
+const store = require('../config/inMemoryStore');
 
 const DEFAULT_USERS = [
   { id: 'u1', name: 'Animesh J', email: 'animesh@aps.in', role: 'Super Admin', module: 'Voice AI', lastLogin: '5m ago', status: 'Online' },
@@ -12,7 +12,6 @@ const DEFAULT_USERS = [
 // GET /api/users — List all system users & roles
 router.get('/', async (req, res) => {
   try {
-    const store = await getStore();
     if (!store.mockUsers || store.mockUsers.length === 0) {
       store.mockUsers = [...DEFAULT_USERS];
     }
@@ -34,7 +33,6 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Name and email are required' });
     }
 
-    const store = await getStore();
     if (!store.mockUsers) store.mockUsers = [...DEFAULT_USERS];
 
     const newUser = {
@@ -74,7 +72,6 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const store = await getStore();
     if (!store.mockUsers) store.mockUsers = [...DEFAULT_USERS];
 
     const idx = store.mockUsers.findIndex(u => u.id === id);
@@ -102,7 +99,6 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const store = await getStore();
     if (!store.mockUsers) store.mockUsers = [...DEFAULT_USERS];
 
     store.mockUsers = store.mockUsers.filter(u => u.id !== id);
