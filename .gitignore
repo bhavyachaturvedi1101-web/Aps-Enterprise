@@ -6,6 +6,18 @@
 .env
 .env.*
 !.env.example
+
+# Sensitive credential/requirements documents (contain raw passwords & API keys)
+det req SEEVORA*
+det_req_seevora*
+*credentials*.docx
+*passwords*.docx
+*api-keys*
+
+# Proprietary APS architecture & roadmap documents
+APS_AI_Architecture_Dev_Brief.pdf
+APS_Enterprise_Final_AI_Architecture.pdf
+APS_Enterprises_8Week_Timeline_DevelopmentOnly*
 *.pem
 *.key
 *.cert
