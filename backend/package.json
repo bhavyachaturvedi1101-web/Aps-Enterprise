@@ -26,6 +26,7 @@
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
+    "docx": "^9.9.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.14",
     "supertest": "^7.0.0"
