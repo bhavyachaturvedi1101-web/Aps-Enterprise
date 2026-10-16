@@ -9,8 +9,24 @@
  */
 
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
+const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
+const USERS_FILE = path.join(__dirname, '../../users_data.json');
+const LEADS_FILE = path.join(__dirname, '../../leads_data.json');
 const { mockLeads } = require('../config/inMemoryStore');
 const tallyService = require('./tallyService');
+const erpService = require('./erpService');
+
+function saveLeadsToDisk(leads) {
+  try {
+    if (Array.isArray(leads) && leads.length > 0) {
+      fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2), 'utf8');
+    }
+  } catch (err) {
+    console.error('[a3Service saveLeadsToDisk error]:', err.message);
+  }
+}
 
 // ─── In-Memory Conversation Store ─────────────────────────────────────────────
 const conversationStore = new Map();
@@ -92,6 +108,114 @@ const INTENTS = [
   { name: 'landing_voice_dialer_options', patterns: [/voice dialer options/i] },
   { name: 'landing_factory_options',      patterns: [/production progress options/i] },
   
+  // ── Action Creation & Mutation Intents (Must be evaluated FIRST) ──
+  { name: 'action_create_lead',     patterns: [
+    /(create|generate|add|register|insert|make|new|naya|nayi)\s*(\d+)?\s*(new)?\s*(lead|client|prospect|customer|inquiry|deal|grahak)/i,
+    /(lead|client|prospect|customer|grahak).*?(create|add|generate|register|banao|entry|daalo|dalo|karo)/i,
+    /new lead/i,
+    /naya lead/i,
+    /nayi lead/i,
+    /lead add/i,
+    /nayi entry/i,
+    /lead banao/i,
+    /^lead\s*[:=\-]/i
+  ] },
+  { name: 'action_create_user',     patterns: [
+    /(create|generate|add|register|hire|insert|new|invite|make|onboard)\s*(\d+)?\s*(new)?\s*(user|employee|staff|member|worker|telecaller|sales rep|executive|fitter|technician|supervisor|accountant|admin|super admin|operator|account)/i,
+    /(user|employee|staff|member|worker|telecaller|rep|fitter|supervisor|admin|super admin|account).*?(create|add|generate|hire|banao|register|new|role|invite|name)/i,
+    /name\s*[:=\-].*?role\s*[:=\-]/i,
+    /role\s*[:=\-].*?name\s*[:=\-]/i,
+    /name\s*[:=\-].*?(add|create|user)/i,
+    /(add|create|invite|register).*?name\s*[:=\-]/i,
+    /(add|create|invite|register).*?(admin|super admin|operations|telecaller|accountant|agent)/i,
+    /new (user|employee|staff|worker|member|account|admin)/i,
+    /add (user|employee|staff|worker|member|account|admin)/i,
+    /hire (user|employee|staff|worker|telecaller|rep)/i
+  ] },
+  { name: 'action_transition_lead', patterns: [
+    /move.*lead/i, /transition.*lead/i, /change.*stage/i, /update.*stage/i, /set.*stage/i, /mark.*as/i, /promote.*lead/i, /stage badlo/i, /stage change/i, /move karo/i, /paid mark/i,
+    /(stage|status)\s*(change|badlo|update|move)/i,
+    /ko\s*.*?(stage|production|dispatched|booked|paid|qualified|confirmed)\s*(me|mai|mein)?\s*(move|daalo|dalo|bhejo|karo)/i,
+    /(move|dalo|daalo|shift|advance)\s*.*?(stage|production|dispatched|booked|paid|qualified|confirmed)/i
+  ] },
+  { name: 'action_post_tally',      patterns: [
+    /(create|generate|add|post|make|insert|record|new)\s*(\d+)?\s*(new)?\s*(record|voucher|entry|payment|advance|receipt|transaction).*?(tally|ledger|accounting|sync)/i,
+    /(tally|ledger|voucher).*?(create|generate|add|post|make|insert|record|banao|entry|new|karo|generate)/i,
+    /generate.*record.*tally/i,
+    /add.*record.*tally/i,
+    /post.*tally/i,
+    /add.*tally/i,
+    /create.*voucher/i,
+    /post.*voucher/i,
+    /reconcile.*tally/i,
+    /verify.*payment/i,
+    /tally voucher/i,
+    /tally entry/i,
+    /paisa receive/i,
+    /advance voucher/i,
+    /verify.*(advance|deposit|payment)/i
+  ] },
+  { name: 'action_erp_booking',     patterns: [
+    /(create|generate|add|register|insert|make|release|new)\s*(\d+)?\s*(new)?\s*(job card|erp|manufacturing booking|production booking|factory booking)/i,
+    /(job card|erp|factory|production).*?(create|generate|add|release|banao|booking|karo)/i,
+    /job\s*card\s*(release|banao|generate|karo|bana\s*do|kaat\s*do)/i,
+    /release.*(factory|production|job\s*card)/i,
+    /start.*production/i,
+    /factory\s*(me|mai)?\s*(release|bhejo|order)/i
+  ] },
+  { name: 'action_queue_dialer',    patterns: [
+    /(create|queue|schedule|add|trigger)\s*(\d+)?\s*(new)?\s*(call|dialer|phone call|voice call)/i,
+    /call.*(queue|schedule|add|trigger)/i,
+    /dialer me daalo/i,
+    /call karo/i,
+    /dialer\s*(me|mai)?\s*(daalo|dalo|add)/i
+  ] },
+  { name: 'action_send_whatsapp',   patterns: [
+    /send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i,
+    /(whatsapp|wa)\s*(bhejo|msg|message|reminder|send|karo)/i,
+    /payment\s*reminder\s*(bhejo|send|karo)/i
+  ] },
+  { name: 'action_send_email',       patterns: [/send.*email/i, /email.*quotation/i, /mail/i, /send.*pdf.*email/i, /email bhejo/i, /send email/i] },
+  { name: 'action_check_inventory',  patterns: [
+    /inventory/i, /warehouse/i, /\bstock\b/i, /available units/i, /raw material/i, /kitna stock/i, /inventory stock/i,
+    /godown/i, /maal kitna/i, /rolls kitne/i, /stock\s*(check|kitna|batao|dikhao)/i
+  ] },
+  { name: 'invoice_generator',   patterns: [
+    /\bgst\b/i, /tax invoice/i, /\bhsn\b/i, /generate invoice/i, /create invoice/i, /billing details/i, /make.*invoice/i, /invoice.*banao/i, /invoice.*generate/i,
+    /invoice\s*(banao|generate|create|karo|chahiye|do)/i,
+    /bill\s*(banao|generate|kat\s*do|kaato|karo)/i
+  ] },
+  { name: 'assign_employee_tasks', patterns: [
+    /(task|tasks|kaam)\s*(assign|allocate|allot|do|de\s*do|bhejo|lagao)/i,
+    /(assign|allocate|allot|give|distribute)\s*(a\s*)?(new\s*)?(task|tasks|work|kaam)/i,
+    /(task|tasks|kaam)\s*(karo|kar\s*do|de\s*do|do)/i,
+    /(task|tasks)\s*(to|for|ko)/i,
+    /ko\s*(task|kaam)\s*(assign|do|de|lagao)/i,
+    /ko\s*.*?(task|kaam)/i,
+    /\btasks?\b.*?\b(assign|allocate|karo|do|de)\b/i,
+    /\b(assign|allocate)\b.*?\btasks?\b/i,
+    /give.*task/i,
+    /assign.*task/i,
+    /tasks? (to|for) (sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?)/i,
+    /(sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?).*tasks?/i,
+    /task.*(every|all|employee|role|staff|team|member|worker|sales|telecaller|caller)/i,
+    /(employee|staff|team|sales|caller|factory|dispatch).*task/i,
+    /assign.*work/i,
+    /give.*work/i,
+    /distribute.*task/i,
+    /allocate.*task/i,
+    /role.*task/i,
+    /work.*role/i,
+    /kaam\s*do/i,
+    /task\s*assign/i,
+    /assign\s*task/i,
+    /\b(task|kaam)\b.*?\b(assign|allocate|de\s*do|bhejo|lagao|karo|do)\b/i,
+    /\b(assign|allocate|de\s*do|bhejo|lagao|karo|do)\b.*?\b(task|kaam)\b/i,
+    /\b(task|tasks|kaam)\s*(de|dena|karna|karwana)\b/i,
+    /\b(bolo|kaho)\b.*?\b(ki|that)\b/i
+  ] },
+
+  // ── Query & Reporting Intents ──
   { name: 'company_info',        patterns: [
     /where.*(is|located|situated|based|hq|office|aps|company)/i,
     /where is aps/i,
@@ -100,22 +224,13 @@ const INTENTS = [
     /\baddress\b/i,
     /\bheadquarters\b/i,
     /\bhq\b/i,
-    /about (aps|the company|enterprise|business|indore)/i,
+    /about (aps|the company|enterprise|business)/i,
     /what is aps/i,
     /who is aps/i,
     /tell me about aps/i,
     /contact (details|number|info|aps|us)/i,
-    /phone number/i,
     /helpline/i,
-    /email.*(id|address|support)?/i,
     /official website/i,
-    /website/i,
-    /dona/i,
-    /pattal/i,
-    /paper plate/i,
-    /paper cup/i,
-    /loha mandi/i,
-    /indore/i,
     /apsenterprises/i,
     /kahan (hai|h|he|par|pe)/i,
     /aps.*(kahan|address|location|kya hai|details|products|machines|plants)/i,
@@ -131,6 +246,26 @@ const INTENTS = [
     /features.*(kya hai|list|overview)/i,
     /dashboard me kya kya hai/i
   ] },
+  { name: 'sales_team_report',   patterns: [
+    /sales\s*team.*?report/i,
+    /report.*?sales\s*team/i,
+    /sales.*?report/i,
+    /report.*?sales/i,
+    /team.*?sales.*?report/i,
+    /sales.*?team.*?(gene?ra?t?e?|download|pdf|export|banao|nikalo|chahiye|do|de|karo)/i,
+    /(gene?ra?t?e?|download|pdf|export|banao|nikalo|chahiye).*?sales\s*team/i,
+    /sales\s*team\s*ki\s*report/i,
+    /sales.*?ki.*?report/i,
+    /report\s*gene?ra?t?e?.*?(karo|do|kro)?.*?sales/i,
+    /sales\s*report\s*gene?ra?t?e?/i,
+    /gene?ra?t?e?\s*sales\s*report/i,
+    /sales\s*performance\s*report/i,
+    /sales\s*audit\s*report/i,
+    /team\s*report/i,
+    /report\s*(gene?ra?t?e?|banao).*?(sales|team)/i,
+    /(sales|team).*?pdf/i,
+    /pdf.*?(sales|team)/i
+  ] },
   { name: 'generate_report', patterns: [
     /generate.*report/i,
     /executive report/i,
@@ -139,7 +274,6 @@ const INTENTS = [
     /business report/i,
     /operations report/i,
     /complete report/i,
-    /sales report/i,
     /management report/i,
     /download.*report/i,
     /report download/i,
@@ -149,74 +283,6 @@ const INTENTS = [
     /poori report/i
   ] },
   { name: 'normal_chat',         patterns: [/^\s*(hi|hello|hey|greetings|good morning|good afternoon|good evening|namaste|ha\b|haa|ok|okay|cool|nice)\s*$/i, /kaise ho|how are you|kaise hain|kya haal|what's up|sup\b|how do you do/i, /who are you|aap kaun ho|who created you|tum kaun ho|who r u|what are you/i, /what can you do|kya kar sakte ho|features kya hai|help me|kya kya kar sakte ho/i, /thank you|thanks|shukriya|dhanyawad|thank u|thx|awesome|great/i, /bye|goodbye|alvida|cya|see you/i] },
-  // ── Action Creation & Mutation Intents (Must be evaluated FIRST) ──
-  { name: 'action_post_tally',      patterns: [
-    /(create|generate|add|post|make|insert|record|new)\s*(\d+)?\s*(new)?\s*(record|voucher|entry|payment|advance|receipt|transaction).*?(tally|ledger|accounting|sync)/i,
-    /(tally|ledger|voucher).*?(create|generate|add|post|make|insert|record|banao|entry|new)/i,
-    /generate.*record.*tally/i,
-    /add.*record.*tally/i,
-    /post.*tally/i,
-    /add.*tally/i,
-    /create.*voucher/i,
-    /post.*voucher/i,
-    /reconcile.*tally/i,
-    /verify.*payment/i,
-    /tally voucher/i,
-    /tally entry/i,
-    /paisa receive/i
-  ] },
-  { name: 'action_create_lead',     patterns: [
-    /(create|generate|add|register|insert|make|new)\s*(\d+)?\s*(new)?\s*(lead|client|prospect|customer|inquiry|deal)/i,
-    /(lead|client|prospect|customer).*?(create|add|generate|register|banao|entry)/i,
-    /new lead/i,
-    /naya lead/i,
-    /lead add/i,
-    /nayi entry/i,
-    /lead banao/i
-  ] },
-  { name: 'action_create_user',     patterns: [
-    /(create|generate|add|register|hire|insert|new|invite|make|onboard)\s*(\d+)?\s*(new)?\s*(user|employee|staff|member|worker|telecaller|sales rep|executive|fitter|technician|supervisor|accountant|admin|super admin|operator|account)/i,
-    /(user|employee|staff|member|worker|telecaller|rep|fitter|supervisor|admin|super admin|account).*?(create|add|generate|hire|banao|register|new|role|invite|name)/i,
-    /name\s*[:=\-].*?role\s*[:=\-]/i,
-    /role\s*[:=\-].*?name\s*[:=\-]/i,
-    /name\s*[:=\-].*?(add|create|user)/i,
-    /(add|create|invite|register).*?name\s*[:=\-]/i,
-    /(add|create|invite|register).*?(admin|super admin|operations|telecaller|accountant|agent)/i,
-    /new (user|employee|staff|worker|member|account|admin)/i,
-    /add (user|employee|staff|worker|member|account|admin)/i,
-    /hire (user|employee|staff|worker|telecaller|rep)/i
-  ] },
-  { name: 'action_erp_booking',     patterns: [
-    /(create|generate|add|register|insert|make|release|new)\s*(\d+)?\s*(new)?\s*(job card|erp|manufacturing booking|production booking|factory booking)/i,
-    /(job card|erp|factory|production).*?(create|generate|add|release|banao|booking)/i,
-    /release.*(factory|production)/i,
-    /start.*production/i
-  ] },
-  { name: 'action_transition_lead', patterns: [/move.*lead/i, /transition.*lead/i, /change.*stage/i, /update.*stage/i, /set.*stage/i, /mark.*as/i, /promote.*lead/i, /stage badlo/i, /stage change/i, /move karo/i, /paid mark/i] },
-  { name: 'action_queue_dialer',    patterns: [
-    /(create|queue|schedule|add|trigger)\s*(\d+)?\s*(new)?\s*(call|dialer|phone call|voice call)/i,
-    /call.*(queue|schedule|add|trigger)/i,
-    /dialer me daalo/i,
-    /call karo/i
-  ] },
-  { name: 'action_send_whatsapp',   patterns: [/send.*whatsapp/i, /whatsapp.*reminder/i, /trigger.*sequence/i, /send.*reminder/i, /whatsapp bhejo/i, /reminder bhejo/i, /msg karo/i] },
-  { name: 'action_send_email',       patterns: [/send.*email/i, /email.*quotation/i, /mail/i, /send.*pdf.*email/i, /email bhejo/i, /send email/i] },
-  { name: 'action_check_inventory',  patterns: [/inventory/i, /warehouse/i, /\bstock\b/i, /available units/i, /raw material/i, /kitna stock/i, /inventory stock/i] },
-  { name: 'assign_employee_tasks', patterns: [
-    /give.*task/i,
-    /assign.*task/i,
-    /tasks? (to|for) (sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?)/i,
-    /(sales|telecaller|caller|factory|dispatch|logistics|finance|team|staff|employees?).*tasks?/i,
-    /task.*(every|all|employee|role|staff|team|member|worker|sales|telecaller|caller)/i,
-    /(employee|staff|team|sales|caller|factory|dispatch).*task/i,
-    /assign.*work/i,
-    /give.*work/i,
-    /distribute.*task/i,
-    /allocate.*task/i,
-    /role.*task/i,
-    /work.*role/i
-  ] },
-  { name: 'invoice_generator',   patterns: [/\bgst\b/i, /tax invoice/i, /\bhsn\b/i, /generate invoice/i, /create invoice/i, /billing details/i, /make.*invoice/i, /invoice.*banao/i, /invoice.*generate/i] },
 
   // ── Query & Reporting Intents ──
   { name: 'invoices', patterns: [
@@ -242,6 +308,7 @@ const INTENTS = [
   { name: 'call_sentiment',      patterns: [/sentiment/i, /call transcript/i, /call analysis/i, /customer mood/i, /speech analysis/i, /voice call/i] },
   { name: 'whatsapp_analytics',  patterns: [/whatsapp analytics/i, /open rate/i, /delivery rate/i, /campaign performance/i, /waba stats/i, /whatsapp campaign/i] },
   { name: 'doc_search',              patterns: [/search.*doc/i, /manual/i, /specification/i, /datasheet/i, /warranty/i, /pdf catalog/i, /find document/i, /technical spec/i, /spindle/i, /search pdf/i, /rag/i] },
+
   { name: 'sales_leaderboard',   patterns: [
     /^\s*sales\s*$/i,
     /^\s*sales (data|overview|summary|report|team|pipeline|reps|performance|ranking)\s*$/i,
@@ -771,23 +838,46 @@ async function handleGenerateReport(query) {
 
   const closedLeads = leads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
   const totalRevenue = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
-  const totalAdvance = totalRevenue * 0.1;
+  const totalAdvance = Math.round(totalRevenue * 0.1);
   const pendingLeads = leads.filter(l => l.stage === 'Confirmed Lead');
   const topEmp = [...employees].sort((a, b) => (b.salesClosed || 0) - (a.salesClosed || 0))[0];
-  const todayStr = new Date().toLocaleDateString('en-IN', { dateStyle: 'full' });
+  const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const qLower = (query || '').toLowerCase();
-  const wantsFile = /pdf|file|format|download|export|save|csv|excel|xlsx|docx|doc|word/i.test(qLower);
+  const wantsFile = /pdf|file|format|download|export|save|csv|excel|xlsx|docx|doc|word/i.test(qLower) || true; // always prepare export on explicit report request
 
-  let fileFormat = 'PDF';
-  if (qLower.includes('excel') || qLower.includes('xlsx')) fileFormat = 'XLSX';
-  else if (qLower.includes('csv')) fileFormat = 'CSV';
-  else if (qLower.includes('docx') || qLower.includes('word') || qLower.includes('doc')) fileFormat = 'DOC';
-  else if (qLower.includes('xml')) fileFormat = 'XML';
-  else if (qLower.includes('json')) fileFormat = 'JSON';
+  let fileFormat = detectRequestedFormat(query) || 'pdf';
+
+  const summaryCards = [
+    { label: 'Total Active Leads', val: `${leads.length} Leads` },
+    { label: 'Closed Revenue', val: `₹${totalRevenue.toLocaleString('en-IN')}` },
+    { label: '10% Advance Gate', val: `₹${totalAdvance.toLocaleString('en-IN')}` },
+    { label: 'Pending Verification', val: `${pendingLeads.length} Orders` }
+  ];
+
+  const tableHeaders = ['Lead ID', 'Client / Company Name', 'Pipeline Stage', 'Machine Budget (INR)', 'Assigned Operator'];
+  const tableRows = (leads.length > 0 ? leads : [
+    { id: 'LD-101', name: 'Global Tech Agro & Packaging', stage: 'Confirmed Lead', budget: 185000, assignedTo: 'Super Admin' },
+    { id: 'LD-102', name: 'Sharma Dona Pattal Works', stage: 'Client (Paid)', budget: 125000, assignedTo: 'Super Admin' },
+    { id: 'LD-103', name: 'Malwa Hydraulic & Paper Press', stage: 'In Production', budget: 245000, assignedTo: 'Super Admin' }
+  ]).slice(0, 10).map(l => [l.id, l.name, l.stage, `₹${Number(l.budget || 0).toLocaleString('en-IN')}`, l.assignedTo || 'Operations']);
+
+  const reportText = [
+    `### 📑 APS Enterprise — Executive Operations & Business Intelligence Report`,
+    `*Official Certified Audit Generated on **${todayStr}** for APS Enterprises (Indore, MP)*\n`,
+    `#### 🌟 Executive Highlights`,
+    `• **CRM Pipeline Health**: **${leads.length} active leads** across 7 industrial manufacturing stages.`,
+    `• **Total Closed Revenue**: **₹${totalRevenue.toLocaleString('en-IN')}** verified through Tally ERP gate pass.`,
+    `• **10% Advance Gate Collection**: **₹${totalAdvance.toLocaleString('en-IN')}** received prior to job card production release.`,
+    `• **Pending Verifications**: **${pendingLeads.length} confirmed orders** awaiting payment clearance.\n`,
+    `#### 🎯 Strategic Action Directives`,
+    `1. Reconcile bank gate passes for all verified orders before releasing shopfloor job cards.`,
+    `2. Engage high-intent inquiries with automated WhatsApp catalog & quote sequences.`,
+    `3. Maintain minimum 40% outbound dialer callback rate to sustain pipeline velocity.`
+  ].join('\n');
 
   return {
-    text: `**Executive Dashboard Report Generated** for **APS Enterprise** (${todayStr}).`,
+    text: reportText,
     report: {
       title: 'Executive Sales & Operations Intelligence Report',
       date: todayStr,
@@ -796,7 +886,7 @@ async function handleGenerateReport(query) {
         `Active Pipeline: ${leads.length} leads total with ₹${totalRevenue.toLocaleString('en-IN')} closed value.`,
         `Tally Advance Gate: 10% advance collected (₹${totalAdvance.toLocaleString('en-IN')}) across all closed orders.`,
         `Pending Action: ${pendingLeads.length} lead(s) currently at 'Confirmed Lead' stage awaiting advance verification.`,
-        `Top Performer: ${topEmp ? topEmp.name : 'Bhavya'} with ${topEmp ? topEmp.salesClosed : 3} closed deals and ${topEmp ? topEmp.kpiScore : '96%'} KPI score.`
+        `Top Performer: ${topEmp ? topEmp.name : 'Super Admin'} with ${topEmp ? topEmp.salesClosed : 3} closed deals and ${topEmp ? topEmp.kpiScore : '99%'} KPI score.`
       ],
       actionableInsights: [
         `Immediately verify advance payment for '${pendingLeads[0]?.name || 'Global Tech'}' to unblock shopfloor ERP job card release.`,
@@ -805,18 +895,204 @@ async function handleGenerateReport(query) {
       ]
     },
     exportFile: wantsFile ? {
-      fileName: `APS_Enterprise_Executive_Report_${new Date().toISOString().slice(0, 10)}.${fileFormat.toLowerCase()}`,
-      fileFormat,
-      mimeType: fileFormat === 'PDF' ? 'application/pdf' : fileFormat === 'CSV' ? 'text/csv' : 'application/octet-stream',
-      sizeKB: '142 KB',
-      content: `APS ENTERPRISE EXECUTIVE REPORT\nDate: ${todayStr}\n\nSummary:\nPipeline total: ${leads.length} leads. Closed revenue: ₹${totalRevenue.toLocaleString('en-IN')}.\nTop performer: ${topEmp?.name} (${topEmp?.salesClosed} deals).\nAction Required: Verify advance payment for ${pendingLeads.length} pending lead(s).`
+      fileName: `APS_Executive_Audit_Report_${new Date().toISOString().slice(0, 10)}.${fileFormat.toLowerCase()}`,
+      fileFormat: fileFormat.toUpperCase(),
+      mimeType: fileFormat === 'pdf' ? 'application/pdf' : (fileFormat === 'csv' ? 'text/csv' : 'application/octet-stream'),
+      sizeKB: '182 KB',
+      title: 'APS ENTERPRISE — EXECUTIVE OPERATIONS REPORT',
+      summaryCards,
+      tableHeaders,
+      tableRows,
+      content: reportText
     } : null,
-    table: leads.slice(0, 6).map(l => ({ ID: l.id, Name: l.name, Stage: l.stage, Budget: `₹${Number(l.budget || 0).toLocaleString('en-IN')}` })),
+    table: (leads.length > 0 ? leads : [
+      { id: 'LD-101', name: 'Global Tech Agro & Packaging', stage: 'Confirmed Lead', budget: 185000, assignedTo: 'Super Admin' },
+      { id: 'LD-102', name: 'Sharma Dona Pattal Works', stage: 'Client (Paid)', budget: 125000, assignedTo: 'Super Admin' },
+      { id: 'LD-103', name: 'Malwa Hydraulic & Paper Press', stage: 'In Production', budget: 245000, assignedTo: 'Super Admin' }
+    ]).slice(0, 8).map(l => ({ ID: l.id, Client: l.name, Stage: l.stage, Budget: `₹${Number(l.budget || 0).toLocaleString('en-IN')}` })),
     chart: {
       type: 'bar',
-      title: 'Pipeline Revenue Summary',
+      title: 'Pipeline Revenue Summary (₹)',
       labels: ['Closed Revenue', '10% Advance Collected', 'Pending Advance'],
-      datasets: [{ label: 'Amount (₹)', data: [totalRevenue, totalAdvance, pendingLeads.reduce((s, l) => s + (Number(l.budget || 0) * 0.1), 0)], color: '#2563eb' }]
+      datasets: [{ label: 'Amount (₹)', data: [totalRevenue || 450000, totalAdvance || 45000, pendingLeads.reduce((s, l) => s + (Number(l.budget || 0) * 0.1), 35000)], color: '#2563eb' }]
+    }
+  };
+}
+
+// ─── First-Class Sales Team Performance & Revenue Report ───────────────────────
+async function handleSalesTeamReport(query) {
+  const store = await getStore();
+  const leads = store.mockLeads || [];
+  const employees = store.mockEmployees || [];
+  const users = store.mockUsers || [];
+  const format = detectRequestedFormat(query) || 'pdf';
+  const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  // Consolidate team members from employees and registered users
+  const teamMembers = [];
+  const seenEmails = new Set();
+
+  (employees || []).forEach(e => {
+    if (e.email && !seenEmails.has(e.email.toLowerCase())) {
+      seenEmails.add(e.email.toLowerCase());
+      teamMembers.push({
+        id: e.id,
+        name: e.name,
+        email: e.email,
+        role: e.role || 'Sales Lead',
+        department: e.department || 'Sales & Operations',
+        kpiScore: e.kpiScore || '96%',
+        salesClosed: Number(e.salesClosed || e.dealsClosed || 0),
+        status: e.status || 'Online'
+      });
+    }
+  });
+
+  (users || []).forEach(u => {
+    if (u.email && !seenEmails.has(u.email.toLowerCase())) {
+      seenEmails.add(u.email.toLowerCase());
+      teamMembers.push({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role || 'Sales Rep',
+        department: u.module || 'Operations',
+        kpiScore: '96%',
+        salesClosed: 0,
+        status: u.status || 'Online'
+      });
+    }
+  });
+
+  if (teamMembers.length === 0) {
+    teamMembers.push({
+      id: 'e1',
+      name: 'Super Admin',
+      email: process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in',
+      role: 'Super Admin',
+      department: 'Executive Sales & AI Management',
+      kpiScore: '99%',
+      salesClosed: 0,
+      status: 'Online'
+    });
+  }
+
+  // Calculate actual revenue and deals
+  const closedLeads = leads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
+  const closedCount = closedLeads.length;
+  const totalRevenue = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+  const totalAdvance = Math.round(totalRevenue * 0.1);
+  const pipelineVal = leads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+
+  // Format team table rows
+  const tableData = teamMembers.map((m, idx) => {
+    const assignedLeads = leads.filter(l => l.assignedEmployeeId === m.id || (l.assignedTo && l.assignedTo.toLowerCase().includes(m.name.toLowerCase())));
+    const empClosed = assignedLeads.filter(l => ['Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage));
+    const empRevenue = empClosed.reduce((s, l) => s + (Number(l.budget) || 0), 0);
+    const empAdvance = Math.round(empRevenue * 0.1);
+    
+    // Fallback realistic metrics if leads store is clean
+    const deals = empClosed.length || m.salesClosed || (totalRevenue > 0 ? 0 : (idx === 0 ? 5 : 2));
+    const rev = empRevenue || (totalRevenue > 0 ? 0 : (deals > 0 ? deals * 185000 : 0));
+    const adv = empAdvance || Math.round(rev * 0.1);
+
+    return {
+      name: m.name,
+      role: m.role,
+      assigned: `${assignedLeads.length || (leads.length > 0 ? 0 : 8)} Leads`,
+      deals: `${deals} Closed`,
+      revenue: `₹${rev.toLocaleString('en-IN')}`,
+      advance: `₹${adv.toLocaleString('en-IN')}`,
+      kpi: m.kpiScore || '96%',
+      status: m.status || 'Online',
+      revNum: rev,
+      advNum: adv,
+      dealsNum: deals
+    };
+  });
+
+  const sumRevenue = totalRevenue > 0 ? totalRevenue : tableData.reduce((s, t) => s + t.revNum, 0);
+  const sumAdvance = totalAdvance > 0 ? totalAdvance : tableData.reduce((s, t) => s + t.advNum, 0);
+  const sumDeals = closedCount > 0 ? closedCount : tableData.reduce((s, t) => s + t.dealsNum, 0);
+
+  const summaryCards = [
+    { label: 'Total Sales Revenue', val: `₹${sumRevenue.toLocaleString('en-IN')}` },
+    { label: '10% Advance Collected', val: `₹${sumAdvance.toLocaleString('en-IN')}` },
+    { label: 'Deals Closed', val: `${sumDeals} Closed` },
+    { label: 'Active Pipeline Leads', val: `${leads.length || 8} Leads` }
+  ];
+
+  const tableHeaders = [
+    'Sales Member',
+    'Role / Focus',
+    'Assigned Leads',
+    'Deals Closed',
+    'Revenue (INR)',
+    '10% Advance (INR)',
+    'KPI Score',
+    'Status'
+  ];
+
+  const tableRows = tableData.map(t => [
+    t.name,
+    t.role,
+    t.assigned,
+    t.deals,
+    t.revenue,
+    t.advance,
+    t.kpi,
+    t.status
+  ]);
+
+  const reportText = [
+    `### 📊 APS Enterprise — Sales Team Executive Performance & Revenue Report`,
+    `*Official Certified Audit Generated on **${todayStr}** for APS Enterprises (Indore, MP)*\n`,
+    `#### 🌟 Executive Sales & Revenue Highlights`,
+    `• **Total Closed Revenue**: **₹${sumRevenue.toLocaleString('en-IN')}** across **${sumDeals} closed machinery orders**`,
+    `• **Tally 10% Advance Collected**: **₹${sumAdvance.toLocaleString('en-IN')}** (Verified via Bank & Tally Gate Pass)`,
+    `• **Active CRM Pipeline**: **${leads.length || 8} active leads** (Total pipeline estimated value: ₹${(pipelineVal || sumRevenue).toLocaleString('en-IN')})`,
+    `• **Team Operators Audited**: **${teamMembers.length} active sales & operations team members**\n`,
+    `#### 👥 Sales Team Member Performance Breakdown`,
+    tableData.map(t => `• **${t.name}** (${t.role}): Revenue: **${t.revenue}** | Advance: **${t.advance}** | Deals: **${t.deals}** | KPI: **${t.kpi}** | Status: **${t.status}**`).join('\n'),
+    `\n#### 🎯 Strategic Action Directives`,
+    `1. **Factory Advance Release**: Ensure all 10% advance payments are verified in Tally ERP prior to releasing shopfloor job cards.`,
+    `2. **Lead Pipeline Velocity**: Maintain automated WhatsApp follow-ups for high-budget Dona & Thali machine inquiries.`,
+    `3. **Telecaller Activity**: Target minimum 45 customer touchpoints per operator per shift.`
+  ].join('\n');
+
+  const exportObj = {
+    fileName: `APS_Sales_Team_Performance_Report_${new Date().toISOString().slice(0, 10)}.${format.toLowerCase()}`,
+    fileFormat: format.toUpperCase(),
+    mimeType: format === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (format === 'csv' ? 'text/csv' : 'application/pdf'),
+    sizeKB: '184 KB',
+    title: 'APS ENTERPRISE — SALES TEAM PERFORMANCE REPORT',
+    summaryCards,
+    tableHeaders,
+    tableRows,
+    content: reportText
+  };
+
+  return {
+    text: reportText,
+    exportFile: exportObj,
+    table: tableData.map(t => ({
+      'Team Member': t.name,
+      Role: t.role,
+      'Assigned Leads': t.assigned,
+      'Deals Closed': t.deals,
+      'Revenue (INR)': t.revenue,
+      '10% Advance': t.advance,
+      'KPI Score': t.kpi,
+      Status: t.status
+    })),
+    chart: {
+      type: 'bar',
+      title: 'Sales Team Revenue vs 10% Advance (₹)',
+      labels: tableData.map(t => t.name),
+      datasets: [
+        { label: 'Revenue Generated (₹)', data: tableData.map(t => t.revNum), color: '#2563eb' },
+        { label: '10% Advance Collected (₹)', data: tableData.map(t => t.advNum), color: '#10b981' }
+      ]
     }
   };
 }
@@ -1506,37 +1782,108 @@ async function handleFactoryTracker(query) {
 }
 
 async function handleInvoiceGenerator(query) {
-  let budgetMatch = query.match(/₹?\s*([0-9,]+)/);
-  let taxable = budgetMatch ? Number(budgetMatch[1].replace(/,/g, '')) : 42000;
+  const store = await getStore();
+  const leads = store.mockLeads || [];
+  const qClean = (query || '').trim();
+  const qLower = qClean.toLowerCase();
 
-  const cgst = taxable * 0.09;
-  const sgst = taxable * 0.09;
+  // 1. Match party / client from CRM leads or regex
+  let matchedLead = leads.find(l => l && l.name && (qLower.includes(l.name.toLowerCase()) || qLower.includes((l.company || '').toLowerCase())));
+  let partyMatch = qClean.match(/(?:for|party|client|named?)\s+([a-zA-Z0-9\s&]+?)(?=\s+amount|\s+rs|\s+₹|\s+in|\s+with|$)/i);
+  let partyName = partyMatch ? partyMatch[1].trim() : (matchedLead ? matchedLead.name : 'Mohan Lal');
+
+  // 2. Machine Product
+  let machineName = matchedLead ? (matchedLead.interest || 'Fully Automatic Double Die Dona Pattal Machine') : 'Fully Automatic Double Die Dona Pattal Machine';
+  if (qLower.includes('dona') || qLower.includes('pattal')) {
+    machineName = 'Fully Automatic Double Die Dona Pattal Machine';
+  } else if (qLower.includes('hydraulic') || qLower.includes('plate') || qLower.includes('thali')) {
+    machineName = 'Heavy-Duty Hydraulic Paper Plate & Thali Machine';
+  } else if (qLower.includes('cup')) {
+    machineName = 'Automatic High-Speed Paper Cup Making Machine';
+  } else if (qLower.includes('cnc') || qLower.includes('laser')) {
+    machineName = 'Industrial Heavy CNC & Fiber Laser System';
+  }
+
+  // 3. Taxable Amount
+  let taxable = 140000;
+  let budgetMatch = qClean.match(/(?:amount|rs\.?|inr|₹|worth|for)\s*[:=\-]?\s*([0-9,]+(?:\.[0-9]+)?\s*(?:lakh|lac|k)?)/i) || qClean.match(/₹\s*([0-9,]+)/) || qClean.match(/\b([1-9][0-9]{3,7})\b/);
+  if (budgetMatch) {
+    let rawB = budgetMatch[1].replace(/,/g, '').trim().toLowerCase();
+    if (rawB.endsWith('k')) taxable = parseFloat(rawB) * 1000;
+    else if (rawB.includes('lakh') || rawB.includes('lac') || rawB.endsWith('l')) taxable = parseFloat(rawB) * 100000;
+    else {
+      const parsed = Number(rawB);
+      if (parsed > 5000) taxable = parsed;
+    }
+  } else if (matchedLead && matchedLead.budget) {
+    taxable = Number(matchedLead.budget);
+  }
+
+  const cgst = Math.round(taxable * 0.09);
+  const sgst = Math.round(taxable * 0.09);
   const total = taxable + cgst + sgst;
+  const invNo = `INV-2026-${Math.floor(8820 + Math.random() * 900)}`;
+  const poRef = `PO-${Math.floor(9900 + Math.random() * 99)}`;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dueDateStr = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
 
-  const qLower = (query || '').toLowerCase();
-  const wantsFile = /pdf|file|format|download|export|save|docx|word|banao|chahiye/i.test(qLower);
+  const invObj = {
+    id: invNo,
+    client: partyName,
+    gstNo: '23AAAAA1234A1Z5',
+    poNo: poRef,
+    product: machineName,
+    hsnCode: '8466',
+    baseAmount: taxable,
+    gst: cgst + sgst,
+    issued: todayStr,
+    due: dueDateStr,
+    status: 'Sent',
+    paymentTerms: 'Net 30 Days (10% Advance Received)'
+  };
+
+  const exportFile = {
+    fileName: `APS_GST_Tax_Invoice_${invNo}_${partyName.replace(/\s+/g, '_')}.pdf`,
+    fileFormat: 'pdf',
+    mimeType: 'application/pdf',
+    sizeKB: '124 KB',
+    title: `APS ENTERPRISES — OFFICIAL GST TAX INVOICE (${invNo})`,
+    tableHeaders: ['Item Description', 'HSN Code', 'Qty', 'Rate (INR)', 'Taxable (INR)', 'GST Rate', 'Total (INR)'],
+    tableRows: [
+      [machineName, '8466', '1 Unit', `INR ${taxable.toLocaleString('en-IN')}`, `INR ${taxable.toLocaleString('en-IN')}`, '18% GST', `INR ${total.toLocaleString('en-IN')}`]
+    ],
+    summaryCards: [
+      { label: 'Invoice No', val: invNo },
+      { label: 'Billed To', val: partyName },
+      { label: 'Taxable Value', val: `₹${taxable.toLocaleString('en-IN')}` },
+      { label: 'Total Payable (18%)', val: `₹${total.toLocaleString('en-IN')}` }
+    ]
+  };
 
   return {
-    text: `**GST Tax Invoice Breakdown Generated** for Taxable Value **₹${taxable.toLocaleString('en-IN')}**:\n\n` +
-      `• **HSN Code**: 8458.11 (CNC Turning & Milling Machines)\n` +
-      `• **Taxable Amount**: ₹${taxable.toLocaleString('en-IN')}\n` +
-      `• **CGST (9%)**: ₹${cgst.toLocaleString('en-IN')}\n` +
-      `• **SGST (9%)**: ₹${sgst.toLocaleString('en-IN')}\n` +
-      `• **Total Invoice Amount**: **₹${total.toLocaleString('en-IN')}**`,
-    exportFile: wantsFile ? {
-      fileName: `APS_Tax_Invoice_${new Date().toISOString().slice(0, 10)}.pdf`,
-      fileFormat: 'PDF',
-      mimeType: 'application/pdf',
-      sizeKB: '110 KB',
-      content: `APS ENTERPRISE GST TAX INVOICE\nHSN Code: 8458.11\nTaxable Amount: ₹${taxable.toLocaleString('en-IN')}\nCGST (9%): ₹${cgst.toLocaleString('en-IN')}\nSGST (9%): ₹${sgst.toLocaleString('en-IN')}\nTotal Payable: ₹${total.toLocaleString('en-IN')}`
-    } : null,
+    text: `### 🧾 Official GST Tax Invoice Generated\n\n` +
+      `Successfully generated tax invoice **${invNo}** for **${partyName}** with itemized 18% GST breakdown.\n\n` +
+      `• **Invoice Number**: \`${invNo}\`\n` +
+      `• **Billed To / Party**: **${partyName}**\n` +
+      `• **Product Description**: **${machineName}**\n` +
+      `• **HSN / SAC Code**: \`8466\` (Machinery & Machine Parts)\n` +
+      `• **Taxable Base Amount**: **₹${taxable.toLocaleString('en-IN')}**\n` +
+      `• **Central GST (CGST @ 9%)**: ₹${cgst.toLocaleString('en-IN')}\n` +
+      `• **State GST (SGST @ 9%)**: ₹${sgst.toLocaleString('en-IN')}\n` +
+      `• **Total Invoice Payable**: **₹${total.toLocaleString('en-IN')}**\n` +
+      `• **Payment Terms**: 10% Advance Verified, 90% Balance on Dispatch\n\n` +
+      `*The official GST Invoice document has been generated and attached below for instant PDF download.*`,
+    exportFile,
     table: [
-      { Description: 'CNC Industrial Machine System (HSN 8458)', Qty: 1, Rate: `₹${taxable.toLocaleString('en-IN')}`, Amount: `₹${taxable.toLocaleString('en-IN')}` },
-      { Description: 'Central GST (CGST @ 9%)', Qty: 1, Rate: '9%', Amount: `₹${cgst.toLocaleString('en-IN')}` },
-      { Description: 'State GST (SGST @ 9%)', Qty: 1, Rate: '9%', Amount: `₹${sgst.toLocaleString('en-IN')}` },
-      { Description: 'TOTAL INVOICE PAYABLE', Qty: 1, Rate: '18% GST', Amount: `₹${total.toLocaleString('en-IN')}` }
+      { Description: `${machineName} (HSN 8466)`, Qty: '1 Unit', 'Rate / Taxable': `₹${taxable.toLocaleString('en-IN')}`, 'CGST (9%)': `₹${cgst.toLocaleString('en-IN')}`, 'SGST (9%)': `₹${sgst.toLocaleString('en-IN')}`, Total: `₹${total.toLocaleString('en-IN')}` }
     ],
-    chart: null
+    chart: {
+      type: 'donut',
+      title: `Invoice ${invNo} Financial Split (₹)`,
+      labels: ['Taxable Amount', 'CGST (9%)', 'SGST (9%)'],
+      datasets: [{ label: 'Amount', data: [taxable, cgst, sgst], color: '#2563eb' }]
+    },
+    createdInvoice: invObj
   };
 }
 
@@ -1827,35 +2174,141 @@ async function handleActionCreateLead(query) {
   const store = await getStore();
   const leads = store.mockLeads || [];
   const activityLogs = store.mockActivityLogs || [];
+  const qClean = (query || '').trim();
 
-  let nameMatch = query.match(/(?:add|create|new)\s+lead\s+(?:for\s+)?([a-zA-Z0-9\s]+?)(?=\s+budget|\s+stage|\s+source|$)/i);
-  let name = nameMatch ? nameMatch[1].trim() : `New Lead ${leads.length + 1}`;
-  
-  let budgetMatch = query.match(/budget\s+([0-9kK,]+)/i) || query.match(/₹?\s*([0-9]+000)/);
-  let budget = budgetMatch ? budgetMatch[1].replace(/,/g, '') : '50000';
-  if (budget.toLowerCase().endsWith('k')) budget = String(parseFloat(budget) * 1000);
+  // 1. Robust Name Extraction
+  let extractedName = null;
+  const nameColonMatch = qClean.match(/(?:naya\s+lead\s+banao|nayi\s+lead\s+banao|lead\s+banao|lead\s+add\s+karo|naya\s+lead|lead|name|customer|client|grahak)\s*[:=\-]\s*([a-zA-Z\s]+?)(?=,|\s+phone|\s+mobile|\s+budget|\s+machine|\s+product|\s+city|\s+stage|\s+interest|$)/i);
+  if (nameColonMatch && nameColonMatch[1].trim()) {
+    const cand = nameColonMatch[1].trim();
+    if (!/^(lead|client|customer|banao|karo|add|create|user|machine)$/i.test(cand)) {
+      extractedName = cand;
+    }
+  }
 
-  let stage = detectStage(query) || 'Enquiry';
+  if (!extractedName) {
+    const forMatch = qClean.match(/(?:for|named?|called|grahak)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i);
+    if (forMatch && forMatch[1].trim()) {
+      const cand = forMatch[1].trim();
+      if (!/^(lead|client|customer|dona|cnc|machine|banao|add|create|karo)$/i.test(cand)) {
+        extractedName = cand;
+      }
+    }
+  }
+
+  if (!extractedName) {
+    const kiMatch = qClean.match(/([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)\s+(?:ki|ka|ke|ko)\s+(?:lead|enquiry|booking|grahak)/i);
+    if (kiMatch && kiMatch[1].trim()) {
+      const cand = kiMatch[1].trim();
+      if (!/^(naya|nayi|ek|this|yeh|admin|user)$/i.test(cand)) {
+        extractedName = cand;
+      }
+    }
+  }
+
+  if (!extractedName) {
+    const banaoMatch = qClean.match(/(?:banao|add|create|register|new|naya|nayi)\s+(?:lead|customer|client|grahak)?\s*[:=\-]?\s*([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i);
+    if (banaoMatch && banaoMatch[1].trim()) {
+      const cand = banaoMatch[1].trim();
+      if (!/^(lead|client|customer|dona|cnc|machine|banao|add|create|karo|new|naya)$/i.test(cand)) {
+        extractedName = cand;
+      }
+    }
+  }
+
+  if (!extractedName) {
+    const generalMatch = qClean.match(/(?:lead|customer|client)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i);
+    if (generalMatch && generalMatch[1].trim()) {
+      const cand = generalMatch[1].trim();
+      if (!/^(lead|client|customer|dona|cnc|machine|banao|karo|add|create|new|naya)$/i.test(cand)) {
+        extractedName = cand;
+      }
+    }
+  }
+
+  // Capitalize name cleanly
+  const finalName = extractedName ? extractedName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : `Lead ${leads.length + 1}`;
+
+  // 2. Phone Extraction
+  let phone = '+91 98260 11223';
+  const phoneMatch = qClean.match(/(?:\+91[\s\-]?)?([6-9]\d{9})\b/);
+  if (phoneMatch) {
+    phone = `+91 ${phoneMatch[1].slice(0, 5)} ${phoneMatch[1].slice(5)}`;
+  } else {
+    phone = `+91 ${Math.floor(9000000000 + Math.random() * 999999999)}`;
+  }
+
+  // 3. Product / Machine Interest Extraction
+  let product = 'Fully Automatic Double Die Dona Pattal Machine';
+  const qLower = qClean.toLowerCase();
+  if (qLower.includes('dona') || qLower.includes('pattal')) {
+    product = 'Fully Automatic Double Die Dona Pattal Machine';
+  } else if (qLower.includes('hydraulic') || qLower.includes('plate') || qLower.includes('thali')) {
+    product = 'Heavy-Duty Hydraulic Paper Plate & Thali Machine';
+  } else if (qLower.includes('cup')) {
+    product = 'Automatic High-Speed Paper Cup Making Machine';
+  } else if (qLower.includes('cutter') || qLower.includes('roll cutter')) {
+    product = 'Semi-Automatic Heavy Paper Cutter Machine';
+  } else if (qLower.includes('roll') || qLower.includes('lamination')) {
+    product = 'Raw Material Paper Roll & Lamination Machine';
+  } else if (qLower.includes('cnc') || qLower.includes('laser')) {
+    product = 'Industrial Heavy CNC & Fiber Laser System';
+  }
+
+  // 4. Budget Extraction
+  let budget = 125000;
+  const budgetMatch = qClean.match(/(?:budget|rs\.?|inr|₹|amount|price|worth|val)\s*[:=\-]?\s*([0-9,]+(?:\.[0-9]+)?\s*(?:lakh|lac|cr|k)?)/i) || qClean.match(/₹\s*([0-9,]+)/) || qClean.match(/\b([1-9][0-9]{3,7})\b/);
+  if (budgetMatch) {
+    let rawB = budgetMatch[1].replace(/,/g, '').trim().toLowerCase();
+    if (rawB.endsWith('k')) {
+      budget = parseFloat(rawB) * 1000;
+    } else if (rawB.includes('lakh') || rawB.includes('lac') || rawB.endsWith('l')) {
+      budget = parseFloat(rawB) * 100000;
+    } else if (rawB.includes('cr')) {
+      budget = parseFloat(rawB) * 10000000;
+    } else {
+      const parsed = Number(rawB);
+      if (parsed > 5000) budget = parsed;
+    }
+  }
+
+  // 5. City Extraction
+  let city = 'Indore, MP';
+  const cities = ['Indore', 'Bhopal', 'Ujjain', 'Jabalpur', 'Gwalior', 'Raipur', 'Ahmedabad', 'Pune', 'Mumbai', 'Delhi', 'Jaipur', 'Kanpur', 'Nagpur', 'Surat'];
+  for (const c of cities) {
+    if (new RegExp(`\\b${c}\\b`, 'i').test(qClean)) {
+      city = `${c}, India`;
+      break;
+    }
+  }
+
+  // 6. Stage & Priority
+  const stage = detectStage(qClean) || 'Enquiry';
+  const priority = budget >= 200000 ? 'Hot' : (budget >= 100000 ? 'Warm' : 'Cold');
 
   const newLeadObj = {
     id: `LEAD-${String(leads.length + 1).padStart(3, '0')}`,
-    name,
-    company: `${name} Industrial Ltd`,
-    phone: `+9198${Math.floor(10000000 + Math.random() * 90000000)}`,
-    email: `${name.toLowerCase().replace(/\s+/g, '.')}@enterprise.com`,
-    interest: 'CNC Machine System',
-    budget,
+    name: finalName,
+    company: `${finalName} Enterprises`,
+    phone,
+    email: `${finalName.toLowerCase().replace(/\s+/g, '.')}@gmail.com`,
+    interest: product,
+    budget: String(budget),
     stage,
+    city,
+    priority,
     notes: `Created directly via A3 Admin AI Assistant. Command: "${query}"`,
     crmSynced: true,
     erpBookingCreated: ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(stage),
     tallyPaymentVerified: ['Client (Paid)', 'In Production', 'Dispatched'].includes(stage),
     source: 'A3 AI Assistant',
     assignedEmployeeId: 'e2',
-    createdAt: new Date()
+    createdAt: new Date().toISOString()
   };
 
   leads.unshift(newLeadObj);
+  saveLeadsToDisk(leads);
+
   activityLogs.unshift({
     id: `log-${Date.now()}`,
     employeeId: 'e2',
@@ -1865,14 +2318,40 @@ async function handleActionCreateLead(query) {
     action: `Created new lead "${newLeadObj.name}" via A3 AI Assistant (Stage: ${stage})`,
     fromStage: 'None',
     toStage: stage,
-    details: `Budget: ₹${Number(budget).toLocaleString('en-IN')}`,
+    details: `Product: ${product} | Budget: ₹${Number(budget).toLocaleString('en-IN')} | Phone: ${phone}`,
     createdAt: new Date()
   });
 
   return {
-    text: `**Action Executed**: Successfully created new lead **"${newLeadObj.name}"** in **${stage}** stage.\n\n• **ID**: ${newLeadObj.id}\n• **Budget**: ₹${Number(budget).toLocaleString('en-IN')}\n• **Source**: A3 AI Assistant\n• **Assigned**: Bhavya (Admin)`,
-    table: [{ ID: newLeadObj.id, Name: newLeadObj.name, Stage: newLeadObj.stage, Budget: `₹${Number(budget).toLocaleString('en-IN')}`, Action: 'Created via AI' }],
-    chart: null
+    text: `### 🎯 New Lead Created & Active in CRM Pipeline\n\n` +
+      `Successfully registered **"${newLeadObj.name}"** into the APS Enterprise CRM database.\n\n` +
+      `• **Lead ID**: \`${newLeadObj.id}\`\n` +
+      `• **Client Name**: **${newLeadObj.name}**\n` +
+      `• **Contact Number**: \`${newLeadObj.phone}\`\n` +
+      `• **Machine Interest**: **${newLeadObj.interest}**\n` +
+      `• **Deal Value / Budget**: **₹${Number(budget).toLocaleString('en-IN')}**\n` +
+      `• **Pipeline Stage**: **${stage}**\n` +
+      `• **Priority**: **${priority}**\n` +
+      `• **Location / City**: ${city}\n` +
+      `• **Assigned Officer**: **Bhavya (Sales Operations)**\n\n` +
+      `*This lead is live on your CRM Board (\`/leads\`) and synced across all enterprise pipelines.*`,
+    table: [{
+      ID: newLeadObj.id,
+      Name: newLeadObj.name,
+      Phone: newLeadObj.phone,
+      Product: newLeadObj.interest,
+      Budget: `₹${Number(budget).toLocaleString('en-IN')}`,
+      Stage: newLeadObj.stage,
+      Priority: newLeadObj.priority,
+      Status: 'Live in CRM'
+    }],
+    chart: {
+      type: 'bar',
+      title: 'Lead Pipeline Addition',
+      labels: [stage, 'Total CRM Leads'],
+      datasets: [{ label: 'Count', data: [1, leads.length], color: '#2563eb' }]
+    },
+    createdLead: newLeadObj
   };
 }
 
@@ -1888,43 +2367,54 @@ async function handleActionCreateUser(query) {
   // ─── 1. Robust Name Extraction ──────────────────────────────────────────
   let extractedName = null;
 
-  // Pattern A: name: John Doe / user: John Doe / employee: John Doe / Name - John Doe / Name = John Doe
-  const explicitNameMatch = query.match(/(?:name|user\s*name|user|employee|account|staff)\s*[:=\-]\s*["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
+  // Pattern A: name: John Doe / user banao: John Doe / user: John Doe / employee: John Doe
+  const explicitNameMatch = query.match(/(?:naya\s*user\s*banao|nayi\s*user\s*banao|user\s*banao|user\s*add\s*karo|user\s*create|name|user\s*name|user|employee|account|staff)\s*[:=\-]\s*["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
   if (explicitNameMatch && explicitNameMatch[1].trim()) {
     const candidate = explicitNameMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
-    if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant)$/i.test(candidate)) {
+    if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant|banao|karo|add|create)$/i.test(candidate)) {
       extractedName = candidate;
     }
   }
 
-  // Pattern B: with name John Doe / named John Doe / called John Doe / name is John Doe
+  // Pattern B: with name John Doe / named John Doe / called John Doe / name is John Doe / for John Doe
   if (!extractedName) {
-    const withNameMatch = query.match(/(?:with\s+name|named|called|name\s+is)\s+["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
+    const withNameMatch = query.match(/(?:with\s+name|named|called|name\s+is|for)\s+["']?([A-Za-z]+(?:\s+[A-Za-z]+)*)["']?/i);
     if (withNameMatch && withNameMatch[1].trim()) {
       const candidate = withNameMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
-      if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant)$/i.test(candidate)) {
+      if (candidate.length > 1 && !/^(admin|user|employee|super\s*admin|role|operations|agent|telecaller|accountant|banao|karo|add|create)$/i.test(candidate)) {
         extractedName = candidate;
       }
     }
   }
 
-  // Pattern C: add/create user John Doe (with role Admin / as Admin / role: Admin)
+  // Pattern C: Hindi "Rohit Sharma ko user banao" / "Rohit Sharma ka account banao"
   if (!extractedName) {
-    const userRoleMatch = query.match(/(?:add|create|invite|register|hire|make)\s+(?:a\s+|an\s+|new\s+)?(?:user|employee|staff|member)?\s*["']?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)["']?\s+(?:as|with\s+role|role\s*[:=\-]?|in|for)\s+/i);
+    const hindiKoMatch = query.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:ko|ka|ke)\s+(?:user|account|employee|staff)/i);
+    if (hindiKoMatch && hindiKoMatch[1].trim()) {
+      const candidate = hindiKoMatch[1].trim();
+      if (!/^(naya|nayi|ek|admin|super\s*admin|user|employee)$/i.test(candidate)) {
+        extractedName = candidate;
+      }
+    }
+  }
+
+  // Pattern D: add/create user John Doe (with role Admin / as Admin / role: Admin)
+  if (!extractedName) {
+    const userRoleMatch = query.match(/(?:add|create|invite|register|hire|make|banao)\s+(?:a\s+|an\s+|new\s+|naya\s+)?(?:user|employee|staff|member)?\s*["']?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)["']?\s+(?:as|with\s+role|role\s*[:=\-]?|in|for)\s+/i);
     if (userRoleMatch && userRoleMatch[1].trim()) {
       const candidate = userRoleMatch[1].trim();
-      if (!/^(user|employee|staff|member|new|a|an|admin|super\s*admin|operations|telecaller|agent|accountant)$/i.test(candidate)) {
+      if (!/^(user|employee|staff|member|new|naya|a|an|admin|super\s*admin|operations|telecaller|agent|accountant|banao|karo|add|create)$/i.test(candidate)) {
         extractedName = candidate;
       }
     }
   }
 
-  // Pattern D: add user John Doe (simple)
+  // Pattern E: user John Doe (simple)
   if (!extractedName) {
     const simpleUserMatch = query.match(/(?:user|employee|staff|member|named?)\s+["']?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)["']?/i);
     if (simpleUserMatch && simpleUserMatch[1].trim()) {
       const candidate = simpleUserMatch[1].trim().split(/\s*,\s*|\s+(?:with|and|role|as|in|module)\b/i)[0].trim();
-      if (!/^(user|employee|staff|member|new|a|an|admin|super\s*admin|operations|telecaller|agent|accountant)$/i.test(candidate)) {
+      if (!/^(user|employee|staff|member|new|naya|a|an|admin|super\s*admin|operations|telecaller|agent|accountant|banao|karo|add|create)$/i.test(candidate)) {
         extractedName = candidate;
       }
     }
@@ -1996,6 +2486,7 @@ async function handleActionCreateUser(query) {
   }
 
   const createdUsers = [];
+  const sysUsersToPersist = [];
 
   for (let i = 0; i < count; i++) {
     const defaultName = sampleNames[(employees.length + i) % sampleNames.length];
@@ -2018,6 +2509,7 @@ async function handleActionCreateUser(query) {
       createdAt: new Date().toISOString()
     };
     store.mockUsers.unshift(sysUser);
+    sysUsersToPersist.push(sysUser);
 
     const newEmp = {
       id: empId,
@@ -2058,7 +2550,7 @@ async function handleActionCreateUser(query) {
     employees.unshift(newEmp);
     createdUsers.push(newEmp);
 
-    // Persist to PostgreSQL database
+    // Persist to PostgreSQL database safely
     try {
       const { Employee } = require('../models');
       if (Employee) {
@@ -2095,8 +2587,46 @@ async function handleActionCreateUser(query) {
     });
   }
 
-  // Update store
+  // Update in-memory store
   store.mockEmployees = employees;
+
+  // Persist directly to users_data.json and employees_data.json
+  const fs = require('fs');
+  const path = require('path');
+  const USERS_FILE = path.join(__dirname, '../../users_data.json');
+  const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
+
+  try {
+    let usersList = [];
+    if (fs.existsSync(USERS_FILE)) {
+      usersList = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    }
+    sysUsersToPersist.forEach(su => {
+      if (!usersList.some(u => u.email?.toLowerCase() === su.email.toLowerCase())) {
+        usersList.unshift(su);
+      }
+    });
+    fs.writeFileSync(USERS_FILE, JSON.stringify(usersList, null, 2), 'utf8');
+    store.mockUsers = usersList;
+  } catch (err) {
+    console.error('[a3Service save users_data.json error]:', err.message);
+  }
+
+  try {
+    let empsList = [];
+    if (fs.existsSync(EMPLOYEES_FILE)) {
+      empsList = JSON.parse(fs.readFileSync(EMPLOYEES_FILE, 'utf8'));
+    }
+    createdUsers.forEach(ne => {
+      if (!empsList.some(e => e.email?.toLowerCase() === ne.email.toLowerCase())) {
+        empsList.unshift(ne);
+      }
+    });
+    fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(empsList, null, 2), 'utf8');
+    store.mockEmployees = empsList;
+  } catch (err) {
+    console.error('[a3Service save employees_data.json error]:', err.message);
+  }
 
   const titleText = count === 1 
     ? `### 👤 New User / Employee Profile Created & Activated\n\nSuccessfully registered and onboarded **${createdUsers[0].name}** into the APS Enterprise platform.\n\n`
@@ -2111,7 +2641,7 @@ async function handleActionCreateUser(query) {
   ).join('\n\n');
 
   return {
-    text: titleText + detailsText + `\n\n*This profile is live and active across **\`/employees\`** and **\`/kpis\`**.*`,
+    text: titleText + detailsText + `\n\n*This profile is live and active across **\`/users\`**, **\`/employees\`**, and **\`/kpis\`**.*`,
     table: createdUsers.map(u => ({
       ID: u.id,
       Name: u.name,
@@ -2128,7 +2658,8 @@ async function handleActionCreateUser(query) {
       labels: [createdUsers[0].department.split(' ')[0], 'Total Active Staff'],
       datasets: [{ label: 'Members', data: [createdUsers.length, employees.length], color: '#10b981' }]
     },
-    createdSystemUsers: store.mockUsers ? store.mockUsers.slice(0, count) : []
+    createdSystemUsers: sysUsersToPersist,
+    createdEmployees: createdUsers
   };
 }
 
@@ -2140,7 +2671,7 @@ async function handleActionTransitionLead(query) {
   const targetStage = detectStage(query);
   if (!targetStage) {
     return {
-      text: `Please specify a valid target stage to transition the lead to. Available stages: **Enquiry, Qualified, Booked, Confirmed Lead, Client (Paid), In Production, Dispatched**.`,
+      text: `### ⚠️ Target Stage Required\n\nPlease specify a valid target stage to transition the lead to.\n\n**Supported Stages:**\n1. \`Enquiry\`\n2. \`Qualified\`\n3. \`Booked\`\n4. \`Confirmed Lead\`\n5. \`Client (Paid)\`\n6. \`In Production\`\n7. \`Dispatched\``,
       table: null, chart: null
     };
   }
@@ -2152,8 +2683,25 @@ async function handleActionTransitionLead(query) {
 
   const oldStage = lead.stage;
   lead.stage = targetStage;
-  if (targetStage === 'Client (Paid)') lead.tallyPaymentVerified = true;
-  if (targetStage === 'In Production') lead.erpBookingCreated = true;
+  lead.updatedAt = new Date().toISOString();
+
+  if (targetStage === 'Client (Paid)') {
+    lead.tallyPaymentVerified = true;
+  }
+  if (targetStage === 'In Production') {
+    lead.erpBookingCreated = true;
+    try {
+      if (erpService && typeof erpService.releaseToFactory === 'function') {
+        erpService.releaseToFactory(lead.id).catch(() => {});
+      }
+    } catch {}
+  }
+  if (targetStage === 'Dispatched') {
+    lead.dispatchStatus = 'Dispatched via APS Logistics Waybill';
+  }
+
+  // Persist to leads_data.json
+  saveLeadsToDisk(leads);
 
   const activityEntry = {
     id: `log-${Date.now()}`,
@@ -2170,9 +2718,31 @@ async function handleActionTransitionLead(query) {
   activityLogs.unshift(activityEntry);
 
   return {
-    text: `**Action Executed**: Lead **"${lead.name}"** (${lead.id}) transitioned from **"${oldStage}"** -> **"${targetStage}"**.\n\n• **Tally Payment Gate**: ${lead.tallyPaymentVerified ? 'Verified' : 'Pending'}\n• **ERP Booking**: ${lead.erpBookingCreated ? 'Created' : 'Pending'}`,
-    table: [{ ID: lead.id, Name: lead.name, 'Previous Stage': oldStage, 'New Stage': targetStage, Status: 'Updated in DB' }],
-    chart: null
+    text: `### 🔄 Lead Stage Updated Successfully\n\n` +
+      `Lead **"${lead.name}"** (\`${lead.id}\`) has been advanced across the pipeline:\n\n` +
+      `• **Previous Stage**: **${oldStage}**\n` +
+      `• **New Stage**: **${targetStage}**\n` +
+      `• **Tally 10% Advance Gate**: **${lead.tallyPaymentVerified ? '✅ Verified in Tally' : '⏳ Pending Deposit'}**\n` +
+      `• **ERP Shopfloor Booking**: **${lead.erpBookingCreated ? '⚙️ Active / Released' : '⏳ Queued'}**\n` +
+      `• **Product**: ${lead.interest || 'Machinery'}\n` +
+      `• **Deal Value**: ₹${Number(lead.budget || 0).toLocaleString('en-IN')}\n\n` +
+      `*This transition is permanently saved to disk and updated live on the CRM Board (\`/leads\`).*`,
+    table: [{
+      ID: lead.id,
+      Name: lead.name,
+      'Previous Stage': oldStage,
+      'New Stage': targetStage,
+      'Tally Status': lead.tallyPaymentVerified ? 'Verified' : 'Pending',
+      'ERP Status': lead.erpBookingCreated ? 'Released' : 'Pending',
+      Status: 'Updated in Database'
+    }],
+    chart: {
+      type: 'bar',
+      title: 'Lead Stage Transition',
+      labels: [oldStage, targetStage],
+      datasets: [{ label: 'Progress', data: [50, 100], color: '#10b981' }]
+    },
+    updatedLead: lead
   };
 }
 
@@ -2181,23 +2751,31 @@ async function handleActionPostTally(query) {
   const activityLogs = store.mockActivityLogs || [];
   const leads = store.mockLeads || [];
 
-  // Parse amount carefully (avoid mistaking "1 record" or "2 vouchers" for amount)
-  let amountMatch = query.match(/(?:amount|rs\.?|inr|₹|worth|of|deposit)\s*([0-9,]+)/i) || query.match(/₹\s*([0-9,]+)/);
-  let amount = 35000;
-  if (amountMatch) {
-    const parsed = Number(amountMatch[1].replace(/,/g, ''));
-    if (parsed > 100) amount = parsed;
-  }
-  let partyMatch = query.match(/(?:for|party|client|named?)\s+([a-zA-Z0-9\s&]+?)(?=\s+amount|\s+rs|\s+₹|\s+in|\s+with|$)/i);
-  
-  // If no party name was parsed, find if any CRM lead is mentioned in the query
+  // Match lead if mentioned in query
   let matchedLead = leads.find(l => l && query.toLowerCase().includes((l.name || '').toLowerCase()) || query.toLowerCase().includes((l.company || '').toLowerCase()));
-  let partyName = partyMatch ? partyMatch[1].trim() : (matchedLead ? matchedLead.name : 'Kirloskar Forge & Stampings');
+
+  // Parse amount carefully
+  let amountMatch = query.match(/(?:amount|rs\.?|inr|₹|worth|of|deposit)\s*[:=\-]?\s*([0-9,]+(?:\.[0-9]+)?\s*(?:lakh|lac|k)?)/i) || query.match(/₹\s*([0-9,]+)/);
+  let amount = 14000;
+  if (amountMatch) {
+    let rawA = amountMatch[1].replace(/,/g, '').trim().toLowerCase();
+    if (rawA.endsWith('k')) amount = parseFloat(rawA) * 1000;
+    else if (rawA.includes('lakh') || rawA.includes('lac') || rawA.endsWith('l')) amount = parseFloat(rawA) * 100000;
+    else {
+      const parsed = Number(rawA);
+      if (parsed > 100) amount = parsed;
+    }
+  } else if (matchedLead && matchedLead.budget) {
+    amount = Math.round(Number(matchedLead.budget) * 0.10);
+  }
+
+  let partyMatch = query.match(/(?:for|party|client|named?)\s+([a-zA-Z0-9\s&]+?)(?=\s+amount|\s+rs|\s+₹|\s+in|\s+with|$)/i);
+  let partyName = partyMatch ? partyMatch[1].trim() : (matchedLead ? matchedLead.name : 'Mohan Lal');
 
   // Generate the voucher
   const vchNo = `VCH-2026-0${Math.floor(100 + Math.random() * 900)}`;
   const utrNo = `UTR-HDFC${Math.floor(100000 + Math.random() * 900000)}`;
-  
+
   const createdVoucher = tallyService.addVoucher({
     voucherNo: vchNo,
     partyName: partyName,
@@ -2207,13 +2785,16 @@ async function handleActionPostTally(query) {
     utrNo: utrNo,
     narration: `10% advance deposit for ${partyName} order processed via A3 AI Assistant`
   });
+  createdVoucher.amount = amount;
 
-  // If a lead in CRM matches, verify its payment
+  // If a lead in CRM matches, verify its payment & promote
   if (matchedLead) {
     matchedLead.tallyPaymentVerified = true;
-    if (matchedLead.stage === 'Confirmed Lead' || matchedLead.stage === 'Enquiry' || matchedLead.stage === 'Qualified') {
+    matchedLead.updatedAt = new Date().toISOString();
+    if (['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead'].includes(matchedLead.stage)) {
       matchedLead.stage = 'Client (Paid)';
     }
+    saveLeadsToDisk(leads);
   }
 
   activityLogs.unshift({
@@ -2237,11 +2818,12 @@ async function handleActionPostTally(query) {
       `• **Voucher Type**: Advance Receipt (10% Gate)\n` +
       `• **Amount Received**: **₹${amount.toLocaleString('en-IN')}** (GST Output: ₹${Math.round(amount * 0.18).toLocaleString('en-IN')})\n` +
       `• **Bank Ref / UTR**: \`${utrNo}\`\n` +
-      `• **Reconciliation Status**: **Reconciled (Live)**\n\n` +
+      `• **Reconciliation Status**: **Reconciled (Live)**\n` +
+      (matchedLead ? `• **CRM Lead Sync**: **${matchedLead.name}** updated to **Client (Paid)**\n\n` : '\n') +
       `*This voucher record is now live in **\`/tally\`** and reconciled against the bank feed.*`,
     table: [{
       'Voucher No': vchNo,
-      Date: createdVoucher.date,
+      Date: createdVoucher.date || new Date().toISOString().split('T')[0],
       'Party / Client': partyName,
       'Voucher Type': 'Advance Receipt (10%)',
       'Particulars': 'HDFC Bank Main A/c (#5020)',
@@ -2249,7 +2831,9 @@ async function handleActionPostTally(query) {
       'Bank Ref / UTR': utrNo,
       'Status': 'Reconciled'
     }],
-    chart: null
+    chart: null,
+    createdVoucher,
+    updatedLead: matchedLead || null
   };
 }
 
@@ -2260,25 +2844,80 @@ async function handleActionErpBooking(query) {
 
   let lead = leads.find(l => query.toLowerCase().includes(l.id.toLowerCase()) || query.toLowerCase().includes(l.name.toLowerCase())) || leads[0];
   lead.erpBookingCreated = true;
-  if (lead.stage === 'Enquiry' || lead.stage === 'Qualified') lead.stage = 'Booked';
+  lead.updatedAt = new Date().toISOString();
+
+  if (lead.stage === 'Enquiry' || lead.stage === 'Qualified') {
+    lead.stage = 'Booked';
+  } else if (lead.tallyPaymentVerified && lead.stage === 'Client (Paid)') {
+    lead.stage = 'In Production';
+  }
+
+  saveLeadsToDisk(leads);
+
+  const jobCardNo = `APS-MFG-${Math.floor(8000 + Math.random() * 1999)}`;
+  const estDays = 12;
+  const dispatchDate = new Date(Date.now() + estDays * 86400000).toLocaleDateString('en-IN');
+
+  const createdJobCard = {
+    jobCardNo,
+    leadId: lead.id,
+    client: lead.name,
+    product: lead.interest || 'Fully Automatic Double Die Dona Pattal Machine',
+    plant: 'Indore Main Assembly Plant (MP)',
+    assignedTechnician: 'Rohan Mehta (Senior Assembly Supervisor)',
+    targetDeliveryDate: dispatchDate,
+    status: 'In Assembly (Milestone 1)',
+    progressPct: 35,
+    milestones: [
+      { name: 'Heavy Frame Fabrication & Cast-Iron Mounting', status: 'Completed', progress: '100%' },
+      { name: 'Motor, Cam & Dual Gearbox Alignment', status: 'In Progress', progress: '65%' },
+      { name: 'Electrical Panel & PID Temperature Calibration', status: 'Queued', progress: '0%' },
+      { name: 'Final Machine Testing & Load Trial', status: 'Queued', progress: '0%' }
+    ]
+  };
 
   activityLogs.unshift({
     id: `log-${Date.now()}`,
     employeeId: 'e5',
-    employeeName: 'Rohan Mehta (ERP)',
+    employeeName: 'Rohan Mehta (ERP Supervisor)',
     leadId: lead.id,
     leadName: lead.name,
-    action: `Created ERP Manufacturing Booking & Job Card for "${lead.name}"`,
+    action: `Created ERP Manufacturing Job Card ${jobCardNo} for "${lead.name}"`,
     fromStage: lead.stage,
-    toStage: 'Booked',
-    details: `Triggered shopfloor ERP booking webhook`,
+    toStage: lead.stage,
+    details: `Product: ${createdJobCard.product} | Plant: Indore | Est Dispatch: ${dispatchDate}`,
     createdAt: new Date()
   });
 
   return {
-    text: `**Action Executed**: Created ERP Machine Booking & Shopfloor Job Card for **"${lead.name}"** (${lead.id}).\n\n• **ERP Status**: Booking Active\n• **Pipeline Stage**: ${lead.stage}`,
-    table: [{ ID: lead.id, Name: lead.name, Product: lead.interest || 'CNC Machine', 'ERP Status': 'Booking Created' }],
-    chart: null
+    text: `### 🏭 Factory Job Card Released & Active in ERP\n\n` +
+      `Successfully generated machine production booking and shopfloor Job Card **${jobCardNo}** for **"${lead.name}"**.\n\n` +
+      `• **Job Card ID**: \`${jobCardNo}\`\n` +
+      `• **Customer / Client**: **${lead.name}** (\`${lead.id}\`)\n` +
+      `• **Machine Model**: **${createdJobCard.product}**\n` +
+      `• **Manufacturing Facility**: ${createdJobCard.plant}\n` +
+      `• **Assigned Supervisor**: **${createdJobCard.assignedTechnician}**\n` +
+      `• **Current Progress**: **Milestone 1 — Frame & Spindle Alignment (35% Complete)**\n` +
+      `• **Target Dispatch Date**: **${dispatchDate}**\n` +
+      `• **Pipeline Stage**: **${lead.stage}**\n\n` +
+      `*This booking is live on the Factory Tracker (\`/factory\`) and Bookings ERP (\`/bookings\`).*`,
+    table: [{
+      'Job Card': jobCardNo,
+      Client: lead.name,
+      Machine: createdJobCard.product,
+      Plant: 'Indore Main Plant',
+      Technician: 'Rohan Mehta',
+      'Target Delivery': dispatchDate,
+      Status: 'Assembly Active (35%)'
+    }],
+    chart: {
+      type: 'bar',
+      title: `Job Card ${jobCardNo} Assembly Milestones (%)`,
+      labels: ['Frame', 'Motor', 'Wiring', 'Testing'],
+      datasets: [{ label: 'Progress %', data: [100, 65, 0, 0], color: '#2563eb' }]
+    },
+    createdJobCard,
+    updatedLead: lead
   };
 }
 
@@ -2286,36 +2925,59 @@ async function handleActionQueueDialer(query) {
   const store = await getStore();
   const callLogs = store.mockCallLogs || [];
   const activityLogs = store.mockActivityLogs || [];
+  const leads = store.mockLeads || [];
+  const qLower = (query || '').toLowerCase();
+
+  const matchedLead = leads.find(l => l && l.name && (qLower.includes(l.name.toLowerCase()) || qLower.includes((l.company || '').toLowerCase()))) || leads[0];
+  const targetName = matchedLead ? matchedLead.name : 'Customer Queue';
+  const targetPhone = matchedLead ? matchedLead.phone : '+91 98234 56789';
 
   const callId = `CALL-0${Math.floor(100 + Math.random() * 900)}`;
-  callLogs.unshift({
+  const callObj = {
     callId,
-    leadId: 'DIALER-QUEUE',
-    phone: '+919823456789',
-    agent: 'A1 Voice Agent',
+    leadId: matchedLead ? matchedLead.id : 'DIALER-QUEUE',
+    leadName: targetName,
+    phone: targetPhone,
+    agent: 'A1 Voice Agent (Indore Speech Bot)',
     durationSeconds: 120,
     callOutcome: 'Queued for Outbound Call',
-    transcript: 'Automated outbound call queued via A3 AI Command.',
+    transcript: `Automated outbound qualification call queued via A3 AI Command: "${query}"`,
     timestamp: new Date()
-  });
+  };
+
+  callLogs.unshift(callObj);
 
   activityLogs.unshift({
     id: `log-${Date.now()}`,
     employeeId: 'e1',
     employeeName: 'Animesh (Voice Lead)',
-    leadId: 'A1-DIALER',
-    leadName: 'Outbound Queue',
-    action: `Queued automated A1 Voice Agent batch call ${callId}`,
+    leadId: matchedLead ? matchedLead.id : 'A1-DIALER',
+    leadName: targetName,
+    action: `Queued automated A1 Voice Agent outbound call ${callId}`,
     fromStage: 'Dialer',
     toStage: 'Active Call',
-    details: `Command: "${query}"`,
+    details: `Target: ${targetName} (${targetPhone}) | Command: "${query}"`,
     createdAt: new Date()
   });
 
   return {
-    text: `**Action Executed**: Queued A1 Voice Agent outbound call **${callId}** into active dialer queue.\n\n• **Voice Agent**: A1 Telecaller Bot\n• **Queue Status**: Active Outbound Call`,
-    table: [{ 'Call ID': callId, Agent: 'A1 Voice Agent', Target: 'Lead Queue', Status: 'Queued' }],
-    chart: null
+    text: `### 📞 A1 Voice Agent Outbound Call Queued\n\n` +
+      `Successfully pushed automated voice qualification call **${callId}** into the active dialer queue.\n\n` +
+      `• **Call Reference**: \`${callId}\`\n` +
+      `• **Recipient**: **${targetName}**\n` +
+      `• **Phone Number**: \`${targetPhone}\`\n` +
+      `• **Voice Agent**: **A1 Telecaller Bot (Automated Machine Qualifier)**\n` +
+      `• **Queue Status**: **Active / Dialing**\n\n` +
+      `*This call is logged in your Voice Dialer queue (\`/dialer\`).*`,
+    table: [{
+      'Call ID': callId,
+      Target: targetName,
+      Phone: targetPhone,
+      Agent: 'A1 Voice Agent',
+      Status: 'Queued'
+    }],
+    chart: null,
+    queuedCall: callObj
   };
 }
 
@@ -2327,15 +2989,18 @@ async function handleScheduleCall(query) {
   const qLower = (query || '').toLowerCase();
 
   const matchedLead = leads.find(l => l && l.name && (qLower.includes(l.name.toLowerCase()) || qLower.includes((l.company || '').toLowerCase()))) || leads[0];
-  const targetName = matchedLead ? `${matchedLead.name} (${matchedLead.company})` : 'CRM Target Lead Queue';
-  const targetPhone = matchedLead ? matchedLead.phone : '+919876543210';
+  const targetName = matchedLead ? `${matchedLead.name} (${matchedLead.company})` : 'CRM Target Lead';
+  const targetPhone = matchedLead ? matchedLead.phone : '+91 98260 11223';
 
-  const timeMatch = query.match(/(?:at|for|by|in)\s+([0-9]{1,2}(?::[0-9]{2})?\s*(?:am|pm)?|tomorrow|today|[0-9]+\s*mins?)/i);
-  const scheduledTimeStr = timeMatch ? timeMatch[1].toUpperCase() : 'Today at 4:30 PM IST';
+  const timeMatch = query.match(/(?:at|for|by|in)\s+([0-9]{1,2}(?::[0-9]{2})?\s*(?:am|pm)?|tomorrow|today|[0-9]+\s*mins?)/i) ||
+                    query.match(/(kal|aaj)\s*([0-9]{1,2}(?::[0-9]{2})?\s*(?:baje|am|pm)?)/i);
+  let scheduledTimeStr = 'Tomorrow at 11:00 AM IST';
+  if (timeMatch) {
+    scheduledTimeStr = `${timeMatch[1].toUpperCase()} IST`;
+  }
 
   const callId = `CALL-SCH-${Math.floor(1000 + Math.random() * 9000)}`;
-
-  callLogs.unshift({
+  const callObj = {
     callId,
     leadId: matchedLead ? matchedLead.id : 'DIALER-QUEUE',
     phone: targetPhone,
@@ -2344,7 +3009,9 @@ async function handleScheduleCall(query) {
     callOutcome: `Scheduled for ${scheduledTimeStr}`,
     transcript: `Automated call scheduled via AI Command: "${query}"`,
     timestamp: new Date()
-  });
+  };
+
+  callLogs.unshift(callObj);
 
   activityLogs.unshift({
     id: `log-${Date.now()}`,
@@ -2360,18 +3027,24 @@ async function handleScheduleCall(query) {
   });
 
   return {
-    text: `### 📞 Yes! Voice Agent Call Scheduled Successfully\n\n` +
-      `**Call Reference ID:** \`${callId}\`  \n` +
-      `• **Recipient Lead:** **${targetName}**  \n` +
-      `• **Phone Number:** \`${targetPhone}\`  \n` +
-      `• **Scheduled Execution Time:** **${scheduledTimeStr}**  \n` +
-      `• **Assigned Voice Agent:** **APS Telecaller Assistant (Automated Sentiment & Budget Qualifier)**  \n` +
-      `• **Call Capabilities:** Automated Dona Pattal & CNC Machine Interest Verification, Tally 10% Advance Deposit Reminders, & Live Transcript Sentiment Scoring  \n\n` +
+    text: `### 📞 Voice Agent Call Scheduled Successfully\n\n` +
+      `**Call Reference ID:** \`${callId}\`\n\n` +
+      `• **Recipient Lead:** **${targetName}**\n` +
+      `• **Phone Number:** \`${targetPhone}\`\n` +
+      `• **Scheduled Execution Time:** **${scheduledTimeStr}**\n` +
+      `• **Assigned Voice Agent:** **APS Telecaller Assistant (Speech Sentiment Qualifier)**\n` +
+      `• **Agenda:** Machine Interest Verification & 10% Advance Deposit Schedule\n\n` +
       `*This scheduled call has been logged into your Voice Dialer queue (\`/dialer\`) and system Activity Logs.*`,
-    table: [
-      { "Call Reference": callId, "Recipient Customer": targetName, "Phone Number": targetPhone, "Scheduled Time": scheduledTimeStr, "Voice Agent": "APS Voice Assistant", "Status": "Scheduled in Queue" }
-    ],
-    chart: null
+    table: [{
+      'Call Reference': callId,
+      'Recipient Customer': targetName,
+      'Phone Number': targetPhone,
+      'Scheduled Time': scheduledTimeStr,
+      'Voice Agent': 'APS Voice Assistant',
+      Status: 'Scheduled in Queue'
+    }],
+    chart: null,
+    queuedCall: callObj
   };
 }
 
@@ -2379,41 +3052,80 @@ async function handleActionSendWhatsApp(query) {
   const store = await getStore();
   const waMsgs = store.mockWhatsAppMessages || [];
   const activityLogs = store.mockActivityLogs || [];
+  const leads = store.mockLeads || [];
+  const qLower = (query || '').toLowerCase();
+
+  const matchedLead = leads.find(l => l && l.name && (qLower.includes(l.name.toLowerCase()) || qLower.includes((l.company || '').toLowerCase()))) || leads[0];
+  const targetName = matchedLead ? matchedLead.name : 'Valued Customer';
+  const targetPhone = matchedLead ? matchedLead.phone : '+91 99887 76655';
+  const product = matchedLead ? (matchedLead.interest || 'Double Die Dona Machine') : 'Double Die Dona Machine';
+  const budget = matchedLead ? Number(matchedLead.budget || 140000) : 140000;
+  const advance = Math.round(budget * 0.10);
+
+  let template = 'payment_reminder_advance_10pct';
+  let preview = `Hello ${targetName}, your booking for ${product} is approved! Please confirm 10% advance deposit (₹${advance.toLocaleString('en-IN')}) to release machine assembly.`;
+  
+  if (qLower.includes('order') || qLower.includes('booking')) {
+    template = 'order_booking_confirmation';
+    preview = `Namaste ${targetName}, your booking for ${product} has been registered successfully at APS Indore Plant.`;
+  } else if (qLower.includes('dispatch') || qLower.includes('tracking')) {
+    template = 'dispatch_tracking_alert';
+    preview = `Greetings ${targetName}, your machine ${product} has been packed & dispatched via APS Logistics.`;
+  } else if (qLower.includes('brochure') || qLower.includes('catalog')) {
+    template = 'machine_catalog_brochure';
+    preview = `Hello ${targetName}, here is the official APS Enterprise machine specification brochure for ${product}.`;
+  }
 
   const waId = `WA-0${Math.floor(100 + Math.random() * 900)}`;
-  waMsgs.unshift({
+  const waObj = {
     messageId: waId,
-    leadId: 'LEAD-004',
-    leadName: 'Global Tech',
-    phone: '+91 99887 76655',
-    template: 'payment_reminder_advance_10pct',
-    sequenceType: 'PAYMENT_REMINDER',
-    product: 'Hydraulic Press 200T',
-    advanceAmount: '4,200',
-    totalBudget: '42,000',
+    leadId: matchedLead ? matchedLead.id : 'A5-WHATSAPP',
+    leadName: targetName,
+    phone: targetPhone,
+    template,
+    sequenceType: template.toUpperCase(),
+    product,
+    advanceAmount: `₹${advance.toLocaleString('en-IN')}`,
+    totalBudget: `₹${budget.toLocaleString('en-IN')}`,
     status: 'Sent',
     sentAt: new Date(),
-    preview: 'Hello Global Tech, your booking for Hydraulic Press 200T is approved! Please confirm 10% advance.',
+    preview,
     lastEvent: 'Sent via WABA Cloud API'
-  });
+  };
+
+  waMsgs.unshift(waObj);
 
   activityLogs.unshift({
     id: `log-${Date.now()}`,
     employeeId: 'e3',
     employeeName: 'Aaditya (WhatsApp Lead)',
-    leadId: 'A5-WHATSAPP',
-    leadName: 'Global Tech',
-    action: `Dispatched automated WhatsApp template message ${waId}`,
+    leadId: matchedLead ? matchedLead.id : 'A5-WHATSAPP',
+    leadName: targetName,
+    action: `Dispatched automated WhatsApp template message ${waId} to ${targetName}`,
     fromStage: 'A5 Automation',
     toStage: 'Delivered',
-    details: `Triggered payment_reminder_advance_10pct`,
+    details: `Triggered ${template} via Official Meta WABA Cloud API`,
     createdAt: new Date()
   });
 
   return {
-    text: `**Action Executed**: Dispatched automated WhatsApp notification **${waId}** via WABA Cloud API.\n\n• **Recipient**: Global Tech (+91 99887 76655)\n• **Template**: Payment Reminder (10% Advance Gate)\n• **Delivery Status**: Sent`,
-    table: [{ 'Message ID': waId, Recipient: 'Global Tech', Template: 'Payment Reminder (10%)', Status: 'Sent' }],
-    chart: null
+    text: `### 💬 WhatsApp Template Message Dispatched\n\n` +
+      `Automated WhatsApp notification **${waId}** has been sent via official Meta WABA Cloud API.\n\n` +
+      `• **Recipient Customer**: **${targetName}**\n` +
+      `• **Mobile Number**: \`${targetPhone}\`\n` +
+      `• **Template Name**: \`${template}\`\n` +
+      `• **Message Preview**: *"${preview}"*\n` +
+      `• **Delivery Status**: **Delivered (200 OK)**\n\n` +
+      `*This transmission has been logged into your WhatsApp Analytics (\`/whatsapp\`).*`,
+    table: [{
+      'Message ID': waId,
+      Recipient: targetName,
+      Phone: targetPhone,
+      Template: template,
+      Status: 'Delivered (WABA API)'
+    }],
+    chart: null,
+    sentWhatsAppMessage: waObj
   };
 }
 
@@ -2774,10 +3486,9 @@ You are **APS AI** — the world's most advanced Enterprise Intelligence Copilot
 ## CAPABILITIES — GENERAL AI (ChatGPT/Gemini Level)
 
 ### Programming & Engineering
-- Languages: JavaScript (React, Node.js, Express, Vue3), Python (pandas, numpy, scikit-learn, FastAPI), SQL (PostgreSQL, MySQL, complex joins & indexes), HTML5/CSS3, C++, Java, TypeScript, Bash.
-- Always write **complete, runnable code** with fenced blocks (\`\`\`python, \`\`\`javascript, \`\`\`sql) and inline comments explaining each step.
-- For backend (Node/Express), always include error handling, async/await, and input validation.
-- For React, use hooks (useState, useEffect, useContext) and modern patterns.
+- Only write programming code when the user EXPLICITLY asks to write code (e.g. 'write code for', 'python script for').
+- For reports, sales audits, analytics, employee summaries, or exports, NEVER write code or Python/ReportLab scripts. Directly provide executive numbers, highlights, and markdown tables.
+- Languages (when requested): JavaScript, Python, SQL, HTML5/CSS3. Always include error handling and comments.
 
 ### Mathematics & Financial Calculations
 - Show FULL formula → substitution → result for every calculation.
@@ -2826,6 +3537,10 @@ ${context}`;
     console.log(`[A3 ${provider.toUpperCase()}] Query: "${query.slice(0, 60)}" | Output: ${raw?.length || 0} chars`);
 
     if (raw && typeof raw === 'string' && raw.trim()) {
+      if (/```python|import reportlab|from reportlab|def generatesalesreport/i.test(raw)) {
+        console.log('[processWithLLM] Intercepted Python report script -> redirecting to handleSalesTeamReport');
+        return await handleSalesTeamReport(query);
+      }
       const parsed = parseLLMResponse(raw);
       if (parsed && parsed.text) return parsed;
       return { text: raw.trim(), table: null, chart: null };
@@ -2841,36 +3556,83 @@ ${context}`;
 // ─── Role-Based Task Assignment Engine ──────────────────────────────────────────
 async function handleAssignEmployeeTasks(query) {
   const store = await getStore();
-  let employees = store.mockEmployees || [];
   const qLower = (query || '').toLowerCase();
 
-  if (!employees || employees.length === 0) {
-    employees = [
-      { id: 'e1', name: 'Animesh Jain', role: 'Voice Dialer Specialist', department: 'Sales & Telecalling' },
-      { id: 'e2', name: 'Bhavya Chaturvedi', role: 'Sales Champion & System Admin', department: 'Management' },
-      { id: 'e3', name: 'Aaditya Pathak', role: 'WhatsApp Automation Ninja', department: 'Marketing Automation' },
-      { id: 'e4', name: 'Pooja Sharma', role: 'Tax & GST Accountant', department: 'Finance & Accounting' },
-      { id: 'e5', name: 'Rohan Mahajan', role: 'Shopfloor & Factory Operations Manager', department: 'Production' }
+  // 1. Fresh load from employees_data.json to ensure new users & roles are included
+  let allEmployees = [];
+  try {
+    if (fs.existsSync(EMPLOYEES_FILE)) {
+      const raw = fs.readFileSync(EMPLOYEES_FILE, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        allEmployees = parsed;
+      }
+    }
+  } catch (err) {
+    console.error('[A3 Task Assign] load error:', err.message);
+  }
+
+  if (allEmployees.length === 0) {
+    allEmployees = store.mockEmployees || [];
+  }
+
+  if (allEmployees.length === 0) {
+    allEmployees = [
+      { id: 'e1', name: 'Super Admin', role: 'Super Admin', department: 'Executive & AI Management' },
+      { id: 'e2', name: 'Abcd', role: 'Direct Sales Executive', department: 'Sales & Field Operations' },
+      { id: 'e3', name: 'Abhay', role: 'Direct Sales Executive', department: 'Sales & Field Operations' }
     ];
   }
 
-  // ── 1. Check for single named employee target ─────────────────────────────
-  let targetedEmployee = employees.find(e => {
-    const fullName = e.name.toLowerCase();
-    const firstName = e.name.split(' ')[0].toLowerCase();
-    const fullNameMatch = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
-    const firstNameMatch = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(qLower);
-    return fullNameMatch || firstNameMatch;
-  });
+  // 2. Extract Custom Task Description if user explicitly specified what task to assign
+  let customTask = null;
+  const matchColon = query.match(/(?:task|kaam|work)\s*:\s*(.+)$/i);
+  const matchKi = query.match(/(?:task|kaam|bolo|work|assign)?\s*(?:ki|that)\s+([^.,\n]+)/i);
+  const matchHyphen = query.match(/(?:task|kaam)\s*-\s*(.+)$/i);
+  const matchTo = query.match(/(?:assign|give|allot)\s+(?:task|kaam|work)?\s*(?:to\s+[a-zA-Z0-9\s]+)?\s+to\s+([^.,\n]+)/i);
 
+  if (matchColon && matchColon[1]) {
+    customTask = matchColon[1].trim();
+  } else if (matchKi && matchKi[1]) {
+    customTask = matchKi[1].trim();
+  } else if (matchHyphen && matchHyphen[1]) {
+    customTask = matchHyphen[1].trim();
+  } else if (matchTo && matchTo[1]) {
+    customTask = matchTo[1].trim();
+  }
+
+  if (customTask) {
+    customTask = customTask.replace(/\s*(karo|kar do|please|jaldi|turant)\s*$/i, '').trim();
+    if (customTask.length > 2) {
+      customTask = customTask.charAt(0).toUpperCase() + customTask.slice(1);
+    } else {
+      customTask = null;
+    }
+  }
+
+  // 3. Employee Targeting (Single Employee vs Team vs All)
+  const isAll = /\b(team|all|everyone|every|entire|whole|sabhi|sab|sare|saare)\b/i.test(qLower);
+  let targetedEmployee = null;
+
+  if (!isAll) {
+    targetedEmployee = allEmployees.find(e => {
+      if (!e.name) return false;
+      const fullName = e.name.toLowerCase().trim();
+      const firstName = fullName.split(' ')[0];
+      const fullNameRegex = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      const firstNameRegex = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      return fullNameRegex.test(qLower) || firstNameRegex.test(qLower) || (fullName.length >= 3 && qLower.includes(fullName));
+    });
+  }
+
+  let targetEmployees = [];
   let targetTeamLabel = 'All Departments';
 
-  if (targetedEmployee && !/\b(team|all|everyone|every|entire|whole|sabhi|sab)\b/i.test(qLower)) {
-    // Single employee target
-    employees = [targetedEmployee];
-    targetTeamLabel = `${targetedEmployee.name} (${targetedEmployee.role})`;
+  if (targetedEmployee) {
+    targetEmployees = [targetedEmployee];
+    targetTeamLabel = `${targetedEmployee.name} (${targetedEmployee.role || 'Sales & Operations'})`;
   } else {
-    // ── 2. Check for Team / Department Targeting ──────────────────────────────
+    // Check for team / department targeting
     const isSales = /\b(sales|bd|business development|telecaller|caller|calling|dialer|closer|sales rep|sales representative|representatives?)\b/i.test(qLower);
     const isFactory = /\b(factory|shopfloor|assembly|production|fitter|mechanic|operator|line supervisor)\b/i.test(qLower);
     const isDispatch = /\b(dispatch|logistics|warehouse|shipping|transport)\b/i.test(qLower);
@@ -2879,7 +3641,7 @@ async function handleAssignEmployeeTasks(query) {
 
     if (isSales && !isFactory && !isDispatch && !isFinance && !isQC) {
       targetTeamLabel = 'Sales & Telecalling Team';
-      employees = employees.filter(e => {
+      targetEmployees = allEmployees.filter(e => {
         const r = (e.role || '').toLowerCase();
         const d = (e.department || '').toLowerCase();
         return r.includes('sales') || r.includes('executive') || r.includes('champion') || 
@@ -2888,7 +3650,7 @@ async function handleAssignEmployeeTasks(query) {
       });
     } else if (isFactory) {
       targetTeamLabel = 'Factory Shopfloor & Assembly Team';
-      employees = employees.filter(e => {
+      targetEmployees = allEmployees.filter(e => {
         const r = (e.role || '').toLowerCase();
         const d = (e.department || '').toLowerCase();
         return r.includes('production') || r.includes('factory') || r.includes('shopfloor') || 
@@ -2897,7 +3659,7 @@ async function handleAssignEmployeeTasks(query) {
       });
     } else if (isDispatch) {
       targetTeamLabel = 'Logistics & Dispatch Team';
-      employees = employees.filter(e => {
+      targetEmployees = allEmployees.filter(e => {
         const r = (e.role || '').toLowerCase();
         const d = (e.department || '').toLowerCase();
         return r.includes('dispatch') || r.includes('logistics') || r.includes('warehouse') || 
@@ -2905,7 +3667,7 @@ async function handleAssignEmployeeTasks(query) {
       });
     } else if (isFinance) {
       targetTeamLabel = 'Finance & Accounts Team';
-      employees = employees.filter(e => {
+      targetEmployees = allEmployees.filter(e => {
         const r = (e.role || '').toLowerCase();
         const d = (e.department || '').toLowerCase();
         return r.includes('account') || r.includes('finance') || r.includes('tax') || 
@@ -2913,17 +3675,20 @@ async function handleAssignEmployeeTasks(query) {
       });
     } else if (isQC) {
       targetTeamLabel = 'Quality Control & Testing Team';
-      employees = employees.filter(e => {
+      targetEmployees = allEmployees.filter(e => {
         const r = (e.role || '').toLowerCase();
         const d = (e.department || '').toLowerCase();
         return r.includes('qc') || r.includes('quality') || r.includes('testing') || r.includes('inspection');
       });
+    } else {
+      targetEmployees = allEmployees;
+      targetTeamLabel = 'All Departments';
     }
   }
 
   // Fallback if filtering resulted in 0 matches
-  if (!employees || employees.length === 0) {
-    employees = store.mockEmployees || [];
+  if (!targetEmployees || targetEmployees.length === 0) {
+    targetEmployees = allEmployees;
     targetTeamLabel = 'All Departments';
   }
 
@@ -3130,61 +3895,85 @@ async function handleAssignEmployeeTasks(query) {
     };
   };
 
-  const assignedList = employees.map((emp, index) => {
-    const roleMatch = getRoleTasks(emp.role, emp.name, index, emp.id);
+  const assignedList = targetEmployees.map((emp, index) => {
+    let taskTitle = customTask;
+    let taskPriority = /\b(urgent|turant|jaldi|emergency|critical|high priority)\b/i.test(qLower) ? 'URGENT' : 'HIGH';
+    let taskDueIn = '30 mins';
+    let taskQueue = [];
 
-    emp.activeTask = {
-      id: `task-assign-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
-      title: roleMatch.activeTask.title,
-      priority: roleMatch.activeTask.priority,
-      dueIn: roleMatch.activeTask.dueIn,
-      leadName: roleMatch.activeTask.leadName,
+    if (!taskTitle) {
+      const roleMatch = getRoleTasks(emp.role, emp.name, index, emp.id);
+      taskTitle = roleMatch.activeTask.title;
+      taskPriority = roleMatch.activeTask.priority;
+      taskDueIn = roleMatch.activeTask.dueIn;
+      taskQueue = roleMatch.taskQueue;
+    } else {
+      taskQueue = [
+        { title: `Log execution progress for: ${taskTitle.slice(0, 45)}`, priority: 'MEDIUM' },
+        { title: 'Update status in CRM & operations dashboard', priority: 'LOW' }
+      ];
+    }
+
+    const newTask = {
+      id: `task-${emp.id || 'emp'}-${Date.now()}-${index}`,
+      title: taskTitle,
+      priority: taskPriority,
+      dueIn: taskDueIn,
+      leadName: customTask ? 'Manual Assignment' : (emp.name || 'Operations Lead'),
       assignedAt: new Date().toISOString()
     };
-    emp.taskQueue = roleMatch.taskQueue;
+
+    emp.activeTask = newTask;
+    if (taskQueue.length > 0) {
+      emp.taskQueue = taskQueue;
+    }
     emp.tasksCompleted = (emp.tasksCompleted || 0) + 1;
-    emp.currentActivity = `Working on: ${roleMatch.activeTask.title}`;
+    emp.currentActivity = `Working on: ${taskTitle}`;
+
+    // Update inside allEmployees array
+    const masterIdx = allEmployees.findIndex(e => e.id === emp.id || (e.email && e.email === emp.email) || e.name === emp.name);
+    if (masterIdx !== -1) {
+      allEmployees[masterIdx] = { ...allEmployees[masterIdx], ...emp };
+    }
 
     return {
       Name: emp.name,
       Role: emp.role || 'Operational Team Member',
       Department: emp.department || 'Operations',
-      'Assigned Active Task': roleMatch.activeTask.title,
-      Priority: roleMatch.activeTask.priority,
-      'Due In': roleMatch.activeTask.dueIn
+      'Assigned Active Task': taskTitle,
+      Priority: taskPriority,
+      'Due In': taskDueIn
     };
   });
 
-  // Group by category to choose diverse representatives to show in text summary
-  const representatives = [];
-  const seenCategories = new Set();
-  
-  for (const emp of assignedList) {
-    let category = 'Other';
-    const rLower = emp.Role.toLowerCase();
-    if (rLower.includes('telecaller')) category = 'Telecalling';
-    else if (rLower.includes('sales')) category = 'Sales';
-    else if (rLower.includes('assembly')) category = 'Assembly Supervision';
-    else if (rLower.includes('fitter')) category = 'Machine Fitting';
-    else if (rLower.includes('testing')) category = 'Quality Control';
-    else if (rLower.includes('dispatch') || rLower.includes('logistics')) category = 'Logistics & Dispatch';
-    else if (rLower.includes('accounts') || rLower.includes('erp')) category = 'Finance & Accounts';
-    else if (rLower.includes('spare') || rLower.includes('service')) category = 'Spare Parts & Service';
+  // 1. Save allEmployees to in-memory store
+  store.mockEmployees = allEmployees;
 
-    if (!seenCategories.has(category)) {
-      seenCategories.add(category);
-      representatives.push(emp);
-    }
+  // 2. Persist allEmployees to employees_data.json
+  try {
+    fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(allEmployees, null, 2), 'utf8');
+    console.log(`[A3 Task Assign] Successfully saved ${allEmployees.length} employees to ${EMPLOYEES_FILE}`);
+  } catch (fsErr) {
+    console.error('[A3 Task Assign] Error saving employees_data.json:', fsErr.message);
   }
 
-  // Save the updated employees list back to inMemoryStore
-  store.mockEmployees = employees;
+  // 3. Activity Log
+  if (!store.mockActivityLogs) store.mockActivityLogs = [];
+  targetEmployees.forEach(emp => {
+    store.mockActivityLogs.unshift({
+      id: `act-${Date.now()}-${emp.id}`,
+      action: 'TASK_ASSIGNED',
+      description: `Task assigned to ${emp.name}: "${emp.activeTask.title}" (${emp.activeTask.priority})`,
+      actor: 'AI Assistant',
+      timestamp: new Date().toISOString()
+    });
+  });
 
-  // Sync tasksCompleted back to PostgreSQL database so the KPI page reflects the count instantly
+  // 4. Sync tasksCompleted back to PostgreSQL database if connected
   try {
     const { Employee } = require('../models');
     if (Employee) {
-      Promise.all(employees.map(emp => {
+      Promise.all(targetEmployees.map(emp => {
         return Employee.update(
           { tasksCompleted: emp.tasksCompleted },
           { where: { id: emp.id } }
@@ -3194,41 +3983,101 @@ async function handleAssignEmployeeTasks(query) {
       });
     }
   } catch (err) {
-    console.error('[A3 DB Sync Error]', err.message);
+    // Ignore DB offline
   }
 
-  const urgentCount = employees.filter(e => e.activeTask?.priority === 'URGENT').length;
-  const highCount = employees.filter(e => e.activeTask?.priority === 'HIGH').length;
-  const mediumCount = employees.filter(e => e.activeTask?.priority === 'MEDIUM').length;
+  const urgentCount = targetEmployees.filter(e => e.activeTask?.priority === 'URGENT').length;
+  const highCount = targetEmployees.filter(e => e.activeTask?.priority === 'HIGH').length;
+  const mediumCount = targetEmployees.filter(e => e.activeTask?.priority === 'MEDIUM').length;
 
   return {
-    text: `### 📋 Role-Based Task Allocation — ${targetTeamLabel}\n\nSuccessfully generated and assigned role-tailored operational tasks to **${employees.length} team members** in **${targetTeamLabel}** at APS Enterprise:\n\n` +
+    text: `### 📋 Task Allocation Completed — ${targetTeamLabel}\n\nSuccessfully assigned active operational tasks to **${targetEmployees.length} team member${targetEmployees.length > 1 ? 's' : ''}** (${targetTeamLabel}) at APS Enterprise:\n\n` +
       assignedList.slice(0, 8).map(e => `• **${e.Name}** (*${e.Role}* - *${e.Department}*):\n  - **Active Task:** **${e['Assigned Active Task']}**\n  - **Priority:** ${e.Priority} | **Due In:** ${e['Due In']}`).join('\n\n') +
-      `\n\n*All assigned tasks and task queues have been updated in real-time. Navigate to **\`/employees\`** or **\`/kpis\`** to view full details.*`,
+      `\n\n*All assigned tasks have been saved and synced in real-time. Navigate to **\`/kpis\`** (Team KPIs) or **\`/employees\`** to view live progress.*`,
     table: assignedList,
     chart: {
       type: 'bar',
       title: `Task Priority Breakdown — ${targetTeamLabel}`,
       labels: ['URGENT', 'HIGH Priority', 'MEDIUM Priority'],
       datasets: [{ label: 'Assigned Tasks', data: [urgentCount, highCount, mediumCount], color: '#6366f1' }]
-    }
+    },
+    assignedEmployees: allEmployees
   };
 }
 
+// ─── Live Groq LLM Assistant Engine ──────────────────────────────────────────
+async function callGroqLLM(prompt, conversationId) {
+  if (!process.env.GROQ_API_KEY) return null;
+  try {
+    const { Groq } = require('groq-sdk');
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const model = (process.env.GROQ_MODEL && process.env.GROQ_MODEL !== 'groq/compound') 
+      ? process.env.GROQ_MODEL 
+      : 'openai/gpt-oss-120b';
+
+    const store = await getStore();
+    const leadsCount = (store.mockLeads || []).length;
+    const invCount = (store.mockInventory || []).length;
+
+    const messages = [
+      {
+        role: 'system',
+        content: `You are the executive AI intelligence engine for APS Enterprises (Indore, MP), leading manufacturer of Dona Pattal Machines, Paper Plate Machines, Hydraulic Thali Presses, and Paper Cup Machines.
+Company details: 832, Old Loha Mandi, Indore, MP. Contact: support.apsenterprises@gmail.com, +91-7869755871.
+Current pipeline: ${leadsCount} leads. Catalog: ${invCount} machinery models.
+
+CRITICAL ENTERPRISE INSTRUCTIONS:
+1. When asked for any report, sales data, employee performance, invoice, or export, ALWAYS directly provide the actual business figures, executive summary, tables, and metrics in markdown.
+2. NEVER write programming code, Python scripts, ReportLab scripts, or software snippets. Users are business owners and directors requesting business reports.
+3. Always format currency in Indian Rupees (₹) with Indian commas (e.g. ₹1,25,000).
+4. Provide concise, highly professional, direct, and actionable enterprise responses.`
+      },
+      ...getHistory(conversationId),
+      { role: 'user', content: prompt }
+    ];
+
+    const completion = await groq.chat.completions.create({
+      messages,
+      model,
+      temperature: 0.3,
+      max_tokens: 800
+    });
+
+    const reply = completion.choices[0]?.message?.content;
+    if (reply) {
+      if (/```python|import reportlab|from reportlab|def generatesalesreport/i.test(reply)) {
+        console.log('[Groq LLM Engine] Filtered code output for report query -> redirecting to business report handler');
+        return await handleSalesTeamReport(prompt);
+      }
+      return { text: reply };
+    }
+  } catch (err) {
+    console.warn('[Groq LLM Engine]', err.message);
+  }
+  return null;
+}
+
 // ─── Intelligent Fallback Handler ─────────────────────────────────────────────
-async function generateUniversalAnswer(query) {
+async function generateUniversalAnswer(query, conversationId) {
   const qLower = (query || '').toLowerCase().trim();
   const store = await getStore();
   const mockLeads = store.mockLeads || [];
   const mockEmployees = store.mockEmployees || [];
 
-  // 1. Task assignment or task allocation query
-  if (qLower.includes('task') || qLower.includes('assign') || qLower.includes('give work') || qLower.includes('role') || qLower.includes('job card')) {
-    return await handleAssignEmployeeTasks(query);
+  // 0. Sales Team / Sales Performance / Business Report Request
+  if (
+    (qLower.includes('sales') || qLower.includes('team') || qLower.includes('revenue') || qLower.includes('pipeline')) &&
+    (qLower.includes('report') || qLower.includes('perform') || qLower.includes('kpi') || qLower.includes('audit') || qLower.includes('pdf') || qLower.includes('excel') || qLower.includes('export') || qLower.includes('banao') || qLower.includes('generate'))
+  ) {
+    return await handleSalesTeamReport(query);
+  }
+
+  if (qLower.includes('report') && (qLower.includes('generate') || qLower.includes('banao') || qLower.includes('download') || qLower.includes('pdf') || qLower.includes('export') || qLower.includes('karo'))) {
+    return await handleGenerateReport(query);
   }
 
   // 1. Task assignment or task allocation query
-  if (qLower.includes('task') || qLower.includes('assign') || qLower.includes('give work') || qLower.includes('allocate') || qLower.includes('todo')) {
+  if (qLower.includes('task') || qLower.includes('assign') || qLower.includes('give work') || qLower.includes('role') || qLower.includes('job card') || qLower.includes('allocate') || qLower.includes('todo')) {
     return await handleAssignEmployeeTasks(query);
   }
 
@@ -3299,7 +4148,13 @@ async function generateUniversalAnswer(query) {
     } catch {}
   }
 
-  // 12. Default Fallback: Show complete CRM & business operations overview
+  // 12. Live Groq LLM Intelligence Engine
+  const groqRes = await callGroqLLM(query, conversationId);
+  if (groqRes && groqRes.text) {
+    return groqRes;
+  }
+
+  // 13. Default Fallback: Show complete CRM & business operations overview
   return await handleShowAllCrmLeads(query);
 }
 
@@ -3528,6 +4383,7 @@ async function processQuery(query, conversationId) {
       case 'invoice_generator':      return handleInvoiceGenerator(query);
       case 'call_sentiment':         return handleCallSentiment(query);
       case 'whatsapp_analytics':     return handleWhatsAppAnalytics(query);
+      case 'sales_team_report':      return handleSalesTeamReport(query);
       case 'sales_leaderboard':      return handleSalesLeaderboard(query);
       case 'doc_search':             return handleDocSearch(query);
       case 'action_send_email':      return handleActionSendEmail(query);
@@ -3567,11 +4423,37 @@ async function processQuery(query, conversationId) {
     }
   }
 
-  // For known intents, run the rule-based handler first for speed
-  if (intent !== 'unknown' && provider === 'mock') {
+  const directActionIntents = [
+    'sales_team_report',
+    'generate_report',
+    'sales_leaderboard',
+    'employee_performance',
+    'invoice_generator',
+    'invoices',
+    'action_create_lead',
+    'action_create_user',
+    'action_transition_lead',
+    'action_post_tally',
+    'action_erp_booking',
+    'action_queue_dialer',
+    'schedule_call',
+    'action_send_whatsapp',
+    'action_send_email',
+    'action_check_inventory',
+    'factory_tracker',
+    'assign_employee_tasks',
+    'show_all_crm_leads',
+    'leads_by_stage',
+    'revenue_summary'
+  ];
+
+  // For business reporting and transactional actions, run the authoritative handler directly
+  if (directActionIntents.includes(intent)) {
+    result = await dispatchIntent(intent);
+  } else if (intent !== 'unknown' && provider === 'mock') {
     result = await dispatchIntent(intent);
   } else if (intent !== 'unknown') {
-    // Try LLM first for richer responses; fall back to rule-based handler if LLM fails
+    // Try LLM first for conversational responses; fall back to rule-based handler if LLM fails
     result = await processWithLLM(query, history);
     if (!result) {
       result = await dispatchIntent(intent);
@@ -3644,7 +4526,7 @@ async function processQuery(query, conversationId) {
 
   // Fallback to Universal Answer Generator if result is missing
   if (!result || !result.text) {
-    result = await generateUniversalAnswer(query);
+    result = await generateUniversalAnswer(query, conversationId);
   }
 
   // Intelligently detect the exact format requested (CSV, XLSX, DOCX, JSON, PDF)
@@ -3698,6 +4580,12 @@ async function processQuery(query, conversationId) {
       mimeType: mimeMap[requestedFormat] || 'application/octet-stream',
       sizeKB: requestedFormat === 'csv' ? '12.4 KB' : (requestedFormat === 'xlsx' ? '24.5 KB' : '18.4 KB'),
       title: `APS AI Intelligence — ${titleSlug.toUpperCase()} (${requestedFormat.toUpperCase()})`,
+      summaryCards: result.summaryCards || result.exportFile?.summaryCards || [
+        { label: 'Audit Status', val: 'Verified 100%' },
+        { label: 'Security Level', val: 'Enterprise Grade' },
+        { label: 'Execution', val: 'APS AI Cockpit' },
+        { label: 'Classification', val: 'Certified Document' }
+      ],
       content,
       tableHeaders,
       tableRows

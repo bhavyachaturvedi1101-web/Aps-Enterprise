@@ -135,11 +135,42 @@ const INITIAL_NOTIFICATIONS = [
   }
 ];
 
+const OPERATOR_PANELS = [
+  {
+    role: 'admin',
+    name: 'Super Admin',
+    email: 'admin@apsenterprises.in',
+    tag: 'Full Cockpit (Settings & Users)',
+    route: '/dashboard'
+  },
+  {
+    role: 'manager',
+    name: 'Operations Manager',
+    email: 'manager@apsenterprises.in',
+    tag: 'Plant Operations & Factory Lead',
+    route: '/dashboard'
+  },
+  {
+    role: 'accountant',
+    name: 'Accounts Officer',
+    email: 'accounts@apsenterprises.in',
+    tag: 'Tally ERP Sync & Invoicing',
+    route: '/tally'
+  },
+  {
+    role: 'employee',
+    name: 'Sales Telecaller',
+    email: 'telecaller@apsenterprises.in',
+    tag: 'CRM Pipeline & Outbound Calls',
+    route: '/crm'
+  }
+];
+
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser, logout, loginWithRole } = useAuth();
+  const { currentUser, login, logout } = useAuth();
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
@@ -165,10 +196,11 @@ export default function DashboardLayout() {
 
   // Dynamic Navigation Groups based on active User Role
   const filteredNavGroups = useMemo(() => {
-    const role = currentUser?.role || 'admin';
-    if (role === 'admin') return ALL_NAV_GROUPS;
+    const role = (currentUser?.role || 'admin').toLowerCase().trim();
+    if (role === 'admin' || role === 'super admin' || role === 'superadmin') return ALL_NAV_GROUPS;
 
-    if (role === 'manager') {
+    // Manager / Operations Lead
+    if (role === 'manager' || role === 'operations') {
       return [
         {
           group: 'PLATFORM',
@@ -180,11 +212,11 @@ export default function DashboardLayout() {
         },
         {
           group: 'AI AGENTS',
-          items: ALL_NAV_GROUPS[2].items.filter(i => ['ai', 'whatsapp', 'dialer'].includes(i.key))
+          items: ALL_NAV_GROUPS[2].items
         },
         {
           group: 'FINANCE',
-          items: ALL_NAV_GROUPS[3].items.filter(i => i.key === 'invoices')
+          items: ALL_NAV_GROUPS[3].items // includes 'tally' & 'invoices'
         },
         {
           group: 'PRODUCTIVITY',
@@ -193,15 +225,33 @@ export default function DashboardLayout() {
       ].filter(g => g.items.length > 0);
     }
 
-    // Employee Role
+    // Accountant Role (Tally ERP, Invoices, Payment Gate, CRM Leads)
+    if (role === 'accountant') {
+      return [
+        {
+          group: 'FINANCE',
+          items: ALL_NAV_GROUPS[3].items // includes 'tally' & 'invoices'
+        },
+        {
+          group: 'OPERATIONS',
+          items: ALL_NAV_GROUPS[1].items.filter(i => ['payments', 'pipeline'].includes(i.key))
+        },
+        {
+          group: 'PRODUCTIVITY',
+          items: ALL_NAV_GROUPS[4].items.filter(i => ['activity'].includes(i.key))
+        }
+      ].filter(g => g.items.length > 0);
+    }
+
+    // Employee / Telecaller Role
     return [
       {
         group: 'OPERATIONS',
-        items: ALL_NAV_GROUPS[1].items.filter(i => i.key === 'pipeline')
+        items: ALL_NAV_GROUPS[1].items.filter(i => ['pipeline'].includes(i.key))
       },
       {
         group: 'AI AGENTS',
-        items: ALL_NAV_GROUPS[2].items.filter(i => ['voice', 'dialer'].includes(i.key))
+        items: ALL_NAV_GROUPS[2].items.filter(i => ['dialer', 'voice', 'ai'].includes(i.key))
       },
       {
         group: 'PRODUCTIVITY',
@@ -220,11 +270,19 @@ export default function DashboardLayout() {
 
   // Dynamic Header Pills based on Role
   const headerPills = useMemo(() => {
-    const role = currentUser?.role || 'admin';
+    const role = (currentUser?.role || 'admin').toLowerCase().trim();
     if (role === 'employee') {
       return [
         { key: 'pipeline', label: 'Lead Pipeline' },
+        { key: 'dialer', label: 'Dialer Queue' },
         { key: 'build', label: 'My Tasks & KPIs' }
+      ];
+    }
+    if (role === 'accountant') {
+      return [
+        { key: 'tally', label: 'Tally Prime Sync' },
+        { key: 'invoices', label: 'Invoices' },
+        { key: 'payments', label: '10% Payment Gate' }
       ];
     }
     return [
@@ -405,11 +463,7 @@ export default function DashboardLayout() {
     navigate(routes[key] || '/dashboard');
   };
 
-  const handleSwitchRole = (roleKey) => {
-    const user = loginWithRole(roleKey);
-    setUserMenuOpen(false);
-    navigate(user.defaultRoute || '/dashboard');
-  };
+
 
   const handleLogout = () => {
     logout();
@@ -651,7 +705,7 @@ export default function DashboardLayout() {
 
           {/* Profile Dropdown & Quick Switch */}
           {userMenuOpen && (
-            <div className="user-dropdown-panel">
+            <div className="user-dropdown-panel" style={{ width: 280 }}>
               <div style={s.dropdownHeader}>
                 <div>Signed in as <strong>{currentUser?.name}</strong></div>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>{currentUser?.email}</div>
@@ -665,43 +719,72 @@ export default function DashboardLayout() {
                   textTransform: 'uppercase',
                   padding: '2px 8px',
                   borderRadius: 8,
-                  backgroundColor: currentUser?.role === 'admin' ? '#fef3c7' : currentUser?.role === 'manager' ? '#dbeafe' : '#d1fae5',
-                  color: currentUser?.role === 'admin' ? '#b45309' : currentUser?.role === 'manager' ? '#1d4ed8' : '#047857'
+                  backgroundColor: currentUser?.role === 'admin' ? '#fef3c7' : currentUser?.role === 'manager' ? '#dbeafe' : currentUser?.role === 'accountant' ? '#ede9fe' : '#d1fae5',
+                  color: currentUser?.role === 'admin' ? '#b45309' : currentUser?.role === 'manager' ? '#1d4ed8' : currentUser?.role === 'accountant' ? '#7c3aed' : '#047857'
                 }}>
                   Active Role: {currentUser?.role}
                 </span>
                 <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 4, fontWeight: 600 }}>{currentUser?.title}</div>
               </div>
 
-              {/* Quick Switch Role */}
-              <div style={{ padding: '8px 12px 4px 12px' }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
-                  Switch Demo Account
+              {/* Quick Switch Panel Selector */}
+              <div style={{ padding: '10px 12px 6px 12px', borderBottom: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '0.64rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Switch Panel / Operator
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
-                  {['admin', 'manager', 'employee'].map(r => (
-                    <button
-                      key={r}
-                      onClick={() => handleSwitchRole(r)}
-                      style={{
-                        padding: '5px 2px',
-                        borderRadius: 6,
-                        border: '1px solid',
-                        borderColor: currentUser?.role === r ? '#2563eb' : '#e2e8f0',
-                        backgroundColor: currentUser?.role === r ? '#eff6ff' : '#ffffff',
-                        fontSize: '0.7rem',
-                        fontWeight: currentUser?.role === r ? 800 : 600,
-                        color: currentUser?.role === r ? '#1d4ed8' : '#64748b',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {r === 'admin' ? 'Admin' : r === 'manager' ? 'Manager' : 'Employee'}
-                    </button>
-                  ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  {OPERATOR_PANELS.map(op => {
+                    const isActive = (currentUser?.role || '').toLowerCase() === op.role.toLowerCase();
+                    return (
+                      <button
+                        key={op.email}
+                        type="button"
+                        onClick={async () => {
+                          if (isActive) return;
+                          try {
+                            const user = await login(op.email, 'admin123');
+                            setUserMenuOpen(false);
+                            navigate(user?.defaultRoute || op.route);
+                          } catch (err) {
+                            console.error('Quick switch error', err);
+                          }
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '6px 8px',
+                          borderRadius: 8,
+                          border: isActive ? '1px solid #cbd5e1' : '1px solid #f1f5f9',
+                          backgroundColor: isActive ? '#f8fafc' : '#ffffff',
+                          cursor: isActive ? 'default' : 'pointer',
+                          textAlign: 'left',
+                          width: '100%',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: '0.74rem', fontWeight: isActive ? 700 : 600, color: isActive ? '#09090b' : '#334155' }}>
+                            {op.name}
+                          </span>
+                          <span style={{ fontSize: '0.65rem', color: '#64748b' }}>
+                            {op.tag}
+                          </span>
+                        </div>
+                        {isActive ? (
+                          <span style={{ fontSize: '0.6rem', fontWeight: 700, padding: '2px 6px', borderRadius: 6, backgroundColor: '#e2e8f0', color: '#0f172a' }}>
+                            Active
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '0.62rem', fontWeight: 600, color: '#2563eb' }}>
+                            Switch
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-
-              <div style={s.dropdownDivider} />
 
               {currentUser?.role === 'admin' && (
                 <>
@@ -790,11 +873,20 @@ export default function DashboardLayout() {
                 {currentUser?.avatar || 'A'}
               </div>
               <div style={s.userCardInfo}>
-                <div style={s.userCardName}>{currentUser?.name || 'admin'}</div>
-                <div style={s.userCardEmail}>{currentUser?.email || 'admin@aps.enterprise'}</div>
+                <div style={s.userCardName} title={currentUser?.name || 'Super Admin'}>
+                  {currentUser?.name || 'Super Admin'}
+                </div>
+                <div style={s.userCardEmail} title={currentUser?.email || 'admin@apsenterprises.in'}>
+                  {currentUser?.email || 'admin@apsenterprises.in'}
+                </div>
               </div>
-              <button onClick={handleLogout} className="sidebar-logout-btn" style={s.logoutBtn} title="Logout">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <button
+                onClick={handleLogout}
+                className="sidebar-logout-btn"
+                style={s.logoutBtn}
+                title="Sign out"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" y1="12" x2="9" y2="12" />
@@ -955,7 +1047,7 @@ const s = {
 
   // ── Sidebar
   sidebar: {
-    width: 220, flexShrink: 0,
+    width: 236, flexShrink: 0,
     background: '#ffffff',
     borderRight: '1px solid #e4e4e7',
     display: 'flex', flexDirection: 'column',
@@ -1009,28 +1101,42 @@ const s = {
 
   // ── Sidebar Bottom
   sidebarBottom: { padding: '0 0.75rem 1rem', flexShrink: 0 },
-  sidebarDivider: { height: 1, backgroundColor: '#e4e4e7', marginBottom: '0.85rem' },
+  sidebarDivider: { height: 1, backgroundColor: '#e4e4e7', marginBottom: '0.75rem' },
   userCard: {
-    display: 'flex', alignItems: 'center', gap: '0.6rem',
-    padding: '0.65rem 0.75rem', borderRadius: 12,
-    background: '#f8fafc', border: '1px solid #e4e4e7'
+    display: 'flex', alignItems: 'center', gap: '0.65rem',
+    padding: '0.6rem 0.7rem', borderRadius: 12,
+    background: '#f8fafc', border: '1px solid #e4e4e7',
+    position: 'relative', boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
   },
   sidebarInitial: {
-    width: 32, height: 32, borderRadius: '50%',
+    width: 34, height: 34, borderRadius: '50%',
     backgroundColor: '#09090b',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '0.85rem', fontWeight: 800, color: '#fff', flexShrink: 0
+    fontSize: '0.85rem', fontWeight: 800, color: '#fff', flexShrink: 0,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
   },
-  userCardInfo: { flex: 1, minWidth: 0 },
+  userCardInfo: {
+    flex: 1, minWidth: 0,
+    display: 'flex', flexDirection: 'column', justifyContent: 'center',
+    gap: 2, overflow: 'hidden'
+  },
   userCardName: {
-    fontSize: '0.8rem', fontWeight: 700, color: '#09090b',
-    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+    fontSize: '0.78rem', fontWeight: 700, color: '#09090b',
+    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+    lineHeight: 1.25
   },
-  userCardEmail: { fontSize: '0.65rem', color: '#71717a', fontWeight: 500 },
+  userCardEmail: {
+    fontSize: '0.66rem', color: '#71717a', fontWeight: 500,
+    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+    lineHeight: 1.2
+  },
   logoutBtn: {
+    flexShrink: 0, marginLeft: 'auto',
+    width: 28, height: 28, borderRadius: 7,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: 'transparent', border: 'none',
     color: '#71717a', cursor: 'pointer',
-    padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center'
+    padding: 0, transition: 'all 0.15s ease'
   },
 
   // ── Main Content

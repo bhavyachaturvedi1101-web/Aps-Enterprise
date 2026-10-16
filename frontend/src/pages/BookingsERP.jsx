@@ -149,7 +149,7 @@ export default function BookingsERP() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [sortBy, setSortBy] = useState('Newest First');
 
-  useEffect(() => {
+  const fetchBookings = () => {
     fetch(`${API}/leads`)
       .then(r => r.json())
       .then(d => {
@@ -176,6 +176,16 @@ export default function BookingsERP() {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchBookings();
+    window.addEventListener('aps_leads_updated', fetchBookings);
+    window.addEventListener('aps_bookings_updated', fetchBookings);
+    return () => {
+      window.removeEventListener('aps_leads_updated', fetchBookings);
+      window.removeEventListener('aps_bookings_updated', fetchBookings);
+    };
   }, []);
 
   const filteredBookings = bookings
@@ -207,7 +217,7 @@ export default function BookingsERP() {
   const pendingCount = bookings.filter(b => b.status === 'Booking Created').length;
 
   return (
-    <div style={{ ...s.page, padding: undefined }} className="page-container">
+    <div style={s.page} className="page-container">
       {/* Header */}
       <div style={s.pageHead} className="mobile-stack-header">
         <div>
@@ -336,9 +346,9 @@ export default function BookingsERP() {
 }
 
 const s = {
-  page: { padding: '2rem', fontFamily: 'var(--font-body)' },
+  page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto', boxSizing: 'border-box' },
   loading: { padding: '3rem', textAlign: 'center', color: '#71717a' },
-  pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' },
+  pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
   title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
   statsRow: { display: 'flex', gap: '1rem', marginBottom: '1.25rem' },
   statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: '1.25rem', border: '1px solid #e4e4e7', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' },

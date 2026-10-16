@@ -1,40 +1,89 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, DEMO_ACCOUNTS } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+
+const OPERATORS_LIST = [
+  {
+    role: 'admin',
+    name: 'Super Admin',
+    email: 'admin@apsenterprises.in',
+    panel: 'Super Admin Panel',
+    subtitle: 'Full System Control • Users & Settings',
+    badge: 'ALL ACCESS',
+    badgeBg: '#fef3c7',
+    badgeColor: '#b45309'
+  },
+  {
+    role: 'manager',
+    name: 'Operations Manager',
+    email: 'manager@apsenterprises.in',
+    panel: 'Operations & Plant Panel',
+    subtitle: 'Factory Orders • Bookings • AI Suite',
+    badge: 'OPERATIONS',
+    badgeBg: '#dbeafe',
+    badgeColor: '#1d4ed8'
+  },
+  {
+    role: 'accountant',
+    name: 'Accounts Officer',
+    email: 'accounts@apsenterprises.in',
+    panel: 'Accounts & ERP Panel',
+    subtitle: 'Tally Prime Sync • Invoices • 10% Gate',
+    badge: 'FINANCE',
+    badgeBg: '#ede9fe',
+    badgeColor: '#7c3aed'
+  },
+  {
+    role: 'employee',
+    name: 'Sales Telecaller',
+    email: 'telecaller@apsenterprises.in',
+    panel: 'Telecalling & CRM Panel',
+    subtitle: 'CRM Leads • Dialer Queue • Voice Agent',
+    badge: 'OUTREACH',
+    badgeBg: '#d1fae5',
+    badgeColor: '#047857'
+  }
+];
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@apsenterprise.com');
-  const [password, setPassword] = useState('••••••••');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('admin');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const { login, loginWithRole } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = async (e) => {
+    e?.preventDefault();
+    setErrorMessage('');
     setLoading(true);
 
-    setTimeout(() => {
-      const user = login(email, password);
+    try {
+      const user = await login(email, password);
       setLoading(false);
-      navigate(user.defaultRoute || '/dashboard');
-    }, 400);
+      navigate(user?.defaultRoute || '/dashboard');
+    } catch (err) {
+      setLoading(false);
+      setErrorMessage(err.message || 'Invalid operator credentials. Please check your email and password.');
+    }
   };
 
-  const handleQuickConnect = (roleKey) => {
-    setSelectedRole(roleKey);
-    const demo = DEMO_ACCOUNTS[roleKey];
-    setEmail(demo.email);
-    setPassword('••••••••');
+  const handleQuickLogin = async (targetEmail) => {
+    setEmail(targetEmail);
+    setPassword('admin123');
+    setErrorMessage('');
     setLoading(true);
 
-    setTimeout(() => {
-      const user = loginWithRole(roleKey);
+    try {
+      const user = await login(targetEmail, 'admin123');
       setLoading(false);
-      navigate(user.defaultRoute || '/dashboard');
-    }, 300);
+      navigate(user?.defaultRoute || '/dashboard');
+    } catch (err) {
+      setLoading(false);
+      setErrorMessage(err.message || 'Quick login failed.');
+    }
   };
 
   return (
@@ -55,7 +104,19 @@ export default function Login() {
 
         {/* Heading */}
         <h1 style={styles.portalTitle}>APS Enterprise Portal</h1>
-        <p style={styles.portalSubtitle}>Sign in to start operations</p>
+        <p style={styles.portalSubtitle}>Sign in to your authorized operator account</p>
+
+        {/* Error Alert Box */}
+        {errorMessage && (
+          <div style={styles.errorBox}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {/* Login Form */}
         <form onSubmit={handleLogin} style={styles.form}>
@@ -65,24 +126,26 @@ export default function Login() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setErrorMessage(''); }}
               style={styles.inputField}
-              placeholder="admin@apsenterprise.com"
+              placeholder="e.g. admin@apsenterprises.in"
               required
+              autoComplete="username"
             />
           </div>
 
           {/* Access Password */}
           <div style={styles.inputGroup}>
-            <label style={styles.inputLabel}>ACCESS PASSWORD</label>
+            <label style={styles.inputLabel}>ACCESS PASSWORD / API KEY</label>
             <div style={styles.passwordWrapper}>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setErrorMessage(''); }}
                 style={styles.inputField}
-                placeholder="••••••••"
+                placeholder="Enter your system access password"
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -101,60 +164,52 @@ export default function Login() {
 
           {/* Submit Button */}
           <button type="submit" disabled={loading} style={styles.loginBtn}>
-            {loading ? 'Authenticating Operator…' : 'Log In Operator'}
+            {loading ? 'Authenticating Operator…' : 'Sign In to Console'}
           </button>
-
-          {/* Quick Connect Demo Accounts without emojis */}
-          <div style={styles.quickConnectWrap}>
-            <div style={styles.quickConnectDivider}>
-              <span style={styles.quickConnectText}>OR QUICK CONNECT (DEMO ACCOUNTS)</span>
-            </div>
-
-            <div style={styles.roleButtonsRow}>
-              {/* Admin */}
-              <button
-                type="button"
-                onClick={() => handleQuickConnect('admin')}
-                style={{
-                  ...styles.roleChipBtn,
-                  borderColor: selectedRole === 'admin' ? '#09090b' : '#e2e8f0',
-                  backgroundColor: selectedRole === 'admin' ? '#09090b' : '#ffffff',
-                  color: selectedRole === 'admin' ? '#ffffff' : '#475569'
-                }}
-              >
-                <span>Admin</span>
-              </button>
-
-              {/* Manager */}
-              <button
-                type="button"
-                onClick={() => handleQuickConnect('manager')}
-                style={{
-                  ...styles.roleChipBtn,
-                  borderColor: selectedRole === 'manager' ? '#2563eb' : '#e2e8f0',
-                  backgroundColor: selectedRole === 'manager' ? '#eff6ff' : '#ffffff',
-                  color: selectedRole === 'manager' ? '#1d4ed8' : '#475569'
-                }}
-              >
-                <span>Manager</span>
-              </button>
-
-              {/* Employee */}
-              <button
-                type="button"
-                onClick={() => handleQuickConnect('employee')}
-                style={{
-                  ...styles.roleChipBtn,
-                  borderColor: selectedRole === 'employee' ? '#10b981' : '#e2e8f0',
-                  backgroundColor: selectedRole === 'employee' ? '#ecfdf5' : '#ffffff',
-                  color: selectedRole === 'employee' ? '#047857' : '#475569'
-                }}
-              >
-                <span>Employee</span>
-              </button>
-            </div>
-          </div>
         </form>
+
+        {/* 1-Click Role Panel Selectors */}
+        <div style={styles.quickAccessSection}>
+          <div style={styles.quickAccessHeader}>
+            <span style={styles.quickAccessTitle}>Select Role Panel to Preview (1-Click)</span>
+            <span style={styles.quickAccessHint}>Pass: admin123</span>
+          </div>
+          <div style={styles.quickAccessGrid}>
+            {OPERATORS_LIST.map((op) => (
+              <button
+                key={op.email}
+                type="button"
+                disabled={loading}
+                onClick={() => handleQuickLogin(op.email)}
+                style={styles.quickCard}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                  e.currentTarget.style.backgroundColor = '#ffffff';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.05)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={styles.quickCardTop}>
+                  <span style={styles.quickCardName}>{op.name}</span>
+                  <span style={{ ...styles.quickCardBadge, backgroundColor: op.badgeBg, color: op.badgeColor }}>
+                    {op.badge}
+                  </span>
+                </div>
+                <div style={styles.quickCardSubtitle}>{op.subtitle}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={styles.footerNote}>
+          APS Enterprises Operating System • Enterprise Multi-Agent Cockpit
+        </div>
       </div>
     </div>
   );
@@ -166,7 +221,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '100vh',
-    backgroundColor: '#f3f4f8',
+    backgroundColor: '#f8fafc',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     position: 'relative',
     overflow: 'hidden',
@@ -177,31 +232,31 @@ const styles = {
     width: 600,
     height: 600,
     borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(238, 225, 255, 0.7) 0%, rgba(243, 244, 248, 0) 70%)',
+    background: 'radial-gradient(circle, rgba(219, 234, 254, 0.7) 0%, rgba(248, 250, 252, 0) 70%)',
     top: '-15%',
     right: '-5%',
     zIndex: 1,
-    filter: 'blur(40px)'
+    filter: 'blur(50px)'
   },
   ambientBlob2: {
     position: 'absolute',
     width: 500,
     height: 500,
     borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(220, 235, 255, 0.6) 0%, rgba(243, 244, 248, 0) 70%)',
+    background: 'radial-gradient(circle, rgba(238, 242, 255, 0.8) 0%, rgba(248, 250, 252, 0) 70%)',
     bottom: '-15%',
     left: '-5%',
     zIndex: 1,
-    filter: 'blur(45px)'
+    filter: 'blur(55px)'
   },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 24,
     border: '1px solid #e2e8f0',
-    boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 1px 1px rgba(0, 0, 0, 0.02)',
+    boxShadow: '0 20px 45px -15px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.02)',
     width: '100%',
-    maxWidth: 440,
-    padding: '2.75rem 2.25rem',
+    maxWidth: 480,
+    padding: '2.5rem 2.25rem',
     textAlign: 'center',
     position: 'relative',
     zIndex: 2
@@ -213,13 +268,13 @@ const styles = {
     marginBottom: '1.25rem'
   },
   brandLogoImg: {
-    height: 58,
+    height: 56,
     width: 'auto',
     objectFit: 'contain',
     display: 'block'
   },
   portalTitle: {
-    fontSize: '1.65rem',
+    fontSize: '1.6rem',
     fontWeight: 800,
     color: '#09090b',
     margin: '0 0 0.35rem 0',
@@ -228,8 +283,22 @@ const styles = {
   portalSubtitle: {
     fontSize: '0.86rem',
     color: '#64748b',
-    margin: '0 0 2rem 0',
+    margin: '0 0 1.75rem 0',
     fontWeight: 500
+  },
+  errorBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '0.75rem 1rem',
+    borderRadius: 12,
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    color: '#b91c1c',
+    fontSize: '0.82rem',
+    fontWeight: 600,
+    textAlign: 'left',
+    marginBottom: '1.25rem'
   },
   form: {
     textAlign: 'left'
@@ -275,7 +344,7 @@ const styles = {
   },
   loginBtn: {
     width: '100%',
-    padding: '0.85rem',
+    padding: '0.9rem',
     borderRadius: 12,
     border: 'none',
     backgroundColor: '#09090b',
@@ -284,39 +353,81 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
     marginTop: '0.75rem',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+    boxShadow: '0 4px 14px rgba(9, 9, 11, 0.16)',
     transition: 'background-color 0.2s, transform 0.1s'
   },
-  quickConnectWrap: {
-    marginTop: '2rem'
+  quickAccessSection: {
+    marginTop: '1.75rem',
+    paddingTop: '1.25rem',
+    borderTop: '1px solid #f1f5f9',
+    textAlign: 'left'
   },
-  quickConnectDivider: {
-    textAlign: 'center',
-    marginBottom: '1rem',
-    position: 'relative'
+  quickAccessHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '0.75rem'
   },
-  quickConnectText: {
-    fontSize: '0.66rem',
-    fontWeight: 700,
-    color: '#94a3b8',
+  quickAccessTitle: {
+    fontSize: '0.68rem',
+    fontWeight: 800,
+    color: '#475569',
     letterSpacing: '0.6px',
     textTransform: 'uppercase'
   },
-  roleButtonsRow: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '0.65rem'
+  quickAccessHint: {
+    fontSize: '0.66rem',
+    color: '#94a3b8',
+    fontWeight: 600
   },
-  roleChipBtn: {
-    padding: '0.7rem 0.5rem',
-    borderRadius: 12,
+  quickAccessGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '0.55rem'
+  },
+  quickCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    padding: '0.75rem 0.8rem',
+    borderRadius: 14,
     border: '1px solid #e2e8f0',
+    backgroundColor: '#f8fafc',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'all 0.15s ease',
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  quickCardTop: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    fontSize: '0.82rem',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 4
+  },
+  quickCardName: {
+    fontSize: '0.78rem',
     fontWeight: 700,
-    transition: 'all 0.15s ease'
+    color: '#09090b'
+  },
+  quickCardBadge: {
+    fontSize: '0.58rem',
+    fontWeight: 800,
+    padding: '2px 6px',
+    borderRadius: 6,
+    letterSpacing: '0.4px',
+    textTransform: 'uppercase'
+  },
+  quickCardSubtitle: {
+    fontSize: '0.66rem',
+    color: '#64748b',
+    lineHeight: 1.3
+  },
+  footerNote: {
+    marginTop: '1.75rem',
+    fontSize: '0.72rem',
+    color: '#94a3b8',
+    fontWeight: 500
   }
 };

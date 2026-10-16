@@ -31,9 +31,14 @@ if (databaseUrl) {
   );
 }
 
+let isConnected = false;
+
+const isDbConnected = () => isConnected;
+
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
+    isConnected = true;
     console.log('PostgreSQL database connection has been established successfully.');
 
     if (process.env.NODE_ENV === 'development') {
@@ -46,6 +51,7 @@ const connectDB = async () => {
       console.log('Database schemas synced (safe) successfully.');
     }
   } catch (error) {
+    isConnected = false;
     console.error('Unable to connect to the database:', error.message || error);
     throw error; // Let caller handle it (don't call process.exit here so Vercel serverless works)
   }
@@ -53,5 +59,7 @@ const connectDB = async () => {
 
 module.exports = {
   sequelize,
-  connectDB
+  connectDB,
+  isDbConnected
 };
+

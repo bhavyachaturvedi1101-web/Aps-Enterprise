@@ -2,18 +2,17 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const { connectDB } = require('./config/db');
+const { connectDB, isDbConnected } = require('./config/db');
 const { authenticate } = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ─── DB Init ───
-let _dbConnected = false;
 let _dbAttempted = false;
 
 const initDB = async () => {
-  if (_dbAttempted) return _dbConnected;
+  if (_dbAttempted) return isDbConnected();
   _dbAttempted = true;
   try {
     if (!process.env.DATABASE_URL) {
@@ -21,11 +20,9 @@ const initDB = async () => {
       return false;
     }
     await connectDB();
-    _dbConnected = true;
     return true;
   } catch (err) {
     console.warn(`[Warning] Database unavailable (${err.message}). Proceeding with in-memory store.`);
-    _dbConnected = false;
     return false;
   }
 };
@@ -62,6 +59,9 @@ app.get('/api/health', (req, res) => {
     modules: ['A1 Voice Agent', 'A2 Admin Cockpit', 'A3 Chatbot API', 'A4 Performance Profiles', 'A5 WhatsApp Automation']
   });
 });
+
+// Auth Routes
+app.use('/api/auth', require('./routes/auth'));
 
 // A2 Admin API Routes
 app.use('/api/leads', require('./routes/leads'));

@@ -1,16 +1,23 @@
 const { Lead, ActivityLog } = require('../models');
 const { isValidTransition, executeTransition } = require('../stateMachine/leadStateMachine');
+const { isDbConnected } = require('../config/db');
+const crmService = require('../services/crmService');
 
 // GET /api/leads — List all leads
 const getLeads = async (req, res) => {
   try {
     let leads = [];
-    try {
-      leads = await Lead.findAll({
-        order: [['createdAt', 'DESC']]
-      });
-    } catch (dbError) {
-      console.warn('DB lookup failed, falling back to mockLeads:', dbError.message);
+    if (isDbConnected()) {
+      try {
+        leads = await Lead.findAll({
+          order: [['createdAt', 'DESC']]
+        });
+      } catch (dbError) {
+        console.warn('DB lookup failed, falling back to mockLeads:', dbError.message);
+        const { mockLeads } = require('../config/inMemoryStore');
+        leads = mockLeads || [];
+      }
+    } else {
       const { mockLeads } = require('../config/inMemoryStore');
       leads = mockLeads || [];
     }
@@ -27,15 +34,17 @@ const getLeadById = async (req, res) => {
     const { id } = req.params;
     let lead = null;
     
-    try {
-      lead = await Lead.findByPk(id);
-      if (!lead) {
-        // Fallback for short ids like '001'
-        const formattedId = `LEAD-${id.padStart(3, '0')}`;
-        lead = await Lead.findByPk(formattedId);
+    if (isDbConnected()) {
+      try {
+        lead = await Lead.findByPk(id);
+        if (!lead) {
+          // Fallback for short ids like '001'
+          const formattedId = `LEAD-${id.padStart(3, '0')}`;
+          lead = await Lead.findByPk(formattedId);
+        }
+      } catch (dbError) {
+        console.warn('DB lookup failed, falling back to mockLeads:', dbError.message);
       }
-    } catch (dbError) {
-      console.warn('DB lookup failed, falling back to mockLeads:', dbError.message);
     }
     
     if (!lead) {
@@ -64,37 +73,42 @@ const createLead = async (req, res) => {
     let lead = null;
     let isMock = false;
 
-    try {
-      const totalLeads = await Lead.count();
-      const newId = `LEAD-${String(totalLeads + 1).padStart(3, '0')}-${Date.now().toString().slice(-4)}`;
+    if (isDbConnected()) {
+      try {
+        const totalLeads = await Lead.count();
+        const newId = `LEAD-${String(totalLeads + 1).padStart(3, '0')}-${Date.now().toString().slice(-4)}`;
 
-      lead = await Lead.create({
-        id: newId,
-        name,
-        phone: phone || '+91 98765 43210',
-        company: company || `${name} Corp`,
-        interest: interest || 'CNC Machine Unit',
-        budget: budget || 20000.00,
-        stage: stage || 'Enquiry',
-        priority: priority || 'Warm',
-        notes: notes || 'Direct manual entry from CRM Board.',
-        crmSynced: true,
-        erpBookingCreated: false,
-        tallyPaymentVerified: false,
-        source: source || 'Direct Web',
-        assignedEmployeeId: 'e1'
-      });
-      
-      await ActivityLog.create({
-        id: `log${Date.now()}`,
-        leadId: lead.id,
-        employeeId: req.user?.id || 'e2',
-        action: `New Lead "${lead.name}" created in CRM Board (Stage: ${lead.stage})`,
-        fromStage: 'None',
-        toStage: lead.stage
-      });
-    } catch (dbErr) {
-      console.warn('DB create failed, falling back to mockLeads:', dbErr.message);
+        lead = await Lead.create({
+          id: newId,
+          name,
+          phone: phone || '+91 98765 43210',
+          company: company || `${name} Corp`,
+          interest: interest || 'CNC Machine Unit',
+          budget: budget || 20000.00,
+          stage: stage || 'Enquiry',
+          priority: priority || 'Warm',
+          notes: notes || 'Direct manual entry from CRM Board.',
+          crmSynced: true,
+          erpBookingCreated: false,
+          tallyPaymentVerified: false,
+          source: source || 'Direct Web',
+          assignedEmployeeId: 'e1'
+        });
+        
+        await ActivityLog.create({
+          id: `log${Date.now()}`,
+          leadId: lead.id,
+          employeeId: req.user?.id || 'e2',
+          action: `New Lead "${lead.name}" created in CRM Board (Stage: ${lead.stage})`,
+          fromStage: 'None',
+          toStage: lead.stage
+        });
+      } catch (dbErr) {
+        console.warn('DB create failed, falling back to mockLeads:', dbErr.message);
+      }
+    }
+
+    if (!lead) {
       isMock = true;
       const { mockLeads, mockActivityLogs } = require('../config/inMemoryStore');
       const newId = `LEAD-${String((mockLeads ? mockLeads.length : 0) + 1).padStart(3, '0')}`;
@@ -103,11 +117,11 @@ const createLead = async (req, res) => {
         name,
         phone: phone || '+91 98765 43210',
         company: company || `${name} Corp`,
-        interest: interest || 'CNC Machine Unit',
-        budget: budget || 20000.00,
+        interest: interest || 'Fully Automatic Double Die Dona Pattal Machine',
+        budget: budget || 125000.00,
         stage: stage || 'Enquiry',
         priority: priority || 'Warm',
-        notes: notes || 'Direct manual entry from CRM Board.',
+        notes: notes || 'Direct entry via APS Operating System.',
         crmSynced: true,
         erpBookingCreated: false,
         tallyPaymentVerified: false,
@@ -120,12 +134,17 @@ const createLead = async (req, res) => {
         mockActivityLogs.unshift({
           id: `log${Date.now()}`,
           leadId: lead.id,
-          employeeId: req.user?.id || 'e2',
-          action: `New Lead "${lead.name}" created in CRM Board (Stage: ${lead.stage})`,
+          employeeId: req.user?.id || 'e1',
+          action: `New Lead "${lead.name}" registered in CRM Board (Stage: ${lead.stage})`,
           createdAt: new Date().toISOString()
         });
       }
     }
+
+    // Background push to Teleforce CRM API
+    crmService.createLead(lead).catch(err => {
+      console.warn('[CRM Push Error]', err.message);
+    });
 
     res.status(201).json({ success: true, lead });
   } catch (error) {
@@ -143,24 +162,26 @@ const updateLead = async (req, res) => {
     let lead = null;
     let isMock = false;
 
-    try {
-      lead = await Lead.findByPk(id);
-      if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
-      if (lead) {
-        await lead.update({
-          name: name !== undefined ? name : lead.name,
-          phone: phone !== undefined ? phone : lead.phone,
-          company: company !== undefined ? company : lead.company,
-          interest: interest !== undefined ? interest : lead.interest,
-          budget: budget !== undefined ? budget : lead.budget,
-          notes: notes !== undefined ? notes : lead.notes,
-          source: source !== undefined ? source : lead.source,
-          stage: stage !== undefined ? stage : lead.stage,
-          priority: priority !== undefined ? priority : lead.priority
-        });
+    if (isDbConnected()) {
+      try {
+        lead = await Lead.findByPk(id);
+        if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
+        if (lead) {
+          await lead.update({
+            name: name !== undefined ? name : lead.name,
+            phone: phone !== undefined ? phone : lead.phone,
+            company: company !== undefined ? company : lead.company,
+            interest: interest !== undefined ? interest : lead.interest,
+            budget: budget !== undefined ? budget : lead.budget,
+            notes: notes !== undefined ? notes : lead.notes,
+            source: source !== undefined ? source : lead.source,
+            stage: stage !== undefined ? stage : lead.stage,
+            priority: priority !== undefined ? priority : lead.priority
+          });
+        }
+      } catch (dbErr) {
+        console.warn('DB update failed, falling back to mockLeads:', dbErr.message);
       }
-    } catch (dbErr) {
-      console.warn('DB update failed, falling back to mockLeads:', dbErr.message);
     }
 
     if (!lead) {
@@ -198,14 +219,16 @@ const deleteLead = async (req, res) => {
     let lead = null;
     let isMock = false;
 
-    try {
-      lead = await Lead.findByPk(id);
-      if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
-      if (lead) {
-        await lead.destroy();
+    if (isDbConnected()) {
+      try {
+        lead = await Lead.findByPk(id);
+        if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
+        if (lead) {
+          await lead.destroy();
+        }
+      } catch (dbErr) {
+        console.warn('DB delete failed, falling back to mockLeads:', dbErr.message);
       }
-    } catch (dbErr) {
-      console.warn('DB delete failed, falling back to mockLeads:', dbErr.message);
     }
 
     if (!lead) {
@@ -242,11 +265,13 @@ const transitionLead = async (req, res) => {
     let lead = null;
     let isMock = false;
 
-    try {
-      lead = await Lead.findByPk(id);
-      if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
-    } catch (dbErr) {
-      console.warn('DB lookup failed in transitionLead, falling back to mockLeads:', dbErr.message);
+    if (isDbConnected()) {
+      try {
+        lead = await Lead.findByPk(id);
+        if (!lead) lead = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
+      } catch (dbErr) {
+        console.warn('DB lookup failed in transitionLead, falling back to mockLeads:', dbErr.message);
+      }
     }
     
     if (!lead) {

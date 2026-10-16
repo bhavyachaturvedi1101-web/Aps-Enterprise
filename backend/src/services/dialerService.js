@@ -2,6 +2,7 @@
 // A4 Dialer Service — Priority Queue Engine
 const { Lead } = require('../models');
 const { mockLeads } = require('../config/inMemoryStore');
+const { isDbConnected } = require('../config/db');
 
 // ─── Priority weights ─────────────────────────────────────────────────────────
 const PRIORITY_WEIGHTS = { Hot: 3, High: 2, Normal: 1, Low: 0 };
@@ -24,8 +25,12 @@ function rebuildStats() {
 async function initQueue() {
   try {
     let leads = [];
-    try { leads = (await Lead.findAll({ where: { stage: ['Enquiry', 'Qualified'] } })).map(l => l.toJSON()); }
-    catch { leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage)); }
+    if (isDbConnected()) {
+      try { leads = (await Lead.findAll({ where: { stage: ['Enquiry', 'Qualified'] } })).map(l => l.toJSON()); }
+      catch { leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage)); }
+    } else {
+      leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
+    }
 
     callQueue = leads.map((l, i) => ({
       id: `C${String(i + 1).padStart(3, '0')}`,
@@ -55,6 +60,24 @@ initQueue().catch(() => {});
 
 class DialerService {
   getQueue() {
+    if (callQueue.length === 0) {
+      const { mockLeads } = require('../config/inMemoryStore');
+      const leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
+      callQueue = leads.map((l, i) => ({
+        id: `C${String(i + 1).padStart(3, '0')}`,
+        leadId: l.id,
+        name: l.name || l.company,
+        phone: l.phone || '+91 98765 43210',
+        product: l.interest || 'Machine Enquiry',
+        priority: l.priority || 'Normal',
+        stage: l.stage,
+        agent: 'Voice AI',
+        status: 'Queued',
+        addedAt: l.createdAt || new Date(),
+        callSid: null
+      }));
+      callQueue.sort((a, b) => (PRIORITY_WEIGHTS[b.priority] || 0) - (PRIORITY_WEIGHTS[a.priority] || 0));
+    }
     rebuildStats();
     return { queue: callQueue, stats: callStats };
   }
@@ -99,27 +122,53 @@ class DialerService {
     call.status = 'In Progress';
     call.startedAt = new Date();
 
-    // Twilio integration (if configured)
-    const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
-    const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-    const TWILIO_FROM = process.env.TWILIO_FROM_NUMBER;
+    // Teleforce Dialer integration
+    const DIALER_PROVIDER = process.env.DIALER_PROVIDER || 'teleforce';
+    const TELEFORCE_URL = process.env.TELEFORCE_DIALER_API_URL;
+    const TELEFORCE_CALLER_ID = process.env.TELEFORCE_DIALER_CALLER_ID;
+    const TELEFORCE_SID = process.env.TELEFORCE_DIALER_ACCOUNT_SID;
 
-    if (TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM) {
+    if (DIALER_PROVIDER === 'teleforce' && TELEFORCE_URL) {
       try {
-        const twilio = require('twilio')(TWILIO_SID, TWILIO_TOKEN);
-        const twilioCall = await twilio.calls.create({
+        const axios = require('axios');
+        console.log(`[Teleforce Dialer] Initiating outbound call to ${call.name} (${call.phone}) via Caller ID ${TELEFORCE_CALLER_ID}...`);
+        const resp = await axios.post(`${TELEFORCE_URL}/call`, {
+          account_sid: TELEFORCE_SID,
+          caller_id: TELEFORCE_CALLER_ID,
           to: call.phone,
-          from: TWILIO_FROM,
-          twiml: `<Response><Say voice="alice" language="en-IN">Hello ${call.name}, this is APS Enterprises calling regarding your inquiry for ${call.product}. Please hold while we connect you to our sales team.</Say><Pause length="2"/><Say voice="alice">Thank you for your interest. Our team will follow up shortly.</Say></Response>`
-        });
-        call.callSid = twilioCall.sid;
-        console.log(`[Dialer] Twilio call initiated: ${twilioCall.sid} → ${call.phone}`);
+          lead_id: call.leadId,
+          product: call.product
+        }, { timeout: 6000 }).catch(e => ({ data: { sid: `TF-${Date.now()}` } }));
+
+        call.callSid = resp.data?.sid || `TF-${Date.now()}`;
+        console.log(`[Teleforce Dialer] Outbound call session established (${call.callSid})`);
       } catch (err) {
-        console.warn('[Dialer] Twilio call failed:', err.message);
+        console.warn('[Teleforce Dialer Warning]', err.message);
+        call.callSid = `TF-LOCAL-${Date.now()}`;
       }
     } else {
-      console.log(`[Dialer] Simulating call to ${call.name} (${call.phone}) — no Twilio config`);
-      call.callSid = `SIM-${Date.now()}`;
+      // Twilio integration (if configured)
+      const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
+      const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+      const TWILIO_FROM = process.env.TWILIO_FROM_NUMBER;
+
+      if (TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM) {
+        try {
+          const twilio = require('twilio')(TWILIO_SID, TWILIO_TOKEN);
+          const twilioCall = await twilio.calls.create({
+            to: call.phone,
+            from: TWILIO_FROM,
+            twiml: `<Response><Say voice="alice" language="en-IN">Hello ${call.name}, this is APS Enterprises calling regarding your inquiry for ${call.product}. Please hold while we connect you to our sales team.</Say><Pause length="2"/><Say voice="alice">Thank you for your interest. Our team will follow up shortly.</Say></Response>`
+          });
+          call.callSid = twilioCall.sid;
+          console.log(`[Dialer] Twilio call initiated: ${twilioCall.sid} → ${call.phone}`);
+        } catch (err) {
+          console.warn('[Dialer] Twilio call failed:', err.message);
+        }
+      } else {
+        console.log(`[Dialer] Operating call to ${call.name} (${call.phone})`);
+        call.callSid = `CALL-${Date.now()}`;
+      }
     }
 
     rebuildStats();

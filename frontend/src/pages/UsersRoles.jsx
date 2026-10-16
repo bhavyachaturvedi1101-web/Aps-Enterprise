@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const INITIAL_USERS = [
-  { id: 'u1', name: 'Animesh J', email: 'animesh@aps.in', role: 'Super Admin', module: 'Voice AI', lastLogin: '5m ago', status: 'Online' },
-  { id: 'u2', name: 'Admin', email: 'admin@aps.enterprise', role: 'Admin', module: 'Dashboard & Core', lastLogin: 'Now', status: 'Online' },
-  { id: 'u3', name: 'Bhavya', email: 'bhavya@aps.in', role: 'Operations', module: 'Operations & CRM', lastLogin: '1h ago', status: 'Away' },
-  { id: 'u4', name: 'Aaditya', email: 'aaditya@aps.in', role: 'Agent', module: 'WhatsApp & Analytics', lastLogin: '2h ago', status: 'Offline' }
+  { id: 'u1', name: 'Super Admin', email: 'admin@apsenterprises.in', role: 'Super Admin', module: 'All Modules', lastLogin: 'Active', status: 'Online' },
+  { id: 'u2', name: 'Operations Manager', email: 'manager@apsenterprises.in', role: 'Admin', module: 'Operations & Production ERP', lastLogin: 'Active', status: 'Online' },
+  { id: 'u3', name: 'Accounts Officer', email: 'accounts@apsenterprises.in', role: 'Accountant', module: 'Tally Sync & Invoicing', lastLogin: 'Active', status: 'Online' },
+  { id: 'u4', name: 'Sales Telecaller', email: 'telecaller@apsenterprises.in', role: 'Telecaller', module: 'Voice AI & CRM Dialer', lastLogin: 'Active', status: 'Online' },
+  { id: 'u5', name: 'Amit Patidar', email: 'amit.patidar@apsenterprises.in', role: 'Agent', module: 'Operations & CRM', lastLogin: 'Active', status: 'Online' },
+  { id: 'u6', name: 'Vikram Rathore', email: 'vikram.rathore@apsenterprises.in', role: 'Operations', module: 'Operations & Production ERP', lastLogin: 'Active', status: 'Online' }
 ];
 
 const ROLE_STYLES = {
@@ -154,12 +156,10 @@ export default function UsersRoles() {
   const getInitialUsers = () => {
     try {
       const raw = localStorage.getItem('aps_system_users');
-      if (raw) {
+      if (raw !== null) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const setOfIds = new Set(parsed.map(u => u.id));
-          const missing = INITIAL_USERS.filter(u => !setOfIds.has(u.id));
-          return [...parsed, ...missing];
+        if (Array.isArray(parsed)) {
+          return parsed;
         }
       }
     } catch {}
@@ -170,6 +170,7 @@ export default function UsersRoles() {
   const [editingUser, setEditingUser] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Operations', module: 'Dashboard & Core', status: 'Online' });
+  const [feedbackMsg, setFeedbackMsg] = useState('');
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,24 +185,11 @@ export default function UsersRoles() {
     fetch(`${API_URL}/users`)
       .then(r => r.json())
       .then(data => {
-        if (data.success && Array.isArray(data.users) && data.users.length > 0) {
-          setUsers(prev => {
-            const raw = localStorage.getItem('aps_system_users');
-            const localList = raw ? JSON.parse(raw) : prev;
-            const serverList = data.users;
-
-            // Merge server and local lists preserving unique users
-            const merged = [...localList];
-            serverList.forEach(su => {
-              if (!merged.some(m => m.email?.toLowerCase() === su.email?.toLowerCase() || m.id === su.id)) {
-                merged.push(su);
-              }
-            });
-            try {
-              localStorage.setItem('aps_system_users', JSON.stringify(merged));
-            } catch {}
-            return merged;
-          });
+        if (data.success && Array.isArray(data.users)) {
+          setUsers(data.users);
+          try {
+            localStorage.setItem('aps_system_users', JSON.stringify(data.users));
+          } catch {}
         }
       })
       .catch(() => {});
@@ -215,7 +203,7 @@ export default function UsersRoles() {
         setUsers(e.detail);
       } else {
         const raw = localStorage.getItem('aps_system_users');
-        if (raw) {
+        if (raw !== null) {
           try { setUsers(JSON.parse(raw)); } catch {}
         }
       }
@@ -224,7 +212,7 @@ export default function UsersRoles() {
     window.addEventListener('focus', fetchUsers);
     window.addEventListener('aps_users_updated', handleCustomUpdate);
     window.addEventListener('storage', handleCustomUpdate);
-    const interval = setInterval(fetchUsers, 3000);
+    const interval = setInterval(fetchUsers, 4000);
 
     return () => {
       window.removeEventListener('focus', fetchUsers);
@@ -233,6 +221,11 @@ export default function UsersRoles() {
       clearInterval(interval);
     };
   }, []);
+
+  const showToast = (msg) => {
+    setFeedbackMsg(msg);
+    setTimeout(() => setFeedbackMsg(''), 3500);
+  };
 
   // Open Edit Modal
   const handleEditClick = (user) => {
@@ -249,11 +242,17 @@ export default function UsersRoles() {
       return updated;
     });
     try {
-      await fetch(`${API_URL}/users/${editingUser.id}`, {
+      const res = await fetch(`${API_URL}/users/${editingUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingUser)
       });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) {
+        setUsers(data.users);
+        try { localStorage.setItem('aps_system_users', JSON.stringify(data.users)); } catch {}
+      }
+      showToast(`User "${editingUser.name}" updated successfully.`);
     } catch {}
     setEditingUser(null);
   };
@@ -265,7 +264,7 @@ export default function UsersRoles() {
     const created = {
       id: `u_${Date.now()}`,
       name: newUser.name.trim(),
-      email: newUser.email.trim(),
+      email: newUser.email.trim().toLowerCase(),
       role: newUser.role,
       module: newUser.module,
       lastLogin: 'Just now',
@@ -277,11 +276,17 @@ export default function UsersRoles() {
       return updated;
     });
     try {
-      await fetch(`${API_URL}/users`, {
+      const res = await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newUser)
       });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) {
+        setUsers(data.users);
+        try { localStorage.setItem('aps_system_users', JSON.stringify(data.users)); } catch {}
+      }
+      showToast(`User "${created.name}" invited successfully.`);
     } catch {}
     setShowInviteModal(false);
     setNewUser({ name: '', email: '', role: 'Operations', module: 'Dashboard & Core', status: 'Online' });
@@ -289,16 +294,43 @@ export default function UsersRoles() {
 
   // Delete user
   const handleDeleteUser = async (id) => {
-    if (window.confirm('Are you sure you want to remove this user?')) {
-      setUsers(prev => {
-        const updated = prev.filter(u => u.id !== id);
-        try { localStorage.setItem('aps_system_users', JSON.stringify(updated)); } catch {}
-        return updated;
-      });
-      try {
-        await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
-      } catch {}
+    const target = users.find(u => u.id === id);
+    if (!target) return;
+
+    const isPrimaryAdmin = target.role === 'Super Admin' && users.filter(u => u.role === 'Super Admin').length <= 1;
+    if (isPrimaryAdmin) {
+      if (!window.confirm(`Warning: "${target.name}" is the primary Super Admin account. Are you sure you want to remove this account?`)) {
+        return;
+      }
+    } else {
+      if (!window.confirm(`Are you sure you want to remove user "${target.name}" (${target.email})?`)) {
+        return;
+      }
+    }
+
+    // Immediately remove from UI and LocalStorage
+    const updated = users.filter(u => u.id !== id && u.email?.toLowerCase() !== target.email?.toLowerCase());
+    setUsers(updated);
+    try {
+      localStorage.setItem('aps_system_users', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('aps_users_updated', { detail: updated }));
+    } catch {}
+
+    if (editingUser && (editingUser.id === id || editingUser.email === target.email)) {
       setEditingUser(null);
+    }
+
+    showToast(`User "${target.name}" removed successfully.`);
+
+    try {
+      const res = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) {
+        setUsers(data.users);
+        try { localStorage.setItem('aps_system_users', JSON.stringify(data.users)); } catch {}
+      }
+    } catch (err) {
+      console.error('Failed to delete user on server:', err);
     }
   };
 
@@ -328,7 +360,7 @@ export default function UsersRoles() {
   const hasActiveFilters = searchQuery || roleFilter !== 'All Roles' || statusFilter !== 'All Statuses' || sortBy !== 'Name (A-Z)';
 
   return (
-    <div style={{ ...s.page, padding: undefined }} className="page-container">
+    <div style={s.page} className="page-container">
       {/* Page Header */}
       <div style={s.pageHead} className="mobile-stack-header">
         <div>
@@ -346,6 +378,15 @@ export default function UsersRoles() {
         </div>
         <button onClick={() => setShowInviteModal(true)} className="btn-blue-primary" style={s.addBtn}>+ Invite User</button>
       </div>
+
+      {feedbackMsg && (
+        <div style={s.toast}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          {feedbackMsg}
+        </div>
+      )}
 
       {/* ── Search, Filter & Sort Toolbar ───────────────────────────────── */}
       <div style={s.toolbar} className="mobile-filter-toolbar">
@@ -451,8 +492,22 @@ export default function UsersRoles() {
                   {u.status}
                 </span>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button onClick={() => handleEditClick(u)} className="edit-btn-hover" style={s.editBtn}>Edit</button>
+                <button 
+                  onClick={() => handleDeleteUser(u.id)} 
+                  className="delete-user-row-btn"
+                  title={`Remove ${u.name}`}
+                  style={s.rowDeleteBtn}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  Remove
+                </button>
               </div>
             </div>
           );
@@ -512,7 +567,15 @@ export default function UsersRoles() {
               />
 
               <div style={s.modalActions}>
-                <button type="button" onClick={() => handleDeleteUser(editingUser.id)} style={s.deleteBtn}>Remove User</button>
+                <button type="button" onClick={() => handleDeleteUser(editingUser.id)} style={s.deleteBtn}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  Remove User
+                </button>
                 <button type="button" onClick={() => setEditingUser(null)} style={s.cancelBtn}>Cancel</button>
                 <button type="submit" style={s.submitBtn}>Save Changes</button>
               </div>
@@ -580,11 +643,27 @@ export default function UsersRoles() {
 }
 
 const s = {
-  page: { padding: '2rem', fontFamily: 'var(--font-body)' },
-  pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' },
+  page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto', boxSizing: 'border-box' },
+  pageHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
   title: { fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#09090b', margin: 0 },
   sub: { fontSize: '0.78rem', color: '#71717a', marginTop: 4 },
   addBtn: { padding: '0.6rem 1.25rem', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.25)', transition: 'all 0.15s ease' },
+
+  // Toast
+  toast: {
+    padding: '8px 16px',
+    backgroundColor: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: 8,
+    color: '#047857',
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    marginBottom: '1rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+  },
 
   // Toolbar
   toolbar: { display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', flexWrap: 'wrap' },
@@ -604,7 +683,21 @@ const s = {
   userAvatar: { width: 30, height: 30, borderRadius: 8, backgroundColor: '#09090b', color: '#fff', fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   userName: { fontWeight: 700, fontSize: '0.85rem', color: '#09090b' },
   rolePill: { backgroundColor: '#f4f4f5', color: '#09090b', fontSize: '0.72rem', fontWeight: 700, padding: '3px 9px', borderRadius: 6, display: 'inline-flex', alignItems: 'center', gap: 5, border: '1px solid #e4e4e7', letterSpacing: '0.2px' },
-  editBtn: { padding: '4px 12px', backgroundColor: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 6, fontSize: '0.72rem', fontWeight: 700, color: '#09090b', cursor: 'pointer', transition: 'all 0.15s' },
+  editBtn: { padding: '5px 12px', backgroundColor: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 6, fontSize: '0.74rem', fontWeight: 700, color: '#09090b', cursor: 'pointer', transition: 'all 0.15s' },
+  rowDeleteBtn: {
+    padding: '5px 10px',
+    backgroundColor: '#fff1f2',
+    border: '1px solid #fecdd3',
+    borderRadius: 6,
+    fontSize: '0.74rem',
+    fontWeight: 700,
+    color: '#e11d48',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 5,
+    transition: 'all 0.15s ease'
+  },
 
   // Modal
   modalOverlay: {
@@ -625,7 +718,20 @@ const s = {
     fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-body)', color: '#09090b'
   },
   modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: '1.25rem' },
-  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
-  deleteBtn: { padding: '0.6rem 1.2rem', borderRadius: 20, border: '1px solid #e4e4e7', background: '#f4f4f5', color: '#71717a', cursor: 'pointer', fontWeight: 700, marginRight: 'auto' },
+  cancelBtn: { padding: '0.6rem 1.2rem', borderRadius: 8, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', fontWeight: 700, color: '#52525b' },
+  deleteBtn: {
+    padding: '0.6rem 1.2rem',
+    borderRadius: 8,
+    border: '1px solid #fecdd3',
+    background: '#fff1f2',
+    color: '#e11d48',
+    cursor: 'pointer',
+    fontWeight: 700,
+    marginRight: 'auto',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    transition: 'all 0.15s ease'
+  },
   submitBtn: { padding: '0.6rem 1.4rem', borderRadius: 8, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px rgba(37,99,235,0.25)', transition: 'all 0.15s ease' }
 };

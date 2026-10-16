@@ -29,9 +29,16 @@ function ProtectedRoute({ element, allowedRoles = [] }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(currentUser.role)) {
-    // Redirect to the user's default role route
-    return <Navigate to={currentUser.defaultRoute || '/crm'} replace />;
+  if (allowedRoles.length > 0) {
+    const rawRole = (currentUser.role || '').toLowerCase().trim();
+    const normalizedRoles = allowedRoles.map(r => r.toLowerCase().trim());
+    const isSuperOrAdmin = rawRole === 'admin' || rawRole === 'super admin' || rawRole === 'superadmin';
+    const isAllowed = isSuperOrAdmin || normalizedRoles.includes(rawRole);
+
+    if (!isAllowed) {
+      // Redirect to the user's default role route
+      return <Navigate to={currentUser.defaultRoute || '/crm'} replace />;
+    }
   }
 
   return element;
@@ -74,7 +81,7 @@ function AppRoutes() {
         {/* Operations */}
         <Route
           path="/crm"
-          element={<ProtectedRoute element={<CRMLeads />} allowedRoles={['admin', 'manager', 'employee']} />}
+          element={<ProtectedRoute element={<CRMLeads />} allowedRoles={['admin', 'manager', 'employee', 'accountant']} />}
         />
         <Route
           path="/bookings"
@@ -82,13 +89,13 @@ function AppRoutes() {
         />
         <Route
           path="/payments"
-          element={<ProtectedRoute element={<PaymentGate />} allowedRoles={['admin', 'manager']} />}
+          element={<ProtectedRoute element={<PaymentGate />} allowedRoles={['admin', 'manager', 'accountant']} />}
         />
 
         {/* AI Agents */}
         <Route
           path="/ai"
-          element={<ProtectedRoute element={<APSAIPage />} allowedRoles={['admin', 'manager']} />}
+          element={<ProtectedRoute element={<APSAIPage />} allowedRoles={['admin', 'manager', 'employee']} />}
         />
         <Route path="/chatbot" element={<Navigate to="/ai" replace />} />
         <Route
@@ -107,11 +114,11 @@ function AppRoutes() {
         {/* Finance */}
         <Route
           path="/tally"
-          element={<ProtectedRoute element={<TallySync />} allowedRoles={['admin']} />}
+          element={<ProtectedRoute element={<TallySync />} allowedRoles={['admin', 'manager', 'accountant', 'operations', 'employee']} />}
         />
         <Route
           path="/invoices"
-          element={<ProtectedRoute element={<Invoices />} allowedRoles={['admin', 'manager']} />}
+          element={<ProtectedRoute element={<Invoices />} allowedRoles={['admin', 'manager', 'accountant']} />}
         />
 
         {/* Productivity */}
@@ -121,7 +128,7 @@ function AppRoutes() {
         />
         <Route
           path="/activity"
-          element={<ProtectedRoute element={<ActivityLog />} allowedRoles={['admin', 'manager', 'employee']} />}
+          element={<ProtectedRoute element={<ActivityLog />} allowedRoles={['admin', 'manager', 'employee', 'accountant']} />}
         />
         <Route
           path="/settings"
