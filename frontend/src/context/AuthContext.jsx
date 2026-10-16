@@ -1,68 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const DEMO_ACCOUNTS = {
-  admin: {
-    id: 'USR-001',
-    name: 'System Administrator',
-    email: 'admin@apsenterprise.com',
-    role: 'admin',
-    title: 'Chief System & Operations Admin',
-    avatar: 'A',
-    avatarBg: '#09090b',
-    permissions: [
-      'Full Platform Management',
-      'AI Strategy & System Control',
-      'Users & Roles Management',
-      'Lead Pipeline & Pipeline Machine Control',
-      'Bookings & Factory Release',
-      '10% Advance Payment Gate (Approve/Verify)',
-      'WhatsApp Automation & Sandbox',
-      'Voice Call Agent & Inbound Dialer',
-      'Tally ERP Sync & Invoicing',
-      'Team KPIs & Employee Activity Management',
-      'System Settings'
-    ],
-    defaultRoute: '/dashboard'
-  },
-  manager: {
-    id: 'USR-002',
-    name: 'Rahul Deshmukh',
-    email: 'manager@apsenterprise.com',
-    role: 'manager',
-    title: 'Operations & Sales Manager',
-    avatar: 'RD',
-    avatarBg: '#2563eb',
-    permissions: [
-      'Dashboard & Analytics',
-      'CRM / Lead Pipeline Management',
-      'Bookings & Factory Order Release',
-      '10% Advance Payment Verification',
-      'WhatsApp Broadcast & Simulator',
-      'Dialer Queue Dispatch',
-      'Invoices & Customer Billing',
-      'Team KPIs & Employee Monitoring',
-      'Activity Log Review'
-    ],
-    defaultRoute: '/dashboard'
-  },
-  employee: {
-    id: 'USR-003',
-    name: 'Bhavya Chaturvedi',
-    email: 'employee@apsenterprise.com',
-    role: 'employee',
-    title: 'Senior Sales & Equipment Specialist',
-    avatar: 'BC',
-    avatarBg: '#10b981',
-    permissions: [
-      'CRM / Assigned Leads',
-      'Dialer Queue (Outbound Calls)',
-      'Voice Agent Calls & Call Outcomes',
-      'My Tasks & KPI Performance Score',
-      'Live Activity Log Entry'
-    ],
-    defaultRoute: '/crm'
-  }
-};
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 const AuthContext = createContext(null);
 
@@ -74,45 +13,49 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error('Failed to parse saved auth user:', e);
     }
-    return null; // Force login screen on first visit
+    return null;
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('aps_auth_user'));
+  const [token, setToken] = useState(() => localStorage.getItem('aps_token') || null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('aps_token'));
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && token) {
       localStorage.setItem('aps_auth_user', JSON.stringify(currentUser));
+      localStorage.setItem('aps_token', token);
       setIsAuthenticated(true);
     } else {
       localStorage.removeItem('aps_auth_user');
+      localStorage.removeItem('aps_token');
       setIsAuthenticated(false);
     }
-  }, [currentUser]);
+  }, [currentUser, token]);
 
-  const loginWithRole = (roleKey) => {
-    const account = DEMO_ACCOUNTS[roleKey] || DEMO_ACCOUNTS.admin;
-    setCurrentUser(account);
+  // Production login against backend API
+  const login = async (email, password) => {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || data.error || 'Authentication failed');
+    }
+
+    setToken(data.token);
+    setCurrentUser(data.user);
     setIsAuthenticated(true);
-    return account;
-  };
-
-  const login = (email, password) => {
-    const trimmedEmail = (email || '').trim().toLowerCase();
-
-    if (trimmedEmail.includes('manager')) {
-      return loginWithRole('manager');
-    }
-    if (trimmedEmail.includes('employee') || trimmedEmail.includes('sales') || trimmedEmail.includes('bhavya')) {
-      return loginWithRole('employee');
-    }
-    // Default to admin
-    return loginWithRole('admin');
+    return data.user;
   };
 
   const logout = () => {
     setCurrentUser(null);
+    setToken(null);
     setIsAuthenticated(false);
     localStorage.removeItem('aps_auth_user');
+    localStorage.removeItem('aps_token');
   };
 
   const hasPermission = (permissionName) => {
@@ -126,18 +69,26 @@ export function AuthProvider({ children }) {
     if (currentUser.role === 'admin') return true;
 
     // Manager allowed paths
-    if (currentUser.role === 'manager') {
+    if (currentUser.role === 'manager' || currentUser.role === 'operations') {
       const managerAllowed = [
         '/dashboard', '/leads', '/crm', '/bookings', '/payments',
-        '/ai', '/whatsapp', '/dialer', '/invoices', '/employees', '/activity'
+        '/ai', '/whatsapp', '/voice', '/dialer', '/tally', '/invoices', '/employees', '/activity'
       ];
       return managerAllowed.some(p => routePath.startsWith(p));
+    }
+
+    // Accountant allowed paths
+    if (currentUser.role === 'accountant') {
+      const accountantAllowed = [
+        '/tally', '/invoices', '/payments', '/crm', '/leads', '/activity'
+      ];
+      return accountantAllowed.some(p => routePath.startsWith(p));
     }
 
     // Employee allowed paths
     if (currentUser.role === 'employee') {
       const employeeAllowed = [
-        '/crm', '/leads', '/dialer', '/voice', '/employees', '/activity'
+        '/crm', '/leads', '/dialer', '/voice', '/ai', '/employees', '/activity'
       ];
       return employeeAllowed.some(p => routePath.startsWith(p));
     }
@@ -149,13 +100,12 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         currentUser,
+        token,
         isAuthenticated,
         login,
-        loginWithRole,
         logout,
         hasPermission,
-        canAccessRoute,
-        demoAccounts: DEMO_ACCOUNTS
+        canAccessRoute
       }}
     >
       {children}

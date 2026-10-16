@@ -553,10 +553,90 @@ function ReportCard({ report }) {
 function cleanPdfText(str) {
   if (!str) return '';
   return String(str)
+    .replace(/₹/g, 'INR ')
+    .replace(/Rs\.?/gi, 'INR ')
+    .replace(/[•●▪■]/g, '- ')
     .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu, '')
     .replace(/[^\x00-\x7F]/g, '')
     .replace(/[\#\*\_`]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
+}
+
+function extractMarkdownTable(text) {
+  if (!text) return null;
+  const lines = text.split('\n');
+  const tableLines = lines.filter(l => /^\s*\|.*\|\s*$/.test(l));
+  if (tableLines.length >= 2) {
+    const parseRow = line => line.split('|').slice(1, -1).map(c => c.trim());
+    const headers = parseRow(tableLines[0]);
+    const rows = tableLines.slice(1)
+      .filter(l => !/^\s*\|[\s\-:]+\|\s*$/.test(l))
+      .map(parseRow);
+    if (headers.length > 0 && rows.length > 0) {
+      return { headers, rows };
+    }
+  }
+  return null;
+}
+
+function sanitizeReportContent(raw) {
+  if (!raw) return '';
+  let clean = raw.replace(/```[\s\S]*?```/g, '');
+  const lines = clean.split('\n').filter(line => {
+    const t = line.trim();
+    if (!t) return false;
+    if (/^(import\s+|from\s+[\w.]+\s+import|def\s+\w+|class\s+\w+|pip\s+install|python\b|console\.log|const\s+\w+\s*=|let\s+\w+\s*=|var\s+\w+\s*=)/i.test(t)) return false;
+    if (/^(\#\!|\/\/|\/\*|\*\/)/.test(t)) return false;
+    if (t.toLowerCase().includes('reportlab') || t.toLowerCase().includes('simpledoctemplate')) return false;
+    return true;
+  });
+  return lines.join('\n');
+}
+
+function parseReportSections(content) {
+  if (!content) return { highlights: [], directives: [], generalLines: [] };
+  const lines = content.split('\n');
+  const highlights = [];
+  const directives = [];
+  const generalLines = [];
+
+  let currentSection = 'general';
+
+  for (const rawLine of lines) {
+    const l = rawLine.trim();
+    if (!l) continue;
+    if (/executive.*highlight/i.test(l)) {
+      currentSection = 'highlights';
+      continue;
+    } else if (/strategic.*directive|action.*directive|recommendation/i.test(l)) {
+      currentSection = 'directives';
+      continue;
+    } else if (/team.*breakdown|breakdown|table/i.test(l)) {
+      currentSection = 'table';
+      continue;
+    }
+
+    if (currentSection === 'highlights') {
+      if (l.startsWith('•') || l.startsWith('-') || l.startsWith('*')) {
+        highlights.push(cleanPdfText(l.replace(/^[•\-\*]\s*/, '')));
+      } else if (!l.startsWith('#')) {
+        highlights.push(cleanPdfText(l));
+      }
+    } else if (currentSection === 'directives') {
+      if (/^\d+\./.test(l) || l.startsWith('•') || l.startsWith('-')) {
+        directives.push(cleanPdfText(l));
+      } else if (!l.startsWith('#')) {
+        directives.push(cleanPdfText(l));
+      }
+    } else if (currentSection !== 'table') {
+      if (!l.startsWith('#') && !l.startsWith('|')) {
+        generalLines.push(cleanPdfText(l));
+      }
+    }
+  }
+
+  return { highlights, directives, generalLines };
 }
 
 function generateRealPDF(exportFile, tableData) {
@@ -573,7 +653,7 @@ function generateRealPDF(exportFile, tableData) {
     const pageHeight = 595.28;
     const margin = 32;
 
-    // ── 1. Header Banner ────────────────────────────────────────────────
+    // ── 1. Top Enterprise Navy Header Banner ────────────────────────────
     doc.setFillColor(15, 23, 42); // #0f172a Deep Slate Navy
     doc.rect(0, 0, pageWidth, 58, 'F');
     doc.setFillColor(37, 99, 235); // #2563eb Blue Line
@@ -661,16 +741,54 @@ function generateRealPDF(exportFile, tableData) {
       if (tableData && Array.isArray(tableData) && tableData.length > 0) {
         headers = Object.keys(tableData[0]);
         rows = tableData.map(r => headers.map(k => String(r[k] ?? '')));
-      } else if (content && content.includes('\n')) {
-        const csvLines = content.split('\n').filter(l => l.trim() && !l.startsWith('===') && !l.startsWith('---'));
-        if (csvLines.length > 1) {
-          headers = csvLines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-          rows = csvLines.slice(1).map(l => l.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+      } else if (content) {
+        const mdTable = extractMarkdownTable(content);
+        if (mdTable) {
+          headers = mdTable.headers;
+          rows = mdTable.rows;
+        } else if (content.includes('\n')) {
+          const csvLines = content.split('\n').filter(l => l.trim() && !l.startsWith('===') && !l.startsWith('---'));
+          if (csvLines.length > 1 && csvLines[0].includes(',')) {
+            headers = csvLines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+            rows = csvLines.slice(1).map(l => l.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+          }
         }
       }
     }
 
+    const { highlights, directives } = parseReportSections(content || '');
+
     if (headers && rows && rows.length > 0) {
+      // Draw Executive Highlights callout box above the table if present
+      if (highlights.length > 0) {
+        const boxY = startY;
+        const boxW = pageWidth - (margin * 2);
+        const boxH = Math.min(50, 20 + Math.ceil(highlights.length / 2) * 12);
+        doc.setFillColor(241, 245, 249);
+        doc.setDrawColor(203, 213, 225);
+        doc.roundedRect(margin, boxY, boxW, boxH, 4, 4, 'FD');
+        doc.setFillColor(37, 99, 235);
+        doc.rect(margin, boxY, 3.5, boxH, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+        doc.text('EXECUTIVE AUDIT SUMMARY & OPERATIONAL HIGHLIGHTS', margin + 12, boxY + 12);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+
+        const colW = (boxW - 24) / 2;
+        highlights.slice(0, 4).forEach((hl, i) => {
+          const hlx = margin + 12 + (i % 2) * colW;
+          const hly = boxY + 24 + Math.floor(i / 2) * 11;
+          doc.text(`* ${hl}`, hlx, hly, { maxWidth: colW - 8 });
+        });
+
+        startY = boxY + boxH + 12;
+      }
+
       const cleanHeaders = headers.map(h => cleanPdfText(h));
       const cleanRows = rows.map(r => r.map(c => cleanPdfText(c)));
 
@@ -699,29 +817,44 @@ function generateRealPDF(exportFile, tableData) {
             fillColor: [248, 250, 252]
           },
           columnStyles: {
-            0: { fontStyle: 'bold' }
-          },
-          didDrawPage: () => {
-            const pageNum = doc.internal.getNumberOfPages();
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7.5);
-            doc.setTextColor(148, 163, 184);
-            doc.setDrawColor(226, 232, 240);
-            doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-            doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT', margin, pageHeight - 9);
-            doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+            0: { fontStyle: 'bold', textColor: [15, 23, 42] },
+            4: { halign: 'right', fontStyle: 'bold', textColor: [37, 99, 235] },
+            5: { halign: 'right', fontStyle: 'bold', textColor: [16, 185, 129] }
           }
         });
+
+        // Strategic Directives section below the table
+        if (directives.length > 0) {
+          let afterTableY = (doc.lastAutoTable?.finalY || startY) + 14;
+          if (afterTableY > pageHeight - 65) {
+            doc.addPage();
+            afterTableY = 40;
+          }
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.5);
+          doc.setTextColor(15, 23, 42);
+          doc.text('STRATEGIC DIRECTIVES & OPERATIONAL ACTION PROTOCOL', margin, afterTableY);
+          afterTableY += 12;
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(71, 85, 105);
+          directives.forEach(d => {
+            if (afterTableY > pageHeight - 35) {
+              doc.addPage();
+              afterTableY = 40;
+            }
+            doc.text(d, margin + 8, afterTableY, { maxWidth: pageWidth - (margin * 2) - 16 });
+            afterTableY += 11;
+          });
+        }
       }
     } else {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(51, 65, 85);
-      const rawText = content || 'APS AI Executive Response';
-      const maxTextWidth = pageWidth - (margin * 2);
-
-      const lines = rawText.split('\n');
+      // Clean fallback: sanitize content to strictly avoid printing scripts or code
+      const sanitized = sanitizeReportContent(content || 'APS AI Executive Operational Report');
+      const lines = sanitized.split('\n');
       let textY = startY;
+      const maxTextWidth = pageWidth - (margin * 2);
 
       for (const rawLine of lines) {
         const cleanLine = cleanPdfText(rawLine);
@@ -751,15 +884,21 @@ function generateRealPDF(exportFile, tableData) {
           textY += isHeading ? 16 : 13;
         }
       }
+    }
 
-      const pageNum = doc.internal.getNumberOfPages();
+    // ── 5. Enterprise Footers on Every Page ──────────────────────────────
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(1);
+      doc.line(margin, pageHeight - 22, pageWidth - margin, pageHeight - 22);
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
       doc.setTextColor(148, 163, 184);
-      doc.setDrawColor(226, 232, 240);
-      doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-      doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT', margin, pageHeight - 9);
-      doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+      doc.text('APS ENTERPRISES • CONFIDENTIAL INTERNAL AUDIT REPORT • INDORE, MP', margin, pageHeight - 10);
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
     }
 
     doc.save(fileName || 'APS_Enterprise_Report.pdf');
@@ -772,7 +911,6 @@ function generateRealPDF(exportFile, tableData) {
     a.download = (exportFile?.fileName || 'export.txt').replace(/\.pdf$/i, '.txt');
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
   }
 }
 
@@ -1007,20 +1145,20 @@ function buildWelcomeText() {
     '',
     '| Capability | Say this |',
     '|---|---|',
-    '| 📊 Full CRM leads table | *"Show all CRM leads"* |',
-    '| 📋 Assign tasks to team | *"Assign tasks to all employees"* |',
-    '| 👤 Target one employee | *"Assign task to Animesh"* |',
-    '| 💰 Revenue & pipeline | *"Show revenue summary"* |',
-    '| 🏆 Top performer | *"Who is the top performer?"* |',
-    '| 📞 Schedule a call | *"Schedule call for Priya Soni"* |',
-    '| 💬 WhatsApp reminder | *"Send WhatsApp to Global Tech"* |',
-    '| 🏭 Factory job cards | *"Track factory job card status"* |',
-    '| 🧾 GST Invoice | *"Generate GST invoice for 42000"* |',
-    '| 📈 AI Revenue Forecast | *"Predict September revenue"* |',
-    '| 📤 Export data | *"Export all leads as Excel"* |',
+    '| Full CRM leads table | *"Show all CRM leads"* |',
+    '| Assign tasks to team | *"Assign tasks to all employees"* |',
+    '| Target one employee | *"Assign task to Animesh"* |',
+    '| Revenue & pipeline | *"Show revenue summary"* |',
+    '| Top performer | *"Who is the top performer?"* |',
+    '| Schedule a call | *"Schedule call for Priya Soni"* |',
+    '| WhatsApp reminder | *"Send WhatsApp to Global Tech"* |',
+    '| Factory job cards | *"Track factory job card status"* |',
+    '| GST Invoice | *"Generate GST invoice for 42000"* |',
+    '| AI Revenue Forecast | *"Predict September revenue"* |',
+    '| Export data | *"Export all leads as Excel"* |',
     '',
     '---',
-    '*💡 I remember our conversation for up to 2 hours — no need to repeat context.*'
+    '*Note: Conversation context is preserved for up to 2 hours.*'
   ];
   return lines.join('\n');
 }
@@ -1122,6 +1260,14 @@ export default function APSAIPage() {
           });
           localStorage.setItem('aps_system_users', JSON.stringify(list));
           window.dispatchEvent(new CustomEvent('aps_users_updated', { detail: list }));
+          window.dispatchEvent(new CustomEvent('aps_employees_updated', { detail: data.createdEmployees }));
+        } catch {}
+      }
+
+      // Synchronize assigned tasks in real-time across Team KPIs & platform
+      if (data.assignedEmployees && Array.isArray(data.assignedEmployees) && data.assignedEmployees.length > 0) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_employees_updated', { detail: data.assignedEmployees }));
         } catch {}
       } else if (data.table && Array.isArray(data.table) && data.table.some(r => r.User || (r.Name && r.Role && !r.Stage))) {
         try {
@@ -1146,6 +1292,50 @@ export default function APSAIPage() {
           });
           localStorage.setItem('aps_system_users', JSON.stringify(list));
           window.dispatchEvent(new CustomEvent('aps_users_updated', { detail: list }));
+        } catch {}
+      }
+
+      // Real-time synchronization for CRM Leads
+      if (data.createdLead || data.updatedLead) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_leads_updated', { detail: data.createdLead || data.updatedLead }));
+        } catch {}
+      }
+
+      // Real-time synchronization for Tally Vouchers & Payments
+      if (data.createdVoucher) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_tally_updated', { detail: data.createdVoucher }));
+          window.dispatchEvent(new CustomEvent('aps_leads_updated', { detail: data.updatedLead }));
+        } catch {}
+      }
+
+      // Real-time synchronization for Factory ERP Job Cards & Bookings
+      if (data.createdJobCard) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_bookings_updated', { detail: data.createdJobCard }));
+          window.dispatchEvent(new CustomEvent('aps_leads_updated', { detail: data.updatedLead }));
+        } catch {}
+      }
+
+      // Real-time synchronization for GST Tax Invoices
+      if (data.createdInvoice) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_invoices_updated', { detail: data.createdInvoice }));
+        } catch {}
+      }
+
+      // Real-time synchronization for Voice Dialer
+      if (data.queuedCall) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_dialer_updated', { detail: data.queuedCall }));
+        } catch {}
+      }
+
+      // Real-time synchronization for WhatsApp Automation
+      if (data.sentWhatsAppMessage) {
+        try {
+          window.dispatchEvent(new CustomEvent('aps_whatsapp_updated', { detail: data.sentWhatsAppMessage }));
         } catch {}
       }
 
@@ -1312,7 +1502,13 @@ export default function APSAIPage() {
                 
                 <div style={s.landingGrid}>
                   <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("assign team tasks options")}>
-                    <div style={s.cardIcon}>📋</div>
+                    <div style={{ ...s.cardIcon, color: '#2563eb', background: '#eff6ff', borderColor: '#dbeafe' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                        <path d="M9 14l2 2 4-4" />
+                      </svg>
+                    </div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Assign Team Tasks</div>
                       <div style={s.cardDesc}>Allocate role-based task backlogs to all staff members instantly.</div>
@@ -1320,7 +1516,14 @@ export default function APSAIPage() {
                   </div>
                   
                   <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("billing & invoices options")}>
-                    <div style={s.cardIcon}>🧾</div>
+                    <div style={{ ...s.cardIcon, color: '#7c3aed', background: '#f5f3ff', borderColor: '#ede9fe' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2 3-2 3 2V4a2 2 0 0 0-2-2z" />
+                        <line x1="8" y1="7" x2="16" y2="7" />
+                        <line x1="8" y1="11" x2="16" y2="11" />
+                        <line x1="8" y1="15" x2="12" y2="15" />
+                      </svg>
+                    </div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Billing & Invoices</div>
                       <div style={s.cardDesc}>Generate proforma or tax invoices with 18% GST splits.</div>
@@ -1328,7 +1531,11 @@ export default function APSAIPage() {
                   </div>
                   
                   <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("voice dialer options")}>
-                    <div style={s.cardIcon}>📞</div>
+                    <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                    </div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Voice Dialer</div>
                       <div style={s.cardDesc}>Schedule follow-up calls or run sentiment audits on call logs.</div>
@@ -1336,7 +1543,14 @@ export default function APSAIPage() {
                   </div>
                   
                   <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("production progress options")}>
-                    <div style={s.cardIcon}>🏭</div>
+                    <div style={{ ...s.cardIcon, color: '#d97706', background: '#fffbeb', borderColor: '#fef3c7' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+                        <path d="M17 18h1" />
+                        <path d="M12 18h1" />
+                        <path d="M7 18h1" />
+                      </svg>
+                    </div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>Production Progress</div>
                       <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
@@ -1485,7 +1699,6 @@ const s = {
     boxSizing: 'border-box'
   },
   cardIcon: {
-    fontSize: '1.5rem',
     width: 44,
     height: 44,
     background: '#f8fafc',

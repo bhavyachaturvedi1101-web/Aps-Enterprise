@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const MOCK_EMPLOYEES = [
-  { id: 'e1', name: 'Animesh', role: 'System Architect', tasksCompleted: 14, callsHandled: 124, salesClosed: 8, kpiScore: '92%' },
-  { id: 'e2', name: 'Bhavya', role: 'Core Engineer', tasksCompleted: 18, callsHandled: 0, salesClosed: 12, kpiScore: '96%' },
-  { id: 'e3', name: 'Aaditya', role: 'Operations Specialist', tasksCompleted: 11, callsHandled: 15, salesClosed: 5, kpiScore: '89%' }
-];
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 export default function Employees() {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API}/employees`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.employees)) {
+          setEmployees(data.employees);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Employee Performance Profiles</h1>
+      <p style={styles.subtitle}>Real-time performance metrics and active task load of system members.</p>
 
       <div style={styles.card}>
         <table style={styles.table}>
@@ -17,6 +30,7 @@ export default function Employees() {
             <tr>
               <th style={styles.th}>Employee Name</th>
               <th style={styles.th}>Role / Focus</th>
+              <th style={styles.th}>Department</th>
               <th style={styles.th}>Tasks Completed</th>
               <th style={styles.th}>Calls Handled</th>
               <th style={styles.th}>Sales Closed</th>
@@ -24,20 +38,35 @@ export default function Employees() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_EMPLOYEES.map((emp) => (
-              <tr key={emp.id} className="table-row-hover" style={styles.tr}>
-                <td style={styles.td}><strong>{emp.name}</strong></td>
-                <td style={styles.td}>{emp.role}</td>
-                <td style={styles.td}>{emp.tasksCompleted}</td>
-                <td style={styles.td}>{emp.callsHandled}</td>
-                <td style={styles.td}>{emp.salesClosed}</td>
-                <td style={styles.td}>
-                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, padding: '3px 10px', borderRadius: 12, fontSize: '0.78rem', display: 'inline-block' }}>
-                    {emp.kpiScore}
-                  </span>
+            {loading ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                  Loading employee records...
                 </td>
               </tr>
-            ))}
+            ) : employees.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                  No employees configured yet. Add members via Users & Roles.
+                </td>
+              </tr>
+            ) : (
+              employees.map((emp) => (
+                <tr key={emp.id} className="table-row-hover" style={styles.tr}>
+                  <td style={styles.td}><strong>{emp.name}</strong></td>
+                  <td style={styles.td}>{emp.role || 'Staff'}</td>
+                  <td style={styles.td}>{emp.department || 'Operations'}</td>
+                  <td style={styles.td}>{emp.tasksCompleted || 0}</td>
+                  <td style={styles.td}>{emp.callsHandled || 0}</td>
+                  <td style={styles.td}>{emp.salesClosed || 0}</td>
+                  <td style={styles.td}>
+                    <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, padding: '3px 10px', borderRadius: 12, fontSize: '0.78rem', display: 'inline-block' }}>
+                      {emp.kpiScore || '100%'}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

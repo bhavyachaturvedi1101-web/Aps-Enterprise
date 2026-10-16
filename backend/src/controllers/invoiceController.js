@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { Invoice, Lead } = require('../models');
 const { mockLeads } = require('../config/inMemoryStore');
+const { isDbConnected } = require('../config/db');
 
 // ─── Helper: number to words (Indian format) ─────────────────────────────────
 function amountInWords(amount) {
@@ -27,12 +28,36 @@ function amountInWords(amount) {
 
 // ─── Helper: next invoice ID ──────────────────────────────────────────────────
 async function nextInvoiceId() {
+  if (isDbConnected()) {
+    try {
+      const count = await Invoice.count();
+      const year = new Date().getFullYear();
+      return `INV-${year}-${String(count + 1001).padStart(4, '0')}`;
+    } catch {
+      // Fallback
+    }
+  }
+  return `INV-${Date.now()}`;
+}
+
+const INVOICES_FILE = path.join(__dirname, '../../invoices_data.json');
+
+function loadInvoicesFromFile() {
   try {
-    const count = await Invoice.count();
-    const year = new Date().getFullYear();
-    return `INV-${year}-${String(count + 1001).padStart(4, '0')}`;
-  } catch {
-    return `INV-${Date.now()}`;
+    if (fs.existsSync(INVOICES_FILE)) {
+      return JSON.parse(fs.readFileSync(INVOICES_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.warn('[invoiceController] Failed to load invoices_data.json:', err.message);
+  }
+  return [];
+}
+
+function saveInvoicesToFile(invoices) {
+  try {
+    fs.writeFileSync(INVOICES_FILE, JSON.stringify(invoices, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('[invoiceController] Failed to save invoices_data.json:', err.message);
   }
 }
 
@@ -40,21 +65,17 @@ async function nextInvoiceId() {
 async function getInvoices(req, res) {
   try {
     let invoices = [];
-    try {
-      invoices = await Invoice.findAll({ order: [['createdAt', 'DESC']] });
-    } catch {
-      invoices = [];
+    if (isDbConnected()) {
+      try {
+        invoices = await Invoice.findAll({ order: [['createdAt', 'DESC']] });
+      } catch {
+        invoices = [];
+      }
+    }
+    if (!invoices || invoices.length === 0) {
+      invoices = loadInvoicesFromFile();
     }
 
-    if (invoices.length === 0) {
-      // Seed with mock data on first load
-      invoices = [
-        { id: 'INV-2026-8801', clientName: 'Apex Metalcraft', clientPhone: '+91 99001 12233', gstNo: '27AAAAA1122A1Z1', poNo: 'PO-9912', product: 'Heavy Duty CNC Router 500T', hsnCode: '8466', baseAmount: 150000, gstAmount: 27000, issuedDate: '2026-08-01', dueDate: '2026-08-31', status: 'Sent', paymentTerms: 'Net 30 Days' },
-        { id: 'INV-2026-8802', clientName: 'Tata Heavy Tools', clientPhone: '+91 99002 23344', gstNo: '27BBBBB3344B1Z2', poNo: 'PO-9915', product: '200T Hydraulic Press Machine', hsnCode: '8462', baseAmount: 420000, gstAmount: 75600, issuedDate: '2026-08-03', dueDate: '2026-08-18', status: 'Draft', paymentTerms: 'Immediate Deposit' },
-        { id: 'INV-2026-8803', clientName: 'Kirloskar Forge', clientPhone: '+91 99003 34455', gstNo: '27CCCC5566C1Z3', poNo: 'PO-9920', product: 'Laser Cutting Automation Arm', hsnCode: '8456', baseAmount: 280000, gstAmount: 50400, issuedDate: '2026-08-05', dueDate: '2026-09-05', status: 'Paid', paymentTerms: '10% Advance Paid' },
-        { id: 'INV-2026-8804', clientName: 'Godrej Process Eq', clientPhone: '+91 99004 45566', gstNo: '27DDDDD7788D1Z4', poNo: 'PO-9924', product: 'Factory Automated Conveyor Line', hsnCode: '8428', baseAmount: 95000, gstAmount: 17100, issuedDate: '2026-08-07', dueDate: '2026-09-07', status: 'Sent', paymentTerms: 'Net 30 Days' }
-      ];
-    }
     res.json({ invoices, count: invoices.length });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch invoices' });
@@ -74,16 +95,24 @@ async function createInvoice(req, res) {
     const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     let invoice = null;
-    try {
-      invoice = await Invoice.create({
-        id, leadId: leadId || null, clientName, clientPhone, clientEmail,
-        gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product,
-        hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt,
-        status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days',
-        issuedDate: new Date().toISOString().split('T')[0], dueDate
-      });
-    } catch {
-      invoice = { id, clientName, clientPhone, clientEmail, gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product, hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt, status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days', issuedDate: new Date().toISOString().split('T')[0], dueDate };
+    if (isDbConnected()) {
+      try {
+        invoice = await Invoice.create({
+          id, leadId: leadId || null, clientName, clientPhone, clientEmail,
+          gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product,
+          hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt,
+          status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days',
+          issuedDate: new Date().toISOString().split('T')[0], dueDate
+        });
+      } catch {
+        invoice = null;
+      }
+    }
+    if (!invoice) {
+      invoice = { id, clientName, clientPhone, clientEmail, gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product, hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt, totalAmount: base + gstAmt, status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days', issuedDate: new Date().toISOString().split('T')[0], dueDate, createdAt: new Date().toISOString() };
+      const currentInvoices = loadInvoicesFromFile();
+      currentInvoices.unshift(invoice);
+      saveInvoicesToFile(currentInvoices);
     }
     res.status(201).json({ success: true, invoice });
   } catch (err) {
@@ -99,15 +128,25 @@ async function updateStatus(req, res) {
     if (!['Draft', 'Sent', 'Paid', 'Overdue'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    try {
-      const inv = await Invoice.findByPk(id);
-      if (inv) {
-        inv.status = status;
-        if (status === 'Paid') inv.paidAt = new Date();
-        await inv.save();
-        return res.json({ success: true, invoice: inv });
-      }
-    } catch {}
+    if (isDbConnected()) {
+      try {
+        const inv = await Invoice.findByPk(id);
+        if (inv) {
+          inv.status = status;
+          if (status === 'Paid') inv.paidAt = new Date();
+          await inv.save();
+          return res.json({ success: true, invoice: inv });
+        }
+      } catch {}
+    }
+    const currentInvoices = loadInvoicesFromFile();
+    const target = currentInvoices.find(i => i.id === id);
+    if (target) {
+      target.status = status;
+      if (status === 'Paid') target.paidAt = new Date().toISOString();
+      saveInvoicesToFile(currentInvoices);
+      return res.json({ success: true, invoice: target });
+    }
     res.json({ success: true, message: `Status updated to ${status}` });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update invoice status' });

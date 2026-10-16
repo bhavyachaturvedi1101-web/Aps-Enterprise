@@ -1,0 +1,37 @@
+{
+  "config": {
+    "approvalPolicy": "countersign",
+    "paymentGatePercentage": 10,
+    "autoSendPaymentReminders": true,
+    "reminderDelayHours": 24,
+    "whatsappProvider": "DoubleTick / Meta Cloud API",
+    "wabaPhoneNumber": "+91 99880 01122",
+    "webhookUrl": "https://platformapi.teleforce.cx/api/v1"
+  },
+  "companyProfile": {
+    "name": "APS Enterprises",
+    "website": "https://www.apsenterprises.in",
+    "tagline": "Leading Dona Pattal & Paper Plate Machine Manufacturer",
+    "address": "832, Old Loha Mandi, In front of Devshree Cinema, Near Khambati Pipes, Indore, MP - 452001",
+    "phones": [
+      "+91-7869755871",
+      "+91-8827848099"
+    ],
+    "emails": [
+      "admin@apsenterprises.in",
+      "support.apsenterprises@gmail.com"
+    ],
+    "products": [
+      "Fully Automatic Double Die Dona Pattal Machine",
+      "Hydraulic Paper Plate & Thali Making Machine",
+      "Automatic High-Speed Paper Cup Making Machine",
+      "Semi-Automatic Heavy Paper Cutter Machine",
+      "Raw Material Paper Roll & Lamination Machine"
+    ]
+  },
+  "allSettings": {
+    "companyName": "APS Enterprises",
+    "approvalPolicy": "countersign",
+    "llmProvider": "groq"
+  }
+}

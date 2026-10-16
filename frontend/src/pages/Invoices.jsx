@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MOCK_INVOICES } from '../mockData';
 
-const INITIAL_TAX_INVOICES = [
-  { id: 'INV-2026-8801', client: 'Apex Metalcraft', gstNo: '27AAAAA1122A1Z1', poNo: 'PO-9912', product: 'Heavy Duty CNC Router 500T', hsnCode: '8466', baseAmount: 150000, gst: 27000, issued: '2026-08-01', due: '2026-08-31', status: 'Sent', paymentTerms: 'Net 30 Days' },
-  { id: 'INV-2026-8802', client: 'Tata Heavy Tools', gstNo: '27BBBBB3344B1Z2', poNo: 'PO-9915', product: '200T Hydraulic Press Machine', hsnCode: '8462', baseAmount: 420000, gst: 75600, issued: '2026-08-03', due: '2026-08-18', status: 'Draft', paymentTerms: 'Immediate Deposit' },
-  { id: 'INV-2026-8803', client: 'Kirloskar Forge', gstNo: '27CCCC5566C1Z3', poNo: 'PO-9920', product: 'Laser Cutting Automation Arm', hsnCode: '8456', baseAmount: 280000, gst: 50400, issued: '2026-08-05', due: '2026-09-05', status: 'Paid', paymentTerms: '10% Advance Paid' },
-  { id: 'INV-2026-8804', client: 'Godrej Process Eq', gstNo: '27DDDDD7788D1Z4', poNo: 'PO-9924', product: 'Factory Automated Conveyor Line', hsnCode: '8428', baseAmount: 95000, gst: 17100, issued: '2026-08-07', due: '2026-09-07', status: 'Sent', paymentTerms: 'Net 30 Days' }
-];
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 export default function Invoices() {
-  const [invoices, setInvoices] = useState(INITIAL_TAX_INVOICES);
+  const [invoices, setInvoices] = useState(MOCK_INVOICES || []);
   const [viewInvoice, setViewInvoice] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -18,6 +15,49 @@ export default function Invoices() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  useEffect(() => {
+    fetch(`${API}/invoices`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.invoices) && data.invoices.length > 0) {
+          setInvoices(data.invoices);
+        }
+      })
+      .catch(() => {});
+
+    try {
+      const saved = localStorage.getItem('aps_custom_invoices');
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list) && list.length > 0) {
+          setInvoices(prev => {
+            const ids = new Set(prev.map(i => i.id));
+            const newOnes = list.filter(i => !ids.has(i.id));
+            return [...newOnes, ...prev];
+          });
+        }
+      }
+    } catch {}
+
+    const handleInvoiceCreated = (e) => {
+      if (e?.detail) {
+        setInvoices(prev => [e.detail, ...prev]);
+        try {
+          const saved = localStorage.getItem('aps_custom_invoices');
+          const list = saved ? JSON.parse(saved) : [];
+          if (!list.some(i => i.id === e.detail.id)) {
+            list.unshift(e.detail);
+            localStorage.setItem('aps_custom_invoices', JSON.stringify(list));
+          }
+        } catch {}
+        showToast(`New GST Tax Invoice "${e.detail.id}" received from AI Assistant!`);
+      }
+    };
+
+    window.addEventListener('aps_invoices_updated', handleInvoiceCreated);
+    return () => window.removeEventListener('aps_invoices_updated', handleInvoiceCreated);
+  }, []);
 
   const handleCreateInvoice = (e) => {
     e.preventDefault();
@@ -67,60 +107,67 @@ export default function Invoices() {
 
       {/* Invoice Visual Cards Grid */}
       <div style={s.cardsGrid}>
-        {invoices.map(inv => {
-          const grandTotal = inv.baseAmount + inv.gst;
-          const isPaid = inv.status === 'Paid';
-          return (
-            <div key={inv.id} style={s.invoiceCard}>
-              <div style={s.cardHead}>
-                <div>
-                  <span style={s.invBadge}>{inv.id}</span>
-                  <div style={s.clientTitle}>{inv.client}</div>
-                  <div style={s.poText}>PO Ref: {inv.poNo}</div>
-                </div>
-                <span style={{
-                  padding: '4px 10px',
-                  borderRadius: 20,
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
-                  color: isPaid ? '#16a34a' : '#2563eb'
-                }}>
-                  {inv.status}
-                </span>
-              </div>
-
-              <div style={s.cardBody}>
-                <div style={s.productName}>{inv.product}</div>
-                <div style={s.hsnText}>HSN Code: {inv.hsnCode} | GST Rate: 18%</div>
-                
-                <div style={s.amountRow}>
+        {invoices.length === 0 ? (
+          <div style={{ gridColumn: '1 / -1', padding: '3.5rem 1.5rem', textAlign: 'center', backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', color: '#71717a' }}>
+            <p style={{ fontWeight: 700, color: '#09090b', margin: '0 0 6px 0', fontSize: '1rem' }}>No Invoices Generated Yet</p>
+            <p style={{ margin: 0, fontSize: '0.85rem' }}>Create a tax invoice using "+ Create Tax Invoice" or generate one automatically via the AI Assistant.</p>
+          </div>
+        ) : (
+          invoices.map(inv => {
+            const grandTotal = inv.baseAmount + inv.gst;
+            const isPaid = inv.status === 'Paid';
+            return (
+              <div key={inv.id} style={s.invoiceCard}>
+                <div style={s.cardHead}>
                   <div>
-                    <div style={s.subLbl}>Base Rate</div>
-                    <div style={s.subVal}>₹{inv.baseAmount.toLocaleString('en-IN')}</div>
+                    <span style={s.invBadge}>{inv.id}</span>
+                    <div style={s.clientTitle}>{inv.client}</div>
+                    <div style={s.poText}>PO Ref: {inv.poNo}</div>
                   </div>
-                  <div>
-                    <div style={s.subLbl}>GST Amount</div>
-                    <div style={s.subVal}>₹{inv.gst.toLocaleString('en-IN')}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={s.subLbl}>Grand Total</div>
-                    <div style={s.totalVal}>₹{grandTotal.toLocaleString('en-IN')}</div>
+                  <span style={{
+                    padding: '4px 10px',
+                    borderRadius: 20,
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
+                    color: isPaid ? '#16a34a' : '#2563eb'
+                  }}>
+                    {inv.status}
+                  </span>
+                </div>
+
+                <div style={s.cardBody}>
+                  <div style={s.productName}>{inv.product}</div>
+                  <div style={s.hsnText}>HSN Code: {inv.hsnCode} | GST Rate: 18%</div>
+                  
+                  <div style={s.amountRow}>
+                    <div>
+                      <div style={s.subLbl}>Base Rate</div>
+                      <div style={s.subVal}>₹{inv.baseAmount.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div>
+                      <div style={s.subLbl}>GST Amount</div>
+                      <div style={s.subVal}>₹{inv.gst.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={s.subLbl}>Grand Total</div>
+                      <div style={s.totalVal}>₹{grandTotal.toLocaleString('en-IN')}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div style={s.cardFooter}>
-                <button onClick={() => setViewInvoice(inv)} style={s.previewBtn}>
-                  Preview & Print PDF
-                </button>
-                <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
-                  Send WhatsApp PDF
-                </button>
+                <div style={s.cardFooter}>
+                  <button onClick={() => setViewInvoice(inv)} style={s.previewBtn}>
+                    Preview & Print PDF
+                  </button>
+                  <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
+                    Send WhatsApp PDF
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {/* New Invoice Modal */}

@@ -3,17 +3,31 @@ const express = require('express');
 const router = express.Router();
 const { Lead, Payment, ActivityLog, Employee } = require('../models');
 const { mockLeads } = require('../config/inMemoryStore');
+const { isDbConnected } = require('../config/db');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function safeLeads() {
   try { return mockLeads || []; } catch { return []; }
 }
 
+async function getAnalyticsLeads() {
+  if (isDbConnected()) {
+    try {
+      const dbLeads = await Lead.findAll();
+      if (dbLeads && dbLeads.length > 0) {
+        return dbLeads.map(l => l.toJSON());
+      }
+    } catch {
+      // Fallback
+    }
+  }
+  return safeLeads();
+}
+
 // ─── GET /api/analytics/overview ─────────────────────────────────────────────
 router.get('/overview', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     const stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
     const byStage = {};
@@ -38,8 +52,7 @@ router.get('/overview', async (req, res) => {
 // ─── GET /api/analytics/pipeline-funnel ──────────────────────────────────────
 router.get('/pipeline-funnel', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     const stages = ['Enquiry', 'Qualified', 'Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'];
     const total = leads.length || 1;
@@ -64,8 +77,7 @@ router.get('/pipeline-funnel', async (req, res) => {
 // ─── GET /api/analytics/revenue ──────────────────────────────────────────────
 router.get('/revenue', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     // Group won leads by month
     const monthMap = {};
@@ -93,8 +105,7 @@ router.get('/revenue', async (req, res) => {
 // ─── GET /api/analytics/forecast ─────────────────────────────────────────────
 router.get('/forecast', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     const pipelineValue = leads
       .filter(l => ['Confirmed Lead', 'Client (Paid)'].includes(l.stage))
@@ -120,8 +131,7 @@ router.get('/forecast', async (req, res) => {
 // ─── GET /api/analytics/employee-perf ────────────────────────────────────────
 router.get('/employee-perf', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     const empMap = {};
     leads.forEach(l => {
@@ -148,8 +158,7 @@ router.get('/employee-perf', async (req, res) => {
 // ─── GET /api/analytics/sources ──────────────────────────────────────────────
 router.get('/sources', async (req, res) => {
   try {
-    let leads = [];
-    try { leads = (await Lead.findAll()).map(l => l.toJSON()); } catch { leads = safeLeads(); }
+    const leads = await getAnalyticsLeads();
 
     const map = {};
     leads.forEach(l => { const s = l.source || 'Unknown'; map[s] = (map[s] || 0) + 1; });

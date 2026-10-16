@@ -40,6 +40,15 @@ body {
   flex-direction: column;
 }
 
+/* Page container layout */
+.page-container {
+  padding: 2rem 2.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 h1,
 h2,
 h3,
@@ -748,4 +757,33 @@ select option {
   h1 {
     font-size: 1.2rem !important;
   }
-}
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Machinery Stock Scrollable List Custom Scrollbar                          */
+/* ───────────────────────────────────────────────────────────────────────── */
+.machinery-stock-scroll-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

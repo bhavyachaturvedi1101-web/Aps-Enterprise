@@ -1,36 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const MOCK_CALLS = [
-  { id: 'C001', name: 'Agarwal Packaging', phone: '+91 98765 43210', product: 'Double Die Paper Plate Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C002', name: 'Sharma Paper Cups', phone: '+91 87654 32109', product: 'Fully Automatic Paper Cup Machine', status: 'In Progress', priority: 'Normal', agent: 'Pooja (Telecaller)' },
-  { id: 'C003', name: 'Bansal Enterprises', phone: '+91 76543 21098', product: 'Hydraulic Dona Pattal Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C004', name: 'Gupta Disposables', phone: '+91 65432 10987', product: 'Silver Craft Paper Roll', status: 'Completed', priority: 'Low', agent: 'Animesh (Sales Lead)' },
-  { id: 'C005', name: 'Mishra Polymers', phone: '+91 54321 09876', product: 'Single Die Paper Plate Machine', status: 'Failed', priority: 'High', agent: 'Voice AI' },
-  { id: 'C006', name: 'Verma Plastics', phone: '+91 98989 12345', product: 'Agarbatti Making Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C007', name: 'Desai Traders', phone: '+91 99887 77665', product: 'Paper Lamination Machine', status: 'In Progress', priority: 'High', agent: 'Pooja (Telecaller)' },
-  { id: 'C008', name: 'Kapur Industries', phone: '+91 91234 56780', product: 'Double Die Paper Plate Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C009', name: 'Jain Packing Solutions', phone: '+91 88776 65544', product: '4-Die Dona Pattal Machine', status: 'Queued', priority: 'High', agent: 'Pooja (Telecaller)' },
-  { id: 'C010', name: 'Sinha Global', phone: '+91 99000 11223', product: 'Hydraulic Dona Pattal Machine', status: 'Completed', priority: 'Low', agent: 'Voice AI' },
-  { id: 'C011', name: 'Reddy Paper Products', phone: '+91 77665 54433', product: 'Fully Automatic Paper Cup Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C012', name: 'Malhotra Enterprises', phone: '+91 88990 01122', product: 'Single Die Paper Plate Machine', status: 'In Progress', priority: 'Normal', agent: 'Animesh (Sales Lead)' },
-  { id: 'C013', name: 'Patel Disposables', phone: '+91 90123 45678', product: 'Silver Craft Paper Roll', status: 'Failed', priority: 'High', agent: 'Pooja (Telecaller)' },
-  { id: 'C014', name: 'Singh Plastics', phone: '+91 95432 10987', product: 'Paper Bag Making Machine', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C015', name: 'Shah Packers', phone: '+91 98765 00011', product: 'Agarbatti Making Machine', status: 'Completed', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C016', name: 'Tiwari Solutions', phone: '+91 87654 11122', product: 'Non-Woven Bag Making Machine', status: 'Queued', priority: 'Normal', agent: 'Pooja (Telecaller)' },
-  { id: 'C017', name: 'Chauhan Manufacturing', phone: '+91 76543 22233', product: 'Heavy Duty Hydraulic Paper Plate Press', status: 'Queued', priority: 'High', agent: 'Voice AI' },
-  { id: 'C018', name: 'Kumar Polymers', phone: '+91 65432 33344', product: 'Double Die Paper Plate Machine', status: 'In Progress', priority: 'Low', agent: 'Voice AI' },
-  { id: 'C019', name: 'Mehta Creations', phone: '+91 91234 44455', product: 'Hydraulic Dona Pattal Machine', status: 'Completed', priority: 'High', agent: 'Animesh (Sales Lead)' },
-  { id: 'C020', name: 'Nair Ventures', phone: '+91 99887 55566', product: 'Slipper Making Machine', status: 'Queued', priority: 'Normal', agent: 'Voice AI' },
-  { id: 'C021', name: 'Yadav Traders', phone: '+91 88776 66677', product: 'Semi-Automatic Dona Making Machine', status: 'Failed', priority: 'High', agent: 'Voice AI' },
-  { id: 'C022', name: 'Rao Packaging', phone: '+91 99000 77788', product: 'Fully Automatic Paper Cup Machine', status: 'Queued', priority: 'Normal', agent: 'Pooja (Telecaller)' }
-];
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 const STATUS_CLR = { Queued:'#09090b', 'In Progress':'#27272a', Completed:'#52525b', Failed:'#71717a' };
 
 export default function DialerQueue() {
-  const [calls, setCalls] = useState(MOCK_CALLS);
+  const [calls, setCalls] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newCall, setNewCall] = useState({ name: '', phone: '', product: 'Double Die Machine', priority: 'High' });
+
+  useEffect(() => {
+    fetch(`${API}/dialer/queue`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.queue)) {
+          setCalls(data.queue);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+
+    const handleDialerUpdate = (e) => {
+      if (e.detail) {
+        const c = e.detail;
+        setCalls(prev => [{
+          id: c.callId || `C00${prev.length + 1}`,
+          name: c.leadName || 'Customer Queue',
+          phone: c.phone || '+91 98234 56789',
+          product: c.product || 'Fully Automatic Dona Machine',
+          status: 'Queued',
+          priority: 'High',
+          agent: 'Voice AI'
+        }, ...prev]);
+      }
+    };
+    window.addEventListener('aps_dialer_updated', handleDialerUpdate);
+    return () => window.removeEventListener('aps_dialer_updated', handleDialerUpdate);
+  }, []);
 
   const handleAddCall = (e) => {
     e.preventDefault();
@@ -80,34 +88,45 @@ export default function DialerQueue() {
             <div key={h} style={s.th}>{h}</div>
           ))}
         </div>
-        {calls.map(call => {
-          const isQueued = call.status === 'Queued';
-          const isInProgress = call.status === 'In Progress';
-          const isCompleted = call.status === 'Completed';
-          const statusColor = isQueued ? '#1d4ed8' : isInProgress ? '#047857' : isCompleted ? '#7c3aed' : '#ef4444';
-          const statusDot = isQueued ? '#3b82f6' : isInProgress ? '#10b981' : isCompleted ? '#a855f7' : '#f87171';
+        {loading ? (
+          <div style={{ padding: '2.5rem', textAlign: 'center', color: '#71717a', fontSize: '0.85rem' }}>
+            Loading dialer queue...
+          </div>
+        ) : calls.length === 0 ? (
+          <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#71717a' }}>
+            <p style={{ fontWeight: 600, color: '#09090b', margin: '0 0 6px 0', fontSize: '0.95rem' }}>Dialer Queue is Empty</p>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: '#71717a' }}>Real leads in Enquiry or Qualified stages will appear here automatically, or you can click "+ Add Outbound Call" above.</p>
+          </div>
+        ) : (
+          calls.map(call => {
+            const isQueued = call.status === 'Queued';
+            const isInProgress = call.status === 'In Progress';
+            const isCompleted = call.status === 'Completed';
+            const statusColor = isQueued ? '#1d4ed8' : isInProgress ? '#047857' : isCompleted ? '#7c3aed' : '#ef4444';
+            const statusDot = isQueued ? '#3b82f6' : isInProgress ? '#10b981' : isCompleted ? '#a855f7' : '#f87171';
 
-          return (
-            <div key={call.id} className="table-row-hover" style={s.row}>
-              <div style={{ ...s.td, fontWeight: 700, color: '#09090b', fontFamily: 'monospace' }}>{call.id}</div>
-              <div style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>{call.name}</div>
-              <div style={{ ...s.td, fontFamily: 'monospace', fontSize: '0.75rem', color: '#52525b' }}>{call.phone}</div>
-              <div style={s.td}>{call.product}</div>
-              <div style={s.td}>{call.agent}</div>
-              <div style={s.td}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: call.priority === 'High' ? '#ef4444' : '#64748b' }}>
-                  {call.priority}
-                </span>
+            return (
+              <div key={call.id} className="table-row-hover" style={s.row}>
+                <div style={{ ...s.td, fontWeight: 700, color: '#09090b', fontFamily: 'monospace' }}>{call.id}</div>
+                <div style={{ ...s.td, fontWeight: 700, color: '#09090b' }}>{call.name}</div>
+                <div style={{ ...s.td, fontFamily: 'monospace', fontSize: '0.75rem', color: '#52525b' }}>{call.phone}</div>
+                <div style={s.td}>{call.product}</div>
+                <div style={s.td}>{call.agent}</div>
+                <div style={s.td}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: call.priority === 'High' ? '#ef4444' : '#64748b' }}>
+                    {call.priority}
+                  </span>
+                </div>
+                <div style={s.td}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: statusColor, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: statusDot }}/>
+                    {call.status}
+                  </span>
+                </div>
               </div>
-              <div style={s.td}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: statusColor, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: statusDot }}/>
-                  {call.status}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {showModal && (
