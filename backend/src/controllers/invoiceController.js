@@ -40,25 +40,15 @@ async function nextInvoiceId() {
   return `INV-${Date.now()}`;
 }
 
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
 const INVOICES_FILE = path.join(__dirname, '../../invoices_data.json');
 
 function loadInvoicesFromFile() {
-  try {
-    if (fs.existsSync(INVOICES_FILE)) {
-      return JSON.parse(fs.readFileSync(INVOICES_FILE, 'utf8'));
-    }
-  } catch (err) {
-    console.warn('[invoiceController] Failed to load invoices_data.json:', err.message);
-  }
-  return [];
+  return safeReadJson(INVOICES_FILE, []);
 }
 
 function saveInvoicesToFile(invoices) {
-  try {
-    fs.writeFileSync(INVOICES_FILE, JSON.stringify(invoices, null, 2), 'utf8');
-  } catch (err) {
-    console.warn('[invoiceController] Failed to save invoices_data.json:', err.message);
-  }
+  safeWriteJson(INVOICES_FILE, invoices);
 }
 
 // ─── GET /api/invoices ────────────────────────────────────────────────────────
@@ -96,6 +86,8 @@ async function createInvoice(req, res) {
 
     let invoice = null;
     if (isDbConnected()) {
+      const { sequelize } = require('../config/db');
+      const t = await sequelize.transaction();
       try {
         invoice = await Invoice.create({
           id, leadId: leadId || null, clientName, clientPhone, clientEmail,
@@ -103,8 +95,22 @@ async function createInvoice(req, res) {
           hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt,
           status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days',
           issuedDate: new Date().toISOString().split('T')[0], dueDate
-        });
-      } catch {
+        }, { transaction: t });
+
+        if (leadId) {
+          const { ActivityLog } = require('../models');
+          await ActivityLog.create({
+            id: `log${Date.now()}`,
+            leadId,
+            employeeId: req.user?.id || 'e1',
+            action: `GST Invoice ${id} created for ${product} (INR ${base + gstAmt})`
+          }, { transaction: t });
+        }
+
+        await t.commit();
+      } catch (dbErr) {
+        await t.rollback();
+        console.warn('[DB Invoice create transaction rollback]:', dbErr.message);
         invoice = null;
       }
     }

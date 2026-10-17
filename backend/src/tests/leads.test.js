@@ -20,6 +20,10 @@ const SALES_HEADERS  = { 'x-api-key': 'sales-key-456' };
 // 1. GET /api/leads  —  List all leads
 // ============================================================
 describe('GET /api/leads', () => {
+  beforeAll(async () => {
+    await request(app).post('/api/config/approval-policy').set(ADMIN_HEADERS).send({ policy: 'single-action' });
+  });
+
   it('should return 200 and an array of leads', async () => {
     const res = await request(app).get('/api/leads').set(ADMIN_HEADERS);
     expect(res.status).toBe(200);

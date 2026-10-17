@@ -1,5 +1,21 @@
 [
   {
+    "voucherNo": "VCH-2026-5070",
+    "tallyMasterId": "MST-85345",
+    "date": "2026-10-16",
+    "partyName": "Animesh",
+    "particulars": "HDFC Bank Main A/c (#5020)",
+    "voucherType": "Advance Receipt (10%)",
+    "amount": 111111,
+    "debitAmount": 0,
+    "creditAmount": 111111,
+    "gstOutput": 20000,
+    "utrNo": "UTR-BANK654623",
+    "reconStatus": "Reconciled",
+    "syncTimestamp": "Just Now",
+    "narration": "Manual voucher entry posted into Tally Prime ledger"
+  },
+  {
     "voucherNo": "VCH-2026-101",
     "tallyMasterId": "MST-88219",
     "date": "2026-10-09",

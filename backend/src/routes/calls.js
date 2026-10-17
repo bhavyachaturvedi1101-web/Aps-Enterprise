@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const callsService = require('../services/callsService');
+const { authorize } = require('../middleware/rbacMiddleware');
 
 // POST /api/calls/outcome — Ingest structured call result from A1 Voice Agent
-router.post('/outcome', async (req, res) => {
+router.post('/outcome', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   try {
     const result = await callsService.processCallOutcome(req.body);
     res.status(201).json(result);

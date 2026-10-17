@@ -3,27 +3,21 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const { systemConfig, companyProfile } = require('../config/inMemoryStore');
+const { authorize } = require('../middleware/rbacMiddleware');
+
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
 
 const SETTINGS_FILE = path.join(__dirname, '../../settings_data.json');
 
 // Initialize settings from disk if available
-try {
-  if (fs.existsSync(SETTINGS_FILE)) {
-    const raw = fs.readFileSync(SETTINGS_FILE, 'utf8');
-    const saved = JSON.parse(raw);
-    if (saved.config) Object.assign(systemConfig, saved.config);
-    if (saved.companyProfile) Object.assign(companyProfile, saved.companyProfile);
-  }
-} catch (e) {
-  console.warn('[SystemConfig] Failed to load settings_data.json:', e.message);
+const saved = safeReadJson(SETTINGS_FILE, null);
+if (saved) {
+  if (saved.config) Object.assign(systemConfig, saved.config);
+  if (saved.companyProfile) Object.assign(companyProfile, saved.companyProfile);
 }
 
 function saveToDisk(data) {
-  try {
-    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2), 'utf8');
-  } catch (err) {
-    console.error('[SystemConfig] Failed to save settings to disk:', err.message);
-  }
+  safeWriteJson(SETTINGS_FILE, data);
 }
 
 // GET /api/config — Get system configuration & business rules
@@ -42,7 +36,7 @@ router.get('/', (req, res) => {
 });
 
 // POST /api/config — Save all system settings & company profile
-router.post('/', (req, res) => {
+router.post('/', authorize(['admin']), (req, res) => {
   try {
     const { config, companyProfile: newProfile, allSettings } = req.body;
     if (config && typeof config === 'object') {
@@ -73,7 +67,7 @@ router.post('/', (req, res) => {
 });
 
 // POST /api/config/approval-policy — Update single-action vs countersign policy
-router.post('/approval-policy', (req, res) => {
+router.post('/approval-policy', authorize(['admin']), (req, res) => {
   const { policy } = req.body;
   if (!['single-action', 'countersign'].includes(policy)) {
     return res.status(400).json({

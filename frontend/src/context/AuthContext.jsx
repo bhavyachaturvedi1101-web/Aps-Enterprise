@@ -44,6 +44,8 @@ export function AuthProvider({ children }) {
       throw new Error(data.message || data.error || 'Authentication failed');
     }
 
+    localStorage.setItem('aps_auth_user', JSON.stringify(data.user));
+    localStorage.setItem('aps_token', data.token);
     setToken(data.token);
     setCurrentUser(data.user);
     setIsAuthenticated(true);

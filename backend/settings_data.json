@@ -1,6 +1,6 @@
 {
   "config": {
-    "approvalPolicy": "countersign",
+    "approvalPolicy": "single-action",
     "paymentGatePercentage": 10,
     "autoSendPaymentReminders": true,
     "reminderDelayHours": 24,
@@ -30,8 +30,8 @@
     ]
   },
   "allSettings": {
-    "companyName": "APS Enterprises",
-    "approvalPolicy": "countersign",
-    "llmProvider": "groq"
+    "config": {
+      "approvalPolicy": "single-action"
+    }
   }
 }

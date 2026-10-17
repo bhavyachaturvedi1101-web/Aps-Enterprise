@@ -89,34 +89,55 @@ export default function Invoices() {
     return () => window.removeEventListener('aps_invoices_updated', handleInvoiceCreated);
   }, []);
 
-  const handleCreateInvoice = (e) => {
+  const handleCreateInvoice = async (e) => {
     e.preventDefault();
     if (!newInv.client || !newInv.product) return;
     const base = parseFloat(newInv.baseAmount) || 0;
+    const gstAmt = Math.round(base * 0.18);
+    const total = base + gstAmt;
+    const id = `INV-2026-880${invoices.length + 1}`;
     const invObj = normalizeInvoice({
-      id: `INV-2026-880${invoices.length + 1}`,
+      id,
       client: newInv.client,
+      clientName: newInv.client,
       gstNo: '27AAAAA0000A1Z5',
       poNo: newInv.poNo || 'PO-9940',
       product: newInv.product,
       hsnCode: '8466',
       baseAmount: base,
-      gst: Math.round(base * 0.18),
-      gstAmount: Math.round(base * 0.18),
-      totalAmount: Math.round(base * 1.18),
+      gst: gstAmt,
+      gstAmount: gstAmt,
+      totalAmount: total,
       issued: new Date().toISOString().split('T')[0],
+      issuedDate: new Date().toISOString().split('T')[0],
       due: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       status: 'Sent',
       paymentTerms: 'Net 30 Days'
     });
     setInvoices(prev => [invObj, ...prev]);
     setShowModal(false);
     showToast(`Invoice "${invObj.id}" generated & saved!`);
+
+    try {
+      await fetch(`${API}/invoices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: newInv.client,
+          product: newInv.product,
+          baseAmount: base,
+          poNo: newInv.poNo || 'PO-9940'
+        })
+      });
+    } catch (err) {
+      console.warn('[Invoices] Local creation retained, API sync failed:', err);
+    }
   };
 
   const handleDispatchWhatsAppPDF = (inv) => {
     const norm = normalizeInvoice(inv);
-    showToast(`GST Tax Invoice PDF "${norm.id}" dispatched to ${norm.client} via WhatsApp!`);
+    showToast(`GST Tax Invoice PDF "${norm.id}" dispatched to ${norm.clientName || norm.client} via WhatsApp!`);
   };
 
   return (
@@ -148,14 +169,18 @@ export default function Invoices() {
         ) : (
           invoices.map(rawInv => {
             const inv = normalizeInvoice(rawInv);
+            const baseAmount = Number(inv.baseAmount || 0);
+            const gstAmount = Number(inv.gstAmount ?? inv.gst ?? Math.round(baseAmount * 0.18));
+            const grandTotal = Number(inv.totalAmount || (baseAmount + gstAmount));
+            const clientName = inv.clientName || inv.client || 'Valued Client';
             const isPaid = inv.status === 'Paid';
             return (
               <div key={inv.id} style={s.invoiceCard}>
                 <div style={s.cardHead}>
                   <div>
                     <span style={s.invBadge}>{inv.id}</span>
-                    <div style={s.clientTitle}>{inv.client}</div>
-                    <div style={s.poText}>PO Ref: {inv.poNo}</div>
+                    <div style={s.clientTitle}>{clientName}</div>
+                    <div style={s.poText}>PO Ref: {inv.poNo || 'N/A'}</div>
                   </div>
                   <span style={{
                     padding: '4px 10px',
@@ -165,32 +190,32 @@ export default function Invoices() {
                     backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
                     color: isPaid ? '#16a34a' : '#2563eb'
                   }}>
-                    {inv.status}
+                    {inv.status || 'Draft'}
                   </span>
                 </div>
 
                 <div style={s.cardBody}>
-                  <div style={s.productName}>{inv.product}</div>
-                  <div style={s.hsnText}>HSN Code: {inv.hsnCode} | GST Rate: 18%</div>
+                  <div style={s.productName}>{inv.product || 'Industrial Equipment'}</div>
+                  <div style={s.hsnText}>HSN Code: {inv.hsnCode || '8466'} | GST Rate: 18%</div>
                   
                   <div style={s.amountRow}>
                     <div>
                       <div style={s.subLbl}>Base Rate</div>
-                      <div style={s.subVal}>₹{formatINR(inv.baseAmount)}</div>
+                      <div style={s.subVal}>₹{formatINR(baseAmount)}</div>
                     </div>
                     <div>
                       <div style={s.subLbl}>GST Amount</div>
-                      <div style={s.subVal}>₹{formatINR(inv.gst)}</div>
+                      <div style={s.subVal}>₹{formatINR(gstAmount)}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={s.subLbl}>Grand Total</div>
-                      <div style={s.totalVal}>₹{formatINR(inv.totalAmount)}</div>
+                      <div style={s.totalVal}>₹{formatINR(grandTotal)}</div>
                     </div>
                   </div>
                 </div>
 
                 <div style={s.cardFooter}>
-                  <button onClick={() => setViewInvoice(inv)} style={s.previewBtn}>
+                  <button onClick={() => setViewInvoice({ ...inv, baseAmount, gstAmount, grandTotal, clientName })} style={s.previewBtn}>
                     Preview & Print PDF
                   </button>
                   <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
@@ -258,6 +283,10 @@ export default function Invoices() {
       {/* Printable Tax Invoice Modal */}
       {viewInvoice && (() => {
         const inv = normalizeInvoice(viewInvoice);
+        const baseAmount = Number(inv.baseAmount || 0);
+        const gstAmount = Number(inv.gstAmount ?? inv.gst ?? Math.round(baseAmount * 0.18));
+        const grandTotal = Number(inv.totalAmount || (baseAmount + gstAmount));
+        const clientName = inv.clientName || inv.client || 'Valued Client';
         return (
           <div style={s.modalOverlay}>
             <div style={{ ...s.modalContent, maxWidth: 640, padding: '2.5rem' }}>
@@ -265,19 +294,19 @@ export default function Invoices() {
                 <div>
                   <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#08060d', fontFamily: 'var(--font-heading)' }}>APS ENTERPRISE CO.</h2>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>Industrial Machinery & Automation Systems</div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {inv.hsnCode}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {inv.hsnCode || '8466'}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' }}>TAX INVOICE</div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#09090b' }}>{inv.id}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#71717a' }}>PO Ref: {inv.poNo}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#71717a' }}>PO Ref: {inv.poNo || 'N/A'}</div>
                 </div>
               </div>
 
               <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 12, marginBottom: '1.5rem', fontSize: '0.8rem' }}>
                 <div style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.68rem', textTransform: 'uppercase' }}>Billed To Client:</div>
-                <div style={{ fontWeight: 800, color: '#08060d', fontSize: '0.95rem', marginTop: 2 }}>{inv.client}</div>
-                <div style={{ color: '#64748b', marginTop: 2 }}>GSTIN: {inv.gstNo} | Terms: {inv.paymentTerms}</div>
+                <div style={{ fontWeight: 800, color: '#08060d', fontSize: '0.95rem', marginTop: 2 }}>{clientName}</div>
+                <div style={{ color: '#64748b', marginTop: 2 }}>GSTIN: {inv.gstNo || '27AAAAA0000A1Z5'} | Terms: {inv.paymentTerms || 'Net 30 Days'}</div>
               </div>
 
               <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', fontSize: '0.8rem' }}>
@@ -291,10 +320,10 @@ export default function Invoices() {
                 </thead>
                 <tbody>
                   <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '10px 12px', fontWeight: 700, color: '#08060d' }}>{inv.product}</td>
-                    <td style={{ padding: '10px 12px' }}>₹{formatINR(inv.baseAmount)}</td>
-                    <td style={{ padding: '10px 12px' }}>₹{formatINR(inv.gst)}</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800 }}>₹{formatINR(inv.totalAmount)}</td>
+                    <td style={{ padding: '10px 12px', fontWeight: 700, color: '#08060d' }}>{inv.product || 'Industrial Machine'}</td>
+                    <td style={{ padding: '10px 12px' }}>₹{formatINR(baseAmount)}</td>
+                    <td style={{ padding: '10px 12px' }}>₹{formatINR(gstAmount)}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800 }}>₹{formatINR(grandTotal)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -307,7 +336,7 @@ export default function Invoices() {
                 </div>
                 <div style={{ textAlign: 'right', fontSize: '0.85rem' }}>
                   <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#09090b' }}>
-                    Grand Total: ₹{formatINR(inv.totalAmount)}
+                    Grand Total: ₹{formatINR(grandTotal)}
                   </div>
                 </div>
               </div>
