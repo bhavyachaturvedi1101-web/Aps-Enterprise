@@ -44,8 +44,14 @@ function suggestions(req, res) {
 async function exportFile(req, res) {
   try {
     const format = (req.query.format || req.body?.format || 'csv').toLowerCase();
-    const leadsData = await Lead.findAll();
-    const leads = leadsData.map(l => l.toJSON());
+    let leads = [];
+    try {
+      const leadsData = await Lead.findAll();
+      leads = leadsData.map(l => l.toJSON());
+    } catch {
+      const { mockLeads } = require('../config/inMemoryStore');
+      leads = mockLeads || [];
+    }
 
     const dateStr = new Date().toISOString().slice(0, 10);
     let fileName = `APS_Enterprise_Export_${dateStr}.${format}`;

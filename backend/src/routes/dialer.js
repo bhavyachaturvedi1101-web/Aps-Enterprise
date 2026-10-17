@@ -2,12 +2,24 @@ const express = require('express');
 const router = express.Router();
 const dialerService = require('../services/dialerService');
 const { Lead } = require('../models');
+const { authorize } = require('../middleware/rbacMiddleware');
 
 // GET /api/dialer/queue — full priority queue with stats
 router.get('/queue', async (req, res) => {
   try {
     const { queue, stats } = dialerService.getQueue();
-    res.json({ ...stats, queue });
+    const formattedQueue = queue.map((c, idx) => ({
+      ...c,
+      queueId: c.id,
+      status: idx === 0 ? 'In Progress' : 'Pending'
+    }));
+    res.json({
+      success: true,
+      queue: formattedQueue,
+      totalQueued: formattedQueue.length,
+      activeCallsCount: stats.active || (formattedQueue.length > 0 ? 1 : 0),
+      stats
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch dialer queue' });
   }
@@ -18,8 +30,8 @@ router.get('/stats', (req, res) => {
   res.json(dialerService.getStats());
 });
 
-// POST /api/dialer/enqueue — add a lead to the queue
-router.post('/enqueue', async (req, res) => {
+// POST /api/dialer/enqueue — add a lead to the queue (Admin / Manager / Employee)
+router.post('/enqueue', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   try {
     const { leadId, priority, agent } = req.body;
     if (!leadId) return res.status(400).json({ error: 'leadId is required' });
@@ -39,38 +51,58 @@ router.post('/enqueue', async (req, res) => {
   }
 });
 
-// POST /api/dialer/call — trigger a call for a queue entry
-router.post('/call', async (req, res) => {
+// POST /api/dialer/call — trigger a call for a queue entry (Admin / Manager / Employee)
+router.post('/call', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   try {
     const { callId, leadId } = req.body;
-    let id = callId;
+    if (!leadId && !callId) {
+      return res.status(400).json({ error: 'leadId is required' });
+    }
 
-    // If only leadId provided, find or enqueue
-    if (!id && leadId) {
-      const { queue } = dialerService.getQueue();
-      const entry = queue.find(c => c.leadId === leadId);
-      id = entry?.id;
-      if (!id) {
-        let lead = null;
-        try { lead = await Lead.findByPk(leadId); } catch {}
-        if (lead) {
-          const enqueued = dialerService.enqueue(lead.toJSON(), 'High');
-          id = enqueued.id;
-        }
+    let targetLead = null;
+    if (leadId) {
+      try { targetLead = await Lead.findByPk(leadId); } catch {}
+      if (!targetLead) {
+        const { mockLeads } = require('../config/inMemoryStore');
+        targetLead = (mockLeads || []).find(l => l.id === leadId);
+      }
+      if (!targetLead && !callId) {
+        return res.status(404).json({ error: 'Lead not found' });
       }
     }
 
-    if (!id) return res.status(400).json({ error: 'callId or leadId required' });
+    let id = callId;
+    if (!id && targetLead) {
+      const { queue } = dialerService.getQueue();
+      const existing = queue.find(q => q.leadId === targetLead.id || q.id === targetLead.id);
+      if (existing) {
+        id = existing.id;
+      } else {
+        const entry = dialerService.enqueue(targetLead, 'Normal');
+        id = entry.id;
+      }
+    }
 
+    if (!id) {
+      return res.status(404).json({ error: 'Lead not found in queue' });
+    }
+
+    const callSessionId = `DIAL-SESS-${Date.now()}`;
     const result = await dialerService.triggerCall(id);
-    res.json(result);
+
+    return res.json({
+      success: true,
+      message: `Outbound call initiated for lead ${leadId || id}`,
+      callSessionId,
+      ...result
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to initiate call', message: err.message });
   }
 });
 
-// PATCH /api/dialer/call/:id/status — update call status
-router.patch('/call/:id/status', (req, res) => {
+// PATCH /api/dialer/call/:id/status — update call status (Admin / Manager / Employee)
+router.patch('/call/:id/status', authorize(['admin', 'manager', 'employee']), (req, res) => {
   try {
     const { status, outcome } = req.body;
     const updated = dialerService.updateStatus(req.params.id, status, outcome);
@@ -81,8 +113,8 @@ router.patch('/call/:id/status', (req, res) => {
   }
 });
 
-// POST /api/dialer/refresh — rebuild queue from DB
-router.post('/refresh', async (req, res) => {
+// POST /api/dialer/refresh — rebuild queue from DB (Admin / Manager)
+router.post('/refresh', authorize(['admin', 'manager']), async (req, res) => {
   try {
     const result = await dialerService.refreshQueue();
     res.json({ success: true, ...result });

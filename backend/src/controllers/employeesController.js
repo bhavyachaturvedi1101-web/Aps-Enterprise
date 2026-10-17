@@ -18,31 +18,22 @@ const mockTimeInStage = [
   { stage: 'Dispatched', avgHours: 12.0, targetHours: 24.0, status: 'Healthy', bottleneckRisk: 'Low' }
 ];
 
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+
 // Helper to load employees from disk or in-memory
 function loadEmployeesFromFile() {
-  try {
-    if (fs.existsSync(EMPLOYEES_FILE)) {
-      const raw = fs.readFileSync(EMPLOYEES_FILE, 'utf8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        store.mockEmployees = parsed;
-        return parsed;
-      }
-    }
-  } catch (err) {
-    console.error('[loadEmployeesFromFile warn]:', err.message);
+  const list = safeReadJson(EMPLOYEES_FILE, null);
+  if (Array.isArray(list) && list.length > 0) {
+    store.mockEmployees = list;
+    return list;
   }
   return store.mockEmployees || [];
 }
 
-// Helper to save employees to disk
+// Helper to save employees safely
 function saveEmployeesToFile(list) {
   store.mockEmployees = list;
-  try {
-    fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(list, null, 2), 'utf8');
-  } catch (err) {
-    console.error('[saveEmployeesToFile warn]:', err.message);
-  }
+  safeWriteJson(EMPLOYEES_FILE, list);
 }
 
 // Helper to decorate employee with mock UI fields
@@ -224,8 +215,8 @@ const createEmployee = async (req, res) => {
       phone: phone || '+91 98765 43210',
       role: role || 'Sales & Operations Associate',
       department: department || 'Sales & Operations',
-      kpiScore: '92%',
-      kpiScoreNum: 92,
+      kpiScore: '85%',
+      kpiScoreNum: 85,
       tasksCompleted: 0,
       callsHandled: 0,
       salesClosed: 0,
@@ -257,34 +248,57 @@ const createEmployee = async (req, res) => {
       ]
     };
 
-    // Try DB insert safely
-    try {
-      await Employee.create({
-        id: empId,
-        name: newEmp.name,
-        email: newEmp.email,
-        phone: newEmp.phone,
-        role: newEmp.role,
-        department: newEmp.department,
-        status: newEmp.status,
-        tasksCompleted: 0,
-        callsHandled: 0,
-        salesClosed: 0
-      });
-    } catch (e) {
-      console.log('[DB createEmployee non-critical warn]:', e.message);
+    // Persist to PostgreSQL if connected with atomic transaction
+    if (isDbConnected()) {
+      const { sequelize } = require('../config/db');
+      const { User } = require('../models');
+      const t = await sequelize.transaction();
+      try {
+        await Employee.create({
+          id: empId,
+          name: newEmp.name,
+          email: newEmp.email,
+          phone: newEmp.phone,
+          role: newEmp.role,
+          department: newEmp.department,
+          status: newEmp.status,
+          kpiScore: newEmp.kpiScore,
+          tasksCompleted: 0,
+          callsHandled: 0,
+          salesClosed: 0,
+          totalRevenue: 0,
+          activeTask: newEmp.activeTask,
+          taskQueue: newEmp.taskQueue
+        }, { transaction: t });
+
+        await User.findOrCreate({
+          where: { email: newEmp.email },
+          defaults: {
+            id: `u${Date.now()}`,
+            name: newEmp.name,
+            email: newEmp.email,
+            role: newEmp.role.includes('Admin') ? 'admin' : (newEmp.role.includes('Manager') ? 'manager' : 'employee'),
+            department: newEmp.department,
+            phone: newEmp.phone,
+            isActive: true
+          },
+          transaction: t
+        });
+
+        await t.commit();
+      } catch (e) {
+        await t.rollback();
+        console.warn('[DB createEmployee transaction non-critical warn]:', e.message);
+      }
     }
 
-    // Save to employees_data.json
+    // Save to employees store
     currentList.unshift(newEmp);
     saveEmployeesToFile(currentList);
 
-    // Also sync to users_data.json so they appear in Users & Roles
+    // Also sync to users store so they appear in Users & Roles
     try {
-      let usersList = [];
-      if (fs.existsSync(USERS_FILE)) {
-        usersList = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-      }
+      let usersList = safeReadJson(USERS_FILE, []);
       if (!usersList.some(u => u.email === newEmp.email)) {
         usersList.unshift({
           id: `u${Date.now()}`,
@@ -296,7 +310,7 @@ const createEmployee = async (req, res) => {
           status: 'Online',
           createdAt: new Date().toISOString()
         });
-        fs.writeFileSync(USERS_FILE, JSON.stringify(usersList, null, 2), 'utf8');
+        safeWriteJson(USERS_FILE, usersList);
         store.mockUsers = usersList;
       }
     } catch (err) {
@@ -453,31 +467,36 @@ const getTimeInStage = async (req, res) => {
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
+    let empData = null;
     try {
-      const empData = await Employee.findByPk(id);
+      empData = await Employee.findByPk(id);
       if (empData) await empData.destroy();
     } catch {}
 
     const currentList = loadEmployeesFromFile();
     const target = currentList.find(e => e.id === id);
+    if (!target && !empData) {
+      return res.status(404).json({ error: 'Employee not found', code: 'EMPLOYEE_NOT_FOUND' });
+    }
+
     const updatedList = currentList.filter(e => e.id !== id);
     saveEmployeesToFile(updatedList);
 
     // Also remove from users_data.json if matching email
     if (target && target.email) {
       try {
-        if (fs.existsSync(USERS_FILE)) {
-          let users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-          users = users.filter(u => u.email !== target.email);
-          fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
-          store.mockUsers = users;
-        }
+        let users = safeReadJson(USERS_FILE, []);
+        users = users.filter(u => u.email !== target.email);
+        safeWriteJson(USERS_FILE, users);
+        store.mockUsers = users;
       } catch {}
     }
 
+    const deletedEmployee = target || { id, name: empData?.name || id };
     return res.json({
       success: true,
-      message: `Team member was successfully deleted.`
+      message: `Team member "${deletedEmployee.name || id}" was successfully deleted.`,
+      deletedEmployee
     });
   } catch (error) {
     console.error(error);

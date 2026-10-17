@@ -325,9 +325,11 @@ const transitionLead = async (req, res) => {
     
     let activityEntry = null;
 
-    if (!isMock) {
+    if (!isMock && isDbConnected()) {
+      const { sequelize } = require('../config/db');
+      const t = await sequelize.transaction();
       try {
-        await lead.save();
+        await lead.save({ transaction: t });
         activityEntry = await ActivityLog.create({
           id: `log${Date.now()}`,
           leadId: lead.id,
@@ -338,9 +340,12 @@ const transitionLead = async (req, res) => {
             : `Transitioned Lead to ${toStage}`,
           fromStage: oldStage,
           toStage: toStage
-        });
+        }, { transaction: t });
+        await t.commit();
       } catch (e) {
-        console.warn('Failed to save to Postgres DB:', e.message);
+        await t.rollback();
+        console.warn('Postgres DB transition transaction rolled back:', e.message);
+        throw e;
       }
     } else {
       // For mock leads, push to the in-memory ActivityLogs array
@@ -354,6 +359,8 @@ const transitionLead = async (req, res) => {
           action: countersignedBy
             ? `Countersigned transition: ${oldStage} → ${toStage} by ${countersignedBy}`
             : `Transitioned Lead to ${toStage}`,
+          fromStage: oldStage,
+          toStage: toStage,
           createdAt: new Date().toISOString()
         };
         mockActivityLogs.unshift(activityEntry);

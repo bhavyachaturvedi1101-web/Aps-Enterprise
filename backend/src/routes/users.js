@@ -3,6 +3,10 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const store = require('../config/inMemoryStore');
+const { authorize } = require('../middleware/rbacMiddleware');
+
+const { isDbConnected } = require('../config/db');
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
 
 const USERS_FILE = path.join(__dirname, '../../users_data.json');
 const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
@@ -12,43 +16,53 @@ const DEFAULT_USERS = [
   { id: 'u1', name: 'Super Admin', email: ADMIN_EMAIL, role: 'Super Admin', module: 'All Modules', lastLogin: 'Now', status: 'Online' }
 ];
 
-// Helper to load users from file or in-memory
+// Helper to load users safely
 function loadUsers() {
-  try {
-    if (fs.existsSync(USERS_FILE)) {
-      const raw = fs.readFileSync(USERS_FILE, 'utf8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        store.mockUsers = parsed;
-        return parsed;
-      }
-    }
-  } catch (e) {
-    console.error('Error reading users_data.json:', e);
+  const list = safeReadJson(USERS_FILE, null);
+  if (Array.isArray(list) && list.length > 0) {
+    store.mockUsers = list;
+    return list;
   }
   if (!store.mockUsers) {
     store.mockUsers = [...DEFAULT_USERS];
-    try {
-      fs.writeFileSync(USERS_FILE, JSON.stringify(store.mockUsers, null, 2), 'utf8');
-    } catch {}
+    safeWriteJson(USERS_FILE, store.mockUsers);
   }
   return store.mockUsers;
 }
 
-// Helper to save users
+// Helper to save users safely
 function saveUsers(usersList) {
   store.mockUsers = usersList;
-  try {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(usersList, null, 2), 'utf8');
-  } catch (e) {
-    console.error('Error writing users_data.json:', e);
-  }
+  safeWriteJson(USERS_FILE, usersList);
 }
 
-// GET /api/users — List all system users & roles
-router.get('/', async (req, res) => {
+// GET /api/users — List all system users & roles (Admin only)
+router.get('/', authorize(['admin']), async (req, res) => {
   try {
-    const users = loadUsers();
+    let dbUsers = [];
+    if (isDbConnected()) {
+      try {
+        const { User } = require('../models');
+        dbUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
+      } catch (e) {}
+    }
+
+    const fileUsers = loadUsers();
+    let users = fileUsers;
+    if (dbUsers && dbUsers.length > 0) {
+      const dbFormatted = dbUsers.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role === 'admin' ? 'Super Admin' : (u.role === 'manager' ? 'Operations Manager' : 'Team Associate'),
+        module: u.department || 'Operations & CRM',
+        lastLogin: u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : 'Recent',
+        status: u.isActive ? 'Online' : 'Offline'
+      }));
+      const existingEmails = new Set(dbFormatted.map(u => u.email.toLowerCase()));
+      users = [...dbFormatted, ...fileUsers.filter(u => !existingEmails.has(u.email.toLowerCase()))];
+    }
+
     return res.json({
       success: true,
       count: users.length,
@@ -59,8 +73,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/users — Create a new system user
-router.post('/', async (req, res) => {
+// POST /api/users — Create a new system user (Admin only)
+router.post('/', authorize(['admin']), async (req, res) => {
   try {
     const { name, email, role, module, status } = req.body;
     if (!name || !email) {
@@ -82,12 +96,29 @@ router.post('/', async (req, res) => {
     users.unshift(newUser);
     saveUsers(users);
 
-    // Also sync to employees_data.json so they appear in Team KPIs
-    try {
-      let empList = [];
-      if (fs.existsSync(EMPLOYEES_FILE)) {
-        empList = JSON.parse(fs.readFileSync(EMPLOYEES_FILE, 'utf8'));
+    // Persist to DB if connected
+    if (isDbConnected()) {
+      try {
+        const { User } = require('../models');
+        await User.findOrCreate({
+          where: { email: newUser.email },
+          defaults: {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role.toLowerCase().includes('admin') ? 'admin' : (newUser.role.toLowerCase().includes('manager') ? 'manager' : 'employee'),
+            department: newUser.module || 'Operations',
+            isActive: true
+          }
+        });
+      } catch (dbErr) {
+        console.warn('[users.js DB create warning]:', dbErr.message);
       }
+    }
+
+    // Also sync to employees store so they appear in Team KPIs
+    try {
+      let empList = safeReadJson(EMPLOYEES_FILE, []);
       if (!empList.some(e => e.email?.toLowerCase() === newUser.email.toLowerCase())) {
         const empId = `e${empList.length + 1}`;
         const newEmp = {
@@ -119,7 +150,7 @@ router.post('/', async (req, res) => {
           taskQueue: []
         };
         empList.unshift(newEmp);
-        fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(empList, null, 2), 'utf8');
+        safeWriteJson(EMPLOYEES_FILE, empList);
         store.mockEmployees = empList;
       }
     } catch (err) {
@@ -147,8 +178,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/users/:id — Update user
-router.put('/:id', async (req, res) => {
+// PUT /api/users/:id — Update user (Admin only)
+router.put('/:id', authorize(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const users = loadUsers();
@@ -176,8 +207,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/users/:id — Remove user
-router.delete('/:id', async (req, res) => {
+// DELETE /api/users/:id — Remove user (Admin only)
+router.delete('/:id', authorize(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const users = loadUsers();
@@ -186,21 +217,26 @@ router.delete('/:id', async (req, res) => {
     const remaining = users.filter(u => u.id !== id && u.email?.toLowerCase() !== id.toLowerCase());
     saveUsers(remaining);
 
+    // Also delete from PostgreSQL if connected
+    if (isDbConnected()) {
+      try {
+        const { User } = require('../models');
+        await User.destroy({ where: { id } });
+      } catch (e) {}
+    }
+
     // Also sync and remove from employees if applicable
     if (targetUser) {
       try {
-        if (fs.existsSync(EMPLOYEES_FILE)) {
-          const empRaw = fs.readFileSync(EMPLOYEES_FILE, 'utf8');
-          const empList = JSON.parse(empRaw);
-          if (Array.isArray(empList)) {
-            const updatedEmps = empList.filter(e => 
-              e.email?.toLowerCase() !== targetUser.email?.toLowerCase() &&
-              e.name?.toLowerCase() !== targetUser.name?.toLowerCase()
-            );
-            fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(updatedEmps, null, 2), 'utf8');
-            if (store.mockEmployees) {
-              store.mockEmployees = updatedEmps;
-            }
+        const empList = safeReadJson(EMPLOYEES_FILE, []);
+        if (Array.isArray(empList)) {
+          const updatedEmps = empList.filter(e => 
+            e.email?.toLowerCase() !== targetUser.email?.toLowerCase() &&
+            e.name?.toLowerCase() !== targetUser.name?.toLowerCase()
+          );
+          safeWriteJson(EMPLOYEES_FILE, updatedEmps);
+          if (store.mockEmployees) {
+            store.mockEmployees = updatedEmps;
           }
         }
       } catch (err) {

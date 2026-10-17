@@ -88,6 +88,43 @@ export default function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newLead, setNewLead] = useState({ name: '', interest: 'Fully Automatic Double Die Dona Pattal Machine', budget: '125000', source: 'Meta Ads', notes: '' });
 
+  // Live Data Hydration from Backend API (decoupling mock state)
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchDashboardData() {
+      try {
+        const headers = {};
+        const token = localStorage.getItem('aps_token') || sessionStorage.getItem('aps_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const [leadsRes, invRes, invSummaryRes] = await Promise.allSettled([
+          fetch(`${API}/leads`, { headers }),
+          fetch(`${API}/inventory`, { headers }),
+          fetch(`${API}/inventory/summary`, { headers })
+        ]);
+
+        if (!isMounted) return;
+
+        if (leadsRes.status === 'fulfilled' && leadsRes.value.ok) {
+          const data = await leadsRes.value.json();
+          if (data.leads && Array.isArray(data.leads)) setLeads(data.leads);
+        }
+        if (invRes.status === 'fulfilled' && invRes.value.ok) {
+          const data = await invRes.value.json();
+          if (data.inventory && Array.isArray(data.inventory)) setInventoryItems(data.inventory);
+        }
+        if (invSummaryRes.status === 'fulfilled' && invSummaryRes.value.ok) {
+          const data = await invSummaryRes.value.json();
+          if (data.summary) setInventorySummary(data.summary);
+        }
+      } catch (err) {
+        console.warn('[Dashboard Fetch Live]', err.message);
+      }
+    }
+    fetchDashboardData();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleAddLeadSubmit = async (e) => {
     e.preventDefault();
     if (!newLead.name) return alert('Lead name is required!');
