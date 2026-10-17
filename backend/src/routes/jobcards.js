@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { JobCard, Booking, Lead } = require('../models');
 const whatsappService = require('../services/whatsappService');
+const { authorize } = require('../middleware/rbacMiddleware');
 
 const MILESTONE_NAMES = ['Material Procured', 'CNC Assembly', 'Quality Testing', 'Dispatch Ready'];
 
@@ -75,8 +76,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/jobcards — create job card for a booking/lead
-router.post('/', async (req, res) => {
+// POST /api/jobcards — create job card for a booking/lead (Admin / Manager)
+router.post('/', authorize(['admin', 'manager']), async (req, res) => {
   try {
     const { leadId, bookingId, product, clientName, priority, estimatedCompletionDate, assignedTeam } = req.body;
     if (!leadId || !product || !clientName) {
@@ -110,7 +111,7 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH /api/jobcards/:id/milestone — complete current milestone
-router.patch('/:id/milestone', async (req, res) => {
+router.patch('/:id/milestone', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   try {
     const { id } = req.params;
     const { completedBy, notes } = req.body;

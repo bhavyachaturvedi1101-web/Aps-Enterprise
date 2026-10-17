@@ -5,6 +5,12 @@
   "main": "backend/src/app.js",
   "scripts": {
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
+    "test": "npm --prefix backend test",
+    "test:ci": "npm --prefix backend test",
+    "verify:release": "node scripts/release-verify.js",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
     "start": "node scripts/start-dev.js",
     "dev": "node scripts/start-dev.js",
     "dev:backend": "npm --prefix backend run dev",

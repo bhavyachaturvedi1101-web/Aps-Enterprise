@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_aps_key_2026';
 const ADMIN_EMAIL = (process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in').toLowerCase();
 const ADMIN_API_KEY = process.env.API_KEY || 'admin-key-123';
+
+// Configurable Operator Passwords via Environment (with safe fallback for demo/development)
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const OPERATOR_PASSWORD = process.env.OPERATOR_PASSWORD || 'aps2026';
 
 // Production Operator Registry for APS Enterprises (Dedicated User per Panel)
 const OPERATORS = [
@@ -94,7 +99,7 @@ const OPERATORS = [
 ];
 
 // POST /api/auth/login — Authenticate system operator
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -109,12 +114,23 @@ router.post('/login', (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // Find operator matching primary or alternative email
+    // 1. Check PostgreSQL User table if available
+    let dbUser = null;
+    try {
+      const { User } = require('../models');
+      dbUser = await User.findOne({
+        where: { email: cleanEmail }
+      });
+    } catch (dbErr) {
+      // Non-critical if DB offline; fallback to OPERATORS registry
+    }
+
+    // 2. Find operator matching primary or alternative email
     const operator = OPERATORS.find(
       op => op.email === cleanEmail || (op.altEmail && op.altEmail === cleanEmail)
     );
 
-    if (!operator) {
+    if (!operator && !dbUser) {
       return res.status(401).json({
         success: false,
         error: 'Invalid Credentials',
@@ -122,17 +138,48 @@ router.post('/login', (req, res) => {
       });
     }
 
-    // Password validation:
-    // Allows ADMIN_API_KEY, JWT_SECRET, or custom configured password
-    const validPasswords = [
-      ADMIN_API_KEY,
-      process.env.ADMIN_PASSWORD,
-      'admin123',
-      'aps2026',
-      'password123'
-    ].filter(Boolean);
+    // 3. Password validation with Bcrypt & Env config
+    let isMatch = false;
 
-    const isMatch = validPasswords.some(p => p === cleanPass);
+    // Check DB user hash
+    if (dbUser && dbUser.passwordHash) {
+      try {
+        isMatch = await bcrypt.compare(cleanPass, dbUser.passwordHash);
+      } catch (e) {}
+    }
+
+    // Check against environment-configured operator passwords
+    if (!isMatch && operator) {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const expectedPass = operator.role === 'admin' ? ADMIN_PASSWORD : OPERATOR_PASSWORD;
+      
+      // In production, reject known insecure defaults if not explicitly overridden
+      if (isProduction && (cleanPass === 'admin123' || cleanPass === 'aps2026') && !process.env.ALLOW_DEFAULT_PASSWORDS_IN_PROD) {
+        return res.status(403).json({
+          success: false,
+          error: 'Insecure Default Password Blocked',
+          message: 'Default passwords are not permitted in production. Please set custom ADMIN_PASSWORD in environment or use database password hash.'
+        });
+      }
+
+      // Allow operator's designated password, universal admin password, or demo operator passwords
+      const acceptedPasswords = [
+        expectedPass,
+        ADMIN_PASSWORD,
+        OPERATOR_PASSWORD,
+        'admin123',
+        'aps2026'
+      ].filter(Boolean);
+
+      if (acceptedPasswords.includes(cleanPass)) {
+        isMatch = true;
+      }
+    }
+
+    // Check static API key direct authentication
+    if (!isMatch && ADMIN_API_KEY && cleanPass === ADMIN_API_KEY) {
+      isMatch = true;
+    }
 
     if (!isMatch) {
       return res.status(401).json({
@@ -142,23 +189,40 @@ router.post('/login', (req, res) => {
       });
     }
 
-    // Generate JWT token
+    // Build user session payload
+    const activeUser = operator || {
+      id: dbUser.id,
+      name: dbUser.name,
+      email: dbUser.email,
+      role: dbUser.role,
+      title: dbUser.title || `${dbUser.role} Operator`,
+      avatar: (dbUser.name || 'U').charAt(0).toUpperCase(),
+      avatarBg: dbUser.avatarBg || '#2563eb',
+      permissions: ['Platform Access', 'Operational Tasks'],
+      defaultRoute: dbUser.role === 'admin' ? '/dashboard' : '/crm'
+    };
+
+    // Generate JWT token (7 days expiry)
     const token = jwt.sign(
       {
-        id: operator.id,
-        name: operator.name,
-        email: operator.email,
-        role: operator.role
+        id: activeUser.id,
+        name: activeUser.name,
+        email: activeUser.email,
+        role: activeUser.role
       },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
 
+    // Strip passwordHashes before returning
+    const safeUser = { ...activeUser };
+    delete safeUser.passwordHashes;
+
     return res.json({
       success: true,
       message: 'Authentication successful',
       token,
-      user: operator
+      user: safeUser
     });
   } catch (err) {
     console.error('[Auth Login Error]', err);
@@ -167,6 +231,19 @@ router.post('/login', (req, res) => {
       error: 'Authentication Server Error',
       message: err.message
     });
+  }
+});
+
+// GET /api/auth/verify — Verify token validity
+router.get('/verify', (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.replace(/^Bearer\s+/, '');
+  if (!token) return res.status(401).json({ valid: false, error: 'No token' });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return res.json({ valid: true, user: decoded });
+  } catch (err) {
+    return res.status(401).json({ valid: false, error: 'Token expired or invalid' });
   }
 });
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const whatsappService = require('../services/whatsappService');
+const { authorize } = require('../middleware/rbacMiddleware');
 
 // GET /api/whatsapp/messages — Audit log of sent automated WhatsApp messages
 router.get('/messages', async (req, res) => {
@@ -26,8 +27,8 @@ router.get('/analytics', async (req, res) => {
   res.json({ analytics });
 });
 
-// POST /api/whatsapp/sequences/:id/toggle — Toggle sequence active/paused
-router.post('/sequences/:id/toggle', async (req, res) => {
+// POST /api/whatsapp/sequences/:id/toggle — Toggle sequence active/paused (Admin / Manager)
+router.post('/sequences/:id/toggle', authorize(['admin', 'manager']), async (req, res) => {
   try {
     const result = await whatsappService.toggleSequence(req.params.id);
     res.json(result);
@@ -36,8 +37,8 @@ router.post('/sequences/:id/toggle', async (req, res) => {
   }
 });
 
-// POST /api/whatsapp/sequences/:id/update — Update sequence delay / params
-router.post('/sequences/:id/update', async (req, res) => {
+// POST /api/whatsapp/sequences/:id/update — Update sequence delay / params (Admin / Manager)
+router.post('/sequences/:id/update', authorize(['admin', 'manager']), async (req, res) => {
   try {
     const result = await whatsappService.updateSequence(req.params.id, req.body);
     res.json(result);
@@ -46,8 +47,8 @@ router.post('/sequences/:id/update', async (req, res) => {
   }
 });
 
-// POST /api/whatsapp/send-reminder — Trigger payment reminder sequence for one or all leads
-router.post('/send-reminder', async (req, res) => {
+// POST /api/whatsapp/send-reminder — Trigger payment reminder sequence (Admin / Manager)
+router.post('/send-reminder', authorize(['admin', 'manager']), async (req, res) => {
   const { leadId, leadIds, all } = req.body;
   try {
     if (all || leadId === 'all' || (Array.isArray(leadIds) && leadIds.length > 0)) {
@@ -62,8 +63,8 @@ router.post('/send-reminder', async (req, res) => {
   }
 });
 
-// POST /api/whatsapp/send-custom — Send arbitrary template message
-router.post('/send-custom', async (req, res) => {
+// POST /api/whatsapp/send-custom — Send arbitrary template message (Admin / Manager)
+router.post('/send-custom', authorize(['admin', 'manager']), async (req, res) => {
   try {
     const result = await whatsappService.sendCustomMessage(req.body);
     res.json(result);
@@ -72,7 +73,7 @@ router.post('/send-custom', async (req, res) => {
   }
 });
 
-// ─── Meta Cloud API Webhook ───────────────────────────────────────────────────
+// ─── Meta Cloud API Webhook (Public Callback) ──────────────────────────────────
 // GET /api/whatsapp/webhook — Meta webhook verification challenge
 router.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];

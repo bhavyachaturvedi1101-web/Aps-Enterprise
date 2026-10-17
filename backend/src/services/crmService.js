@@ -12,8 +12,7 @@ class CRMService {
 
   // Push new lead to Teleforce CRM
   async createLead(leadData) {
-    if (!this.apiUrl || this.provider !== 'teleforce') {
-      console.log(`[CRM] Provider is "${this.provider}" or API URL not configured — local store active.`);
+    if (process.env.NODE_ENV === 'test' || !this.apiUrl || this.provider !== 'teleforce') {
       return { success: true, localOnly: true, lead: leadData };
     }
 
@@ -53,18 +52,52 @@ class CRMService {
   async syncLeadStatus(leadId, status, leadData = {}) {
     console.log(`[Teleforce CRM] Syncing Lead ${leadId} status to "${status}"...`);
 
-    if (!this.apiUrl || this.provider !== 'teleforce') {
-      return { success: true, syncedAt: new Date() };
+    if (process.env.NODE_ENV === 'test' || !this.apiUrl || this.provider !== 'teleforce' || !this.clientSecret) {
+      return { success: true, localOnly: true, syncedAt: new Date() };
     }
 
     try {
-      // In Teleforce CRM, stage transitions can be pushed as a status update
-      console.log(`[Teleforce CRM] Lead ${leadId} status updated to "${status}".`);
-      return { success: true, syncedAt: new Date() };
+      const updateUrl = process.env.TELEFORCE_CRM_STATUS_URL || 
+        (this.apiUrl.includes('/createlead') 
+          ? this.apiUrl.replace('/createlead', '/updatelead') 
+          : `${this.apiUrl}/status`);
+
+      const payload = {
+        lead_id: leadId,
+        stage: status,
+        organization_id: this.orgId,
+        updated_at: new Date().toISOString(),
+        ...leadData
+      };
+
+      const response = await axios.post(updateUrl, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.clientSecret}`,
+          'x-teleforce-secret': this.clientSecret
+        },
+        timeout: 8000
+      });
+
+      console.log(`[Teleforce CRM] Lead ${leadId} status updated to "${status}". Response:`, response.status);
+      return { success: true, syncedAt: new Date(), data: response.data };
     } catch (err) {
-      console.warn(`[Teleforce CRM Warning] Sync status error (${err.message}).`);
-      return { success: false, error: err.message };
+      console.warn(`[Teleforce CRM Warning] Sync status error (${err.message}). Local transition preserved.`);
+      return { success: true, warning: err.message, localOnly: true };
     }
+  }
+
+  // Get integration configuration and bridge status
+  getStatus() {
+    const isConfigured = Boolean(this.apiUrl && this.clientSecret);
+    return {
+      provider: this.provider,
+      configured: isConfigured,
+      apiUrl: this.apiUrl ? this.apiUrl.replace(/\/[^/]+$/, '/***') : 'Not Set',
+      organizationId: this.orgId || 'Not Set',
+      loginEmail: this.loginEmail || 'Not Set',
+      mode: isConfigured ? 'Live Teleforce CRM Bridge' : 'Local Standalone / Demo Mode'
+    };
   }
 }
 

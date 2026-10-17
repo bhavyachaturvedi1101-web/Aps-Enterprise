@@ -1,15 +1,19 @@
 'use strict';
-// A4 Dialer Service — Priority Queue Engine
+// A4 Dialer Service — Durable Priority Queue Engine
+const path = require('path');
 const { Lead } = require('../models');
 const { mockLeads } = require('../config/inMemoryStore');
 const { isDbConnected } = require('../config/db');
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+
+const DIALER_QUEUE_FILE = path.join(__dirname, '../../dialer_queue.json');
 
 // ─── Priority weights ─────────────────────────────────────────────────────────
 const PRIORITY_WEIGHTS = { Hot: 3, High: 2, Normal: 1, Low: 0 };
 const STATUS_PRIORITY = { Enquiry: 2, Qualified: 3, Booked: 1 };
 
-// ─── In-memory queue ──────────────────────────────────────────────────────────
-let callQueue = [];
+// ─── In-memory cache backed by durable disk/serverless storage ────────────────
+let callQueue = safeReadJson(DIALER_QUEUE_FILE, []);
 let callStats = { queued: 0, active: 0, completed: 0, failed: 0 };
 
 function rebuildStats() {
@@ -21,7 +25,11 @@ function rebuildStats() {
   };
 }
 
-// ─── Initialize queue from DB/mock leads ──────────────────────────────────────
+function persistQueue() {
+  safeWriteJson(DIALER_QUEUE_FILE, callQueue);
+}
+
+// ─── Initialize queue from DB/mock leads + hydrate persisted states ──────────
 async function initQueue() {
   try {
     let leads = [];
@@ -32,24 +40,47 @@ async function initQueue() {
       leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
     }
 
-    callQueue = leads.map((l, i) => ({
-      id: `C${String(i + 1).padStart(3, '0')}`,
-      leadId: l.id,
-      name: l.name || l.company,
-      phone: l.phone || '+91 98765 43210',
-      product: l.interest || 'Machine Enquiry',
-      priority: l.priority || 'Normal',
-      stage: l.stage,
-      agent: 'Voice AI',
-      status: 'Queued',
-      addedAt: l.createdAt || new Date(),
-      callSid: null
-    }));
+    const persisted = safeReadJson(DIALER_QUEUE_FILE, []);
+    const existingMap = new Map();
+    if (Array.isArray(persisted) && persisted.length > 0) {
+      persisted.forEach(p => existingMap.set(p.leadId, p));
+    }
 
-    // Sort by priority
+    // Merge persisted states with inbound leads
+    const mergedQueue = leads.map((l, i) => {
+      const saved = existingMap.get(l.id);
+      if (saved) {
+        return {
+          ...saved,
+          name: l.name || l.company || saved.name,
+          phone: l.phone || saved.phone,
+          product: l.interest || saved.product,
+          priority: l.priority || saved.priority,
+          stage: l.stage || saved.stage
+        };
+      }
+      return {
+        id: `C${String(i + 1).padStart(3, '0')}`,
+        leadId: l.id,
+        name: l.name || l.company,
+        phone: l.phone || '+91 98765 43210',
+        product: l.interest || 'Machine Enquiry',
+        priority: l.priority || 'Normal',
+        stage: l.stage,
+        agent: 'Voice AI',
+        status: 'Queued',
+        addedAt: l.createdAt || new Date(),
+        callSid: null
+      };
+    });
+
+    callQueue = mergedQueue;
+
+    // Sort by priority (Hot > High > Normal > Low)
     callQueue.sort((a, b) => (PRIORITY_WEIGHTS[b.priority] || 0) - (PRIORITY_WEIGHTS[a.priority] || 0));
     rebuildStats();
-    console.log(`[Dialer] Queue initialized with ${callQueue.length} leads`);
+    persistQueue();
+    console.log(`[Dialer] Durable queue initialized with ${callQueue.length} leads (persisted in dialer_queue.json)`);
   } catch (err) {
     console.warn('[Dialer] Queue init failed:', err.message);
   }
@@ -111,13 +142,13 @@ class DialerService {
     else callQueue.splice(insertIdx, 0, entry);
 
     rebuildStats();
+    persistQueue();
     return entry;
   }
 
   async triggerCall(callId, agentPhone = null) {
     const call = callQueue.find(c => c.id === callId);
     if (!call) return { success: false, error: 'Call not found in queue' };
-    if (call.status === 'In Progress') return { success: false, error: 'Call already in progress' };
 
     call.status = 'In Progress';
     call.startedAt = new Date();
@@ -172,6 +203,7 @@ class DialerService {
     }
 
     rebuildStats();
+    persistQueue();
     return { success: true, call, callSid: call.callSid };
   }
 
@@ -182,6 +214,7 @@ class DialerService {
     if (outcome) call.outcome = outcome;
     if (['Completed', 'Failed'].includes(status)) call.endedAt = new Date();
     rebuildStats();
+    persistQueue();
     return call;
   }
 
