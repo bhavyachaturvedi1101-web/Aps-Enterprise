@@ -1187,6 +1187,71 @@ export default function APSAIPage() {
   const inputRef = useRef(null);
   const convId = useRef(getConversationId());
 
+  // ─── Persistent AI Memory State ──────────────────────────────────────────
+  const [showMemoryModal, setShowMemoryModal] = useState(false);
+  const [memoriesList, setMemoriesList] = useState([]);
+  const [memoryFilter, setMemoryFilter] = useState('ALL');
+  const [memorySearchText, setMemorySearchText] = useState('');
+  const [newMemoryFact, setNewMemoryFact] = useState('');
+  const [newMemoryTarget, setNewMemoryTarget] = useState('');
+  const [memorySaving, setMemorySaving] = useState(false);
+  const [memoryAlert, setMemoryAlert] = useState(null);
+
+  const fetchMemories = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/memory`);
+      if (res.data?.memories) {
+        setMemoriesList(res.data.memories);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchMemories();
+  }, [fetchMemories]);
+
+  const handleSaveMemoryDirect = async (e) => {
+    if (e) e.preventDefault();
+    if (!newMemoryFact || !newMemoryFact.trim() || memorySaving) return;
+    setMemorySaving(true);
+    setMemoryAlert(null);
+    try {
+      const res = await axios.post(`${API}/memory`, {
+        fact: newMemoryFact.trim(),
+        target: newMemoryTarget.trim() || null,
+        type: 'LEARNED_FACT'
+      });
+      if (res.data?.success) {
+        setNewMemoryFact('');
+        setNewMemoryTarget('');
+        setMemoryAlert({ type: 'success', text: 'Knowledge successfully saved to AI persistent memory!' });
+        fetchMemories();
+        setTimeout(() => setMemoryAlert(null), 4000);
+      }
+    } catch {
+      setMemoryAlert({ type: 'error', text: 'Failed to save memory to backend.' });
+    } finally {
+      setMemorySaving(false);
+    }
+  };
+
+  const handleDeleteMemoryItem = async (id) => {
+    try {
+      await axios.delete(`${API}/memory/${id}`);
+      fetchMemories();
+    } catch {}
+  };
+
+  const handleClearAllMemory = async () => {
+    if (!window.confirm('Are you sure you want to reset all AI persistent memories to initial system state?')) return;
+    try {
+      await axios.delete(`${API}/memory`);
+      fetchMemories();
+      setMemoryAlert({ type: 'success', text: 'All memories reset to initial baseline.' });
+      setTimeout(() => setMemoryAlert(null), 3000);
+    } catch {}
+  };
+
   // Save history whenever messages change
   useEffect(() => {
     saveHistory(messages);
@@ -1338,6 +1403,7 @@ export default function APSAIPage() {
           window.dispatchEvent(new CustomEvent('aps_whatsapp_updated', { detail: data.sentWhatsAppMessage }));
         } catch {}
       }
+      fetchMemories();
 
       setMessages(prev => [
         ...prev.slice(0, -1),
@@ -1408,6 +1474,19 @@ export default function APSAIPage() {
         </div>
 
         <div style={s.headerRight}>
+          <button
+            onClick={() => {
+              setShowMemoryModal(true);
+              fetchMemories();
+            }}
+            style={s.memoryHeaderBtn}
+            title="View & Manage AI Persistent Memory"
+          >
+            <span style={{ fontSize: '1.05rem' }}>🧠</span>
+            <span style={{ fontWeight: 700 }}>AI Memory</span>
+            <span style={s.memoryBadgeCount}>{memoriesList.length}</span>
+          </button>
+
           <button onClick={clearHistory} style={s.actionBtn} title="Reset Chat">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
@@ -1469,6 +1548,36 @@ export default function APSAIPage() {
             <div style={s.knowledgeItem}>
               <span style={s.kKey}>Sales Team:</span>
               <span style={s.kVal}>5 Active Operators</span>
+            </div>
+          </div>
+
+          <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+              <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
+                <span>🧠</span>
+                <span>AI Persistent Memory</span>
+              </div>
+              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>
+                {memoriesList.length} items
+              </span>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+              APS AI saves learned facts, employee boundaries, and actions across all sessions.
+            </p>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              <button
+                onClick={() => { setShowMemoryModal(true); fetchMemories(); }}
+                style={{ flex: 1, padding: '6px 10px', borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Open Memory Hub
+              </button>
+              <button
+                onClick={() => sendQuery("Show AI memory")}
+                style={{ padding: '6px 10px', borderRadius: 8, background: '#fff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                title="Print memory in chat"
+              >
+                Log to Chat
+              </button>
             </div>
           </div>
         </div>
@@ -1556,6 +1665,16 @@ export default function APSAIPage() {
                       <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
                     </div>
                   </div>
+
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => { setShowMemoryModal(true); fetchMemories(); }}>
+                    <div style={{ ...s.cardIcon, color: '#0284c7', background: '#f0f9ff', borderColor: '#e0f2fe' }}>
+                      <span style={{ fontSize: '1.25rem' }}>🧠</span>
+                    </div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>AI Persistent Memory Space</div>
+                      <div style={s.cardDesc}>View what the AI has remembered, teach new operational directives, or check action logs.</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -1636,6 +1755,228 @@ export default function APSAIPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── AI Persistent Memory Modal & Knowledge Space ────────────────── */}
+      {showMemoryModal && (
+        <div style={s.modalBackdrop} onClick={() => setShowMemoryModal(false)}>
+          <div style={s.modalContainer} onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div style={s.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={s.modalBrainIcon}>🧠</div>
+                <div>
+                  <h2 style={s.modalTitle}>APS AI — Persistent Memory & Knowledge Space</h2>
+                  <div style={s.modalSubtitle}>
+                    All operational actions, learned guidelines, and security boundaries preserved across sessions
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowMemoryModal(false)}
+                style={s.modalCloseBtn}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick KPI Stats Summary */}
+            <div style={s.memoryStatsRow}>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>💡</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'LEARNED_FACT').length}</div>
+                  <div style={s.memoryStatLbl}>Learned Directives</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>📋</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length}</div>
+                  <div style={s.memoryStatLbl}>Tasks Allocated</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_REJECTED').length}</div>
+                  <div style={s.memoryStatLbl}>Guarded Actions</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>👥</span>
+                <div>
+                  <div style={s.memoryStatVal}>6 Active</div>
+                  <div style={s.memoryStatLbl}>Registered Employees</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Teach Form */}
+            <form onSubmit={handleSaveMemoryDirect} style={s.teachForm}>
+              <div style={s.teachFormTitle}>
+                <span>💡</span> Teach AI New Memory or Entity Directive
+              </div>
+              {memoryAlert && (
+                <div style={memoryAlert.type === 'success' ? s.alertSuccess : s.alertError}>
+                  {memoryAlert.text}
+                </div>
+              )}
+              <div style={s.teachInputsRow}>
+                <input
+                  type="text"
+                  placeholder="e.g. Animesh is our machinery raw material vendor from Bhopal..."
+                  value={newMemoryFact}
+                  onChange={(e) => setNewMemoryFact(e.target.value)}
+                  style={s.teachInputFact}
+                />
+                <input
+                  type="text"
+                  placeholder="Entity (e.g. Animesh)"
+                  value={newMemoryTarget}
+                  onChange={(e) => setNewMemoryTarget(e.target.value)}
+                  style={s.teachInputTarget}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMemoryFact.trim() || memorySaving}
+                  style={s.teachSubmitBtn}
+                >
+                  {memorySaving ? 'Saving...' : 'Save to Memory'}
+                </button>
+              </div>
+            </form>
+
+            {/* Search and Category Filters */}
+            <div style={s.filterBar}>
+              <div style={s.filterChips}>
+                {[
+                  { key: 'ALL', label: `All (${memoriesList.length})` },
+                  { key: 'LEARNED_FACT', label: `💡 Learned (${memoriesList.filter(m => m.type === 'LEARNED_FACT').length})` },
+                  { key: 'TASK_ASSIGNED', label: `📋 Tasks (${memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length})` },
+                  { key: 'TASK_REJECTED', label: `⚠️ Guarded (${memoriesList.filter(m => m.type === 'TASK_REJECTED').length})` }
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setMemoryFilter(tab.key)}
+                    style={{
+                      ...s.filterChip,
+                      ...(memoryFilter === tab.key ? s.filterChipActive : {})
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Search memories..."
+                value={memorySearchText}
+                onChange={(e) => setMemorySearchText(e.target.value)}
+                style={s.filterSearchInput}
+              />
+            </div>
+
+            {/* Memories Scrollable List */}
+            <div style={s.memoriesScrollList}>
+              {(() => {
+                const filtered = memoriesList.filter(m => {
+                  if (memoryFilter !== 'ALL' && m.type !== memoryFilter) return false;
+                  if (memorySearchText && memorySearchText.trim()) {
+                    const q = memorySearchText.toLowerCase();
+                    return (
+                      (m.summary && m.summary.toLowerCase().includes(q)) ||
+                      (m.target && m.target.toLowerCase().includes(q)) ||
+                      (m.type && m.type.toLowerCase().includes(q))
+                    );
+                  }
+                  return true;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div style={s.emptyMemoryState}>
+                      <div style={{ fontSize: '2.2rem', marginBottom: 8 }}>🧠</div>
+                      <div style={{ fontWeight: 700, color: '#1e293b' }}>No memories found</div>
+                      <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                        Teach the AI a new rule above or perform operational tasks to populate persistent memory.
+                      </div>
+                    </div>
+                  );
+                }
+
+                return filtered.map((m, idx) => {
+                  const isLearned = m.type === 'LEARNED_FACT';
+                  const isTask = m.type === 'TASK_ASSIGNED';
+                  const isRejected = m.type === 'TASK_REJECTED';
+                  const dateStr = new Date(m.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                  const timeStr = new Date(m.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                  return (
+                    <div key={m.id || idx} style={s.memoryItemCard}>
+                      <div style={s.memoryItemHeader}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{
+                            ...s.typeBadge,
+                            ...(isLearned ? s.typeBadgeLearned : (isTask ? s.typeBadgeTask : (isRejected ? s.typeBadgeRejected : s.typeBadgeSystem)))
+                          }}>
+                            {isLearned ? '💡 LEARNED FACT' : (isTask ? '📋 TASK ASSIGNED' : (isRejected ? '⚠️ GUARDED REJECTION' : '⚡ SYSTEM'))}
+                          </span>
+                          {m.target && (
+                            <span style={s.targetBadge}>
+                              Target: <strong>{m.target}</strong>
+                            </span>
+                          )}
+                          <span style={s.memoryTime}>{dateStr} {timeStr}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteMemoryItem(m.id)}
+                          style={s.deleteMemoryBtn}
+                          title="Delete memory entry"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                      <div style={s.memorySummaryText}>{m.summary}</div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={s.modalFooter}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={handleClearAllMemory}
+                  style={s.footerSecondaryBtn}
+                >
+                  Reset Memory
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMemoryModal(false);
+                    sendQuery("Show AI memory");
+                  }}
+                  style={s.footerQueryBtn}
+                >
+                  Recall in Chat
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMemoryModal(false)}
+                style={s.footerCloseBtn}
+              >
+                Close Space
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes apsai-page-dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
@@ -2207,5 +2548,350 @@ const s = {
     display: 'block',
     width: '100%',
     fontFamily: 'inherit'
+  },
+
+  // ── Persistent AI Memory Styles ──
+  memoryHeaderBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '7px 14px',
+    borderRadius: 10,
+    background: 'linear-gradient(135deg, #1e3a8a, #2563eb)',
+    border: 'none',
+    color: '#ffffff',
+    fontSize: '0.78rem',
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
+    transition: 'all 0.15s'
+  },
+  memoryBadgeCount: {
+    padding: '2px 7px',
+    borderRadius: 12,
+    background: 'rgba(255,255,255,0.25)',
+    color: '#ffffff',
+    fontSize: '0.7rem',
+    fontWeight: 800
+  },
+  modalBackdrop: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(15, 23, 42, 0.65)',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 99999,
+    padding: '1.5rem',
+    boxSizing: 'border-box'
+  },
+  modalContainer: {
+    background: '#ffffff',
+    borderRadius: 20,
+    width: '100%',
+    maxWidth: '760px',
+    maxHeight: '88vh',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+    overflow: 'hidden'
+  },
+  modalHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '1.2rem 1.6rem',
+    borderBottom: '1px solid #e2e8f0',
+    background: '#f8fafc'
+  },
+  modalBrainIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.35rem',
+    color: '#fff',
+    boxShadow: '0 4px 10px rgba(37,99,235,0.25)'
+  },
+  modalTitle: {
+    margin: 0,
+    fontSize: '1.08rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  modalSubtitle: {
+    fontSize: '0.74rem',
+    color: '#64748b',
+    marginTop: 2
+  },
+  modalCloseBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.1rem',
+    color: '#94a3b8',
+    cursor: 'pointer',
+    padding: 6,
+    borderRadius: 8,
+    transition: 'color 0.15s'
+  },
+  memoryStatsRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: 10,
+    padding: '1rem 1.6rem 0.6rem',
+    background: '#ffffff'
+  },
+  memoryStatCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '10px 12px',
+    borderRadius: 12,
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0'
+  },
+  memoryStatVal: {
+    fontSize: '1rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  memoryStatLbl: {
+    fontSize: '0.66rem',
+    fontWeight: 600,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: '0.3px'
+  },
+  teachForm: {
+    padding: '0.8rem 1.6rem',
+    background: '#f8fafc',
+    borderTop: '1px solid #e2e8f0',
+    borderBottom: '1px solid #e2e8f0'
+  },
+  teachFormTitle: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: '#334155',
+    marginBottom: 8,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  },
+  alertSuccess: {
+    padding: '7px 12px',
+    borderRadius: 8,
+    background: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    color: '#065f46',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    marginBottom: 8
+  },
+  alertError: {
+    padding: '7px 12px',
+    borderRadius: 8,
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
+    color: '#991b1b',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    marginBottom: 8
+  },
+  teachInputsRow: {
+    display: 'flex',
+    gap: 8,
+    alignItems: 'center'
+  },
+  teachInputFact: {
+    flex: 2,
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.78rem',
+    outline: 'none',
+    boxSizing: 'border-box'
+  },
+  teachInputTarget: {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.78rem',
+    outline: 'none',
+    boxSizing: 'border-box'
+  },
+  teachSubmitBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    fontSize: '0.76rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap'
+  },
+  filterBar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0.8rem 1.6rem 0.4rem',
+    gap: 12
+  },
+  filterChips: {
+    display: 'flex',
+    gap: 6,
+    flexWrap: 'wrap'
+  },
+  filterChip: {
+    padding: '5px 10px',
+    borderRadius: 20,
+    background: '#f1f5f9',
+    border: '1px solid #e2e8f0',
+    color: '#64748b',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    cursor: 'pointer'
+  },
+  filterChipActive: {
+    background: '#2563eb',
+    borderColor: '#2563eb',
+    color: '#ffffff'
+  },
+  filterSearchInput: {
+    padding: '6px 12px',
+    borderRadius: 20,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.72rem',
+    outline: 'none',
+    width: '180px'
+  },
+  memoriesScrollList: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '0.6rem 1.6rem 1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    minHeight: '220px'
+  },
+  memoryItemCard: {
+    padding: '10px 14px',
+    borderRadius: 10,
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4
+  },
+  memoryItemHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  typeBadge: {
+    fontSize: '0.64rem',
+    fontWeight: 800,
+    letterSpacing: '0.3px',
+    padding: '3px 8px',
+    borderRadius: 6
+  },
+  typeBadgeLearned: {
+    background: '#ecfdf5',
+    color: '#065f46',
+    border: '1px solid #a7f3d0'
+  },
+  typeBadgeTask: {
+    background: '#eff6ff',
+    color: '#1e40af',
+    border: '1px solid #bfdbfe'
+  },
+  typeBadgeRejected: {
+    background: '#fef2f2',
+    color: '#991b1b',
+    border: '1px solid #fecaca'
+  },
+  typeBadgeSystem: {
+    background: '#f5f3ff',
+    color: '#6b21a8',
+    border: '1px solid #ddd6fe'
+  },
+  targetBadge: {
+    fontSize: '0.68rem',
+    color: '#475569',
+    background: '#f1f5f9',
+    padding: '2px 6px',
+    borderRadius: 4
+  },
+  memoryTime: {
+    fontSize: '0.68rem',
+    color: '#94a3b8'
+  },
+  deleteMemoryBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    opacity: 0.6,
+    fontSize: '0.78rem',
+    padding: '2px 4px'
+  },
+  memorySummaryText: {
+    fontSize: '0.8rem',
+    color: '#1e293b',
+    lineHeight: 1.45,
+    marginTop: 2
+  },
+  emptyMemoryState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '3rem 1rem',
+    textAlign: 'center'
+  },
+  modalFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '1rem 1.6rem',
+    borderTop: '1px solid #e2e8f0',
+    background: '#f8fafc'
+  },
+  footerSecondaryBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#fee2e2',
+    color: '#991b1b',
+    border: 'none',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
+  },
+  footerQueryBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#eff6ff',
+    color: '#1d4ed8',
+    border: '1px solid #bfdbfe',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
+  },
+  footerCloseBtn: {
+    padding: '8px 16px',
+    borderRadius: 8,
+    background: '#0f172a',
+    color: '#ffffff',
+    border: 'none',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
   }
 };

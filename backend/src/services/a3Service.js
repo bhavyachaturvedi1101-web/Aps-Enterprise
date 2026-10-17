@@ -17,6 +17,7 @@ const LEADS_FILE = path.join(__dirname, '../../leads_data.json');
 const { mockLeads } = require('../config/inMemoryStore');
 const tallyService = require('./tallyService');
 const erpService = require('./erpService');
+const aiMemory = require('./aiMemoryService');
 
 function saveLeadsToDisk(leads) {
   try {
@@ -109,6 +110,24 @@ const INTENTS = [
   { name: 'landing_factory_options',      patterns: [/production progress options/i] },
   
   // ── Action Creation & Mutation Intents (Must be evaluated FIRST) ──
+  { name: 'ai_memory_teach', patterns: [
+    /\b(remember|yaad rakhna|yaad rakho|note down|save to memory|yeh yaad rakhna|yeh yaad rakho|save this fact|store this|save memory)\b/i,
+    /\b(teach ai|add to memory|note that|keep in mind)\b/i,
+    /\b(animesh is|animesh hamara|animesh hamare)\b/i
+  ] },
+  { name: 'ai_memory_recall', patterns: [
+    /\b(memory|actions|history|past actions|previous tasks?|recent actions|action log)\b/i,
+    /\b(kya kiya|kya kaam kiya|kya action liya|kisko task diya|kisko kaam diya|kise kaam diya)\b/i,
+    /\b(pichla task|pichla kaam|pichle actions|purana task|last task)\b/i,
+    /\bwhat did (you|i) (do|assign|perform|execute)\b/i,
+    /\bshow (ai )?memory\b/i,
+    /\bview (ai )?memory\b/i,
+    /\bcheck (ai )?memory\b/i,
+    /\b(who is|who's|kaun hai)\s+animesh\b/i,
+    /\banimesh.*(kya hua|kaha hai|ka task|status|kaun hai|kya hai|details?)\b/i,
+    /\bwhat do you (know|remember) about animesh\b/i,
+    /\brepeat.*(last|previous)\b/i
+  ] },
   { name: 'action_create_lead',     patterns: [
     /(create|generate|add|register|insert|make|new|naya|nayi)\s*(\d+)?\s*(new)?\s*(lead|client|prospect|customer|inquiry|deal|grahak)/i,
     /(lead|client|prospect|customer|grahak).*?(create|add|generate|register|banao|entry|daalo|dalo|karo)/i,
@@ -3277,7 +3296,19 @@ ${leadDetails || 'No leads found.'}
 ${recentActivity}
 
 ━━━ [10] DASHBOARD NAVIGATION MAP ━━━
-/ = Overview Dashboard | /crm = Kanban CRM Pipeline | /payments = Tally Payment Gate | /whatsapp = WhatsApp Automation | /voice = Voice Dialer | /employees = Team KPIs | /invoices = GST Invoices | /bookings = ERP Bookings | /tally = Tally Sync | /activity = Audit Log | /ai = AI Copilot`;
+/ = Overview Dashboard | /crm = Kanban CRM Pipeline | /payments = Tally Payment Gate | /whatsapp = WhatsApp Automation | /voice = Voice Dialer | /employees = Team KPIs | /invoices = GST Invoices | /bookings = ERP Bookings | /tally = Tally Sync | /activity = Audit Log | /ai = AI Copilot
+
+━━━ [11] AI LONG-TERM PERSISTENT ACTION MEMORY ━━━
+${aiMemory.formatMemoriesForPrompt(10)}
+
+CRITICAL TEAM MEMBER ROSTER (ONLY THESE 6 ARE EMPLOYEES):
+• Super Admin (Super Admin - Executive & AI Management)
+• Operations Manager (Operations & Production Lead - Factory Operations & Manufacturing)
+• Accounts Officer (Senior Accountant - Finance & Accounting)
+• Sales Telecaller (Senior Telecaller - Voice Operations & Telecalling)
+• Amit Patidar (Field Sales Executive - Field Sales & Plant Demonstrations)
+• Vikram Rathore (Plant Assembly Supervisor - Plant Quality Control & Assembly)
+*If a user requests tasks or queries about someone not in this roster (e.g. Animesh), clarify immediately that they are not an employee of APS Enterprise.*`;
 }
 
 // ─── HTTPS helper ─────────────────────────────────────────────────────────────
@@ -3309,12 +3340,9 @@ async function callGroq(messages) {
   // Valid active models on this Groq account (verified 2026-08-26 via /v1/models API)
   const envModel = process.env.GROQ_MODEL;
   const fallbackChain = [
-    'groq/compound',          // Primary: Groq Compound (Llama 4 Scout hybrid, 131k ctx)
-    'openai/gpt-oss-120b',    // Fallback 1: GPT-OSS 120B via Groq (131k ctx)
-    'qwen/qwen3.8-27b',       // Fallback 2: Qwen3.8 27B (fast, multilingual)
-    'qwen/qwen3.6-27b',       // Fallback 3: Qwen3.6 27B
-    'openai/gpt-oss-20b',     // Fallback 4: GPT-OSS 20B (lightest, fastest)
-    'groq/compound-mini',     // Fallback 5: Compound Mini
+    'openai/gpt-oss-120b',    // Primary: GPT-OSS 120B via Groq
+    'qwen/qwen3.8-27b',       // Fast Multilingual 27B
+    'openai/gpt-oss-20b'      // Light & Ultra-fast
   ];
   // Put env model first (deduplicated), then the rest of the chain
   const models = envModel
@@ -3584,12 +3612,109 @@ async function handleAssignEmployeeTasks(query) {
     ];
   }
 
-  // 2. Extract Custom Task Description if user explicitly specified what task to assign
+  // 2. Candidate Individual Detection
+  const isAll = /\b(team|all|everyone|every|entire|whole|sabhi|sab|sare|saare)\b/i.test(qLower);
+
+  // Extract candidate target name if specified in query
+  let candidateTarget = null;
+  const matchKo = query.match(/([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*ko\s*(?:bhi\s*)?(?:task|kaam|work|duty|bolo|kaho|assign)/i);
+  const matchAssignTo = query.match(/(?:assign|give|allot)\s+(?:task|kaam|work)?\s*(?:to\s+)?([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)/i);
+  const matchTell = query.match(/tell\s+([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s+(?:to|ki|that)/i);
+  const matchKaTask = query.match(/([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:ka\s+task|ke\s+tasks)/i);
+
+  if (matchKo && matchKo[1]) {
+    candidateTarget = matchKo[1].trim();
+  } else if (matchAssignTo && matchAssignTo[1]) {
+    candidateTarget = matchAssignTo[1].trim();
+  } else if (matchTell && matchTell[1]) {
+    candidateTarget = matchTell[1].trim();
+  } else if (matchKaTask && matchKaTask[1]) {
+    candidateTarget = matchKaTask[1].trim();
+  }
+
+  // Explicit check for Animesh (or other common test names)
+  if (!candidateTarget && /\banimesh\b/i.test(qLower)) {
+    candidateTarget = 'Animesh';
+  }
+
+  // Filter out stop words and department names from candidateTarget
+  const genericWords = [
+    'all', 'team', 'everyone', 'everybody', 'whole', 'entire', 'sabhi', 'sab', 'sabko', 'sare', 'saare',
+    'kisko', 'kise', 'unhe', 'unko', 'usse', 'usko', 'mujhe', 'hame', 'someone', 'anybody', 'anyone',
+    'employee', 'employees', 'staff', 'member', 'members', 'sales', 'factory', 'telecaller', 'telecalling',
+    'dispatch', 'finance', 'accounts', 'qc', 'quality', 'production', 'operator', 'fitter', 'new', 'urgent',
+    'task', 'kaam', 'work', 'job', 'duty'
+  ];
+
+  if (candidateTarget && genericWords.includes(candidateTarget.toLowerCase())) {
+    candidateTarget = null;
+  }
+
+  // Check if candidate matches any registered employee
+  let targetedEmployee = null;
+  if (!isAll) {
+    targetedEmployee = allEmployees.find(e => {
+      if (!e.name) return false;
+      const fullName = e.name.toLowerCase().trim();
+      const firstName = fullName.split(' ')[0];
+      const lastName = fullName.split(' ')[1] || '';
+
+      if (candidateTarget) {
+        const cLower = candidateTarget.toLowerCase().trim();
+        if (fullName === cLower || firstName === cLower || (lastName && lastName === cLower)) {
+          return true;
+        }
+      }
+
+      const fullNameRegex = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      const firstNameRegex = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      return fullNameRegex.test(qLower) || (firstName.length >= 4 && firstNameRegex.test(qLower));
+    });
+  }
+
+  // ─── CRITICAL GUARD: User attempted to assign a task to a non-existent person ───
+  if (!isAll && candidateTarget && !targetedEmployee) {
+    const requestedName = candidateTarget.charAt(0).toUpperCase() + candidateTarget.slice(1);
+
+    // 1. Persist the rejection event into AI Memory so it is remembered across sessions
+    aiMemory.recordMemory({
+      type: 'TASK_REJECTED',
+      topic: 'task_assignment',
+      target: requestedName,
+      query: query,
+      summary: `Task assignment to "${requestedName}" rejected: "${requestedName}" is not an employee or team member of APS Enterprise.`,
+      status: 'rejected',
+      details: {
+        requestedName,
+        reason: 'Person not present in employee roster',
+        activeTeamCount: allEmployees.length
+      }
+    });
+
+    // 2. Return immediate, polite refusal with the real team roster
+    return {
+      text: `### ⚠️ Cannot Assign Task — Employee Not Found\n\n` +
+        `**"${requestedName}" is not a registered employee or team member of APS Enterprise.**\n\n` +
+        `Operational tasks can only be assigned to registered employees. No changes have been made to existing employee tasks.\n\n` +
+        `#### 👥 Current Registered Team Members (Only these 6 are employees):\n` +
+        allEmployees.map((e, i) => `${i + 1}. **${e.name}** — ${e.role} (*${e.department}*)`).join('\n') +
+        `\n\n*To allocate a task, please specify one of the registered employees above (e.g. "Amit Patidar ko task do: ..."), or register a new team member in [User Management](/users).*`,
+      table: allEmployees.map(e => ({
+        'Employee Name': e.name,
+        'Role': e.role,
+        'Department': e.department,
+        'Status': e.status || 'Online',
+        'Current Activity': e.currentActivity || 'Active'
+      })),
+      status: 'rejected'
+    };
+  }
+
+  // 3. Extract Custom Task Description if user explicitly specified what task to assign
   let customTask = null;
   const matchColon = query.match(/(?:task|kaam|work)\s*:\s*(.+)$/i);
   const matchKi = query.match(/(?:task|kaam|bolo|work|assign)?\s*(?:ki|that)\s+([^.,\n]+)/i);
   const matchHyphen = query.match(/(?:task|kaam)\s*-\s*(.+)$/i);
-  const matchTo = query.match(/(?:assign|give|allot)\s+(?:task|kaam|work)?\s*(?:to\s+[a-zA-Z0-9\s]+)?\s+to\s+([^.,\n]+)/i);
 
   if (matchColon && matchColon[1]) {
     customTask = matchColon[1].trim();
@@ -3597,32 +3722,22 @@ async function handleAssignEmployeeTasks(query) {
     customTask = matchKi[1].trim();
   } else if (matchHyphen && matchHyphen[1]) {
     customTask = matchHyphen[1].trim();
-  } else if (matchTo && matchTo[1]) {
-    customTask = matchTo[1].trim();
+  }
+
+  // Strip candidateTarget or targetedEmployee name from customTask if leaked in
+  const nameToStrip = (targetedEmployee ? targetedEmployee.name : '') || candidateTarget || '';
+  if (customTask && nameToStrip) {
+    const nReg = new RegExp(`^\\s*${nameToStrip.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[:,-]?\\s*`, 'i');
+    customTask = customTask.replace(nReg, '').trim();
   }
 
   if (customTask) {
     customTask = customTask.replace(/\s*(karo|kar do|please|jaldi|turant)\s*$/i, '').trim();
-    if (customTask.length > 2) {
-      customTask = customTask.charAt(0).toUpperCase() + customTask.slice(1);
-    } else {
+    if (customTask.length < 4 || (nameToStrip && customTask.toLowerCase() === nameToStrip.toLowerCase())) {
       customTask = null;
+    } else {
+      customTask = customTask.charAt(0).toUpperCase() + customTask.slice(1);
     }
-  }
-
-  // 3. Employee Targeting (Single Employee vs Team vs All)
-  const isAll = /\b(team|all|everyone|every|entire|whole|sabhi|sab|sare|saare)\b/i.test(qLower);
-  let targetedEmployee = null;
-
-  if (!isAll) {
-    targetedEmployee = allEmployees.find(e => {
-      if (!e.name) return false;
-      const fullName = e.name.toLowerCase().trim();
-      const firstName = fullName.split(' ')[0];
-      const fullNameRegex = new RegExp(`\\b${fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      const firstNameRegex = new RegExp(`\\b${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      return fullNameRegex.test(qLower) || firstNameRegex.test(qLower) || (fullName.length >= 3 && qLower.includes(fullName));
-    });
   }
 
   let targetEmployees = [];
@@ -3969,6 +4084,35 @@ async function handleAssignEmployeeTasks(query) {
     });
   });
 
+  // 3b. AI Persistent Action Memory
+  if (targetEmployees.length === 1) {
+    aiMemory.recordMemory({
+      type: 'TASK_ASSIGNED',
+      topic: 'task_assignment',
+      target: targetEmployees[0].name,
+      query: query,
+      summary: `Assigned task "${targetEmployees[0].activeTask?.title}" (${targetEmployees[0].activeTask?.priority || 'HIGH'}) to ${targetEmployees[0].name} (${targetEmployees[0].role})`,
+      status: 'completed',
+      details: {
+        employeeId: targetEmployees[0].id,
+        task: targetEmployees[0].activeTask
+      }
+    });
+  } else {
+    aiMemory.recordMemory({
+      type: 'TASK_ASSIGNED',
+      topic: 'task_assignment',
+      target: targetTeamLabel,
+      query: query,
+      summary: `Allocated role-based active tasks to ${targetEmployees.length} team members across ${targetTeamLabel}`,
+      status: 'completed',
+      details: {
+        teamCount: targetEmployees.length,
+        teamLabel: targetTeamLabel
+      }
+    });
+  }
+
   // 4. Sync tasksCompleted back to PostgreSQL database if connected
   try {
     const { Employee } = require('../models');
@@ -4005,6 +4149,115 @@ async function handleAssignEmployeeTasks(query) {
   };
 }
 
+// ─── AI Memory Management Handlers ───────────────────────────────────────────
+async function handleAiMemoryTeach(query) {
+  let raw = (query || '').trim();
+  
+  // Extract fact being taught
+  let fact = raw
+    .replace(/^(?:please\s+)?(?:remember\s+that|remember|yaad\s+rakhna\s+ki|yaad\s+rakho\s+ki|yaad\s+rakhna|yaad\s+rakho|note\s+down\s+that|note\s+down|note\s+that|save\s+to\s+memory(?:\s*:)?|save\s+this\s+fact(?:\s*:)?|teach\s+ai(?:\s*:)?|keep\s+in\s+mind\s+that|keep\s+in\s+mind)\s*/i, '')
+    .trim();
+
+  if (!fact || fact.length < 3) {
+    fact = raw;
+  }
+
+  // Detect target entity (e.g., Animesh, Indore Factory, Tally, etc.)
+  let target = 'General Directive';
+  const entityMatch = fact.match(/\b(animesh|indore|pune|factory|tally|crm|machine|dona|cup|thali|raw material|client|vendor|supplier)\b/i);
+  if (entityMatch) {
+    target = entityMatch[1].charAt(0).toUpperCase() + entityMatch[1].slice(1);
+  }
+
+  const topic = target.toLowerCase() === 'animesh' ? 'entity_profile' : 'business_knowledge';
+  const entry = aiMemory.learnFact(fact, topic, target, query);
+
+  return {
+    text: `### 🧠 Saved to AI Persistent Memory\n\n` +
+      `I have saved this information to persistent memory and will use it across all future conversations and operational answers:\n\n` +
+      `• **Subject / Entity:** **${target}**\n` +
+      `• **Learned Knowledge:** *"${fact}"*\n` +
+      `• **Category:** \`${topic}\`\n` +
+      `• **Storage Status:** ✅ Persisted to \`ai_memory.json\`\n\n` +
+      `*You can ask anytime: "What do you know about ${target}?" or "Show AI memory" to review saved knowledge.*`,
+    table: [
+      {
+        'Entity': target,
+        'Category': topic,
+        'Saved Information': fact,
+        'Status': '💡 Active in Memory'
+      }
+    ],
+    learnedMemory: entry
+  };
+}
+
+async function handleAiMemoryRecall(query) {
+  const qLower = (query || '').toLowerCase();
+
+  // If query specifically asks about Animesh
+  if (qLower.includes('animesh')) {
+    const animeshMemories = aiMemory.queryMemories('animesh', 10);
+    const learnedFacts = animeshMemories.filter(m => m.type === 'LEARNED_FACT');
+    const rejected = animeshMemories.filter(m => m.type === 'TASK_REJECTED');
+
+    if (learnedFacts.length > 0) {
+      return {
+        text: `### 🧠 AI Memory Recall — Animesh\n\n` +
+          `According to persistent AI memory:\n\n` +
+          learnedFacts.map(f => `• **Learned Knowledge:** ${f.summary}`).join('\n') +
+          `\n\n*System Boundary Note: Animesh is NOT an employee of APS Enterprise, so internal employee tasks cannot be allocated to him.*`,
+        table: animeshMemories.map(m => ({
+          'Timestamp': new Date(m.timestamp).toLocaleTimeString('en-IN'),
+          'Type': m.type.replace(/_/g, ' '),
+          'Memory Details': m.summary,
+          'Status': m.status
+        }))
+      };
+    } else if (rejected.length > 0) {
+      return {
+        text: `### 🧠 AI Memory Recall — Animesh\n\n` +
+          `**Animesh is not an employee or team member of APS Enterprise.**\n\n` +
+          `A previous attempt to allocate an operational task to "Animesh" was blocked/rejected by the system because tasks can only be assigned to registered employees.\n\n` +
+          `#### 👥 Current Registered Team Members:\n` +
+          `1. **Super Admin** (Executive & AI Management)\n` +
+          `2. **Operations Manager** (Factory Operations & Manufacturing)\n` +
+          `3. **Accounts Officer** (Finance & Accounting)\n` +
+          `4. **Sales Telecaller** (Voice Operations & Telecalling)\n` +
+          `5. **Amit Patidar** (Field Sales & Plant Demonstrations)\n` +
+          `6. **Vikram Rathore** (Plant Quality Control & Assembly)\n\n` +
+          `*If Animesh has a different role (such as an external supplier or buyer), teach the AI by saying: "Remember that Animesh is our [role]".*`,
+        table: rejected.map(m => ({
+          'Timestamp': new Date(m.timestamp).toLocaleTimeString('en-IN'),
+          'Action': 'Task Assignment Blocked',
+          'Target': m.target,
+          'Reason': m.summary
+        }))
+      };
+    } else {
+      return {
+        text: `### 👤 AI Inquiry — Animesh\n\n` +
+          `**"Animesh" is not a registered employee of APS Enterprise**, and no past operational tasks have been assigned to him.\n\n` +
+          `Registered team members of APS Enterprise:\n` +
+          `• **Super Admin** (*Executive & AI Management*)\n` +
+          `• **Operations Manager** (*Factory Operations & Manufacturing*)\n` +
+          `• **Accounts Officer** (*Finance & Accounting*)\n` +
+          `• **Sales Telecaller** (*Voice Operations & Telecalling*)\n` +
+          `• **Amit Patidar** (*Field Sales & Plant Demonstrations*)\n` +
+          `• **Vikram Rathore** (*Plant Quality Control & Assembly*)\n\n` +
+          `*If Animesh is a vendor, partner, or client, you can tell me: "Remember that Animesh is our [role]".*`
+      };
+    }
+  }
+
+  // General memory query
+  const res = aiMemory.formatMemoriesForUser();
+  return {
+    text: res.text,
+    table: res.table
+  };
+}
+
 // ─── Live Groq LLM Assistant Engine ──────────────────────────────────────────
 async function callGroqLLM(prompt, conversationId) {
   if (!process.env.GROQ_API_KEY) return null;
@@ -4025,6 +4278,18 @@ async function callGroqLLM(prompt, conversationId) {
         content: `You are the executive AI intelligence engine for APS Enterprises (Indore, MP), leading manufacturer of Dona Pattal Machines, Paper Plate Machines, Hydraulic Thali Presses, and Paper Cup Machines.
 Company details: 832, Old Loha Mandi, Indore, MP. Contact: support.apsenterprises@gmail.com, +91-7869755871.
 Current pipeline: ${leadsCount} leads. Catalog: ${invCount} machinery models.
+
+CRITICAL REGISTERED TEAM ROSTER (ONLY THESE 6 ARE EMPLOYEES):
+• Super Admin (Super Admin - Executive & AI Management)
+• Operations Manager (Operations & Production Lead - Factory Operations & Manufacturing)
+• Accounts Officer (Senior Accountant - Finance & Accounting)
+• Sales Telecaller (Senior Telecaller - Voice Operations & Telecalling)
+• Amit Patidar (Field Sales Executive - Field Sales & Plant Demonstrations)
+• Vikram Rathore (Plant Assembly Supervisor - Plant Quality Control & Assembly)
+*Animesh is NOT an employee of APS Enterprise. If asked about tasks or role, verify against persistent memory.*
+
+━━━ AI PERSISTENT ACTION MEMORY & LEARNED FACTS ━━━
+${aiMemory.formatMemoriesForPrompt(15)}
 
 CRITICAL ENTERPRISE INSTRUCTIONS:
 1. When asked for any report, sales data, employee performance, invoice, or export, ALWAYS directly provide the actual business figures, executive summary, tables, and metrics in markdown.
@@ -4063,6 +4328,19 @@ async function generateUniversalAnswer(query, conversationId) {
   const store = await getStore();
   const mockLeads = store.mockLeads || [];
   const mockEmployees = store.mockEmployees || [];
+
+  // 0a. AI Persistent Memory Teach
+  if (/\b(remember|yaad rakhna|yaad rakho|note down|save to memory|teach ai)\b/i.test(qLower)) {
+    return await handleAiMemoryTeach(query);
+  }
+
+  // 0b. AI Persistent Memory Recall & Non-Employee Queries
+  if (
+    /\b(memory|actions|history|past actions|what did you do|kya kiya|kisko task diya|who is animesh|animesh kaun hai)\b/i.test(qLower) ||
+    (/\banimesh\b/i.test(qLower) && !/\b(task|assign|kaam)\b/i.test(qLower))
+  ) {
+    return await handleAiMemoryRecall(query);
+  }
 
   // 0. Sales Team / Sales Performance / Business Report Request
   if (
@@ -4419,11 +4697,15 @@ async function processQuery(query, conversationId) {
       case 'kpi_stats':              return handleKpiStats();
       case 'dialer':                 return handleDialer();
       case 'whatsapp':               return handleWhatsApp();
+      case 'ai_memory_teach':        return handleAiMemoryTeach(query);
+      case 'ai_memory_recall':       return handleAiMemoryRecall(query);
       default:                       return null;
     }
   }
 
   const directActionIntents = [
+    'ai_memory_teach',
+    'ai_memory_recall',
     'sales_team_report',
     'generate_report',
     'sales_leaderboard',
