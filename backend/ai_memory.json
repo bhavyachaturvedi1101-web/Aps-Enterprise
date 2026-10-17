@@ -1,5 +1,26 @@
 [
   {
+    "id": "mem-1792235857950-4lwn",
+    "timestamp": "2026-10-17T11:17:37.950Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "assign task to manager",
+    "summary": "Assigned task \"Verify raw material stock levels (steel sheets & copper coils) before next batch\" (HIGH) to Operations Manager (Operations & Production Lead)",
+    "target": "Operations Manager",
+    "status": "completed",
+    "details": {
+      "employeeId": "e2",
+      "task": {
+        "id": "task-e2-1792235857946-0",
+        "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+        "priority": "HIGH",
+        "dueIn": "35 mins",
+        "leadName": "Operations Manager",
+        "assignedAt": "2026-10-17T11:17:37.946Z"
+      }
+    }
+  },
+  {
     "id": "mem-1792235150347-o0gm",
     "timestamp": "2026-10-17T11:05:50.347Z",
     "type": "LEARNED_FACT",

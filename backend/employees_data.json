@@ -4348,7 +4348,7 @@
     "moduleScope": "Operations & Production ERP",
     "kpiScore": "96%",
     "kpiScoreNum": 96,
-    "tasksCompleted": 61,
+    "tasksCompleted": 62,
     "callsHandled": 28,
     "salesClosed": 12,
     "totalRevenue": 2890000,
@@ -4365,22 +4365,22 @@
     "status": "Online",
     "avatar": "OM",
     "avatarBg": "#2563eb",
-    "currentActivity": "Releasing ERP job cards for Double Die Dona machines",
+    "currentActivity": "Working on: Verify raw material stock levels (steel sheets & copper coils) before next batch",
     "activeTask": {
-      "id": "task-e2-default",
-      "title": "Release ERP job card for Pune Unit 1 — Hydraulic Press 500T",
-      "priority": "URGENT",
-      "dueIn": "25 mins",
-      "leadName": "ERP Shopfloor Release",
-      "assignedAt": "2026-10-17T06:00:00.000Z"
+      "id": "task-e2-1792235857946-0",
+      "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+      "priority": "HIGH",
+      "dueIn": "35 mins",
+      "leadName": "Operations Manager",
+      "assignedAt": "2026-10-17T11:17:37.946Z"
     },
     "taskQueue": [
       {
-        "title": "Audit raw material stock levels (steel plates & hydraulic fluids)",
-        "priority": "HIGH"
+        "title": "Conduct safety audit of Indore plant component storage zone",
+        "priority": "LOW"
       },
       {
-        "title": "Coordinate operator shift rotations on Assembly Line 1",
+        "title": "Log daily output metrics in manufacturing dashboard",
         "priority": "MEDIUM"
       }
     ]
