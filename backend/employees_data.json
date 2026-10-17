@@ -4300,7 +4300,7 @@
     "moduleScope": "All Modules",
     "kpiScore": "99%",
     "kpiScoreNum": 99,
-    "tasksCompleted": 46,
+    "tasksCompleted": 48,
     "callsHandled": 38,
     "salesClosed": 14,
     "totalRevenue": 3450000,
@@ -4317,26 +4317,22 @@
     "status": "Online",
     "avatar": "A",
     "avatarBg": "#09090b",
-    "currentActivity": "Working on: Draft commercial proposal & proforma invoice for Apex Metalcraft Works",
+    "currentActivity": "Reviewing executive sales pipeline and AI automation sequences",
     "activeTask": {
-      "id": "task-e1-1792153366650-0",
-      "title": "Draft commercial proposal & proforma invoice for Apex Metalcraft Works",
+      "id": "task-e1-default",
+      "title": "Executive Sales Pipeline & AI Automation Audit",
       "priority": "HIGH",
-      "dueIn": "25 mins",
-      "leadName": "Super Admin",
-      "assignedAt": "2026-10-16T12:22:46.650Z"
+      "dueIn": "45 mins",
+      "leadName": "Executive Deck",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
     },
     "taskQueue": [
       {
-        "title": "Update CRM pipeline stages for leads that have responded",
-        "priority": "HIGH"
+        "title": "Audit weekly team KPI leaderboard and badges",
+        "priority": "MEDIUM"
       },
       {
-        "title": "Draft custom commercial quotation for top 3 Qualified leads",
-        "priority": "HIGH"
-      },
-      {
-        "title": "Review weekly sales KPI report & submit to management",
+        "title": "Review enterprise access permissions across departments",
         "priority": "LOW"
       }
     ]
@@ -4352,7 +4348,7 @@
     "moduleScope": "Operations & Production ERP",
     "kpiScore": "96%",
     "kpiScoreNum": 96,
-    "tasksCompleted": 59,
+    "tasksCompleted": 61,
     "callsHandled": 28,
     "salesClosed": 12,
     "totalRevenue": 2890000,
@@ -4369,22 +4365,22 @@
     "status": "Online",
     "avatar": "OM",
     "avatarBg": "#2563eb",
-    "currentActivity": "Working on: Schedule next shift rotation & confirm operator availability on Line A & B",
+    "currentActivity": "Releasing ERP job cards for Double Die Dona machines",
     "activeTask": {
-      "id": "task-e2-1792153366650-1",
-      "title": "Schedule next shift rotation & confirm operator availability on Line A & B",
-      "priority": "MEDIUM",
-      "dueIn": "40 mins",
-      "leadName": "Operations Manager",
-      "assignedAt": "2026-10-16T12:22:46.650Z"
+      "id": "task-e2-default",
+      "title": "Release ERP job card for Pune Unit 1 — Hydraulic Press 500T",
+      "priority": "URGENT",
+      "dueIn": "25 mins",
+      "leadName": "ERP Shopfloor Release",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
     },
     "taskQueue": [
       {
-        "title": "Conduct safety audit of Indore plant component storage zone",
-        "priority": "LOW"
+        "title": "Audit raw material stock levels (steel plates & hydraulic fluids)",
+        "priority": "HIGH"
       },
       {
-        "title": "Log daily output metrics in manufacturing dashboard",
+        "title": "Coordinate operator shift rotations on Assembly Line 1",
         "priority": "MEDIUM"
       }
     ]
@@ -4400,7 +4396,7 @@
     "moduleScope": "Tally Sync & Invoicing",
     "kpiScore": "98%",
     "kpiScoreNum": 98,
-    "tasksCompleted": 73,
+    "tasksCompleted": 75,
     "callsHandled": 15,
     "salesClosed": 8,
     "totalRevenue": 1940000,
@@ -4417,23 +4413,23 @@
     "status": "Online",
     "avatar": "AO",
     "avatarBg": "#7c3aed",
-    "currentActivity": "Working on: Generate GST Tax Invoices (HSN 8466) for 3 Client (Paid) orders above ₹5L",
+    "currentActivity": "Reconciling Tally ERP advance payments & issuing GST invoices",
     "activeTask": {
-      "id": "task-e3-1792153366650-2",
-      "title": "Generate GST Tax Invoices (HSN 8466) for 3 Client (Paid) orders above ₹5L",
-      "priority": "HIGH",
-      "dueIn": "30 mins",
-      "leadName": "Accounts Officer",
-      "assignedAt": "2026-10-16T12:22:46.650Z"
+      "id": "task-e3-default",
+      "title": "Reconcile 10% Tally advance deposit vouchers for Confirmed Leads",
+      "priority": "URGENT",
+      "dueIn": "20 mins",
+      "leadName": "Tally Advance Gate",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
     },
     "taskQueue": [
       {
-        "title": "Verify CGST/SGST split in pending invoices above ₹5L for e-IRN",
+        "title": "Generate GST Tax Invoices (HSN 8466) for Client orders",
         "priority": "HIGH"
       },
       {
-        "title": "Prepare monthly ledger reconciliation report for management",
-        "priority": "LOW"
+        "title": "Verify bank RTGS advance deposits above ₹1.5L",
+        "priority": "MEDIUM"
       }
     ]
   },
@@ -4448,7 +4444,7 @@
     "moduleScope": "Voice AI & CRM Dialer",
     "kpiScore": "92%",
     "kpiScoreNum": 92,
-    "tasksCompleted": 87,
+    "tasksCompleted": 89,
     "callsHandled": 142,
     "salesClosed": 9,
     "totalRevenue": 1365000,
@@ -4465,14 +4461,14 @@
     "status": "Online",
     "avatar": "ST",
     "avatarBg": "#059669",
-    "currentActivity": "Working on: Verify technical electricity & space requirements with 10 inbound prospects",
+    "currentActivity": "Calling qualified IndiaMart inbound leads",
     "activeTask": {
-      "id": "task-e4-1792153366650-3",
-      "title": "Verify technical electricity & space requirements with 10 inbound prospects",
-      "priority": "MEDIUM",
-      "dueIn": "45 mins",
-      "leadName": "Sales Telecaller",
-      "assignedAt": "2026-10-16T12:22:46.650Z"
+      "id": "task-e4-default",
+      "title": "Call 12 high-priority IndiaMart inquiries for Double Die Dona Machine",
+      "priority": "HIGH",
+      "dueIn": "30 mins",
+      "leadName": "IndiaMart Inbound Queue",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
     },
     "taskQueue": [
       {
@@ -4480,12 +4476,8 @@
         "priority": "MEDIUM"
       },
       {
-        "title": "Follow up with cold leads unresponsive for 3+ days via callback",
+        "title": "Follow up with cold leads unresponsive for 3+ days",
         "priority": "MEDIUM"
-      },
-      {
-        "title": "Brief team on top objections heard in today's call batch",
-        "priority": "LOW"
       }
     ]
   },
@@ -4500,7 +4492,7 @@
     "moduleScope": "CRM & Client Visits",
     "kpiScore": "90%",
     "kpiScoreNum": 90,
-    "tasksCompleted": 43,
+    "tasksCompleted": 49,
     "callsHandled": 64,
     "salesClosed": 7,
     "totalRevenue": 1120000,
@@ -4517,14 +4509,14 @@
     "status": "Online",
     "avatar": "AP",
     "avatarBg": "#ea580c",
-    "currentActivity": "Working on: Conduct closing negotiation call with Bharat Engineering for 2 Dona units",
+    "currentActivity": "Working on: Draft custom multi-unit machine quotation for Bharat Forge industrial order",
     "activeTask": {
-      "id": "task-e5-1792153366650-4",
-      "title": "Conduct closing negotiation call with Bharat Engineering for 2 Dona units",
+      "id": "task-e5-1792235150307-0",
+      "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
       "priority": "HIGH",
-      "dueIn": "30 mins",
+      "dueIn": "40 mins",
       "leadName": "Amit Patidar",
-      "assignedAt": "2026-10-16T12:22:46.650Z"
+      "assignedAt": "2026-10-17T11:05:50.307Z"
     },
     "taskQueue": [
       {
@@ -4552,7 +4544,7 @@
     "moduleScope": "Production ERP & Job Cards",
     "kpiScore": "97%",
     "kpiScoreNum": 97,
-    "tasksCompleted": 72,
+    "tasksCompleted": 71,
     "callsHandled": 12,
     "salesClosed": 6,
     "totalRevenue": 850000,
@@ -4569,23 +4561,23 @@
     "status": "Online",
     "avatar": "VR",
     "avatarBg": "#0891b2",
-    "currentActivity": "Working on: Find 5 leads for my Voice agents",
+    "currentActivity": "Supervising Line B spindle alignment and pressure tolerances",
     "activeTask": {
-      "id": "task-e6-1792154011775-0",
-      "title": "Find 5 leads for my Voice agents",
+      "id": "task-e6-default",
+      "title": "Inspect Assembly Line B spindle alignment & verify RPM output on Machine #MAC-4412",
       "priority": "HIGH",
-      "dueIn": "30 mins",
-      "leadName": "Manual Assignment",
-      "assignedAt": "2026-10-16T12:33:31.775Z"
+      "dueIn": "40 mins",
+      "leadName": "Assembly Line B",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
     },
     "taskQueue": [
       {
-        "title": "Log execution progress for: Find 5 leads for my Voice agents",
+        "title": "Audit bearing mounting tolerances & lubrication points on Line 2 chassis",
         "priority": "MEDIUM"
       },
       {
-        "title": "Update status in CRM & operations dashboard",
-        "priority": "LOW"
+        "title": "Verify mechanical torque specifications on 4-Die Dona machine gearboxes",
+        "priority": "HIGH"
       }
     ]
   }

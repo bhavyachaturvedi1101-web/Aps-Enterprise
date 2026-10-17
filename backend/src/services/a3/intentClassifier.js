@@ -5,6 +5,18 @@
  */
 
 const INTENTS = [
+  // ── AI Persistent Memory Intents (Evaluated early to capture commands & recall) ──
+  { name: 'ai_memory_teach', patterns: [
+    /^(please\s+)?(remember\s+that|remember|yaad\s+rakhna\s+ki|yaad\s+rakho\s+ki|yaad\s+rakhna|yaad\s+rakho|note\s+down\s+that|note\s+down|note\s+that|save\s+to\s+memory|save\s+this\s+fact|teach\s+ai|keep\s+in\s+mind\s+that|keep\s+in\s+mind)/i,
+    /save.*?(memory|fact|note)/i,
+    /teach.*?(ai|assistant)/i
+  ] },
+  { name: 'ai_memory_recall', patterns: [
+    /\b(what\s+do\s+you\s+remember|show\s+memory|show\s+ai\s+memory|recall\s+memory|search\s+memory|past\s+memories|learned\s+facts|ai\s+memory)\b/i,
+    /\b(who\s+is\s+animesh|animesh\s+kaun\s+hai|tell\s+me\s+about\s+animesh|animesh\s+ke\s+baare\s+mein|about\s+animesh)\b/i,
+    /^(?!.*(task|assign|kaam|work|duty|bhejo|allot)).*?\banimesh\b/i
+  ] },
+
   // ── Options Flow Intents ──
   { name: 'landing_assign_tasks_options', patterns: [/assign team tasks options/i] },
   { name: 'landing_invoices_options',     patterns: [/billing & invoices options/i] },

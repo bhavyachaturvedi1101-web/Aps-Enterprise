@@ -227,7 +227,17 @@ ${empDetails || 'No team data available.'}
 ${leadDetails || 'No leads found.'}
 
 ━━━ [5] RECENT ACTIVITY ━━━
-${recentActivity}`;
+${recentActivity}
+
+━━━ [6] AI PERSISTENT LONG-TERM MEMORY & LEARNED FACTS ━━━
+${(() => {
+  try {
+    const aiMemory = require('../aiMemoryService');
+    return aiMemory.formatMemoriesForPrompt(query);
+  } catch {
+    return 'No persistent memories available.';
+  }
+})()}`;
 }
 
 async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHandler) {

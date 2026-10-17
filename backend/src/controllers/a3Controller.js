@@ -1,5 +1,6 @@
 'use strict';
 const { processQuery, getSuggestions } = require('../services/a3Service');
+const aiMemory = require('../services/aiMemoryService');
 const { Lead } = require('../models');
 
 /**
@@ -34,6 +35,92 @@ async function query(req, res, next) {
  */
 function suggestions(req, res) {
   return res.json({ suggestions: getSuggestions() });
+}
+
+/**
+ * GET /api/a3/memory
+ * Returns persistent memories list, categorized with counts.
+ */
+function getMemories(req, res) {
+  try {
+    const search = req.query.search || null;
+    const memories = search ? aiMemory.queryMemories(search, 50) : aiMemory.loadMemories();
+    const learnedFacts = memories.filter(m => m.type === 'LEARNED_FACT');
+    const taskAssigned = memories.filter(m => m.type === 'TASK_ASSIGNED');
+    const taskRejected = memories.filter(m => m.type === 'TASK_REJECTED');
+
+    return res.json({
+      success: true,
+      totalCount: memories.length,
+      counts: {
+        learnedFacts: learnedFacts.length,
+        taskAssigned: taskAssigned.length,
+        taskRejected: taskRejected.length,
+        total: memories.length
+      },
+      memories
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * POST /api/a3/memory
+ * Directly learn/save a new fact or operational instruction to memory
+ * Body: { fact: string, topic?: string, target?: string }
+ */
+function addMemory(req, res) {
+  try {
+    const { fact, topic, target, type } = req.body;
+    if (!fact || !fact.trim()) {
+      return res.status(400).json({ success: false, error: 'fact field is required' });
+    }
+
+    const memory = aiMemory.recordMemory({
+      type: type || 'LEARNED_FACT',
+      topic: topic || 'user_directive',
+      target: target || 'General',
+      summary: fact.trim(),
+      status: 'saved',
+      details: { addedVia: 'api_manual' }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Memory saved successfully',
+      memory
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * DELETE /api/a3/memory/:id
+ * Delete a specific memory entry
+ */
+function deleteMemory(req, res) {
+  try {
+    const { id } = req.params;
+    const ok = aiMemory.deleteMemory(id);
+    return res.json({ success: ok });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * DELETE /api/a3/memory
+ * Reset all memories to default baseline
+ */
+function clearMemories(req, res) {
+  try {
+    const reset = aiMemory.clearMemories();
+    return res.json({ success: true, memories: reset });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 }
 
 /**
@@ -84,4 +171,12 @@ async function exportFile(req, res) {
   }
 }
 
-module.exports = { query, suggestions, exportFile };
+module.exports = {
+  query,
+  suggestions,
+  exportFile,
+  getMemories,
+  addMemory,
+  deleteMemory,
+  clearMemories
+};

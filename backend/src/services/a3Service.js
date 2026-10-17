@@ -65,8 +65,46 @@ async function processQuery(query, conversationId = 'default') {
 
   let result = null;
 
+  // Direct action intents that should run their specialized handler directly
+  const directActionIntents = [
+    'ai_memory_teach',
+    'ai_memory_recall',
+    'sales_team_report',
+    'generate_report',
+    'sales_leaderboard',
+    'employee_performance',
+    'invoice_generator',
+    'invoices',
+    'action_create_lead',
+    'action_create_user',
+    'action_transition_lead',
+    'action_post_tally',
+    'action_erp_booking',
+    'action_queue_dialer',
+    'schedule_call',
+    'action_send_whatsapp',
+    'action_send_email',
+    'action_check_inventory',
+    'factory_tracker',
+    'assign_employee_tasks',
+    'show_all_crm_leads',
+    'leads_by_stage',
+    'revenue_summary'
+  ];
+
+  if (directActionIntents.includes(intent)) {
+    const handler = getHandler(intent);
+    if (typeof handler === 'function') {
+      try {
+        result = await handler(cleanQuery, convId);
+      } catch (handlerErr) {
+        console.error(`[A3 Handler Error] on intent "${intent}":`, handlerErr);
+      }
+    }
+  }
+
   // 2. Direct LLM execution if provider configured and active
-  if (LLM_PROVIDER !== 'mock') {
+  if (!result && LLM_PROVIDER !== 'mock') {
     try {
       result = await processWithLLM(cleanQuery, convId, intent);
     } catch (llmErr) {

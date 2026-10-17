@@ -1,6 +1,6 @@
 'use strict';
 const { Router } = require('express');
-const { query, suggestions, exportFile } = require('../controllers/a3Controller');
+const { query, suggestions, exportFile, getMemories, addMemory, deleteMemory, clearMemories } = require('../controllers/a3Controller');
 const { processQuery } = require('../services/a3Service');
 
 const router = Router();
@@ -14,6 +14,12 @@ router.get('/suggestions', suggestions);
 // GET & POST /api/a3/export — export reports & dataset files (CSV, Excel, XML, PDF, DOCX)
 router.get('/export', exportFile);
 router.post('/export', exportFile);
+
+// Persistent AI Memory endpoints
+router.get('/memory', getMemories);
+router.post('/memory', addMemory);
+router.delete('/memory/:id', deleteMemory);
+router.delete('/memory', clearMemories);
 
 // POST /api/a3/stream — Server-Sent Events streaming response
 router.post('/stream', async (req, res) => {

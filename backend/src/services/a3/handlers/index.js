@@ -5,8 +5,13 @@ const sales = require('./salesHandlers');
 const operations = require('./operationsHandlers');
 const finance = require('./financeHandlers');
 const comms = require('./commsHandlers');
+const memory = require('./memoryHandlers');
 
 const HANDLERS = {
+  // AI Persistent Memory
+  ai_memory_teach: memory.handleAiMemoryTeach,
+  ai_memory_recall: memory.handleAiMemoryRecall,
+
   // Navigation / Landing Options
   landing_assign_tasks_options: sales.handleAssignTasksOptions,
   landing_invoices_options: finance.handleInvoicesOptions,
