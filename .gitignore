@@ -6,18 +6,25 @@
 .env
 .env.*
 !.env.example
+!.env.production.example
+backend/.env
+backend/.env.*
+!backend/.env.example
 
 # Sensitive credential/requirements documents (contain raw passwords & API keys)
 det req SEEVORA*
 det_req_seevora*
-*credentials*.docx
-*passwords*.docx
+*credentials*
+*passwords*
 *api-keys*
+*.docx
+*.pdf
+*.pptx
 
 # Proprietary APS architecture & roadmap documents
-APS_AI_Architecture_Dev_Brief.pdf
-APS_Enterprise_Final_AI_Architecture.pdf
-APS_Enterprises_8Week_Timeline_DevelopmentOnly*
+APS_AI_Architecture*
+APS_Enterprise_Final*
+APS_Enterprises_*
 *.pem
 *.key
 *.cert
