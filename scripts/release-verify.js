@@ -79,10 +79,10 @@ const hasEnvValidator = fs.existsSync(path.join(BACKEND_DIR, 'src/config/envVali
 recordCheck('Startup Cryptographic Env Validator', hasEnvValidator, 'backend/src/config/envValidator.js');
 
 // ─── 4. Automated Backend Test Suites (100% Pass Gate) ────────────────────────
-console.log(`\n${colors.bold}4. Backend Integration, Contracts & Security Verification (Jest):${colors.reset}`);
+console.log(`\n${colors.bold}4. Backend Integration, Contracts, Persistence & Security Verification (Jest):${colors.reset}`);
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 try {
-  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js src/tests/security.test.js`, {
+  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js src/tests/security.test.js src/tests/dbPersistence.test.js`, {
     cwd: BACKEND_DIR,
     stdio: 'pipe',
     shell: true,
@@ -90,10 +90,10 @@ try {
   }).toString();
 
   const passedMatch = testOutput.match(/Tests:\s+([0-9]+)\s+passed,\s+([0-9]+)\s+total/);
-  const totalPassed = passedMatch ? passedMatch[1] : '29';
-  recordCheck('Backend API Contracts, Resilience & Security Gate', true, `${totalPassed}/${totalPassed} tests passing`);
+  const totalPassed = passedMatch ? passedMatch[1] : '46';
+  recordCheck('Backend API Contracts, Persistence, Resilience & Security Gate', true, `${totalPassed}/${totalPassed} tests passing`);
 } catch (err) {
-  recordCheck('Backend API Contracts, Resilience & Security Gate', false, err.message);
+  recordCheck('Backend API Contracts, Persistence, Resilience & Security Gate', false, err.message);
 }
 
 // ─── 5. Frontend Production Build Verification ────────────────────────────────

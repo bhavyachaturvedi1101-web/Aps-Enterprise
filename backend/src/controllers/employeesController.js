@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { Employee, ActivityLog, Lead } = require('../models');
-const { isDbConnected } = require('../config/db');
+const { Employee, ActivityLog, Lead, User } = require('../models');
+const { isDbConnected, sequelize } = require('../config/db');
+const { withDb, isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const store = require('../config/inMemoryStore');
 
 const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
@@ -38,7 +39,7 @@ function saveEmployeesToFile(list) {
 
 // Helper to decorate employee with mock UI fields
 const decorateEmployee = (e) => {
-  const emp = e.toJSON ? e.toJSON() : e;
+  const emp = e && e.toJSON ? e.toJSON() : (e || {});
   const mockEmp = ((store && store.mockEmployees) || []).find(me => me.id === emp.id) || {};
   
   const tasksCompleted = emp.tasksCompleted !== undefined ? emp.tasksCompleted : (mockEmp.tasksCompleted || 0);
@@ -65,25 +66,17 @@ const decorateEmployee = (e) => {
 };
 
 // GET /api/employees — Aggregate performance list + team summary KPIs (A4 Module)
-const getEmployees = async (req, res) => {
+const getEmployees = async (req, res, next) => {
   try {
-    let rawEmployees = [];
-    if (isDbConnected()) {
-      try {
-        const dbEmps = await Employee.findAll();
-        if (Array.isArray(dbEmps) && dbEmps.length > 0) {
-          rawEmployees = dbEmps;
-        }
-      } catch {
-        // Supabase / DB offline — fall back gracefully to file-based store
+    const employees = await withDb(
+      async () => {
+        const dbEmps = await Employee.findAll({ order: [['createdAt', 'ASC']] });
+        return (dbEmps || []).map(decorateEmployee);
+      },
+      () => {
+        return loadEmployeesFromFile().map(decorateEmployee);
       }
-    }
-
-    if (!rawEmployees || rawEmployees.length === 0) {
-      rawEmployees = loadEmployeesFromFile();
-    }
-
-    const employees = rawEmployees.map(decorateEmployee);
+    );
 
     const totalCalls = employees.reduce((sum, e) => sum + (e.callsHandled || 0), 0);
     const totalSales = employees.reduce((sum, e) => sum + (e.salesClosed || 0), 0);
@@ -107,58 +100,53 @@ const getEmployees = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[getEmployees fallback error]:', error);
-    const fallback = loadEmployeesFromFile().map(decorateEmployee);
-    return res.json({
-      success: true,
-      employees: fallback,
-      summary: {
-        totalEmployees: fallback.length,
-        activeMembers: fallback.length,
-        totalCallsHandled: 0,
-        totalSalesClosed: 0,
-        totalRevenueClosed: 0,
-        totalTasksCompleted: 0,
-        teamAvgKpiScore: '92%',
-        avgCallDurationSec: 112,
-        slaAdherenceRate: '94.6%'
-      }
-    });
+    next(error);
   }
 };
 
 // GET /api/employees/:id/performance — Detailed profile per employee (A4 Module)
-const getEmployeePerformance = async (req, res) => {
+const getEmployeePerformance = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let empData = null;
-    try {
-      empData = await Employee.findByPk(id);
-    } catch {}
 
-    if (!empData) {
-      const fileList = loadEmployeesFromFile();
-      empData = fileList.find(e => e.id === id);
-    }
+    const data = await withDb(
+      async () => {
+        const empRecord = await Employee.findByPk(id);
+        if (!empRecord) return null;
 
-    if (!empData) {
+        const assignedLeads = await Lead.findAll({ where: { assignedEmployeeId: id } });
+        const employeeLogs = await ActivityLog.findAll({
+          where: { employeeId: id },
+          order: [['createdAt', 'DESC']]
+        });
+
+        return {
+          employee: decorateEmployee(empRecord),
+          assignedLeads,
+          employeeLogs
+        };
+      },
+      () => {
+        const fileList = loadEmployeesFromFile();
+        const empData = fileList.find(e => e.id === id);
+        if (!empData) return null;
+
+        const assignedLeads = (store.mockLeads || []).filter(l => l.assignedEmployeeId === id);
+        const employeeLogs = (store.mockActivityLogs || []).filter(l => l.employeeId === id);
+
+        return {
+          employee: decorateEmployee(empData),
+          assignedLeads,
+          employeeLogs
+        };
+      }
+    );
+
+    if (!data) {
       return res.status(404).json({ error: 'Employee profile not found', code: 'EMPLOYEE_NOT_FOUND' });
     }
 
-    const employee = decorateEmployee(empData);
-    let assignedLeads = [];
-    let employeeLogs = [];
-    try {
-      assignedLeads = await Lead.findAll({ where: { assignedEmployeeId: id } });
-    } catch {
-      assignedLeads = (store.mockLeads || []).filter(l => l.assignedEmployeeId === id);
-    }
-    try {
-      employeeLogs = await ActivityLog.findAll({ where: { employeeId: id }, order: [['createdAt', 'DESC']] });
-    } catch {
-      employeeLogs = (store.mockActivityLogs || []).filter(l => l.employeeId === id);
-    }
-
+    const { employee, assignedLeads, employeeLogs } = data;
     const totalAssignedBudget = assignedLeads.reduce((sum, l) => sum + (parseFloat(l.budget) || 0), 0);
 
     return res.json({
@@ -172,9 +160,9 @@ const getEmployeePerformance = async (req, res) => {
         kpiScoreNum: employee.kpiScoreNum,
         conversionRate: employee.conversionRate,
         avgResponseTimeMin: employee.avgResponseTimeMin,
-        tasksCompleted: employee.tasksCompleted,
-        callsHandled: employee.callsHandled,
-        salesClosed: employee.salesClosed,
+        tasksCompleted: employee.tasksCompleted || 0,
+        callsHandled: employee.callsHandled || 0,
+        salesClosed: employee.salesClosed || 0,
         totalRevenue: employee.totalRevenue || 0,
         weeklyKpiHistory: employee.weeklyKpiHistory,
         stageConversions: employee.stageConversions,
@@ -192,218 +180,288 @@ const getEmployeePerformance = async (req, res) => {
       activityLogs: employeeLogs
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to fetch employee performance' });
+    next(error);
   }
 };
 
 // POST /api/employees — Add new team member with initial task queue
-const createEmployee = async (req, res) => {
+const createEmployee = async (req, res, next) => {
   try {
     const { name, email, phone, role, department, initialTask } = req.body;
     if (!name || !email) {
       return res.status(400).json({ error: 'Name and email are required.' });
     }
 
-    const currentList = loadEmployeesFromFile();
-    const empId = `e${currentList.length + 1}`;
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
 
-    const newEmp = {
-      id: empId,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone || '+91 98765 43210',
-      role: role || 'Sales & Operations Associate',
-      department: department || 'Sales & Operations',
-      kpiScore: '85%',
-      kpiScoreNum: 85,
-      tasksCompleted: 0,
-      callsHandled: 0,
-      salesClosed: 0,
-      totalRevenue: 0,
-      status: 'Active',
-      conversionRate: '34.5%',
-      avgCallDurationSec: 112,
-      avgResponseTimeMin: 4.0,
-      weeklyKpiHistory: [85, 88, 90, 92],
-      activeTask: initialTask ? {
-        id: `task-${empId}-1`,
-        title: initialTask,
-        priority: 'High',
-        type: 'Operational Task',
-        stage: 'In Progress',
-        dueIn: '45 mins',
-        assignedAt: new Date()
-      } : {
-        id: `task-${empId}-1`,
-        title: `Onboarding & initial pipeline sync for ${name}`,
-        priority: 'Normal',
-        type: 'System Onboarding',
-        stage: 'Onboarding',
-        dueIn: '1 hour',
-        assignedAt: new Date()
+    const created = await withDb(
+      async () => {
+        const count = await Employee.count();
+        const empId = `e${count + 1}`;
+
+        const activeTask = initialTask ? {
+          id: `task-${empId}-1`,
+          title: initialTask,
+          priority: 'High',
+          type: 'Operational Task',
+          stage: 'In Progress',
+          dueIn: '45 mins',
+          assignedAt: new Date()
+        } : {
+          id: `task-${empId}-1`,
+          title: `Onboarding & initial pipeline sync for ${cleanName}`,
+          priority: 'Normal',
+          type: 'System Onboarding',
+          stage: 'Onboarding',
+          dueIn: '1 hour',
+          assignedAt: new Date()
+        };
+
+        const taskQueue = [
+          { title: `Review ${department || 'Operations'} SOP`, priority: 'Normal' }
+        ];
+
+        const t = await sequelize.transaction();
+        try {
+          const emp = await Employee.create({
+            id: empId,
+            name: cleanName,
+            email: cleanEmail,
+            phone: phone || '+91 98765 43210',
+            role: role || 'Sales & Operations Associate',
+            department: department || 'Sales & Operations',
+            status: 'Active',
+            kpiScore: '85%',
+            tasksCompleted: 0,
+            callsHandled: 0,
+            salesClosed: 0,
+            totalRevenue: 0,
+            activeTask,
+            taskQueue
+          }, { transaction: t });
+
+          await User.findOrCreate({
+            where: { email: cleanEmail },
+            defaults: {
+              id: `u${Date.now()}`,
+              name: cleanName,
+              email: cleanEmail,
+              role: (role || '').includes('Admin') ? 'admin' : ((role || '').includes('Manager') ? 'manager' : 'employee'),
+              department: department || 'Sales & Operations',
+              phone: phone || '+91 98765 43210',
+              isActive: true
+            },
+            transaction: t
+          });
+
+          await t.commit();
+          return decorateEmployee(emp);
+        } catch (dbErr) {
+          await t.rollback();
+          throw dbErr;
+        }
       },
-      taskQueue: [
-        { title: `Review ${department || 'Operations'} SOP`, priority: 'Normal' }
-      ]
-    };
+      () => {
+        const currentList = loadEmployeesFromFile();
+        const empId = `e${currentList.length + 1}`;
 
-    // Persist to PostgreSQL if connected with atomic transaction
-    if (isDbConnected()) {
-      const { sequelize } = require('../config/db');
-      const { User } = require('../models');
-      const t = await sequelize.transaction();
-      try {
-        await Employee.create({
+        const newEmp = {
           id: empId,
-          name: newEmp.name,
-          email: newEmp.email,
-          phone: newEmp.phone,
-          role: newEmp.role,
-          department: newEmp.department,
-          status: newEmp.status,
-          kpiScore: newEmp.kpiScore,
+          name: cleanName,
+          email: cleanEmail,
+          phone: phone || '+91 98765 43210',
+          role: role || 'Sales & Operations Associate',
+          department: department || 'Sales & Operations',
+          kpiScore: '85%',
+          kpiScoreNum: 85,
           tasksCompleted: 0,
           callsHandled: 0,
           salesClosed: 0,
           totalRevenue: 0,
-          activeTask: newEmp.activeTask,
-          taskQueue: newEmp.taskQueue
-        }, { transaction: t });
-
-        await User.findOrCreate({
-          where: { email: newEmp.email },
-          defaults: {
-            id: `u${Date.now()}`,
-            name: newEmp.name,
-            email: newEmp.email,
-            role: newEmp.role.includes('Admin') ? 'admin' : (newEmp.role.includes('Manager') ? 'manager' : 'employee'),
-            department: newEmp.department,
-            phone: newEmp.phone,
-            isActive: true
+          status: 'Active',
+          conversionRate: '34.5%',
+          avgCallDurationSec: 112,
+          avgResponseTimeMin: 4.0,
+          weeklyKpiHistory: [85, 88, 90, 92],
+          activeTask: initialTask ? {
+            id: `task-${empId}-1`,
+            title: initialTask,
+            priority: 'High',
+            type: 'Operational Task',
+            stage: 'In Progress',
+            dueIn: '45 mins',
+            assignedAt: new Date()
+          } : {
+            id: `task-${empId}-1`,
+            title: `Onboarding & initial pipeline sync for ${cleanName}`,
+            priority: 'Normal',
+            type: 'System Onboarding',
+            stage: 'Onboarding',
+            dueIn: '1 hour',
+            assignedAt: new Date()
           },
-          transaction: t
-        });
+          taskQueue: [
+            { title: `Review ${department || 'Operations'} SOP`, priority: 'Normal' }
+          ]
+        };
 
-        await t.commit();
-      } catch (e) {
-        await t.rollback();
-        console.warn('[DB createEmployee transaction non-critical warn]:', e.message);
+        currentList.unshift(newEmp);
+        saveEmployeesToFile(currentList);
+
+        try {
+          let usersList = safeReadJson(USERS_FILE, []);
+          if (!usersList.some(u => u.email === cleanEmail)) {
+            usersList.unshift({
+              id: `u${Date.now()}`,
+              name: cleanName,
+              email: cleanEmail,
+              role: (newEmp.role || '').includes('Admin') ? 'Admin' : 'Operations',
+              module: (newEmp.department || '').includes('Voice') ? 'Voice AI' : 'Operations & CRM',
+              lastLogin: 'Just now',
+              status: 'Online',
+              createdAt: new Date().toISOString()
+            });
+            safeWriteJson(USERS_FILE, usersList);
+            store.mockUsers = usersList;
+          }
+        } catch (err) {
+          console.error('[Sync to Users error]:', err.message);
+        }
+
+        return decorateEmployee(newEmp);
       }
-    }
+    );
 
-    // Save to employees store
-    currentList.unshift(newEmp);
-    saveEmployeesToFile(currentList);
-
-    // Also sync to users store so they appear in Users & Roles
-    try {
-      let usersList = safeReadJson(USERS_FILE, []);
-      if (!usersList.some(u => u.email === newEmp.email)) {
-        usersList.unshift({
-          id: `u${Date.now()}`,
-          name: newEmp.name,
-          email: newEmp.email,
-          role: newEmp.role.includes('Admin') ? 'Admin' : 'Operations',
-          module: newEmp.department.includes('Voice') ? 'Voice AI' : 'Operations & CRM',
-          lastLogin: 'Just now',
-          status: 'Online',
-          createdAt: new Date().toISOString()
-        });
-        safeWriteJson(USERS_FILE, usersList);
-        store.mockUsers = usersList;
-      }
-    } catch (err) {
-      console.error('[Sync to Users error]:', err.message);
-    }
-
-    const decoratedEmp = decorateEmployee(newEmp);
-    return res.status(201).json({ success: true, employee: decoratedEmp });
+    return res.status(201).json({ success: true, employee: created });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to create employee' });
+    next(error);
   }
 };
 
 // POST /api/employees/:id/complete-task — Mark current task complete
-const completeTask = async (req, res) => {
+const completeTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let completedTitle = 'General Operational Follow-up';
-    let nextTask = {
-      id: `task-${id}-${Date.now()+1}`,
-      title: `Auto-assigned pipeline task`,
-      priority: 'Normal',
-      type: 'Automated Queue Assignment',
-      stage: 'In Progress',
-      dueIn: '45 mins',
-      assignedAt: new Date()
-    };
 
-    const currentList = loadEmployeesFromFile();
-    const empData = currentList.find(e => e.id === id);
-    if (!empData) {
+    const result = await withDb(
+      async () => {
+        const emp = await Employee.findByPk(id);
+        if (!emp) return { notFound: true };
+
+        const tasksCompleted = (emp.tasksCompleted || 0) + 1;
+        let completedTitle = emp.activeTask?.title || 'General Operational Follow-up';
+        let queue = Array.isArray(emp.taskQueue) ? [...emp.taskQueue] : [];
+        let nextTask = {
+          id: `task-${id}-${Date.now() + 1}`,
+          title: 'Auto-assigned pipeline task',
+          priority: 'Normal',
+          type: 'Automated Queue Assignment',
+          stage: 'In Progress',
+          dueIn: '45 mins',
+          assignedAt: new Date()
+        };
+
+        if (queue.length > 0) {
+          const queued = queue.shift();
+          nextTask = {
+            id: `task-${id}-${Date.now() + 1}`,
+            title: queued.title,
+            priority: queued.priority || 'Normal',
+            type: queued.type || 'Automated Queue Assignment',
+            stage: 'In Progress',
+            dueIn: queued.dueIn || '30 mins',
+            assignedAt: new Date()
+          };
+        }
+
+        await emp.update({
+          tasksCompleted,
+          activeTask: nextTask,
+          taskQueue: queue
+        });
+
+        const decorated = decorateEmployee(emp);
+        return {
+          employee: decorated,
+          completedTask: { id: `task-${id}-${Date.now()}`, title: completedTitle },
+          nextTask,
+          tasksCompleted,
+          kpiScore: decorated.kpiScore
+        };
+      },
+      () => {
+        const currentList = loadEmployeesFromFile();
+        const empData = currentList.find(e => e.id === id);
+        if (!empData) return { notFound: true };
+
+        let completedTitle = 'General Operational Follow-up';
+        let nextTask = {
+          id: `task-${id}-${Date.now() + 1}`,
+          title: `Auto-assigned pipeline task`,
+          priority: 'Normal',
+          type: 'Automated Queue Assignment',
+          stage: 'In Progress',
+          dueIn: '45 mins',
+          assignedAt: new Date()
+        };
+
+        empData.tasksCompleted = (empData.tasksCompleted || 0) + 1;
+        if (empData.activeTask) {
+          completedTitle = empData.activeTask.title;
+        }
+
+        if (Array.isArray(empData.taskQueue) && empData.taskQueue.length > 0) {
+          const queued = empData.taskQueue.shift();
+          nextTask = {
+            id: `task-${id}-${Date.now() + 1}`,
+            title: queued.title,
+            priority: queued.priority || 'Normal',
+            type: queued.type || 'Automated Queue Assignment',
+            stage: 'In Progress',
+            dueIn: queued.dueIn || '30 mins',
+            assignedAt: new Date()
+          };
+        }
+        empData.activeTask = nextTask;
+        empData.currentActivity = `Working on: ${nextTask.title}`;
+
+        saveEmployeesToFile(currentList);
+        const decorated = decorateEmployee(empData);
+
+        return {
+          employee: decorated,
+          completedTask: { id: `task-${id}-${Date.now()}`, title: completedTitle },
+          nextTask,
+          tasksCompleted: decorated.tasksCompleted,
+          kpiScore: decorated.kpiScore
+        };
+      }
+    );
+
+    if (result.notFound) {
       return res.status(404).json({ error: 'Employee not found', code: 'EMPLOYEE_NOT_FOUND' });
     }
 
-    empData.tasksCompleted = (empData.tasksCompleted || 0) + 1;
-    if (empData.activeTask) {
-      completedTitle = empData.activeTask.title;
-    }
-
-    if (Array.isArray(empData.taskQueue) && empData.taskQueue.length > 0) {
-      const queued = empData.taskQueue.shift();
-      nextTask = {
-        id: `task-${id}-${Date.now()+1}`,
-        title: queued.title,
-        priority: queued.priority || 'Normal',
-        type: queued.type || 'Automated Queue Assignment',
-        stage: 'In Progress',
-        dueIn: queued.dueIn || '30 mins',
-        assignedAt: new Date()
-      };
-    }
-    empData.activeTask = nextTask;
-    empData.currentActivity = `Working on: ${nextTask.title}`;
-
-    saveEmployeesToFile(currentList);
-
-    // Try DB increment safely
-    try {
-      const dbEmp = await Employee.findByPk(id);
-      if (dbEmp) {
-        dbEmp.tasksCompleted = empData.tasksCompleted;
-        await dbEmp.save();
-      }
-    } catch {}
-
-    const employee = decorateEmployee(empData);
-    const completedTask = { id: `task-${id}-${Date.now()}`, title: completedTitle };
-
     return res.json({
       success: true,
-      message: `Task completed! Next task has been automatically assigned to ${employee.name}.`,
-      completedTask,
-      activeTask: nextTask,
-      tasksCompleted: employee.tasksCompleted,
-      kpiScore: employee.kpiScore,
-      employee
+      message: `Task completed! Next task has been automatically assigned to ${result.employee.name}.`,
+      completedTask: result.completedTask,
+      activeTask: result.nextTask,
+      tasksCompleted: result.tasksCompleted,
+      kpiScore: result.kpiScore,
+      employee: result.employee
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to complete task' });
+    next(error);
   }
 };
 
 // POST /api/employees/:id/assign-task — Manually queue or assign a new task to an employee
-const assignTask = async (req, res) => {
+const assignTask = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, priority, type } = req.body;
-
-    const currentList = loadEmployeesFromFile();
-    const empData = currentList.find(e => e.id === id);
-    if (!empData) return res.status(404).json({ error: 'Employee not found' });
 
     const newTask = {
       id: `task-${id}-${Date.now()}`,
@@ -414,37 +472,62 @@ const assignTask = async (req, res) => {
       assignedAt: new Date()
     };
 
-    empData.activeTask = newTask;
-    empData.currentActivity = `Working on: ${title}`;
-    saveEmployeesToFile(currentList);
+    const result = await withDb(
+      async () => {
+        const emp = await Employee.findByPk(id);
+        if (!emp) return { notFound: true };
 
-    const employee = decorateEmployee(empData);
+        await emp.update({
+          activeTask: newTask
+        });
+
+        return { employee: decorateEmployee(emp) };
+      },
+      () => {
+        const currentList = loadEmployeesFromFile();
+        const empData = currentList.find(e => e.id === id);
+        if (!empData) return { notFound: true };
+
+        empData.activeTask = newTask;
+        empData.currentActivity = `Working on: ${title}`;
+        saveEmployeesToFile(currentList);
+
+        return { employee: decorateEmployee(empData) };
+      }
+    );
+
+    if (result.notFound) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
     return res.status(201).json({
       success: true,
-      message: `New task assigned to ${employee.name}.`,
-      employee
+      message: `New task assigned to ${result.employee.name}.`,
+      employee: result.employee
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to assign task' });
+    next(error);
   }
 };
 
 // GET /api/activity — Audit log
-const getActivityLogs = async (req, res) => {
+const getActivityLogs = async (req, res, next) => {
   try {
-    let logs = [];
-    try {
-      logs = await ActivityLog.findAll({ order: [['createdAt', 'DESC']], limit: 100 });
-    } catch {
-      logs = store.mockActivityLogs || [];
-    }
+    const logs = await withDb(
+      async () => {
+        return await ActivityLog.findAll({ order: [['createdAt', 'DESC']], limit: 100 });
+      },
+      () => {
+        return store.mockActivityLogs || [];
+      }
+    );
+
     return res.json({ 
       activityLogs: logs,
       totalLogs: logs.length
     });
   } catch (error) {
-    return res.json({ activityLogs: store.mockActivityLogs || [], totalLogs: 0 });
+    next(error);
   }
 };
 
@@ -464,43 +547,51 @@ const getTimeInStage = async (req, res) => {
 };
 
 // DELETE /api/employees/:id — Remove/Delete employee member (A4 Module)
-const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let empData = null;
-    try {
-      empData = await Employee.findByPk(id);
-      if (empData) await empData.destroy();
-    } catch {}
 
-    const currentList = loadEmployeesFromFile();
-    const target = currentList.find(e => e.id === id);
-    if (!target && !empData) {
+    const result = await withDb(
+      async () => {
+        const emp = await Employee.findByPk(id);
+        if (!emp) return { notFound: true };
+
+        const deletedName = emp.name;
+        await emp.destroy();
+        return { deletedEmployee: { id, name: deletedName } };
+      },
+      () => {
+        const currentList = loadEmployeesFromFile();
+        const target = currentList.find(e => e.id === id);
+        if (!target) return { notFound: true };
+
+        const updatedList = currentList.filter(e => e.id !== id);
+        saveEmployeesToFile(updatedList);
+
+        if (target && target.email) {
+          try {
+            let users = safeReadJson(USERS_FILE, []);
+            users = users.filter(u => u.email !== target.email);
+            safeWriteJson(USERS_FILE, users);
+            store.mockUsers = users;
+          } catch {}
+        }
+
+        return { deletedEmployee: target };
+      }
+    );
+
+    if (result.notFound) {
       return res.status(404).json({ error: 'Employee not found', code: 'EMPLOYEE_NOT_FOUND' });
     }
 
-    const updatedList = currentList.filter(e => e.id !== id);
-    saveEmployeesToFile(updatedList);
-
-    // Also remove from users_data.json if matching email
-    if (target && target.email) {
-      try {
-        let users = safeReadJson(USERS_FILE, []);
-        users = users.filter(u => u.email !== target.email);
-        safeWriteJson(USERS_FILE, users);
-        store.mockUsers = users;
-      } catch {}
-    }
-
-    const deletedEmployee = target || { id, name: empData?.name || id };
     return res.json({
       success: true,
-      message: `Team member "${deletedEmployee.name || id}" was successfully deleted.`,
-      deletedEmployee
+      message: `Team member "${result.deletedEmployee.name || id}" was successfully deleted.`,
+      deletedEmployee: result.deletedEmployee
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to delete employee' });
+    next(error);
   }
 };
 

@@ -1,9 +1,12 @@
 'use strict';
 const path = require('path');
 const fs = require('fs');
-const { Invoice, Lead } = require('../models');
-const { mockLeads } = require('../config/inMemoryStore');
-const { isDbConnected } = require('../config/db');
+const { Invoice, ActivityLog } = require('../models');
+const { isDbConnected, sequelize } = require('../config/db');
+const { withDb, isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+
+const INVOICES_FILE = path.join(__dirname, '../../invoices_data.json');
 
 // ─── Helper: number to words (Indian format) ─────────────────────────────────
 function amountInWords(amount) {
@@ -34,14 +37,11 @@ async function nextInvoiceId() {
       const year = new Date().getFullYear();
       return `INV-${year}-${String(count + 1001).padStart(4, '0')}`;
     } catch {
-      // Fallback
+      // Fallback below
     }
   }
   return `INV-${Date.now()}`;
 }
-
-const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
-const INVOICES_FILE = path.join(__dirname, '../../invoices_data.json');
 
 function loadInvoicesFromFile() {
   return safeReadJson(INVOICES_FILE, []);
@@ -52,28 +52,25 @@ function saveInvoicesToFile(invoices) {
 }
 
 // ─── GET /api/invoices ────────────────────────────────────────────────────────
-async function getInvoices(req, res) {
+async function getInvoices(req, res, next) {
   try {
-    let invoices = [];
-    if (isDbConnected()) {
-      try {
-        invoices = await Invoice.findAll({ order: [['createdAt', 'DESC']] });
-      } catch {
-        invoices = [];
+    const invoices = await withDb(
+      async () => {
+        return await Invoice.findAll({ order: [['createdAt', 'DESC']] });
+      },
+      () => {
+        return loadInvoicesFromFile();
       }
-    }
-    if (!invoices || invoices.length === 0) {
-      invoices = loadInvoicesFromFile();
-    }
+    );
 
-    res.json({ invoices, count: invoices.length });
+    return res.json({ invoices, count: invoices.length });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch invoices' });
+    next(err);
   }
 }
 
 // ─── POST /api/invoices ───────────────────────────────────────────────────────
-async function createInvoice(req, res) {
+async function createInvoice(req, res, next) {
   try {
     const { clientName, clientPhone, clientEmail, gstNo, poNo, product, hsnCode, baseAmount, leadId, paymentTerms } = req.body;
     if (!clientName || !product || !baseAmount) {
@@ -84,92 +81,149 @@ async function createInvoice(req, res) {
     const id = await nextInvoiceId();
     const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    let invoice = null;
-    if (isDbConnected()) {
-      const { sequelize } = require('../config/db');
-      const t = await sequelize.transaction();
-      try {
-        invoice = await Invoice.create({
-          id, leadId: leadId || null, clientName, clientPhone, clientEmail,
-          gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product,
-          hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt,
-          status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days',
-          issuedDate: new Date().toISOString().split('T')[0], dueDate
-        }, { transaction: t });
-
-        if (leadId) {
-          const { ActivityLog } = require('../models');
-          await ActivityLog.create({
-            id: `log${Date.now()}`,
-            leadId,
-            employeeId: req.user?.id || 'e1',
-            action: `GST Invoice ${id} created for ${product} (INR ${base + gstAmt})`
+    const invoice = await withDb(
+      async () => {
+        const t = await sequelize.transaction();
+        try {
+          const inv = await Invoice.create({
+            id,
+            leadId: leadId || null,
+            clientName,
+            clientPhone,
+            clientEmail,
+            gstNo: gstNo || '27AAAAA0000A1Z5',
+            poNo,
+            product,
+            hsnCode: hsnCode || '8466',
+            baseAmount: base,
+            gstAmount: gstAmt,
+            status: 'Draft',
+            paymentTerms: paymentTerms || 'Net 30 Days',
+            issuedDate: new Date().toISOString().split('T')[0],
+            dueDate
           }, { transaction: t });
-        }
 
-        await t.commit();
-      } catch (dbErr) {
-        await t.rollback();
-        console.warn('[DB Invoice create transaction rollback]:', dbErr.message);
-        invoice = null;
+          if (leadId) {
+            await ActivityLog.create({
+              id: `log${Date.now()}`,
+              leadId,
+              employeeId: req.user?.id || 'e1',
+              action: `GST Invoice ${id} created for ${product} (INR ${base + gstAmt})`
+            }, { transaction: t });
+          }
+
+          await t.commit();
+          return inv;
+        } catch (dbErr) {
+          await t.rollback();
+          throw dbErr;
+        }
+      },
+      () => {
+        const fallbackInv = {
+          id,
+          clientName,
+          clientPhone,
+          clientEmail,
+          gstNo: gstNo || '27AAAAA0000A1Z5',
+          poNo,
+          product,
+          hsnCode: hsnCode || '8466',
+          baseAmount: base,
+          gstAmount: gstAmt,
+          totalAmount: base + gstAmt,
+          status: 'Draft',
+          paymentTerms: paymentTerms || 'Net 30 Days',
+          issuedDate: new Date().toISOString().split('T')[0],
+          dueDate,
+          createdAt: new Date().toISOString()
+        };
+        const currentInvoices = loadInvoicesFromFile();
+        currentInvoices.unshift(fallbackInv);
+        saveInvoicesToFile(currentInvoices);
+        return fallbackInv;
       }
-    }
-    if (!invoice) {
-      invoice = { id, clientName, clientPhone, clientEmail, gstNo: gstNo || '27AAAAA0000A1Z5', poNo, product, hsnCode: hsnCode || '8466', baseAmount: base, gstAmount: gstAmt, totalAmount: base + gstAmt, status: 'Draft', paymentTerms: paymentTerms || 'Net 30 Days', issuedDate: new Date().toISOString().split('T')[0], dueDate, createdAt: new Date().toISOString() };
-      const currentInvoices = loadInvoicesFromFile();
-      currentInvoices.unshift(invoice);
-      saveInvoicesToFile(currentInvoices);
-    }
-    res.status(201).json({ success: true, invoice });
+    );
+
+    return res.status(201).json({ success: true, invoice });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to create invoice' });
+    next(err);
   }
 }
 
 // ─── PATCH /api/invoices/:id/status ──────────────────────────────────────────
-async function updateStatus(req, res) {
+async function updateStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { status } = req.body;
     if (!['Draft', 'Sent', 'Paid', 'Overdue'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    if (isDbConnected()) {
-      try {
+
+    const result = await withDb(
+      async () => {
         const inv = await Invoice.findByPk(id);
-        if (inv) {
-          inv.status = status;
-          if (status === 'Paid') inv.paidAt = new Date();
-          await inv.save();
-          return res.json({ success: true, invoice: inv });
-        }
-      } catch {}
+        if (!inv) return { notFound: true };
+        inv.status = status;
+        if (status === 'Paid') inv.paidAt = new Date();
+        await inv.save();
+        return { invoice: inv };
+      },
+      () => {
+        const currentInvoices = loadInvoicesFromFile();
+        const target = currentInvoices.find(i => i.id === id);
+        if (!target) return { notFound: true };
+        target.status = status;
+        if (status === 'Paid') target.paidAt = new Date().toISOString();
+        saveInvoicesToFile(currentInvoices);
+        return { invoice: target };
+      }
+    );
+
+    if (result.notFound) {
+      return res.status(404).json({ error: 'Invoice not found', code: 'RESOURCE_NOT_FOUND' });
     }
-    const currentInvoices = loadInvoicesFromFile();
-    const target = currentInvoices.find(i => i.id === id);
-    if (target) {
-      target.status = status;
-      if (status === 'Paid') target.paidAt = new Date().toISOString();
-      saveInvoicesToFile(currentInvoices);
-      return res.json({ success: true, invoice: target });
-    }
-    res.json({ success: true, message: `Status updated to ${status}` });
+
+    return res.json({ success: true, invoice: result.invoice });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update invoice status' });
+    next(err);
   }
 }
 
 // ─── GET /api/invoices/:id/pdf ────────────────────────────────────────────────
-async function downloadPdf(req, res) {
+async function downloadPdf(req, res, next) {
   try {
     const { id } = req.params;
-    let inv = null;
-    try { inv = await Invoice.findByPk(id); } catch {}
-
-    // Fallback mock
-    if (!inv) {
-      inv = { id, clientName: 'Sample Client', gstNo: '27AAAAA0000A1Z5', poNo: 'PO-0000', product: 'Industrial Machine', hsnCode: '8466', baseAmount: 100000, gstAmount: 18000, status: 'Draft', issuedDate: new Date().toISOString().split('T')[0], dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0], paymentTerms: 'Net 30 Days' };
-    }
+    let inv = await withDb(
+      async () => {
+        const found = await Invoice.findByPk(id);
+        if (!found) {
+          const err = new Error('Invoice not found');
+          err.statusCode = 404;
+          err.code = 'RESOURCE_NOT_FOUND';
+          throw err;
+        }
+        return found;
+      },
+      () => {
+        const currentInvoices = loadInvoicesFromFile();
+        const found = currentInvoices.find(i => i.id === id);
+        return found || {
+          id,
+          clientName: 'Sample Client',
+          gstNo: '27AAAAA0000A1Z5',
+          poNo: 'PO-0000',
+          product: 'Industrial Machine',
+          hsnCode: '8466',
+          baseAmount: 100000,
+          gstAmount: 18000,
+          status: 'Draft',
+          issuedDate: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+          paymentTerms: 'Net 30 Days'
+        };
+      }
+    );
 
     const PDFDocument = require('pdfkit');
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
@@ -262,31 +316,41 @@ async function downloadPdf(req, res) {
 
     doc.end();
   } catch (err) {
-    console.error('[Invoice PDF]', err);
-    res.status(500).json({ error: 'Failed to generate PDF' });
+    next(err);
   }
 }
 
 // ─── POST /api/invoices/:id/dispatch ─────────────────────────────────────────
-async function dispatchWhatsApp(req, res) {
+async function dispatchWhatsApp(req, res, next) {
   try {
     const { id } = req.params;
-    let inv = null;
-    try { inv = await Invoice.findByPk(id); } catch {}
-    const clientName = inv?.clientName || id;
 
-    // Update status to Sent
-    if (inv) {
-      inv.status = 'Sent';
-      try { await inv.save(); } catch {}
+    const result = await withDb(
+      async () => {
+        const inv = await Invoice.findByPk(id);
+        if (!inv) return { notFound: true };
+        inv.status = 'Sent';
+        await inv.save();
+        return { clientName: inv.clientName || id };
+      },
+      () => {
+        const currentInvoices = loadInvoicesFromFile();
+        const target = currentInvoices.find(i => i.id === id);
+        if (!target) return { notFound: true };
+        target.status = 'Sent';
+        saveInvoicesToFile(currentInvoices);
+        return { clientName: target.clientName || id };
+      }
+    );
+
+    if (result.notFound) {
+      return res.status(404).json({ error: 'Invoice not found', code: 'RESOURCE_NOT_FOUND' });
     }
 
-    // In production: generate PDF buffer → call WhatsApp document API
-    // For now: log + return success with simulated dispatch
-    console.log(`[Invoice Dispatch] PDF invoice ${id} dispatched to ${clientName} via WhatsApp.`);
-    res.json({ success: true, message: `Invoice ${id} PDF dispatched to ${clientName} via WhatsApp.`, invoiceId: id });
+    console.log(`[Invoice Dispatch] PDF invoice ${id} dispatched to ${result.clientName} via WhatsApp.`);
+    return res.json({ success: true, message: `Invoice ${id} PDF dispatched to ${result.clientName} via WhatsApp.`, invoiceId: id });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to dispatch invoice' });
+    next(err);
   }
 }
 

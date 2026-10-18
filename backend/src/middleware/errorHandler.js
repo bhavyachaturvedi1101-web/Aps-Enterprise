@@ -41,8 +41,23 @@ const errorHandler = (err, req, res, next) => {
   let message = err.message || 'An unexpected error occurred.';
   let details = err.details || null;
 
-  // 1. Handle Sequelize Database Errors
-  if (err.name === 'SequelizeValidationError') {
+  // 1. Handle Database Availability & Connection Errors (503 Service Unavailable)
+  if (
+    err.name === 'DatabaseUnavailableError' ||
+    err.code === 'DATABASE_UNAVAILABLE' ||
+    err.name === 'SequelizeConnectionError' ||
+    err.name === 'SequelizeConnectionRefusedError' ||
+    err.name === 'SequelizeHostNotFoundError' ||
+    err.name === 'SequelizeHostNotReachableError' ||
+    err.name === 'SequelizeInvalidConnectionError' ||
+    err.name === 'SequelizeConnectionTimedOutError' ||
+    err.name === 'TimeoutError'
+  ) {
+    statusCode = 503;
+    errorCode = 'DATABASE_UNAVAILABLE';
+    message = err.message || 'Database service is temporarily unavailable. Please retry shortly.';
+    res.setHeader('Retry-After', '5');
+  } else if (err.name === 'SequelizeValidationError') {
     statusCode = 400;
     errorCode = 'VALIDATION_ERROR';
     message = 'Database validation failed';

@@ -100,6 +100,11 @@ function validateSecurityConfig(env = process.env) {
     errors.push('ALLOW_DEV_ANONYMOUS_AUTH must NOT be enabled in production.');
   }
 
+  // 5. Strict Database Persistence Requirements
+  if (isProd && !env.DATABASE_URL) {
+    errors.push('DATABASE_URL is required in production environment. In-memory / file degradation is disabled.');
+  }
+
   return {
     valid: errors.length === 0,
     errors,

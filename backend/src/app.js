@@ -17,14 +17,22 @@ let _dbAttempted = false;
 const initDB = async () => {
   if (_dbAttempted) return isDbConnected();
   _dbAttempted = true;
+  const isProd = process.env.NODE_ENV === 'production';
   try {
     if (!process.env.DATABASE_URL) {
+      if (isProd) {
+        throw new Error('DATABASE_URL is required in production environment.');
+      }
       console.log('[DB] No DATABASE_URL provided. Running in in-memory store mode.');
       return false;
     }
     await connectDB();
     return true;
   } catch (err) {
+    if (isProd) {
+      console.error(`[CRITICAL] Database initialization failed in production: ${err.message}`);
+      throw err;
+    }
     console.warn(`[Warning] Database unavailable (${err.message}). Proceeding with in-memory store.`);
     return false;
   }
@@ -135,9 +143,25 @@ app.get('/api/health/live', (req, res) => {
 
 // Readiness Probe
 app.get('/api/health/ready', (req, res) => {
+  const connected = isDbConnected();
+  const { isStrictDbMode } = require('./utils/dbPolicy');
+  const strict = isStrictDbMode();
+
+  if (strict && !connected) {
+    return res.status(503).json({
+      status: 'NOT_READY',
+      ready: false,
+      reason: 'DATABASE_DISCONNECTED',
+      error: 'PostgreSQL database connection offline',
+      code: 'DATABASE_UNAVAILABLE',
+      timestamp: new Date().toISOString()
+    });
+  }
+
   res.status(200).json({
     status: 'READY',
-    database: isDbConnected() ? 'connected' : 'in-memory-fallback',
+    ready: true,
+    database: connected ? 'connected' : 'in-memory-fallback',
     timestamp: new Date().toISOString()
   });
 });

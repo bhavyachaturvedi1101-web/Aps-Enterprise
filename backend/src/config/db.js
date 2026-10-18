@@ -5,10 +5,11 @@ require('dotenv').config();
 const databaseUrl = process.env.DATABASE_URL;
 
 const poolConfig = {
-  max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 5,
-  min: 0,
-  acquire: 30000,
-  idle: 10000
+  max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 10,
+  min: process.env.DB_POOL_MIN ? parseInt(process.env.DB_POOL_MIN, 10) : 2,
+  acquire: process.env.DB_POOL_ACQUIRE ? parseInt(process.env.DB_POOL_ACQUIRE, 10) : 30000,
+  idle: 10000,
+  evict: 5000
 };
 
 let sequelize;
@@ -45,30 +46,37 @@ let isConnected = false;
 
 const isDbConnected = () => isConnected;
 
-const connectDB = async (retryCount = 1) => {
-  try {
-    await sequelize.authenticate();
-    isConnected = true;
-    console.log('PostgreSQL database connection has been established successfully.');
+/**
+ * Resilient database connection with exponential backoff retry
+ */
+const connectDB = async (maxRetries = 3, initialDelayMs = 1000) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await sequelize.authenticate();
+      isConnected = true;
+      console.log('PostgreSQL database connection has been established successfully.');
 
-    if (process.env.NODE_ENV === 'development') {
-      // In dev: safely alter tables to reflect model schema updates
-      await sequelize.sync({ alter: true });
-      console.log('Database schemas synced (alter) successfully.');
-    } else {
-      // In production: only create missing tables — never drop data
-      await sequelize.sync({ force: false, alter: false });
-      console.log('Database schemas synced (safe) successfully.');
+      if (process.env.NODE_ENV === 'development') {
+        // In dev: safely alter tables to reflect model schema updates
+        await sequelize.sync({ alter: true });
+        console.log('Database schemas synced (alter) successfully.');
+      } else {
+        // In production: only create missing tables — never drop data
+        await sequelize.sync({ force: false, alter: false });
+        console.log('Database schemas synced (safe) successfully.');
+      }
+      return true;
+    } catch (error) {
+      isConnected = false;
+      if (attempt < maxRetries) {
+        const delay = initialDelayMs * Math.pow(2, attempt - 1);
+        console.warn(`[DB Connect Warning] Attempt ${attempt}/${maxRetries} failed (${error.message}). Retrying in ${delay / 1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        console.error(`[DB Connect Critical] All ${maxRetries} connection attempts failed:`, error.message || error);
+        throw error;
+      }
     }
-  } catch (error) {
-    if (retryCount > 0) {
-      console.warn(`[DB Connect Warning] First attempt failed (${error.message}). Retrying in 1s...`);
-      await new Promise(r => setTimeout(r, 1000));
-      return connectDB(retryCount - 1);
-    }
-    isConnected = false;
-    console.error('Unable to connect to the database:', error.message || error);
-    throw error;
   }
 };
 

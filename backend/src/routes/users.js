@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const path = require('path');
 const store = require('../config/inMemoryStore');
 const { authorize } = require('../middleware/rbacMiddleware');
-
 const { isDbConnected } = require('../config/db');
+const { withDb, isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+const { User, Employee, ActivityLog } = require('../models');
 
 const USERS_FILE = path.join(__dirname, '../../users_data.json');
 const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
@@ -36,32 +36,31 @@ function saveUsers(usersList) {
   safeWriteJson(USERS_FILE, usersList);
 }
 
-// GET /api/users — List all system users & roles (Admin only)
-router.get('/', authorize(['admin']), async (req, res) => {
-  try {
-    let dbUsers = [];
-    if (isDbConnected()) {
-      try {
-        const { User } = require('../models');
-        dbUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
-      } catch (e) {}
-    }
+function formatDbUser(u) {
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role === 'admin' ? 'Super Admin' : (u.role === 'manager' ? 'Operations Manager' : 'Team Associate'),
+    module: u.department || 'Operations & CRM',
+    lastLogin: u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : 'Recent',
+    status: u.isActive ? 'Online' : 'Offline'
+  };
+}
 
-    const fileUsers = loadUsers();
-    let users = fileUsers;
-    if (dbUsers && dbUsers.length > 0) {
-      const dbFormatted = dbUsers.map(u => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        role: u.role === 'admin' ? 'Super Admin' : (u.role === 'manager' ? 'Operations Manager' : 'Team Associate'),
-        module: u.department || 'Operations & CRM',
-        lastLogin: u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : 'Recent',
-        status: u.isActive ? 'Online' : 'Offline'
-      }));
-      const existingEmails = new Set(dbFormatted.map(u => u.email.toLowerCase()));
-      users = [...dbFormatted, ...fileUsers.filter(u => !existingEmails.has(u.email.toLowerCase()))];
-    }
+// GET /api/users — List all system users & roles (Admin only)
+router.get('/', authorize(['admin']), async (req, res, next) => {
+  try {
+    const users = await withDb(
+      async () => {
+        const dbUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
+        return (dbUsers || []).map(formatDbUser);
+      },
+      () => {
+        const fileUsers = loadUsers();
+        return fileUsers;
+      }
+    );
 
     return res.json({
       success: true,
@@ -69,197 +68,266 @@ router.get('/', authorize(['admin']), async (req, res) => {
       users
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to load users', message: err.message });
+    next(err);
   }
 });
 
 // POST /api/users — Create a new system user (Admin only)
-router.post('/', authorize(['admin']), async (req, res) => {
+router.post('/', authorize(['admin']), async (req, res, next) => {
   try {
     const { name, email, role, module, status } = req.body;
     if (!name || !email) {
       return res.status(400).json({ error: 'Name and email are required' });
     }
 
-    const users = loadUsers();
-    const newUser = {
-      id: `u${Date.now()}`,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      role: role || 'Operations',
-      module: module || (role === 'Admin' ? 'Dashboard & Core' : (role === 'Super Admin' ? 'Voice AI' : 'Operations & CRM')),
-      lastLogin: 'Just now',
-      status: status || 'Online',
-      createdAt: new Date().toISOString()
-    };
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const resolvedRole = role || 'Operations';
+    const resolvedModule = module || (role === 'Admin' ? 'Dashboard & Core' : (role === 'Super Admin' ? 'Voice AI' : 'Operations & CRM'));
 
-    users.unshift(newUser);
-    saveUsers(users);
-
-    // Persist to DB if connected
-    if (isDbConnected()) {
-      try {
-        const { User } = require('../models');
-        await User.findOrCreate({
-          where: { email: newUser.email },
+    const result = await withDb(
+      async () => {
+        const [dbUser, created] = await User.findOrCreate({
+          where: { email: cleanEmail },
           defaults: {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role.toLowerCase().includes('admin') ? 'admin' : (newUser.role.toLowerCase().includes('manager') ? 'manager' : 'employee'),
-            department: newUser.module || 'Operations',
-            isActive: true
+            id: `u${Date.now()}`,
+            name: cleanName,
+            email: cleanEmail,
+            role: resolvedRole.toLowerCase().includes('admin') ? 'admin' : (resolvedRole.toLowerCase().includes('manager') ? 'manager' : 'employee'),
+            department: resolvedModule,
+            isActive: status !== 'Offline'
           }
         });
-      } catch (dbErr) {
-        console.warn('[users.js DB create warning]:', dbErr.message);
-      }
-    }
 
-    // Also sync to employees store so they appear in Team KPIs
-    try {
-      let empList = safeReadJson(EMPLOYEES_FILE, []);
-      if (!empList.some(e => e.email?.toLowerCase() === newUser.email.toLowerCase())) {
-        const empId = `e${empList.length + 1}`;
-        const newEmp = {
-          id: empId,
-          name: newUser.name,
-          email: newUser.email,
-          phone: '+91 98765 43210',
-          role: newUser.role === 'Admin' ? 'System Administrator' : (newUser.role === 'Super Admin' ? 'Super Admin' : (newUser.role === 'Telecaller' ? 'Lead Telecaller Executive' : 'Direct Sales Executive')),
-          department: newUser.module || 'Sales & Operations',
-          status: 'Active',
-          kpiScore: '92%',
-          kpiScoreNum: 92,
-          tasksCompleted: 0,
-          callsHandled: 0,
-          salesClosed: 0,
-          totalRevenue: 0,
-          conversionRate: '30%',
-          avgCallDurationSec: 110,
-          avgResponseTimeMin: 3.5,
-          weeklyKpiHistory: [88, 90, 91, 92],
-          activeTask: {
-            id: `task-${empId}-1`,
-            title: `System onboarding for ${newUser.name}`,
-            priority: 'Normal',
-            type: 'System Onboarding',
-            dueIn: '45 mins',
-            assignedAt: new Date()
-          },
-          taskQueue: []
+        // Also ensure employee record exists in DB
+        await Employee.findOrCreate({
+          where: { email: cleanEmail },
+          defaults: {
+            id: `e${Date.now()}`,
+            name: cleanName,
+            email: cleanEmail,
+            phone: '+91 98765 43210',
+            role: resolvedRole.toLowerCase().includes('admin') ? 'System Administrator' : 'Sales Associate',
+            department: resolvedModule,
+            status: 'Active',
+            kpiScore: '90%',
+            tasksCompleted: 0,
+            callsHandled: 0,
+            salesClosed: 0,
+            totalRevenue: 0
+          }
+        });
+
+        const allUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
+        return {
+          user: formatDbUser(dbUser),
+          users: allUsers.map(formatDbUser)
         };
-        empList.unshift(newEmp);
-        safeWriteJson(EMPLOYEES_FILE, empList);
-        store.mockEmployees = empList;
-      }
-    } catch (err) {
-      console.error('[users.js sync to employees error]:', err.message);
-    }
+      },
+      () => {
+        const users = loadUsers();
+        const newUser = {
+          id: `u${Date.now()}`,
+          name: cleanName,
+          email: cleanEmail,
+          role: resolvedRole,
+          module: resolvedModule,
+          lastLogin: 'Just now',
+          status: status || 'Online',
+          createdAt: new Date().toISOString()
+        };
 
-    // Also add to activity logs
-    if (store.mockActivityLogs) {
-      store.mockActivityLogs.unshift({
-        id: `act-${Date.now()}`,
-        employeeName: 'System AI',
-        action: `Created new user account "${newUser.name}" with role "${newUser.role}" (${newUser.module})`,
-        createdAt: new Date()
-      });
-    }
+        users.unshift(newUser);
+        saveUsers(users);
+
+        // Also sync to employees store so they appear in Team KPIs
+        try {
+          let empList = safeReadJson(EMPLOYEES_FILE, []);
+          if (!empList.some(e => e.email?.toLowerCase() === cleanEmail)) {
+            const empId = `e${empList.length + 1}`;
+            const newEmp = {
+              id: empId,
+              name: cleanName,
+              email: cleanEmail,
+              phone: '+91 98765 43210',
+              role: resolvedRole === 'Admin' ? 'System Administrator' : (resolvedRole === 'Super Admin' ? 'Super Admin' : (resolvedRole === 'Telecaller' ? 'Lead Telecaller Executive' : 'Direct Sales Executive')),
+              department: resolvedModule,
+              status: 'Active',
+              kpiScore: '92%',
+              kpiScoreNum: 92,
+              tasksCompleted: 0,
+              callsHandled: 0,
+              salesClosed: 0,
+              totalRevenue: 0,
+              conversionRate: '30%',
+              avgCallDurationSec: 110,
+              avgResponseTimeMin: 3.5,
+              weeklyKpiHistory: [88, 90, 91, 92],
+              activeTask: {
+                id: `task-${empId}-1`,
+                title: `System onboarding for ${cleanName}`,
+                priority: 'Normal',
+                type: 'System Onboarding',
+                dueIn: '45 mins',
+                assignedAt: new Date()
+              },
+              taskQueue: []
+            };
+            empList.unshift(newEmp);
+            safeWriteJson(EMPLOYEES_FILE, empList);
+            store.mockEmployees = empList;
+          }
+        } catch (err) {
+          console.error('[users.js sync to employees error]:', err.message);
+        }
+
+        if (store.mockActivityLogs) {
+          store.mockActivityLogs.unshift({
+            id: `act-${Date.now()}`,
+            employeeName: 'System AI',
+            action: `Created new user account "${cleanName}" with role "${resolvedRole}" (${resolvedModule})`,
+            createdAt: new Date()
+          });
+        }
+
+        return { user: newUser, users };
+      }
+    );
 
     return res.status(201).json({
       success: true,
-      message: `User ${newUser.name} created successfully`,
-      user: newUser,
-      users
+      message: `User ${cleanName} created successfully`,
+      user: result.user,
+      users: result.users
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to create user', message: err.message });
+    next(err);
   }
 });
 
 // PUT /api/users/:id — Update user (Admin only)
-router.put('/:id', authorize(['admin']), async (req, res) => {
+router.put('/:id', authorize(['admin']), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const users = loadUsers();
 
-    const idx = users.findIndex(u => u.id === id || u.email?.toLowerCase() === id.toLowerCase());
-    if (idx === -1) {
+    const result = await withDb(
+      async () => {
+        const u = await User.findByPk(id);
+        if (!u) return { notFound: true };
+
+        const { name, role, module, status } = req.body;
+        if (name) u.name = name.trim();
+        if (role) u.role = role.toLowerCase().includes('admin') ? 'admin' : (role.toLowerCase().includes('manager') ? 'manager' : 'employee');
+        if (module) u.department = module;
+        if (status !== undefined) u.isActive = status !== 'Offline';
+
+        await u.save();
+        const allUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
+        return {
+          user: formatDbUser(u),
+          users: allUsers.map(formatDbUser)
+        };
+      },
+      () => {
+        const users = loadUsers();
+        const idx = users.findIndex(u => u.id === id || u.email?.toLowerCase() === id.toLowerCase());
+        if (idx === -1) {
+          return { notFound: true };
+        }
+
+        users[idx] = {
+          ...users[idx],
+          ...req.body,
+          updatedAt: new Date().toISOString()
+        };
+        saveUsers(users);
+
+        return {
+          user: users[idx],
+          users
+        };
+      }
+    );
+
+    if (result.notFound) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    users[idx] = {
-      ...users[idx],
-      ...req.body,
-      updatedAt: new Date().toISOString()
-    };
-    saveUsers(users);
 
     return res.json({
       success: true,
       message: 'User updated successfully',
-      user: users[idx],
-      users
+      user: result.user,
+      users: result.users
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to update user', message: err.message });
+    next(err);
   }
 });
 
 // DELETE /api/users/:id — Remove user (Admin only)
-router.delete('/:id', authorize(['admin']), async (req, res) => {
+router.delete('/:id', authorize(['admin']), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const users = loadUsers();
 
-    const targetUser = users.find(u => u.id === id || u.email?.toLowerCase() === id.toLowerCase());
-    const remaining = users.filter(u => u.id !== id && u.email?.toLowerCase() !== id.toLowerCase());
-    saveUsers(remaining);
+    const result = await withDb(
+      async () => {
+        const u = await User.findByPk(id);
+        if (!u) return { notFound: true };
 
-    // Also delete from PostgreSQL if connected
-    if (isDbConnected()) {
-      try {
-        const { User } = require('../models');
-        await User.destroy({ where: { id } });
-      } catch (e) {}
-    }
+        await u.destroy();
+        const allUsers = await User.findAll({ order: [['createdAt', 'DESC']] });
+        return {
+          users: allUsers.map(formatDbUser)
+        };
+      },
+      () => {
+        const users = loadUsers();
+        const targetUser = users.find(u => u.id === id || u.email?.toLowerCase() === id.toLowerCase());
+        const remaining = users.filter(u => u.id !== id && u.email?.toLowerCase() !== id.toLowerCase());
+        saveUsers(remaining);
 
-    // Also sync and remove from employees if applicable
-    if (targetUser) {
-      try {
-        const empList = safeReadJson(EMPLOYEES_FILE, []);
-        if (Array.isArray(empList)) {
-          const updatedEmps = empList.filter(e => 
-            e.email?.toLowerCase() !== targetUser.email?.toLowerCase() &&
-            e.name?.toLowerCase() !== targetUser.name?.toLowerCase()
-          );
-          safeWriteJson(EMPLOYEES_FILE, updatedEmps);
-          if (store.mockEmployees) {
-            store.mockEmployees = updatedEmps;
+        if (targetUser) {
+          try {
+            const empList = safeReadJson(EMPLOYEES_FILE, []);
+            if (Array.isArray(empList)) {
+              const updatedEmps = empList.filter(e => 
+                e.email?.toLowerCase() !== targetUser.email?.toLowerCase() &&
+                e.name?.toLowerCase() !== targetUser.name?.toLowerCase()
+              );
+              safeWriteJson(EMPLOYEES_FILE, updatedEmps);
+              if (store.mockEmployees) {
+                store.mockEmployees = updatedEmps;
+              }
+            }
+          } catch (err) {
+            console.error('Error syncing employee deletion:', err);
+          }
+
+          if (store.mockActivityLogs) {
+            store.mockActivityLogs.unshift({
+              id: `act-${Date.now()}`,
+              employeeName: 'System AI',
+              action: `Removed system account "${targetUser.name}" (${targetUser.email})`,
+              createdAt: new Date()
+            });
           }
         }
-      } catch (err) {
-        console.error('Error syncing employee deletion:', err);
-      }
 
-      if (store.mockActivityLogs) {
-        store.mockActivityLogs.unshift({
-          id: `act-${Date.now()}`,
-          employeeName: 'System AI',
-          action: `Removed system account "${targetUser.name}" (${targetUser.email})`,
-          createdAt: new Date()
-        });
+        return { users: remaining };
       }
+    );
+
+    if (result.notFound) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
     return res.json({
       success: true,
       message: 'User removed successfully',
-      users: remaining
+      users: result.users
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to delete user', message: err.message });
+    next(err);
   }
 });
 

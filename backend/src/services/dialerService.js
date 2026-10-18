@@ -4,6 +4,7 @@ const path = require('path');
 const { Lead } = require('../models');
 const { mockLeads } = require('../config/inMemoryStore');
 const { isDbConnected } = require('../config/db');
+const { isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
 
 const DIALER_QUEUE_FILE = path.join(__dirname, '../../dialer_queue.json');
@@ -34,8 +35,14 @@ async function initQueue() {
   try {
     let leads = [];
     if (isDbConnected()) {
-      try { leads = (await Lead.findAll({ where: { stage: ['Enquiry', 'Qualified'] } })).map(l => l.toJSON()); }
-      catch { leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage)); }
+      try {
+        leads = (await Lead.findAll({ where: { stage: ['Enquiry', 'Qualified'] } })).map(l => l.toJSON());
+      } catch (err) {
+        if (isStrictDbMode()) throw err;
+        leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
+      }
+    } else if (isStrictDbMode()) {
+      throw new DatabaseUnavailableError('Active database connection required in production mode for dialer queue.');
     } else {
       leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
     }
@@ -92,6 +99,9 @@ initQueue().catch(() => {});
 class DialerService {
   getQueue() {
     if (callQueue.length === 0) {
+      if (isStrictDbMode()) {
+        throw new DatabaseUnavailableError('Active database connection required in production mode for dialer queue.');
+      }
       const { mockLeads } = require('../config/inMemoryStore');
       const leads = (mockLeads || []).filter(l => ['Enquiry', 'Qualified'].includes(l.stage));
       callQueue = leads.map((l, i) => ({

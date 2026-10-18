@@ -55,7 +55,8 @@ describe('Security & Secrets Hardening Verification', () => {
         NODE_ENV: 'production',
         API_KEY: 'c7b5a3e1f9d2a4b6c8e0f1a3d5b7c9e1f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2',
         JWT_SECRET: 'f1a3d5b7c9e1f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2c7b5a3e1f9d2a4b6c8e0',
-        ADMIN_PASSWORD: 'HighEntropyProdPassword!2026'
+        ADMIN_PASSWORD: 'HighEntropyProdPassword!2026',
+        DATABASE_URL: 'postgresql://postgres:production_strong_secret@db.prod.internal:5432/aps_enterprise'
       };
 
       const result = validateSecurityConfig(mockEnv);
