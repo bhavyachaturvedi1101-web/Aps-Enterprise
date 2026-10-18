@@ -8,6 +8,7 @@
     "test": "npm --prefix backend test",
     "test:ci": "npm --prefix backend test",
     "verify:release": "node scripts/release-verify.js",
+    "security:generate-keys": "node scripts/generate-secrets.js",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",

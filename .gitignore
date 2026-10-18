@@ -84,6 +84,7 @@ dump.rdb
 # 6. Uploads & Temporary Directories
 temp/
 tmp/
+scratch/
 uploads/
 coverage/
 .nyc_output/

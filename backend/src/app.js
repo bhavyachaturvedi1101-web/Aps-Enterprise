@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { validateSecurityEnvironment } = require('./config/envValidator');
+validateSecurityEnvironment();
+
 const { connectDB, isDbConnected } = require('./config/db');
 const { authenticate } = require('./middleware/authMiddleware');
 

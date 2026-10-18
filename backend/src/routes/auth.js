@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+
+function timingSafeCompare(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = crypto.createHash('sha256').update(a).digest();
+  const bufB = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_aps_key_2026';
 const ADMIN_EMAIL = (process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in').toLowerCase();
@@ -107,6 +115,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing credentials',
+        code: 'MISSING_CREDENTIALS',
         message: 'Please provide both email and password.'
       });
     }
@@ -153,8 +162,8 @@ router.post('/login', async (req, res) => {
       const isProduction = process.env.NODE_ENV === 'production';
       const expectedPass = operator.role === 'admin' ? ADMIN_PASSWORD : OPERATOR_PASSWORD;
       
-      // In production, reject known insecure defaults if not explicitly overridden
-      if (isProduction && (cleanPass === 'admin123' || cleanPass === 'aps2026') && !process.env.ALLOW_DEFAULT_PASSWORDS_IN_PROD) {
+      // In production, reject known insecure defaults strictly
+      if (isProduction && (cleanPass === 'admin123' || cleanPass === 'aps2026' || cleanPass === 'password')) {
         return res.status(403).json({
           success: false,
           error: 'Insecure Default Password Blocked',
@@ -162,22 +171,21 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      // Allow operator's designated password, universal admin password, or demo operator passwords
-      const acceptedPasswords = [
-        expectedPass,
-        ADMIN_PASSWORD,
-        OPERATOR_PASSWORD,
-        'admin123',
-        'aps2026'
-      ].filter(Boolean);
-
-      if (acceptedPasswords.includes(cleanPass)) {
+      // Timing-safe comparison against operator's designated password
+      if (expectedPass && timingSafeCompare(cleanPass, expectedPass)) {
         isMatch = true;
+      }
+
+      // In non-production only, allow demo fallback passwords for automated test suites
+      if (!isProduction && !isMatch) {
+        if (cleanPass === 'admin123' || cleanPass === 'aps2026') {
+          isMatch = true;
+        }
       }
     }
 
-    // Check static API key direct authentication
-    if (!isMatch && ADMIN_API_KEY && cleanPass === ADMIN_API_KEY) {
+    // Check static API key direct authentication in constant time
+    if (!isMatch && ADMIN_API_KEY && timingSafeCompare(cleanPass, ADMIN_API_KEY)) {
       isMatch = true;
     }
 
@@ -202,7 +210,7 @@ router.post('/login', async (req, res) => {
       defaultRoute: dbUser.role === 'admin' ? '/dashboard' : '/crm'
     };
 
-    // Generate JWT token (7 days expiry)
+    // Generate JWT token (7 days expiry, explicitly signed with HS256)
     const token = jwt.sign(
       {
         id: activeUser.id,
@@ -211,7 +219,10 @@ router.post('/login', async (req, res) => {
         role: activeUser.role
       },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      {
+        algorithm: 'HS256',
+        expiresIn: '7d'
+      }
     );
 
     // Strip passwordHashes before returning

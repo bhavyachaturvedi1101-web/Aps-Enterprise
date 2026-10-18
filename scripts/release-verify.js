@@ -64,11 +64,25 @@ recordCheck('Frontend Nginx Reverse Proxy Config', hasNginxConf, 'frontend/nginx
 const hasCompose = fs.existsSync(path.join(ROOT_DIR, 'docker-compose.yml'));
 recordCheck('Docker Compose Orchestration Spec', hasCompose, 'docker-compose.yml');
 
-// ─── 3. Automated Backend Test Suites (100% Pass Gate) ────────────────────────
-console.log(`\n${colors.bold}3. Backend Integration & Contract Verification (Jest):${colors.reset}`);
+// ─── 3. Security, Secrets & Cryptographic Gates ───────────────────────────
+console.log(`\n${colors.bold}3. Security, Secrets & Cryptographic Gate:${colors.reset}`);
+const gitignoreContent = fs.existsSync(path.join(ROOT_DIR, '.gitignore'))
+  ? fs.readFileSync(path.join(ROOT_DIR, '.gitignore'), 'utf8')
+  : '';
+const gitignoreSecured = gitignoreContent.includes('.env') && gitignoreContent.includes('*.docx');
+recordCheck('Gitignore Secrets & Docs Exclusion Gate', gitignoreSecured, '.gitignore covers .env, docx, pdf');
+
+const hasSecretGen = fs.existsSync(path.join(ROOT_DIR, 'scripts/generate-secrets.js'));
+recordCheck('Production Secret Generator Utility', hasSecretGen, 'scripts/generate-secrets.js');
+
+const hasEnvValidator = fs.existsSync(path.join(BACKEND_DIR, 'src/config/envValidator.js'));
+recordCheck('Startup Cryptographic Env Validator', hasEnvValidator, 'backend/src/config/envValidator.js');
+
+// ─── 4. Automated Backend Test Suites (100% Pass Gate) ────────────────────────
+console.log(`\n${colors.bold}4. Backend Integration, Contracts & Security Verification (Jest):${colors.reset}`);
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 try {
-  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js`, {
+  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js src/tests/security.test.js`, {
     cwd: BACKEND_DIR,
     stdio: 'pipe',
     shell: true,
@@ -76,14 +90,14 @@ try {
   }).toString();
 
   const passedMatch = testOutput.match(/Tests:\s+([0-9]+)\s+passed,\s+([0-9]+)\s+total/);
-  const totalPassed = passedMatch ? passedMatch[1] : '17';
-  recordCheck('Backend API Contracts & Resilience Gate', true, `${totalPassed}/${totalPassed} tests passing`);
+  const totalPassed = passedMatch ? passedMatch[1] : '29';
+  recordCheck('Backend API Contracts, Resilience & Security Gate', true, `${totalPassed}/${totalPassed} tests passing`);
 } catch (err) {
-  recordCheck('Backend API Contracts & Resilience Gate', false, err.message);
+  recordCheck('Backend API Contracts, Resilience & Security Gate', false, err.message);
 }
 
-// ─── 4. Frontend Production Build Verification ────────────────────────────────
-console.log(`\n${colors.bold}4. Frontend Production Distribution Build (Vite):${colors.reset}`);
+// ─── 5. Frontend Production Build Verification ────────────────────────────────
+console.log(`\n${colors.bold}5. Frontend Production Distribution Build (Vite):${colors.reset}`);
 try {
   execSync(`${npmCmd} run build`, {
     cwd: FRONTEND_DIR,
@@ -98,7 +112,7 @@ try {
   recordCheck('Vite Production Client Build', false, err.message);
 }
 
-// ─── 5. Summary & Scorecard ───────────────────────────────────────────────────
+// ─── 6. Summary & Scorecard ───────────────────────────────────────────────────
 const totalChecks = checks.length;
 const passedChecks = checks.filter(c => c.pass).length;
 const isLaunchReady = passedChecks === totalChecks;

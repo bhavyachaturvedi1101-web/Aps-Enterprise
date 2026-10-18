@@ -9,6 +9,7 @@
     "migrate": "node src/migrations/migrationRunner.js",
     "db:migrate": "node src/migrations/migrationRunner.js",
     "test": "jest --runInBand --forceExit",
+    "security:generate-keys": "node ../scripts/generate-secrets.js",
     "test:watch": "jest --runInBand --watchAll",
     "test:coverage": "jest --runInBand --forceExit --coverage"
   },
