@@ -1,5 +1,41 @@
 [
   {
+    "id": "mem-1792394451874-d5f8",
+    "timestamp": "2026-10-19T07:20:51.874Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "give task to manager",
+    "summary": "Assigned task \"Verify raw material stock levels (steel sheets & copper coils) before next batch\" (HIGH) to Operations Manager (Operations & Production Lead)",
+    "target": "Operations Manager",
+    "status": "completed",
+    "details": {
+      "employeeId": "e2",
+      "task": {
+        "id": "task-e2-1792394451866-0",
+        "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+        "priority": "HIGH",
+        "dueIn": "35 mins",
+        "leadName": "Operations Manager",
+        "assignedAt": "2026-10-19T07:20:51.866Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792392843072-rgbs",
+    "timestamp": "2026-10-19T06:54:03.072Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Bhavya ko urgent task assign kardo: Review Global Tech advance payment",
+    "summary": "Task assignment to \"Kardo\" rejected: \"Kardo\" is not an employee or team member of APS Enterprise.",
+    "target": "Kardo",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Kardo",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 116
+    }
+  },
+  {
     "id": "mem-1792235857950-4lwn",
     "timestamp": "2026-10-17T11:17:37.950Z",
     "type": "TASK_ASSIGNED",

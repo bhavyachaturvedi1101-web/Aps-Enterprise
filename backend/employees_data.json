@@ -4348,7 +4348,7 @@
     "moduleScope": "Operations & Production ERP",
     "kpiScore": "96%",
     "kpiScoreNum": 96,
-    "tasksCompleted": 62,
+    "tasksCompleted": 63,
     "callsHandled": 28,
     "salesClosed": 12,
     "totalRevenue": 2890000,
@@ -4367,12 +4367,12 @@
     "avatarBg": "#2563eb",
     "currentActivity": "Working on: Verify raw material stock levels (steel sheets & copper coils) before next batch",
     "activeTask": {
-      "id": "task-e2-1792235857946-0",
+      "id": "task-e2-1792394451866-0",
       "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
       "priority": "HIGH",
       "dueIn": "35 mins",
       "leadName": "Operations Manager",
-      "assignedAt": "2026-10-17T11:17:37.946Z"
+      "assignedAt": "2026-10-19T07:20:51.866Z"
     },
     "taskQueue": [
       {

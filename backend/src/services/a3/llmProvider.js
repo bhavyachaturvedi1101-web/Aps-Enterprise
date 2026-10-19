@@ -32,12 +32,9 @@ async function callGroq(messages) {
 
   const envModel = process.env.GROQ_MODEL;
   const fallbackChain = [
-    'groq/compound',
     'openai/gpt-oss-120b',
-    'qwen/qwen3.8-27b',
-    'qwen/qwen3.6-27b',
     'openai/gpt-oss-20b',
-    'groq/compound-mini'
+    'qwen/qwen3.8-27b'
   ];
   const models = envModel
     ? [envModel, ...fallbackChain.filter(m => m !== envModel)]
@@ -49,7 +46,7 @@ async function callGroq(messages) {
       const result = await httpsPost(
         'api.groq.com', '/openai/v1/chat/completions',
         { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        { model, messages, temperature: 0.35, max_tokens: 4096, top_p: 0.95 }
+        { model, messages, temperature: 0.35, max_tokens: 1024, top_p: 0.95 }
       );
       if (result.error) {
         const errMsg = result.error.message || '';
@@ -84,7 +81,7 @@ async function callOpenAI(messages) {
   const result = await httpsPost(
     'api.openai.com', '/v1/chat/completions',
     { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    { model: 'gpt-4o-mini', messages, temperature: 0.4, max_tokens: 2048 }
+    { model: 'gpt-4o-mini', messages, temperature: 0.4, max_tokens: 1024 }
   );
   return result?.choices?.[0]?.message?.content || '';
 }
@@ -105,7 +102,7 @@ async function callGemini(systemPrompt, history, userQuery) {
     'generativelanguage.googleapis.com',
     `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
     { 'Content-Type': 'application/json' },
-    { contents, generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }
+    { contents, generationConfig: { temperature: 0.4, maxOutputTokens: 1024 } }
   );
   return result?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
@@ -155,7 +152,6 @@ async function buildFullContext(query, getStore) {
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
   const actLogs = store.mockActivityLogs || [];
-  const callLogs = store.mockCallLogs || [];
   const qLower = (query || '').toLowerCase().trim();
 
   const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
@@ -166,78 +162,60 @@ async function buildFullContext(query, getStore) {
   const pendingBalance = totalRevenueLocked * 0.9;
   const confirmedLeads = leads.filter(l => l.stage === 'Confirmed Lead');
   const advancePending = confirmedLeads.reduce((s, l) => s + (Number(l.budget || l.dealValue || l.value) || 0) * 0.1, 0);
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const thisMonthLeads = leads.filter(l => new Date(l.createdAt || Date.now()) >= startOfMonth);
 
-  const empDetails = employees.map(e => {
-    const active = e.activeTask
-      ? `Active: "${e.activeTask.title}" [P:${e.activeTask.priority}, Lead: ${e.activeTask.leadName || 'N/A'}, Due: ${e.activeTask.dueIn || 'N/A'}]`
-      : 'Active: None';
-    const queued = Array.isArray(e.taskQueue) && e.taskQueue.length > 0
-      ? 'Queue: ' + e.taskQueue.map((t, i) => `${i + 1}."${t.title}"(${t.priority})`).join(' | ')
-      : 'Queue: Empty';
-    const convRate = e.conversionRate || (e.salesClosed && e.leadsAssigned ? `${Math.round((e.salesClosed / e.leadsAssigned) * 100)}%` : 'N/A');
-    return `• ${e.name} [${e.role} / ${e.department}] KPI=${e.kpiScore} Sales=${e.salesClosed} Rev=₹${(e.totalRevenue || 0).toLocaleString('en-IN')} Conv=${convRate} Calls=${e.callsHandled || 0}\n  ${active} | ${queued}`;
+  // Group stage breakdown counts
+  const stageCounts = {};
+  leads.forEach(l => {
+    const st = l.stage || 'Enquiry';
+    stageCounts[st] = (stageCounts[st] || 0) + 1;
+  });
+  const stageSummaryStr = Object.entries(stageCounts)
+    .map(([st, cnt]) => `${st}: ${cnt}`)
+    .join(' | ');
+
+  // Compact employee list (top 6 active members)
+  const empDetails = employees.slice(0, 6).map(e => {
+    const active = e.activeTask ? `Active: "${e.activeTask.title}"` : 'Active: None';
+    return `• ${e.name} [${e.role}] KPI=${e.kpiScore} Closed=${e.salesClosed || 0} Rev=₹${(e.totalRevenue || 0).toLocaleString('en-IN')} | ${active}`;
   }).join('\n');
 
+  // Filter leads: prioritize directly mentioned leads, then take top 8 recent leads as sample
   const mentionedLeads = leads.filter(l =>
-    qLower.includes((l.name || '').toLowerCase()) || qLower.includes((l.company || '').toLowerCase())
+    qLower.includes((l.name || '').toLowerCase()) || (l.company && qLower.includes(l.company.toLowerCase()))
   );
-  const remainingLeads = leads.filter(l => !mentionedLeads.some(x => x.id === l.id));
-  const allLeadsOrdered = [...mentionedLeads, ...remainingLeads];
+  const sampleLeads = mentionedLeads.length > 0
+    ? mentionedLeads
+    : leads.slice(0, 8);
 
-  const leadDetails = allLeadsOrdered.map(l =>
-    `[${l.stage}] ${l.id} | ${l.name} (${l.company || 'N/A'}) | ₹${(Number(l.budget || l.dealValue || l.value) || 0).toLocaleString('en-IN')} | Product:${l.interest || l.product || l.machineRequired || 'N/A'} | Owner:${l.assignedTo || l.assignedEmployeeId || 'Unassigned'} | Tally:${l.tallyPaymentVerified ? 'Verified' : 'Pending'} | ERP:${l.erpBookingCreated ? 'Booked' : 'Pending'} | Source:${l.source || 'N/A'} | City:${l.city || l.location || 'N/A'}`
+  const leadDetails = sampleLeads.map(l =>
+    `• [${l.stage}] ${l.name} (${l.company || 'N/A'}) - ₹${(Number(l.budget || l.dealValue || l.value) || 0).toLocaleString('en-IN')} | Machine: ${l.interest || l.product || 'Standard'}`
   ).join('\n');
 
-  const recentActivity = actLogs.slice(0, 5).map(a =>
-    `[${new Date(a.timestamp || a.createdAt || Date.now()).toLocaleDateString('en-IN')}] ${a.action || a.type} | Lead:${a.leadName || a.leadId || '?'} | By:${a.employeeName || 'System'}`
-  ).join('\n') || 'No recent activity logged.';
+  // Compact recent activity (top 3)
+  const recentActivity = actLogs.slice(0, 3).map(a =>
+    `• ${a.action || a.type}: ${a.leadName || 'General'} (by ${a.employeeName || 'System'})`
+  ).join('\n') || 'None';
 
-  const totalCalls = callLogs.length;
-  const avgCallDuration = totalCalls > 0 ? Math.round(callLogs.reduce((s, c) => s + (c.durationSeconds || 0), 0) / totalCalls) : 0;
-  const sentimentBreakdown = { positive: 0, neutral: 0, negative: 0 };
-  callLogs.forEach(c => {
-    const s = (c.sentiment || '').toLowerCase();
-    if (s.includes('positive')) sentimentBreakdown.positive++;
-    else if (s.includes('negative')) sentimentBreakdown.negative++;
-    else sentimentBreakdown.neutral++;
-  });
-
-  return `═══ APS ENTERPRISE — LIVE INTELLIGENCE STATE [${new Date().toLocaleString('en-IN')}] ═══
-
-━━━ [1] COMPANY IDENTITY & LOCATIONS ━━━
-• Full Name: APS Enterprise — Lead Industrial Manufacturer, Indore MP
-• Head Office: 832, Old Loha Mandi, Opp. Devshree Cinema, Near Khambati Pipes, Indore, MP 452001
-• Contact: +91-7869755871 | +91-8827848099 | info@apsenterprises.in | www.apsenterprises.in
-
-━━━ [2] FINANCIAL HEALTH SNAPSHOT ━━━
-• Total Pipeline Value: ₹${totalPipeline.toLocaleString('en-IN')} (${leads.length} Leads)
-• Revenue Locked (Closed Stages): ₹${totalRevenueLocked.toLocaleString('en-IN')} (${closedLeads.length} Deals)
-• Advance Collected (10% of Locked): ₹${advanceCollected.toLocaleString('en-IN')}
-• Balance Pending (90% of Locked): ₹${pendingBalance.toLocaleString('en-IN')}
-• Advance Pending (Confirmed but Unpaid): ₹${advancePending.toLocaleString('en-IN')} from ${confirmedLeads.length} leads
-• New Leads This Month: ${thisMonthLeads.length} leads
-
-━━━ [3] LIVE TEAM PERFORMANCE ━━━
-${empDetails || 'No team data available.'}
-
-━━━ [4] FULL CRM PIPELINE STATE ━━━
-${leadDetails || 'No leads found.'}
-
-━━━ [5] RECENT ACTIVITY ━━━
-${recentActivity}
-
-━━━ [6] AI PERSISTENT LONG-TERM MEMORY & LEARNED FACTS ━━━
-${(() => {
+  // Persistent Memory snippet (top 5 relevant memories)
+  let memorySnippet = 'No custom memory.';
   try {
     const aiMemory = require('../aiMemoryService');
-    return aiMemory.formatMemoriesForPrompt(query);
-  } catch {
-    return 'No persistent memories available.';
-  }
-})()}`;
+    memorySnippet = aiMemory.formatMemoriesForPrompt(query) || 'No custom memory.';
+  } catch {}
+
+  return `═══ APS ENTERPRISE LIVE INTELLIGENCE [${new Date().toLocaleDateString('en-IN')}] ═══
+• Company: APS Enterprise, 832 Old Loha Mandi, Indore MP | Phone: +91-7869755871 | info@apsenterprises.in
+• Core Products: Double Die Dona Pattal Machine, Heavy Duty Hydraulic Press, Single Die Dona Machine, High-Speed Paper Cup Machine, Paper Roll Cutters.
+• Financials: Total Pipeline: ₹${totalPipeline.toLocaleString('en-IN')} (${leads.length} leads) | Locked Revenue: ₹${totalRevenueLocked.toLocaleString('en-IN')} | Advance Collected: ₹${advanceCollected.toLocaleString('en-IN')} | Balance Pending: ₹${pendingBalance.toLocaleString('en-IN')}
+• Pipeline Stages: ${stageSummaryStr}
+• Team Snapshot (Top):
+${empDetails || 'None'}
+• Leads (${mentionedLeads.length > 0 ? 'Direct Matches' : `Showing 8 of ${leads.length}`}):
+${leadDetails || 'None'}
+• Recent Events:
+${recentActivity}
+• Persistent Learned Memory:
+${memorySnippet}`;
 }
 
 async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHandler) {
@@ -246,7 +224,19 @@ async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHa
 
   try {
     const context = await buildFullContext(query, getStore);
-    const systemPrompt = `You are APS AI — Enterprise Intelligence Copilot for APS Enterprise, Indore. Always answer with rich markdown and professional clarity. Match the user's language.\n\n${context}`;
+    const systemPrompt = `You are APS AI — Executive Operations Intelligence Copilot for APS Enterprise, Indore.
+
+EXECUTIVE ANSWER PROTOCOL:
+1. **Key Takeaway First**: Always start with a 1-2 sentence executive summary (TL;DR) or bottom-line figure before diving into details.
+2. **Visual Hierarchy & Structure**:
+   - Use clean section headers (### Header) to separate topics.
+   - For comparisons, rosters, or multi-field datasets, ALWAYS use clean Markdown Tables with column headers (| Col 1 | Col 2 |).
+   - Use concise bullet points (•) and numbered steps (1., 2.) rather than dense walls of text.
+   - Bold all critical numbers, metrics, currencies, and names (e.g. **₹42,000**, **84%**, **Plant 1**).
+3. **Tone**: Crisp, authoritative, executive-ready, and operational. Match the user's language (English, Hindi, Hinglish) seamlessly.
+4. **Actionable Closure**: When relevant, end with 1-2 suggested operational actions.
+
+${context}`;
 
     let history = Array.isArray(historyOrConvId) ? historyOrConvId : [];
     if (typeof historyOrConvId === 'string') {
@@ -259,7 +249,10 @@ async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHa
     let raw = '';
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...(Array.isArray(history) ? history : []),
+      ...(Array.isArray(history) ? history : []).map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: m.content || m.text || ''
+      })).slice(-6),
       { role: 'user', content: query }
     ];
 
@@ -282,11 +275,89 @@ async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHa
   }
 }
 
+/**
+ * Universal fallback answer generator for general queries when LLM is unavailable or unconfigured
+ */
+async function generateUniversalAnswer(query, convId) {
+  const qLower = (query || '').toLowerCase().trim();
+  const store = await getDefaultStore();
+  const employees = store.mockEmployees || [];
+
+  // 1. Employee query
+  const matchedEmp = employees.find(e => qLower.includes(e.name.toLowerCase()));
+  if (matchedEmp) {
+    const active = matchedEmp.activeTask
+      ? `• **Active Task:** **${matchedEmp.activeTask.title}** (Priority: ${matchedEmp.activeTask.priority || 'Normal'}, Due: ${matchedEmp.activeTask.dueIn || 'Today'})\n`
+      : '• **Active Task:** None currently in progress.\n';
+    const queue = Array.isArray(matchedEmp.taskQueue) && matchedEmp.taskQueue.length > 0
+      ? `\n**Queued Tasks:**\n` + matchedEmp.taskQueue.map((t, i) => `${i + 1}. ${t.title} [${t.priority || 'Normal'}]`).join('\n')
+      : '';
+    return {
+      text: `### 👤 Employee Profile — ${matchedEmp.name}\n\n` +
+        `• **Role / Department:** ${matchedEmp.role} (${matchedEmp.department || 'Operations'})\n` +
+        `• **KPI Score:** **${matchedEmp.kpiScore}** | **Sales Closed:** ${matchedEmp.salesClosed || 0} (₹${(matchedEmp.totalRevenue || 0).toLocaleString('en-IN')})\n` +
+        `• **Conversion Rate:** ${matchedEmp.conversionRate || 'N/A'}\n\n` +
+        `#### ⚡ Task Status:\n${active}${queue}\n\n` +
+        `*To assign a task, say: "Assign task to ${matchedEmp.name}: [task description]"*`,
+      table: null,
+      chart: null,
+      intent: 'employee_profile'
+    };
+  }
+
+  // 2. Machine & Equipment Knowledge (APS Core Catalog)
+  if (qLower.includes('dona') || qLower.includes('hydraulic') || qLower.includes('crank') || qLower.includes('cup') || qLower.includes('cutter') || qLower.includes('roll') || qLower.includes('machine') || qLower.includes('spec')) {
+    return {
+      text: `### ⚙️ APS Enterprise Industrial Machinery Catalog\n\n` +
+        `APS Enterprise manufactures heavy-duty industrial machinery in Indore, MP:\n\n` +
+        `1. **Fully Automatic Double Die Dona Pattal Machine (APS-DD-01)**: High-speed dual feeder, 4,000–6,000 pcs/hr output. Ideal for high-volume paper dona/plate production.\n` +
+        `2. **Heavy Duty Hydraulic Paper Plate & Thali Press (APS-HYD-50)**: High tonnage hydraulic pressure, supports multi-layer GSM sheets, wrinkle-free deep thali pressing.\n` +
+        `3. **Single Die High-Speed Crank Dona Machine (APS-SD-02)**: Low power consumption (1–1.5 HP), durable mechanical crank drive for consistent daily continuous operation.\n` +
+        `4. **Automatic High-Speed Paper Cup Machine (APS-CUP-90)**: Ultrasonic sealing, 70–90 cups/min, smart sensor control.\n` +
+        `5. **Semi-Automatic Roll Cutter Machine (APS-CUT-36)**: Precision cutting for craft/silver rolls from 80 to 140 GSM.\n\n` +
+        `*Would you like to check current warehouse stock or generate a GST quotation for any of these machines?*`,
+      table: null,
+      chart: null,
+      intent: 'machinery_catalog'
+    };
+  }
+
+  // 3. Company identity & Indore Location
+  if (qLower.includes('aps') || qLower.includes('indore') || qLower.includes('company') || qLower.includes('address') || qLower.includes('office') || qLower.includes('phone') || qLower.includes('contact')) {
+    return {
+      text: `### 🏢 APS Enterprise — Indore, Madhya Pradesh\n\n` +
+        `• **Head Office & Factory:** 832, Old Loha Mandi, Opp. Devshree Cinema, Near Khambati Pipes, Indore, MP 452001\n` +
+        `• **Phone:** +91-7869755871 | +91-8827848099\n` +
+        `• **Email:** info@apsenterprises.in | Web: www.apsenterprises.in\n` +
+        `• **Core Domain:** High-speed paper plate, dona pattal, hydraulic thali, and paper cup manufacturing equipment.`,
+      table: null,
+      chart: null,
+      intent: 'company_info'
+    };
+  }
+
+  // 4. Default Assistant Guidance
+  return {
+    text: `### 🤖 APS AI Operations Copilot\n\n` +
+      `I can execute commands, query real-time data, and generate business documents across your workspace:\n\n` +
+      `• **CRM & Sales:** *"Show leads by stage"*, *"Create new lead for Rajesh in Indore"*, *"Predict monthly revenue"*\n` +
+      `• **Factory & ERP:** *"Check warehouse inventory"*, *"Track factory job cards"*, *"Release ERP booking"*\n` +
+      `• **Accounting & Invoicing:** *"Generate GST invoice for 42000"*, *"Verify Tally advance vouchers"*\n` +
+      `• **Team & Memory:** *"Assign task to Bhavya: verify payment"*, *"Remember that client requires 120 GSM paper"*\n` +
+      `• **Exports:** *"Give me Excel of CRM leads"*, *"Download PDF report of warehouse stock"*\n\n` +
+      `How can I assist your operations right now?`,
+    table: null,
+    chart: null,
+    intent: 'normal_chat'
+  };
+}
+
 module.exports = {
   callGroq,
   callOpenAI,
   callGemini,
   parseLLMResponse,
   buildFullContext,
-  processWithLLM
+  processWithLLM,
+  generateUniversalAnswer
 };
