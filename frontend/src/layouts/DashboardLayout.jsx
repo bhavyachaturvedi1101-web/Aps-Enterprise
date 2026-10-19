@@ -477,14 +477,14 @@ export default function DashboardLayout() {
     top: 0,
     left: sidebarOpen ? 0 : -240,
     width: 240,
-    height: '100vh',
+    height: '100dvh',
     boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
     transition: 'left 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     zIndex: 1000
   } : {};
 
   return (
-    <div style={s.container}>
+    <div className="dashboard-app-container" style={s.container}>
 
       {/* ─── TOP HEADER ─────────────────────────────────────────────────── */}
       <header style={{ ...s.header, padding: isMobile ? '0 1rem' : '0 1.75rem' }}>
@@ -809,7 +809,7 @@ export default function DashboardLayout() {
       </header>
 
       {/* ─── BODY: SIDEBAR + MAIN ───────────────────────────────────────── */}
-      <div style={s.bodyWrapper}>
+      <div className="dashboard-body-wrapper" style={s.bodyWrapper}>
 
         {/* Mobile Sidebar Backdrop */}
         {isMobile && sidebarOpen && (
@@ -897,7 +897,7 @@ export default function DashboardLayout() {
         </aside>
 
         {/* ─── MAIN CONTENT ─────────────────────────────────────────────── */}
-        <main style={s.mainContent}>
+        <main className="dashboard-main-content" style={s.mainContent}>
           <Outlet />
         </main>
       </div>
@@ -978,7 +978,7 @@ export default function DashboardLayout() {
 const s = {
   container: {
     display: 'flex', flexDirection: 'column',
-    height: '100vh', backgroundColor: 'var(--bg-primary)', overflow: 'hidden'
+    height: '100dvh', maxHeight: '100dvh', backgroundColor: 'var(--bg-primary)', overflow: 'hidden'
   },
 
   // ── Header
@@ -1043,7 +1043,7 @@ const s = {
   dropdownIcon: { color: '#71717a' },
 
   // ── Body
-  bodyWrapper: { display: 'flex', flexGrow: 1, overflow: 'hidden' },
+  bodyWrapper: { display: 'flex', flexGrow: 1, minHeight: 0, overflow: 'hidden' },
 
   // ── Sidebar
   sidebar: {
@@ -1140,7 +1140,15 @@ const s = {
   },
 
   // ── Main Content
-  mainContent: { flexGrow: 1, overflowY: 'auto', position: 'relative', backgroundColor: 'var(--bg-primary)' },
+  mainContent: {
+    flexGrow: 1,
+    minHeight: 0,
+    overflowY: 'auto',
+    position: 'relative',
+    backgroundColor: 'var(--bg-primary)',
+    WebkitOverflowScrolling: 'touch',
+    overscrollBehaviorY: 'contain'
+  },
 
   // ── Dropdowns
   dropdownPanel: { position: 'absolute', top: 46, right: 0, width: 280, backgroundColor: '#fff', borderRadius: 16, border: '1px solid #e4e4e7', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.12)', zIndex: 100, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },

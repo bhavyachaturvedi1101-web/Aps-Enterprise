@@ -1761,7 +1761,7 @@ export default function APSAIPage() {
   };
 
   return (
-    <div style={s.pageWrapper}>
+    <div className="apsai-page-wrapper" style={s.pageWrapper}>
       {/* ─── Top Page Header ────────────────────────────────────────── */}
       <div style={s.headerBanner}>
         <div style={s.headerLeft}>
@@ -1800,9 +1800,9 @@ export default function APSAIPage() {
       </div>
 
       {/* ─── Main Workspace Grid ────────────────────────────────────── */}
-      <div style={s.mainGrid}>
+      <div className="apsai-main-grid" style={s.mainGrid}>
         {/* Left Side: Quick Query Categories & Live Metrics */}
-        <div style={s.sideNav} id="apsai-side-nav">
+        <div className="apsai-side-nav" style={s.sideNav} id="apsai-side-nav">
           <div style={s.sideCard}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
               <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center' }}>
@@ -1959,7 +1959,7 @@ export default function APSAIPage() {
         </div>
 
         {/* Right Side: Chat Conversation Area */}
-        <div style={s.chatContainer}>
+        <div className="apsai-chat-container" style={s.chatContainer}>
           <style>{`
             .apsai-landing-card {
               transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
@@ -2008,7 +2008,7 @@ export default function APSAIPage() {
             }
           `}</style>
           {/* Messages scroll area */}
-          <div style={s.messagesArea} id="apsai-page-messages">
+          <div className="apsai-messages-area" style={s.messagesArea} id="apsai-page-messages">
             {messages.length === 1 && messages[0].isWelcome ? (
               <div style={s.welcomeLanding}>
                 <h1 style={s.welcomeHeader}>How can I help you today?</h1>
