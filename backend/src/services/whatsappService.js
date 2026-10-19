@@ -420,7 +420,7 @@ class WhatsAppService {
 
     try {
       await sendTextMessage(phone,
-        `Dear ${name},\n\nYour *${product}* is now in active production at our factory floor! 🏭\n\nExpected completion: 15-21 working days.\nYou will receive dispatch tracking details once ready.\n\n— APS Enterprises, Indore`
+        `Dear ${name},\n\nYour *${product}* is now in active production at our factory floor.\n\nExpected completion: 15-21 working days.\nYou will receive dispatch tracking details once ready.\n\n— APS Enterprises, Indore`
       );
     } catch {}
 
@@ -446,7 +446,7 @@ class WhatsAppService {
 
     try {
       await sendTextMessage(phone,
-        `Dear ${name},\n\nGreat news! Your *${product}* has been dispatched! 🚚\n\nTracking: APS-TRK-${Date.now().toString().slice(-6)}\nExpected delivery: 3-5 working days.\n\nFor any queries: +91 99880 01122\n\n— APS Enterprises, Indore`
+        `Dear ${name},\n\nGreat news! Your *${product}* has been dispatched.\n\nTracking: APS-TRK-${Date.now().toString().slice(-6)}\nExpected delivery: 3-5 working days.\n\nFor any queries: +91 99880 01122\n\n— APS Enterprises, Indore`
       );
     } catch {}
 

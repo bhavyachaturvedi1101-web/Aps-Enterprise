@@ -10,7 +10,7 @@ function getStore() {
 
 async function handleFactoryOptions() {
   return {
-    text: `### 🏭 Factory Operations Controls\nSelect factory operation command:`,
+    text: `### Factory Operations Controls\nSelect factory operation command:`,
     options: [
       'Track assembly progress on active job cards',
       'Check warehouse stock of raw materials & machinery',
@@ -21,7 +21,7 @@ async function handleFactoryOptions() {
 
 async function handleFactoryTracker() {
   return {
-    text: `### 🏭 Factory Shop Floor Assembly Tracker\n\n• **Active Job Cards:** 4 Units in Assembly\n• **Stage:** CNC Frame Welding & Motor Mount\n• **On-Time Rate:** 96.2%`,
+    text: `### Factory Shop Floor Assembly Tracker\n\n• **Active Job Cards:** 4 Units in Assembly\n• **Stage:** CNC Frame Welding & Motor Mount\n• **On-Time Rate:** 96.2%`,
     table: [
       { 'Job #': 'JC-0992', Machine: 'Slipper Making Machine', Stage: 'Quality Testing', Priority: 'High' },
       { 'Job #': 'JC-0993', Machine: 'Paper Bag Making Machine', Stage: 'CNC Assembly', Priority: 'Normal' }
@@ -34,7 +34,7 @@ async function handleActionCheckInventory() {
   const store = await getStore();
   const inv = store.mockInventory || [];
   return {
-    text: `### 📦 Warehouse Inventory Report\n\nFound **${inv.length} SKU categories** monitored in Plant 1.`,
+    text: `### Warehouse Inventory Report\n\nFound **${inv.length} SKU categories** monitored in Plant 1.`,
     table: inv.slice(0, 10).map(i => ({
       SKU: i.sku,
       Name: i.name,
@@ -50,7 +50,7 @@ async function handleActionErpBooking(query) {
   const erpService = require('../../erpService');
   const res = await erpService.createBooking('LEAD-001', { interest: 'Automatic Dona Machine' });
   return {
-    text: `### ⚙️ ERP Booking Registered\n\nBooking ID: \`${res.bookingId}\` created in enterprise ERP system.`,
+    text: `### ERP Booking Registered\n\nBooking ID: \`${res.bookingId}\` created in enterprise ERP system.`,
     table: [{ 'Booking ID': res.bookingId, Status: 'Confirmed', Mode: res.mode }],
     chart: null
   };
@@ -58,7 +58,7 @@ async function handleActionErpBooking(query) {
 
 async function handleDocSearch(query) {
   return {
-    text: `### 📄 Technical Specification Search (RAG)\n\nFound matching specification document for query: "${query}". Automatic Dona Making Machine features 2.5kW motor, 4000 pcs/hr output.`,
+    text: `### Technical Specification Search (RAG)\n\nFound matching specification document for query: "${query}". Automatic Dona Making Machine features 2.5kW motor, 4000 pcs/hr output.`,
     table: null,
     chart: null
   };
@@ -66,7 +66,7 @@ async function handleDocSearch(query) {
 
 async function handleCompanyInfo() {
   return {
-    text: `### 🏢 APS Enterprises India\nLeading manufacturer of high-speed paper plate, dona, and packaging machinery headquartered in Indore, MP.`,
+    text: `### APS Enterprises India\nLeading manufacturer of high-speed paper plate, dona, and packaging machinery headquartered in Indore, MP.`,
     table: null,
     chart: null
   };
@@ -74,7 +74,7 @@ async function handleCompanyInfo() {
 
 async function handleDashboardInfo() {
   return {
-    text: `### 🖥️ APS Cockpit Overview\nCentral operational panel connecting CRM, Tally ERP 9, Factory Shop Floor, Meta WhatsApp API, and AI Voice Dialer.`,
+    text: `### APS Cockpit Overview\nCentral operational panel connecting CRM, Tally ERP 9, Factory Shop Floor, Meta WhatsApp API, and AI Voice Dialer.`,
     table: null,
     chart: null
   };

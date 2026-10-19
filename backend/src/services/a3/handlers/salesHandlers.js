@@ -104,7 +104,7 @@ async function handlePredictiveForecast() {
   const pipelineVal = leads.reduce((acc, l) => acc + (Number(l.budget) || 0), 0);
   const weighted = Math.round(pipelineVal * 0.35);
   return {
-    text: `### 📈 Predictive Sales AI Forecast\n\n• **Weighted Projection:** **₹${weighted.toLocaleString('en-IN')}** (at 35% historic conversion rate)\n• **Active Pipeline:** ₹${pipelineVal.toLocaleString('en-IN')}\n• **Confidence Score:** 89.4%`,
+    text: `### Predictive Sales AI Forecast\n\n• **Weighted Projection:** **₹${weighted.toLocaleString('en-IN')}** (at 35% historic conversion rate)\n• **Active Pipeline:** ₹${pipelineVal.toLocaleString('en-IN')}\n• **Confidence Score:** 89.4%`,
     table: [
       { Period: 'Next 30 Days', Projected: `₹${weighted.toLocaleString('en-IN')}`, Confidence: '91%' },
       { Period: 'Next 60 Days', Projected: `₹${Math.round(weighted * 1.8).toLocaleString('en-IN')}`, Confidence: '84%' }
@@ -115,7 +115,7 @@ async function handlePredictiveForecast() {
 
 async function handleAssignTasksOptions() {
   return {
-    text: `### 📋 Task Assignment Cockpit\nSelect task assignment mode:`,
+    text: `### Task Assignment Cockpit\nSelect task assignment mode:`,
     options: [
       'Assign lead follow-up to Telecaller',
       'Assign machine quality inspection to Engineering',
@@ -235,10 +235,10 @@ async function handleAssignEmployeeTasks(query) {
 
     // 2. Return immediate, polite refusal with the real team roster
     return {
-      text: `### ⚠️ Cannot Assign Task — Employee Not Found\n\n` +
+      text: `### Cannot Assign Task — Employee Not Found\n\n` +
         `**"${requestedName}" is not a registered employee or team member of APS Enterprise.**\n\n` +
         `Operational tasks can only be assigned to registered employees. No changes have been made to existing employee tasks.\n\n` +
-        `#### 👥 Current Registered Team Members (Only these are employees):\n` +
+        `#### Current Registered Team Members (Only these are employees):\n` +
         allEmployees.map((e, i) => `${i + 1}. **${e.name}** — ${e.role} (*${e.department}*)`).join('\n') +
         `\n\n*To allocate a task, please specify one of the registered employees above (e.g. "Amit Patidar ko task do: ..."), or register a new team member in [User Management](/users).*`,
       table: allEmployees.map(e => ({
@@ -555,7 +555,7 @@ async function handleAssignEmployeeTasks(query) {
   const mediumCount = targetEmployees.filter(e => e.activeTask?.priority === 'MEDIUM').length;
 
   return {
-    text: `### 📋 Task Allocation Completed — ${targetTeamLabel}\n\nSuccessfully assigned active operational tasks to **${targetEmployees.length} team member${targetEmployees.length > 1 ? 's' : ''}** (${targetTeamLabel}) at APS Enterprise:\n\n` +
+    text: `### Task Allocation Completed — ${targetTeamLabel}\n\nSuccessfully assigned active operational tasks to **${targetEmployees.length} team member${targetEmployees.length > 1 ? 's' : ''}** (${targetTeamLabel}) at APS Enterprise:\n\n` +
       assignedList.slice(0, 8).map(e => `• **${e.Name}** (*${e.Role}* - *${e.Department}*):\n  - **Active Task:** **${e['Assigned Active Task']}**\n  - **Priority:** ${e.Priority} | **Due In:** ${e['Due In']}`).join('\n\n') +
       `\n\n*All assigned tasks have been saved and synced in real-time. Navigate to **\`/kpis\`** (Team KPIs) or **\`/employees\`** to view live progress.*`,
     table: assignedList,
@@ -571,7 +571,7 @@ async function handleAssignEmployeeTasks(query) {
 
 async function handleActionCreateUser(query) {
   return {
-    text: `### 👤 User Registration\nOperator credentials initialized. User invited with designated role permissions.`,
+    text: `### User Registration\nOperator credentials initialized. User invited with designated role permissions.`,
     table: null,
     chart: null
   };

@@ -162,7 +162,7 @@ router.patch('/:id/milestone', authorize(['admin', 'manager', 'employee']), asyn
       if (lead) {
         await whatsappService.sendTextMessage?.(
           lead.phone || '+919988001122',
-          `Dear ${cardData.clientName},\n\nMilestone Update for your *${cardData.product}* (Job: ${cardData.jobNumber}):\n\n✅ *${milestoneName}* — Completed\n\n${allDone ? '🚚 Your machine is now DISPATCH READY!' : `Next: ${milestones[nextIdx]?.name || 'Final dispatch'}`}\n\n— APS Enterprises`
+          `Dear ${cardData.clientName},\n\nMilestone Update for your *${cardData.product}* (Job: ${cardData.jobNumber}):\n\n*${milestoneName}* — Completed\n\n${allDone ? 'Your machine is now DISPATCH READY!' : `Next: ${milestones[nextIdx]?.name || 'Final dispatch'}`}\n\n— APS Enterprises`
         ).catch(() => {});
       }
     } catch {}

@@ -18,6 +18,36 @@ function getConversationId() {
   return id;
 }
 
+// ─── Universal Emoji Stripper & Sanitizer ──────────────────────────────────────
+const EMOJI_REGEX = /[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA70}-\u{1FAFF}]/gu;
+
+export function stripEmojis(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(EMOJI_REGEX, '')
+    .replace(/^(#{1,6})[ \t]+/gm, '$1 ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/^\s+/gm, '');
+}
+
+function sanitizeMsg(m) {
+  if (!m) return m;
+  const clean = { ...m };
+  if (clean.text) clean.text = stripEmojis(clean.text);
+  if (Array.isArray(clean.options)) clean.options = clean.options.map(stripEmojis);
+  if (Array.isArray(clean.table)) {
+    clean.table = clean.table.map(row => {
+      if (!row || typeof row !== 'object') return row;
+      const cleanRow = {};
+      for (const [k, v] of Object.entries(row)) {
+        cleanRow[stripEmojis(k)] = typeof v === 'string' ? stripEmojis(v) : v;
+      }
+      return cleanRow;
+    });
+  }
+  return clean;
+}
+
 // ─── LocalStorage Chat History ────────────────────────────────────────────────
 const HISTORY_KEY = 'apsai_chat_history';
 
@@ -27,7 +57,11 @@ function loadHistory() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return parsed.filter(m => !m.isWelcome);
+        const sanitized = parsed.filter(m => !m.isWelcome).map(sanitizeMsg);
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(sanitized));
+        } catch { }
+        return sanitized;
       }
     }
   } catch { }
@@ -36,7 +70,7 @@ function loadHistory() {
 
 function saveHistory(messages) {
   try {
-    const clean = messages.filter(m => !m.loading && !m.isWelcome).slice(-40);
+    const clean = messages.filter(m => !m.loading && !m.isWelcome).map(sanitizeMsg).slice(-40);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(clean));
   } catch { }
 }
@@ -272,7 +306,7 @@ function MiniTable({ rows }) {
         <thead>
           <tr style={{ background: '#f1f5f9' }}>
             {headers.map(h => (
-              <th key={h} style={s.th}>{h}</th>
+              <th key={h} style={s.th}>{stripEmojis(h)}</th>
             ))}
           </tr>
         </thead>
@@ -280,7 +314,7 @@ function MiniTable({ rows }) {
           {visibleRows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
               {headers.map(h => (
-                <td key={h} style={s.td}>{row[h]}</td>
+                <td key={h} style={s.td}>{typeof row[h] === 'string' ? stripEmojis(row[h]) : row[h]}</td>
               ))}
             </tr>
           ))}
@@ -304,7 +338,7 @@ function MiniTable({ rows }) {
                 onMouseOver={(e) => e.target.style.background = '#f1f5f9'}
                 onMouseOut={(e) => e.target.style.background = '#f8fafc'}
               >
-                {showAll ? '🔼 Show Less' : `🔽 +${rows.length - 10} more rows (Click to expand)`}
+                {showAll ? 'Show Less' : `+${rows.length - 10} more rows (Click to expand)`}
               </td>
             </tr>
           )}
@@ -343,7 +377,7 @@ function MarkdownTable({ headers, rows, isUser }) {
                 whiteSpace: 'nowrap',
                 letterSpacing: '-0.1px'
               }}>
-                {parseInlineStyles(h.trim(), isUser)}
+                {parseInlineStyles(stripEmojis(h.trim()), isUser)}
               </th>
             ))}
           </tr>
@@ -364,7 +398,7 @@ function MarkdownTable({ headers, rows, isUser }) {
                   verticalAlign: 'top',
                   lineHeight: 1.5
                 }}>
-                  {parseInlineStyles(cell.trim(), isUser)}
+                  {parseInlineStyles(stripEmojis(cell.trim()), isUser)}
                 </td>
               ))}
             </tr>
@@ -380,7 +414,7 @@ function RenderText({ text, isUser }) {
   if (!text) return null;
 
   // Normalize special Unicode space variants and zero-width characters to standard ASCII characters
-  const normalizedText = String(text)
+  const normalizedText = stripEmojis(String(text))
     .replace(/[\u202F\u00A0\u2007\u2009\u200a]/g, ' ')
     .replace(/[\u200B-\u200D\uFEFF]/g, '');
 
@@ -740,7 +774,7 @@ function ReportCard({ report }) {
           <ul style={s.reportList}>
             {actionableInsights.map((item, i) => (
               <li key={i} style={s.reportItemInsight}>
-                <span style={{ color: '#10b981', fontWeight: 800 }}>⚡</span> {item}
+                <span style={{ color: '#10b981', fontWeight: 800 }}>✓</span> {item}
               </li>
             ))}
           </ul>
@@ -1362,7 +1396,10 @@ function MessageCard({ msg, onSelectOption }) {
 
                 {msg.processingMs && (
                   <span style={s.latencyBadge}>
-                    ⚡ {msg.processingMs}ms
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 3 }}>
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span>{msg.processingMs}ms</span>
                   </span>
                 )}
 
@@ -1390,7 +1427,7 @@ function buildWelcomeText() {
   const greet = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
   const date = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const lines = [
-    `### ${greet}, Bhavya 👋`,
+    `### ${greet}, Bhavya`,
     `**${date}** — APS Enterprise AI is fully online.`,
     '',
     '---',
@@ -1398,7 +1435,7 @@ function buildWelcomeText() {
     "I'm your **Autonomous Business Intelligence Co-Pilot** for APS Enterprise.",
     'Ask me anything in **Hindi, English, or Hinglish** — I understand it all.',
     '',
-    '**⚡ Try these right now:**',
+    '**Try these right now:**',
     '',
     '| Capability | Say this |',
     '|---|---|',
@@ -1428,27 +1465,101 @@ const WELCOME_MSG = {
   chart: null
 };
 
+// ─── Query Category Icon Component (Clean Vector SVGs) ───────────────────────
+function QueryIcon({ name, size = 14, color = '#64748b' }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: color,
+    strokeWidth: 2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    style: { flexShrink: 0 }
+  };
+  switch (name) {
+    case 'factory':
+      return (
+        <svg {...p}><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="17" y1="18" x2="18" y2="18"/><line x1="12" y1="18" x2="13" y2="18"/><line x1="7" y1="18" x2="8" y2="18"/></svg>
+      );
+    case 'search':
+      return (
+        <svg {...p}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      );
+    case 'package':
+      return (
+        <svg {...p}><line x1="16.5" y1="9.4" x2="7.55" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      );
+    case 'message':
+      return (
+        <svg {...p}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      );
+    case 'receipt':
+      return (
+        <svg {...p}><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+      );
+    case 'percent':
+      return (
+        <svg {...p}><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      );
+    case 'bar-chart':
+      return (
+        <svg {...p}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      );
+    case 'award':
+      return (
+        <svg {...p}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      );
+    case 'trending':
+      return (
+        <svg {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      );
+    case 'alert':
+      return (
+        <svg {...p}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      );
+    case 'mic':
+      return (
+        <svg {...p}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      );
+    case 'mail':
+      return (
+        <svg {...p}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      );
+    case 'excel':
+    case 'file':
+      return (
+        <svg {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      );
+    default:
+      return (
+        <svg {...p}><circle cx="12" cy="12" r="9"/></svg>
+      );
+  }
+}
+
 // ─── Curated Common Queries Catalog (Single Source of Truth) ──────────────────
 const SIDEBAR_COMMON_QUERIES = [
   // Operations
-  { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status', category: 'ops', icon: '🏭' },
-  { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual', category: 'ops', icon: '📄' },
-  { label: 'Warehouse Inventory Stock', query: 'Check warehouse inventory stock', category: 'ops', icon: '📦' },
-  { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics', category: 'ops', icon: '💬' },
+  { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status', category: 'ops', icon: 'factory' },
+  { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual', category: 'ops', icon: 'search' },
+  { label: 'Warehouse Inventory Stock', query: 'Check warehouse inventory stock', category: 'ops', icon: 'package' },
+  { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics', category: 'ops', icon: 'message' },
 
   // Finance & ERP
-  { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000', category: 'finance', icon: '🧾' },
-  { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order', category: 'finance', icon: '💹' },
-  { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report', category: 'finance', icon: '📊' },
+  { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000', category: 'finance', icon: 'receipt' },
+  { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order', category: 'finance', icon: 'percent' },
+  { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report', category: 'finance', icon: 'bar-chart' },
 
   // Sales & CRM
-  { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges', category: 'sales', icon: '🏆' },
-  { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast', category: 'sales', icon: '📈' },
-  { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?', category: 'sales', icon: '⚠️' },
-  { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts', category: 'sales', icon: '🎙️' },
-  { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech', category: 'sales', icon: '✉️' },
-  { label: 'Export Leads Data to Excel', query: 'Export leads to Excel', category: 'sales', icon: '📑' },
-  { label: 'Export Leads Data to CSV', query: 'Export leads to CSV', category: 'sales', icon: '📋' }
+  { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges', category: 'sales', icon: 'award' },
+  { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast', category: 'sales', icon: 'trending' },
+  { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?', category: 'sales', icon: 'alert' },
+  { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts', category: 'sales', icon: 'mic' },
+  { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech', category: 'sales', icon: 'mail' },
+  { label: 'Export Leads Data to Excel', query: 'Export leads to Excel', category: 'sales', icon: 'excel' },
+  { label: 'Export Leads Data to CSV', query: 'Export leads to CSV', category: 'sales', icon: 'file' }
 ];
 
 // ─── MAIN APS AI PAGE COMPONENT ───────────────────────────────────────────────
@@ -1707,7 +1818,7 @@ export default function APSAIPage() {
 
       setMessages(prev => [
         ...prev.slice(0, -1),
-        {
+        sanitizeMsg({
           role: 'bot',
           text: data.text || data.answer,
           options: data.options || null,
@@ -1717,7 +1828,7 @@ export default function APSAIPage() {
           exportFile: data.exportFile,
           processingMs: data.processingMs,
           time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-        }
+        })
       ]);
     } catch {
       setMessages(prev => [
@@ -1785,7 +1896,14 @@ export default function APSAIPage() {
             style={s.memoryHeaderBtn}
             title="View & Manage AI Persistent Memory"
           >
-            <span style={{ fontSize: '1.05rem' }}>🧠</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+              <rect x="9" y="9" width="6" height="6" />
+              <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+              <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+              <line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" />
+              <line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
+            </svg>
             <span style={{ fontWeight: 700 }}>AI Memory</span>
             <span style={s.memoryBadgeCount}>{memoriesList.length}</span>
           </button>
@@ -1806,7 +1924,9 @@ export default function APSAIPage() {
           <div style={s.sideCard}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
               <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>⚡</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
                 <span>Common Queries</span>
               </div>
               <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '2px 7px', borderRadius: 10, border: '1px solid #dbeafe' }}>
@@ -1897,7 +2017,9 @@ export default function APSAIPage() {
                     style={s.quickQueryBtn}
                     title={item.query}
                   >
-                    <span style={{ fontSize: '0.85rem' }}>{item.icon}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <QueryIcon name={item.icon} size={14} color="#64748b" />
+                    </span>
                     <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
                   </button>
                 ))
@@ -1932,7 +2054,10 @@ export default function APSAIPage() {
           <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
               <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
-                <span>🧠</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                  <rect x="9" y="9" width="6" height="6" />
+                </svg>
                 <span>AI Persistent Memory</span>
               </div>
               <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>
@@ -2077,7 +2202,12 @@ export default function APSAIPage() {
 
                   <div className="apsai-landing-card" style={s.landingCard} onClick={() => { setShowMemoryModal(true); fetchMemories(); }}>
                     <div style={{ ...s.cardIcon, color: '#0284c7', background: '#f0f9ff', borderColor: '#e0f2fe' }}>
-                      <span style={{ fontSize: '1.25rem' }}>🧠</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                        <rect x="9" y="9" width="6" height="6" />
+                        <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+                        <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+                      </svg>
                     </div>
                     <div style={s.cardContent}>
                       <div style={s.cardTitle}>AI Persistent Memory Space</div>
@@ -2167,7 +2297,14 @@ export default function APSAIPage() {
             {/* Modal Header */}
             <div style={s.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={s.modalBrainIcon}>🧠</div>
+                <div style={s.modalBrainIcon}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <rect x="9" y="9" width="6" height="6" />
+                    <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+                    <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+                  </svg>
+                </div>
                 <div>
                   <h2 style={s.modalTitle}>APS AI — Persistent Memory & Knowledge Space</h2>
                   <div style={s.modalSubtitle}>
@@ -2187,28 +2324,28 @@ export default function APSAIPage() {
             {/* Quick KPI Stats Summary */}
             <div style={s.memoryStatsRow}>
               <div style={s.memoryStatCard}>
-                <span style={{ fontSize: '1.2rem' }}>💡</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div>
                   <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'LEARNED_FACT').length}</div>
                   <div style={s.memoryStatLbl}>Learned Directives</div>
                 </div>
               </div>
               <div style={s.memoryStatCard}>
-                <span style={{ fontSize: '1.2rem' }}>📋</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
                 <div>
                   <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length}</div>
                   <div style={s.memoryStatLbl}>Tasks Allocated</div>
                 </div>
               </div>
               <div style={s.memoryStatCard}>
-                <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <div>
                   <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_REJECTED').length}</div>
                   <div style={s.memoryStatLbl}>Guarded Actions</div>
                 </div>
               </div>
               <div style={s.memoryStatCard}>
-                <span style={{ fontSize: '1.2rem' }}>👥</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <div>
                   <div style={s.memoryStatVal}>6 Active</div>
                   <div style={s.memoryStatLbl}>Registered Employees</div>
@@ -2219,7 +2356,7 @@ export default function APSAIPage() {
             {/* Direct Teach Form */}
             <form onSubmit={handleSaveMemoryDirect} style={s.teachForm}>
               <div style={s.teachFormTitle}>
-                <span>💡</span> Teach AI New Memory or Entity Directive
+                Teach AI New Memory or Entity Directive
               </div>
               {memoryAlert && (
                 <div style={memoryAlert.type === 'success' ? s.alertSuccess : s.alertError}>
@@ -2256,9 +2393,9 @@ export default function APSAIPage() {
               <div style={s.filterChips}>
                 {[
                   { key: 'ALL', label: `All (${memoriesList.length})` },
-                  { key: 'LEARNED_FACT', label: `💡 Learned (${memoriesList.filter(m => m.type === 'LEARNED_FACT').length})` },
-                  { key: 'TASK_ASSIGNED', label: `📋 Tasks (${memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length})` },
-                  { key: 'TASK_REJECTED', label: `⚠️ Guarded (${memoriesList.filter(m => m.type === 'TASK_REJECTED').length})` }
+                  { key: 'LEARNED_FACT', label: `Learned (${memoriesList.filter(m => m.type === 'LEARNED_FACT').length})` },
+                  { key: 'TASK_ASSIGNED', label: `Tasks (${memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length})` },
+                  { key: 'TASK_REJECTED', label: `Guarded (${memoriesList.filter(m => m.type === 'TASK_REJECTED').length})` }
                 ].map(tab => (
                   <button
                     key={tab.key}
@@ -2301,7 +2438,12 @@ export default function APSAIPage() {
                 if (filtered.length === 0) {
                   return (
                     <div style={s.emptyMemoryState}>
-                      <div style={{ fontSize: '2.2rem', marginBottom: 8 }}>🧠</div>
+                      <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                          <rect x="4" y="4" width="16" height="16" rx="2" />
+                          <rect x="9" y="9" width="6" height="6" />
+                        </svg>
+                      </div>
                       <div style={{ fontWeight: 700, color: '#1e293b' }}>No memories found</div>
                       <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
                         Teach the AI a new rule above or perform operational tasks to populate persistent memory.
@@ -2325,7 +2467,7 @@ export default function APSAIPage() {
                             ...s.typeBadge,
                             ...(isLearned ? s.typeBadgeLearned : (isTask ? s.typeBadgeTask : (isRejected ? s.typeBadgeRejected : s.typeBadgeSystem)))
                           }}>
-                            {isLearned ? '💡 LEARNED FACT' : (isTask ? '📋 TASK ASSIGNED' : (isRejected ? '⚠️ GUARDED REJECTION' : '⚡ SYSTEM'))}
+                            {isLearned ? 'LEARNED FACT' : (isTask ? 'TASK ASSIGNED' : (isRejected ? 'GUARDED REJECTION' : 'SYSTEM'))}
                           </span>
                           {m.target && (
                             <span style={s.targetBadge}>
@@ -2339,7 +2481,9 @@ export default function APSAIPage() {
                           style={s.deleteMemoryBtn}
                           title="Delete memory entry"
                         >
-                          🗑️
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
+                          </svg>
                         </button>
                       </div>
                       <div style={s.memorySummaryText}>{m.summary}</div>

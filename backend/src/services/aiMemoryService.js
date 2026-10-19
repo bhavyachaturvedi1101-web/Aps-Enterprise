@@ -205,7 +205,7 @@ function formatMemoriesForUser(searchTerm = null) {
   
   if (memories.length === 0) {
     return {
-      text: `### 🧠 AI Memory & Knowledge Base\n\nNo recorded memories found ${searchTerm ? `matching **"${searchTerm}"**` : 'in memory yet'}.\n\n*All operational tasks assigned, user-taught facts, rejections, and reports are automatically remembered and preserved across sessions.*`,
+      text: `### AI Memory & Knowledge Base\n\nNo recorded memories found ${searchTerm ? `matching **"${searchTerm}"**` : 'in memory yet'}.\n\n*All operational tasks assigned, user-taught facts, rejections, and reports are automatically remembered and preserved across sessions.*`,
       table: null
     };
   }
@@ -224,33 +224,33 @@ function formatMemoriesForUser(searchTerm = null) {
       'Action Type': m.type.replace(/_/g, ' '),
       'Target / Entity': m.target || 'General',
       'Memory Content': m.summary,
-      'Status': m.status === 'rejected' ? '⚠️ Rejected' : (m.status === 'saved' ? '💡 Remembered' : '✅ Active')
+      'Status': m.status === 'rejected' ? 'Rejected' : (m.status === 'saved' ? 'Remembered' : 'Active')
     };
   });
 
-  let text = `### 🧠 APS AI Memory & Knowledge Base (${memories.length} entries)\n\n` +
+  let text = `### APS AI Memory & Knowledge Base (${memories.length} entries)\n\n` +
     `APS AI maintains an active, persistent memory across sessions. It remembers instructions taught by the team, recent task allocations, and security/roster boundaries.\n\n`;
 
   if (learnedFacts.length > 0) {
-    text += `#### 💡 Learned Facts & Custom Directives (${learnedFacts.length})\n` +
+    text += `#### Learned Facts & Custom Directives (${learnedFacts.length})\n` +
       learnedFacts.map((f, i) => `• **${f.target ? `[${f.target}] ` : ''}**${f.summary}`).join('\n') +
       `\n\n`;
   }
 
   if (rejectedActions.length > 0) {
-    text += `#### ⚠️ Rejected / Guarded Actions (${rejectedActions.length})\n` +
+    text += `#### Rejected / Guarded Actions (${rejectedActions.length})\n` +
       rejectedActions.map((r, i) => `• **${r.target || 'Entity'}:** ${r.summary}`).join('\n') +
       `\n\n`;
   }
 
   if (taskActions.length > 0) {
-    text += `#### 📋 Recent Task Allocations (${taskActions.length})\n` +
+    text += `#### Recent Task Allocations (${taskActions.length})\n` +
       taskActions.slice(0, 5).map((t, i) => `• **${t.target}:** ${t.summary}`).join('\n') +
       `\n\n`;
   }
 
   if (otherActions.length > 0 && learnedFacts.length === 0 && taskActions.length === 0 && rejectedActions.length === 0) {
-    text += `#### ⚡ Recent Activity Log\n` +
+    text += `#### Recent Activity Log\n` +
       otherActions.slice(0, 6).map((o, i) => `• ${o.summary}`).join('\n') +
       `\n\n`;
   }

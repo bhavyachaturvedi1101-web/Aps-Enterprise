@@ -88,11 +88,11 @@ async function runMigrations() {
         { transaction }
       );
       await transaction.commit();
-      console.log(`[Migrations] ✔ Applied: ${migrationId}`);
+      console.log(`[Migrations] Applied: ${migrationId}`);
       appliedCount++;
     } catch (err) {
       await transaction.rollback();
-      console.error(`[Migrations] ✖ Migration failed on ${migrationId}:`, err);
+      console.error(`[Migrations] Migration failed on ${migrationId}:`, err);
       throw err;
     }
   }

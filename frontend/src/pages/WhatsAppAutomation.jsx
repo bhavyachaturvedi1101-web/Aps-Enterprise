@@ -1032,7 +1032,7 @@ export default function WhatsAppAutomation() {
                 onClick={() => setShowQuickTemplateModal(true)}
                 style={s.waTriggerHsmBtn}
               >
-                ⚡ Dispatch HSM Template
+                Dispatch HSM Template
               </button>
             </div>
 
@@ -1107,7 +1107,7 @@ export default function WhatsAppAutomation() {
             {/* Incoming Customer Message Simulator Bar */}
             <div style={s.quickSimSection}>
               <span style={s.quickSimLabel}>
-                📥 Simulate Customer Response ({activeClientThread?.name}):
+                Simulate Customer Response ({activeClientThread?.name}):
               </span>
               <div style={s.quickSimPillsWrap}>
                 <button
@@ -1116,7 +1116,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer confirming advance payment"
                 >
-                  ✓ "Payment Done via UPI"
+                  "Payment Done via UPI"
                 </button>
                 <button
                   type="button"
@@ -1124,7 +1124,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer requesting documentation"
                 >
-                  📄 "Request Warranty PDF"
+                  "Request Warranty PDF"
                 </button>
                 <button
                   type="button"
@@ -1132,7 +1132,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer asking about delivery schedule"
                 >
-                  🚚 "Delivery Schedule Query"
+                  "Delivery Schedule Query"
                 </button>
               </div>
             </div>
@@ -1141,7 +1141,6 @@ export default function WhatsAppAutomation() {
             <form onSubmit={handleSendChatMessage} style={s.chatInputForm}>
               {/* Fixed APS Enterprise Admin Sender Badge */}
               <div style={s.adminSenderBadge} title="You are typing and sending this message as APS Enterprise (Admin)">
-                <span style={{ fontSize: '0.85rem' }}>🏢</span>
                 <span style={{ fontWeight: 800, color: '#15803d', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>APS Enterprise</span>
               </div>
 

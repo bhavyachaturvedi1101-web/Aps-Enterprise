@@ -63,7 +63,7 @@ async function callGroq(messages) {
       let content = result?.choices?.[0]?.message?.content || '';
       content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       if (content) {
-        console.log(`[A3 Groq] ✅ Used model: ${model} | Chars: ${content.length}`);
+        console.log(`[A3 Groq] Used model: ${model} | Chars: ${content.length}`);
         return content;
       }
     } catch (err) {
@@ -235,6 +235,7 @@ EXECUTIVE ANSWER PROTOCOL:
    - Bold all critical numbers, metrics, currencies, and names (e.g. **₹42,000**, **84%**, **Plant 1**).
 3. **Tone**: Crisp, authoritative, executive-ready, and operational. Match the user's language (English, Hindi, Hinglish) seamlessly.
 4. **Actionable Closure**: When relevant, end with 1-2 suggested operational actions.
+5. **No Emojis**: Never use emojis in titles, headers, bullet points, or table cells. Maintain a strictly clean, professional enterprise appearance.
 
 ${context}`;
 
@@ -293,11 +294,11 @@ async function generateUniversalAnswer(query, convId) {
       ? `\n**Queued Tasks:**\n` + matchedEmp.taskQueue.map((t, i) => `${i + 1}. ${t.title} [${t.priority || 'Normal'}]`).join('\n')
       : '';
     return {
-      text: `### 👤 Employee Profile — ${matchedEmp.name}\n\n` +
+      text: `### Employee Profile — ${matchedEmp.name}\n\n` +
         `• **Role / Department:** ${matchedEmp.role} (${matchedEmp.department || 'Operations'})\n` +
         `• **KPI Score:** **${matchedEmp.kpiScore}** | **Sales Closed:** ${matchedEmp.salesClosed || 0} (₹${(matchedEmp.totalRevenue || 0).toLocaleString('en-IN')})\n` +
         `• **Conversion Rate:** ${matchedEmp.conversionRate || 'N/A'}\n\n` +
-        `#### ⚡ Task Status:\n${active}${queue}\n\n` +
+        `#### Task Status:\n${active}${queue}\n\n` +
         `*To assign a task, say: "Assign task to ${matchedEmp.name}: [task description]"*`,
       table: null,
       chart: null,
@@ -308,7 +309,7 @@ async function generateUniversalAnswer(query, convId) {
   // 2. Machine & Equipment Knowledge (APS Core Catalog)
   if (qLower.includes('dona') || qLower.includes('hydraulic') || qLower.includes('crank') || qLower.includes('cup') || qLower.includes('cutter') || qLower.includes('roll') || qLower.includes('machine') || qLower.includes('spec')) {
     return {
-      text: `### ⚙️ APS Enterprise Industrial Machinery Catalog\n\n` +
+      text: `### APS Enterprise Industrial Machinery Catalog\n\n` +
         `APS Enterprise manufactures heavy-duty industrial machinery in Indore, MP:\n\n` +
         `1. **Fully Automatic Double Die Dona Pattal Machine (APS-DD-01)**: High-speed dual feeder, 4,000–6,000 pcs/hr output. Ideal for high-volume paper dona/plate production.\n` +
         `2. **Heavy Duty Hydraulic Paper Plate & Thali Press (APS-HYD-50)**: High tonnage hydraulic pressure, supports multi-layer GSM sheets, wrinkle-free deep thali pressing.\n` +
@@ -325,7 +326,7 @@ async function generateUniversalAnswer(query, convId) {
   // 3. Company identity & Indore Location
   if (qLower.includes('aps') || qLower.includes('indore') || qLower.includes('company') || qLower.includes('address') || qLower.includes('office') || qLower.includes('phone') || qLower.includes('contact')) {
     return {
-      text: `### 🏢 APS Enterprise — Indore, Madhya Pradesh\n\n` +
+      text: `### APS Enterprise — Indore, Madhya Pradesh\n\n` +
         `• **Head Office & Factory:** 832, Old Loha Mandi, Opp. Devshree Cinema, Near Khambati Pipes, Indore, MP 452001\n` +
         `• **Phone:** +91-7869755871 | +91-8827848099\n` +
         `• **Email:** info@apsenterprises.in | Web: www.apsenterprises.in\n` +
@@ -338,7 +339,7 @@ async function generateUniversalAnswer(query, convId) {
 
   // 4. Default Assistant Guidance
   return {
-    text: `### 🤖 APS AI Operations Copilot\n\n` +
+    text: `### APS AI Operations Copilot\n\n` +
       `I can execute commands, query real-time data, and generate business documents across your workspace:\n\n` +
       `• **CRM & Sales:** *"Show leads by stage"*, *"Create new lead for Rajesh in Indore"*, *"Predict monthly revenue"*\n` +
       `• **Factory & ERP:** *"Check warehouse inventory"*, *"Track factory job cards"*, *"Release ERP booking"*\n` +

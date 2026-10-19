@@ -65,7 +65,7 @@ export default function LeadDetails() {
         alert('10% advance verified successfully against Tally ledger! Order released to factory.');
         await fetchLeadData();
       } else {
-        alert(`❌ Verification failed: ${data.error || 'Unknown error'}\n${data.reason || data.details || ''}`);
+        alert(`Verification failed: ${data.error || 'Unknown error'}\n${data.reason || data.details || ''}`);
       }
     } catch (err) {
       console.error(err);
@@ -105,7 +105,7 @@ export default function LeadDetails() {
         body: JSON.stringify({ leadId: lead.id, leadName: lead.name })
       });
       if (res.ok) {
-        alert('💬 WhatsApp reminder sent successfully!');
+        alert('WhatsApp reminder sent successfully!');
         await fetchLeadData();
       }
     } catch (err) {

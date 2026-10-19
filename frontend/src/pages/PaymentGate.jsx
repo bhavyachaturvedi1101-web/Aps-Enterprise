@@ -148,7 +148,11 @@ export default function PaymentGate() {
           gap: 10,
           animation: 'fadeIn 0.2s ease-out'
         }}>
-          <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          {toast.type === 'error' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          )}
           <span>{toast.msg}</span>
           <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '1rem', marginLeft: 8 }}>×</button>
         </div>

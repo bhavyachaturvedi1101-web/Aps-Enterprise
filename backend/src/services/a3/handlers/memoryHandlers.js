@@ -25,19 +25,19 @@ async function handleAiMemoryTeach(query) {
   const entry = aiMemory.learnFact(fact, topic, target, query);
 
   return {
-    text: `### 🧠 Saved to AI Persistent Memory\n\n` +
+    text: `### Saved to AI Persistent Memory\n\n` +
       `I have saved this information to persistent memory and will use it across all future conversations and operational answers:\n\n` +
       `• **Subject / Entity:** **${target}**\n` +
       `• **Learned Knowledge:** *"${fact}"*\n` +
       `• **Category:** \`${topic}\`\n` +
-      `• **Storage Status:** ✅ Persisted to \`ai_memory.json\`\n\n` +
+      `• **Storage Status:** Persisted to \`ai_memory.json\`\n\n` +
       `*You can ask anytime: "What do you know about ${target}?" or "Show AI memory" to review saved knowledge.*`,
     table: [
       {
         'Entity': target,
         'Category': topic,
         'Saved Information': fact,
-        'Status': '💡 Active in Memory'
+        'Status': 'Active in Memory'
       }
     ],
     learnedMemory: entry
@@ -53,12 +53,12 @@ async function handleAiMemoryRecall(query) {
     const learnedFacts = animeshMemories.filter(m => m.type === 'LEARNED_FACT');
     const rejected = animeshMemories.filter(m => m.type === 'TASK_REJECTED');
 
-    let text = `### 👤 Knowledge Profile — Animesh\n\n`;
-    text += `• **Employee Status:** ❌ **Not a registered employee** of APS Enterprise.\n`;
+    let text = `### Knowledge Profile — Animesh\n\n`;
+    text += `• **Employee Status:** **Not a registered employee** of APS Enterprise.\n`;
     text += `• **System Role:** External individual / Non-team member.\n\n`;
 
     if (learnedFacts.length > 0) {
-      text += `#### 🧠 Learned Knowledge in Persistent Memory:\n`;
+      text += `#### Learned Knowledge in Persistent Memory:\n`;
       learnedFacts.forEach((m, idx) => {
         text += `${idx + 1}. *"${m.fact}"* (Saved on ${new Date(m.timestamp).toLocaleDateString('en-IN')})\n`;
       });
@@ -66,7 +66,7 @@ async function handleAiMemoryRecall(query) {
     }
 
     if (rejected.length > 0) {
-      text += `#### ⚠️ Blocked Operational Actions Logged:\n`;
+      text += `#### Blocked Operational Actions Logged:\n`;
       rejected.forEach((r, idx) => {
         text += `${idx + 1}. **Task Assignment Blocked:** User attempted: *"${r.query}"* — Rejected because Animesh is not an employee.\n`;
       });
@@ -92,7 +92,7 @@ async function handleAiMemoryRecall(query) {
 
   if (!results || results.length === 0) {
     return {
-      text: `### 🧠 AI Persistent Memory\n\nNo specific memory records found matching "${queryTerm || 'all'}".\n\n` +
+      text: `### AI Persistent Memory\n\nNo specific memory records found matching "${queryTerm || 'all'}".\n\n` +
         `You can teach the AI anytime using statements like:\n` +
         `• *"Remember that Animesh is not an employee"* \n` +
         `• *"Note down that Indore factory opens at 8 AM"*`,
@@ -101,14 +101,14 @@ async function handleAiMemoryRecall(query) {
   }
 
   const tableData = results.map(r => ({
-    'Type': r.type === 'LEARNED_FACT' ? '💡 Learned Fact' : '📋 Past Action',
+    'Type': r.type === 'LEARNED_FACT' ? 'Learned Fact' : 'Past Action',
     'Subject': r.target || r.topic || 'General',
     'Details': r.fact || r.summary || (r.details ? JSON.stringify(r.details) : 'Recorded event'),
     'Date': new Date(r.timestamp).toLocaleDateString('en-IN')
   }));
 
   return {
-    text: `### 🧠 AI Persistent Long-Term Memory (${results.length} Records Found)\n\n` +
+    text: `### AI Persistent Long-Term Memory (${results.length} Records Found)\n\n` +
       `Here are the relevant knowledge entries and past operational actions stored in persistent memory:\n\n` +
       results.map((r, i) => `${i + 1}. **[${r.type}]** ${r.target ? `*${r.target}* — ` : ''}${r.fact || r.summary}`).join('\n') +
       `\n\n*All memories persist across restarts in \`backend/ai_memory.json\` and are injected into AI contextual reasoning.*`,

@@ -36,7 +36,7 @@ async function testAll() {
       if (res.assignedEmployees) console.log(`✓ assignedEmployees count:`, res.assignedEmployees.length);
       if (res.createdSystemUsers) console.log(`✓ createdSystemUsers count:`, res.createdSystemUsers.length);
     } catch (err) {
-      console.error(`❌ ERROR:`, err);
+      console.error(`[FAIL] ERROR:`, err);
     }
   }
 

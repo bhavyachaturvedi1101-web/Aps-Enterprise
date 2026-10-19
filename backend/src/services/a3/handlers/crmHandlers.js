@@ -54,7 +54,7 @@ async function handleShowAllCrmLeads() {
   const totalRevenue = closedLeads.reduce((s, l) => s + (Number(l.budget) || 0), 0);
 
   return {
-    text: `### 📊 Complete CRM Lead Database — ${leads.length} Total Records\n\n` +
+    text: `### Complete CRM Lead Database — ${leads.length} Total Records\n\n` +
       `**Pipeline Breakdown:**\n` +
       stages.map((s, i) => `• **${s}**: ${stageCounts[i]} leads`).join('\n') +
       `\n\n**Closed Revenue**: ₹${totalRevenue.toLocaleString('en-IN')} from ${closedLeads.length} closed deals.`,
@@ -67,8 +67,8 @@ async function handleShowAllCrmLeads() {
       Interest: (l.interest || '—').slice(0, 35),
       Phone: l.phone || '—',
       Source: l.source || '—',
-      'Tally Verified': l.tallyPaymentVerified ? '✅ Yes' : '❌ No',
-      'ERP Booked': l.erpBookingCreated ? '✅ Yes' : '❌ No',
+      'Tally Verified': l.tallyPaymentVerified ? 'Yes' : 'No',
+      'ERP Booked': l.erpBookingCreated ? 'Yes' : 'No',
       Assigned: empMap[l.assignedEmployeeId] || l.assignedEmployeeId || 'Unassigned',
       'Created Date': l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-IN') : '—'
     })),
@@ -217,7 +217,7 @@ async function handleActionCreateLead(query) {
   saveLeadsToDisk(leads);
 
   return {
-    text: `### ✅ Lead Created Successfully\n\n• **ID:** \`${newLead.id}\`\n• **Name:** **${newLead.name}**\n• **Budget:** ₹${budget.toLocaleString('en-IN')}\n• **Stage:** Enquiry`,
+    text: `### Lead Created Successfully\n\n• **ID:** \`${newLead.id}\`\n• **Name:** **${newLead.name}**\n• **Budget:** ₹${budget.toLocaleString('en-IN')}\n• **Stage:** Enquiry`,
     table: [newLead],
     chart: null
   };
@@ -235,7 +235,7 @@ async function handleActionTransitionLead(query) {
     targetLead.updatedAt = new Date().toISOString();
     saveLeadsToDisk(leads);
     return {
-      text: `### 🔄 Lead Stage Updated\n\nLead **${targetLead.name}** (\`${targetLead.id}\`) transitioned to stage **${targetStage}**.`,
+      text: `### Lead Stage Updated\n\nLead **${targetLead.name}** (\`${targetLead.id}\`) transitioned to stage **${targetStage}**.`,
       table: [targetLead],
       chart: null
     };

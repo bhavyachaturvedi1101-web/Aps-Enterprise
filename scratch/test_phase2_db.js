@@ -10,10 +10,10 @@ async function runPhase2Tests() {
 
   function assert(condition, message) {
     if (condition) {
-      console.log(`✅ PASS: ${message}`);
+      console.log(`[PASS] PASS: ${message}`);
       passCount++;
     } else {
-      console.error(`❌ FAIL: ${message}`);
+      console.error(`[FAIL] FAIL: ${message}`);
       failCount++;
     }
   }

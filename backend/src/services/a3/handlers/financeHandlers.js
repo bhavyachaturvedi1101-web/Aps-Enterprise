@@ -10,7 +10,7 @@ function getStore() {
 
 async function handleInvoicesOptions() {
   return {
-    text: `### 🧾 Financial Billing Controls\nSelect invoicing operation:`,
+    text: `### Financial Billing Controls\nSelect invoicing operation:`,
     options: [
       'Generate GST tax invoice for lead deposit',
       'Review pending 10% payment vouchers in Tally',
@@ -23,7 +23,7 @@ async function handleInvoices() {
   const store = await getStore();
   const invoices = store.mockInvoices || [];
   return {
-    text: `### 🧾 Customer Invoice Ledger\nFound **${invoices.length} invoices** recorded in system.`,
+    text: `### Customer Invoice Ledger\nFound **${invoices.length} invoices** recorded in system.`,
     table: invoices.slice(0, 10).map(i => ({
       Invoice: i.invoiceNumber,
       Customer: i.customerName,
@@ -42,7 +42,7 @@ async function handleInvoiceGenerator(query) {
   const invNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
   return {
-    text: `### 🧾 GST Tax Invoice Generated\n\n• **Invoice #:** \`${invNumber}\`\n• **Subtotal:** ₹${rawAmt.toLocaleString('en-IN')}\n• **GST (18%):** ₹${gst.toLocaleString('en-IN')}\n• **Total Payable:** **₹${total.toLocaleString('en-IN')}**`,
+    text: `### GST Tax Invoice Generated\n\n• **Invoice #:** \`${invNumber}\`\n• **Subtotal:** ₹${rawAmt.toLocaleString('en-IN')}\n• **GST (18%):** ₹${gst.toLocaleString('en-IN')}\n• **Total Payable:** **₹${total.toLocaleString('en-IN')}**`,
     table: [
       { Field: 'Invoice Number', Value: invNumber },
       { Field: 'Taxable Amount', Value: `₹${rawAmt.toLocaleString('en-IN')}` },
@@ -61,7 +61,7 @@ async function handleMarginCalculator(query) {
   const marginPct = Math.round((profit / revenue) * 100);
 
   return {
-    text: `### 💰 Machine Order Profit Margin Analysis\n\n• **Order Revenue:** ₹${revenue.toLocaleString('en-IN')}\n• **Manufacturing Cost:** ₹${cost.toLocaleString('en-IN')}\n• **Net Profit:** **₹${profit.toLocaleString('en-IN')}** (${marginPct}% margin)`,
+    text: `### Machine Order Profit Margin Analysis\n\n• **Order Revenue:** ₹${revenue.toLocaleString('en-IN')}\n• **Manufacturing Cost:** ₹${cost.toLocaleString('en-IN')}\n• **Net Profit:** **₹${profit.toLocaleString('en-IN')}** (${marginPct}% margin)`,
     table: [
       { Metric: 'Revenue', Value: `₹${revenue.toLocaleString('en-IN')}` },
       { Metric: 'Estimated Cost', Value: `₹${cost.toLocaleString('en-IN')}` },
@@ -80,7 +80,7 @@ async function handleActionPostTally(query) {
     narration: '10% Advance Deposit via A3 AI command'
   });
   return {
-    text: `### 🏛️ Tally ERP Voucher Created\n\nVoucher posted to Tally Prime bridge: ${res.voucherNumber || 'VCH-TALLY-SYNCED'}.`,
+    text: `### Tally ERP Voucher Created\n\nVoucher posted to Tally Prime bridge: ${res.voucherNumber || 'VCH-TALLY-SYNCED'}.`,
     table: [res],
     chart: null
   };
@@ -88,7 +88,7 @@ async function handleActionPostTally(query) {
 
 async function handleExplainMetrics() {
   return {
-    text: `### 📊 Enterprise Metrics Guide\n\n• **10% Payment Gate:** Mandatory hard gate preventing factory production release prior to customer financial commitment.\n• **KPI Score:** Weighted index of deals closed, outbound dialer connection rate, and customer satisfaction.\n• **On-Time Assembly:** Factory floor delivery adherence against committed job card date.`,
+    text: `### Enterprise Metrics Guide\n\n• **10% Payment Gate:** Mandatory hard gate preventing factory production release prior to customer financial commitment.\n• **KPI Score:** Weighted index of deals closed, outbound dialer connection rate, and customer satisfaction.\n• **On-Time Assembly:** Factory floor delivery adherence against committed job card date.`,
     table: null,
     chart: null
   };
