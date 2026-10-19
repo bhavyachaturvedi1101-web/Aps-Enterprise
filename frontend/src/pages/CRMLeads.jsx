@@ -686,7 +686,7 @@ export default function CRMLeads() {
       )}
 
       {/* ── Main Kanban Swimlane Columns (Horizontally Scrollable) ─── */}
-      <div ref={boardRef} style={s.kanbanBoard}>
+      <div ref={boardRef} className="pipeline-kanban crm-leads-board" style={s.kanbanBoard}>
         {STAGES.map(stage => {
           const meta = STAGE_META[stage];
           const columnLeads = leadsByStage[stage] || [];
@@ -716,7 +716,7 @@ export default function CRMLeads() {
               </div>
 
               {/* Column Cards Container */}
-              <div style={s.columnBody}>
+              <div className="crm-kanban-column-body" style={s.columnBody}>
                 {columnLeads.map((lead) => {
                   const priorityStyle = PRIORITY_THEMES[lead.priority] || PRIORITY_THEMES['Warm'];
                   const sourceStyle = SOURCE_THEMES[lead.source] || SOURCE_THEMES['Default'];

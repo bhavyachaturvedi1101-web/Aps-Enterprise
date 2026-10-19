@@ -24,20 +24,62 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  height: 100dvh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Unified Single Scroll Surface Architecture                                */
+/* ───────────────────────────────────────────────────────────────────────── */
+.dashboard-app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.dashboard-body-wrapper {
+  display: flex;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-main-content,
+main {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative;
+  background-color: var(--bg-primary);
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y;
+  transform: translateZ(0);
+  will-change: scroll-position;
 }
 
 /* Page container layout */
@@ -437,27 +479,104 @@ select option {
     height: calc(64px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* ─── Main Layout ─────────────────────────────────────────────────────── */
-  /* Remove sidebar-based padding, add bottom clearance for bottom nav */
+  /* ─── Main Content Single Scroll Surface ───────────────────────────── */
+  .dashboard-main-content,
   main {
     padding: 0 !important;
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y;
+    transform: translateZ(0);
+    will-change: scroll-position;
   }
 
-  /* ─── Page-level padding fix (all pages use inline padding:2rem) ──────── */
-  /* Target the first div child of main, which is each page's root div */
+  /* ─── ELIMINATE DOUBLE SCROLLING ───────────────────────────────────── */
+  /* CRITICAL: Do NOT set overflow-x: hidden on main > div.
+     In CSS specification, setting overflow-x: hidden forces overflow-y to compute to auto,
+     which creates a competing nested vertical scroll container and causes double scrolling.
+     Instead, use overflow: visible with overflow-x: clip so child pages NEVER create
+     a secondary scroll container while still preventing horizontal bleed! */
   main > div {
     padding: 1rem !important;
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    flex: none !important;
   }
 
-  /* Also target the page-container class from Dashboard */
   .page-container {
     padding: 1rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* ─── Neutralize In-Page Nested Scroll Traps (Mobile) ─────────────── */
+  /* Machinery stock list in Dashboard: expand fully in mobile flow */
+  .machinery-stock-scroll-list {
+    max-height: none !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+  }
+
+  /* CRM Leads Kanban Column: expand cards vertically in column */
+  .crm-kanban-column-body {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* APS AI Page Mobile Layout */
+  .apsai-page-wrapper {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0.75rem 0.5rem 1rem !important;
+  }
+
+  .apsai-main-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .apsai-chat-container {
+    order: 1 !important;
+    height: calc(100dvh - 190px) !important;
+    min-height: 480px !important;
+  }
+
+  .apsai-messages-area {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y;
+  }
+
+  .apsai-side-nav {
+    order: 2 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* WhatsApp Automation Mobile Layout */
+  .whatsapp-app-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 520px !important;
+    max-height: none !important;
   }
 
   /* ─── Typography ──────────────────────────────────────────────────────── */
@@ -719,9 +838,9 @@ select option {
     min-height: 38px;
   }
 
-  /* ─── Prevent Horizontal Overflow ────────────────────────────────────── */
+  /* ─── Prevent Body Rubberband & Window Scroll Contention ──────────────── */
   body {
-    overflow-x: hidden !important;
+    overflow: hidden !important;
   }
 }
 
@@ -731,10 +850,16 @@ select option {
 @media (max-width: 480px) {
   main > div {
     padding: 0.75rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
 
   .page-container {
     padding: 0.75rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
 
   .stat-chips-row {

@@ -848,9 +848,9 @@ export default function WhatsAppAutomation() {
 
       {/* ── TAB 4: MANUAL TRIGGER & WHATSAPP MULTI-CLIENT LIVE INBOX ── */}
       {activeTab === 'broadcast' && (
-        <div style={s.waAppContainer}>
+        <div className="whatsapp-app-container" style={s.waAppContainer}>
           {/* ──── LEFT PANE: WHATSAPP INBOX CHATS LIST (Matching User Reference Image) ──── */}
-          <div style={s.waInboxPane}>
+          <div className="whatsapp-inbox-pane" style={s.waInboxPane}>
             {/* Top Bar Header */}
             <div style={s.waInboxHeader}>
               <div style={s.waInboxTitleRow}>
