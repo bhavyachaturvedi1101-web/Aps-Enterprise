@@ -16,15 +16,18 @@ function timingSafeCompare(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
+const { getEmployeeId } = require('./rbacMiddleware');
+
 // Build active API key registry
 const knownApiKeys = {
-  [ADMIN_API_KEY]: { id: 'USR-001', name: 'Super Admin', role: 'admin' }
+  [ADMIN_API_KEY]: { id: 'USR-001', name: 'Super Admin', role: 'admin', employeeId: 'e1', email: 'admin@apsenterprises.in' }
 };
 
 // Allow static test keys only in dev/test environments for automated testing
 if (!isProduction) {
-  knownApiKeys['sales-key-456'] = { id: 'USR-003', name: 'Sales Telecaller', role: 'employee' };
-  knownApiKeys['ops-key-789'] = { id: 'USR-002', name: 'Operations Manager', role: 'manager' };
+  knownApiKeys['sales-key-456'] = { id: 'USR-004', name: 'Sales Telecaller', role: 'employee', employeeId: 'e4', email: 'telecaller@apsenterprises.in' };
+  knownApiKeys['ops-key-789'] = { id: 'USR-002', name: 'Operations Manager', role: 'manager', employeeId: 'e2', email: 'manager@apsenterprises.in' };
+  knownApiKeys['acct-key-321'] = { id: 'USR-003', name: 'Accounts Officer', role: 'accountant', employeeId: 'e3', email: 'accounts@apsenterprises.in' };
 }
 
 /**
@@ -35,7 +38,7 @@ function matchApiKey(providedKey) {
   let matchedUser = null;
   for (const [key, user] of Object.entries(knownApiKeys)) {
     if (timingSafeCompare(providedKey, key)) {
-      matchedUser = user;
+      matchedUser = { ...user };
     }
   }
   return matchedUser;
@@ -55,6 +58,13 @@ const authenticate = (req, res, next) => {
   const rawAuth = req.headers['authorization'] || '';
   const apiKey = req.headers['x-api-key'] || '';
 
+  const attachUser = (user) => {
+    req.user = {
+      ...user,
+      employeeId: user.employeeId || getEmployeeId(user)
+    };
+  };
+
   // 1. Try JWT Bearer token
   if (rawAuth.startsWith('Bearer ')) {
     const token = rawAuth.slice(7).trim();
@@ -62,14 +72,14 @@ const authenticate = (req, res, next) => {
     // Check if a known static API key was passed in Bearer format
     const apiKeyMatch = matchApiKey(token);
     if (apiKeyMatch) {
-      req.user = apiKeyMatch;
+      attachUser(apiKeyMatch);
       return next();
     }
 
     try {
       // Strictly enforce HS256 algorithm to prevent algorithm confusion exploits
       const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
-      req.user = decoded;
+      attachUser(decoded);
       return next();
     } catch (jwtErr) {
       return res.status(401).json({
@@ -84,7 +94,7 @@ const authenticate = (req, res, next) => {
   if (apiKey) {
     const matchedUser = matchApiKey(apiKey);
     if (matchedUser) {
-      req.user = matchedUser;
+      attachUser(matchedUser);
       return next();
     }
     return res.status(401).json({
@@ -97,7 +107,7 @@ const authenticate = (req, res, next) => {
   // 3. Fallback for internal development or test mode ONLY if not in production
   // In production (NODE_ENV === 'production'), this is strictly bypassed
   if (!isProduction && !apiKey && !rawAuth && process.env.ALLOW_DEV_ANONYMOUS_AUTH !== 'false') {
-    req.user = { id: 'USR-001', name: 'Super Admin', role: 'admin' };
+    attachUser({ id: 'USR-001', name: 'Super Admin', role: 'admin', employeeId: 'e1' });
     return next();
   }
 

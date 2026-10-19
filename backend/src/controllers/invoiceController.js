@@ -5,6 +5,7 @@ const { Invoice, ActivityLog } = require('../models');
 const { isDbConnected, sequelize } = require('../config/db');
 const { withDb, isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+const { maskName } = require('../utils/privacyMasker');
 
 const INVOICES_FILE = path.join(__dirname, '../../invoices_data.json');
 
@@ -347,7 +348,7 @@ async function dispatchWhatsApp(req, res, next) {
       return res.status(404).json({ error: 'Invoice not found', code: 'RESOURCE_NOT_FOUND' });
     }
 
-    console.log(`[Invoice Dispatch] PDF invoice ${id} dispatched to ${result.clientName} via WhatsApp.`);
+    console.log(`[Invoice Dispatch] PDF invoice ${id} dispatched to ${maskName(result.clientName)} via WhatsApp.`);
     return res.json({ success: true, message: `Invoice ${id} PDF dispatched to ${result.clientName} via WhatsApp.`, invoiceId: id });
   } catch (err) {
     next(err);

@@ -50,8 +50,8 @@ const MOCK_JOB_CARDS = [
   }
 ];
 
-// GET /api/jobcards — all job cards
-router.get('/', async (req, res) => {
+// GET /api/jobcards — all job cards (Admin, Manager, Accountant & Employee)
+router.get('/', authorize(['admin', 'manager', 'accountant', 'employee']), async (req, res) => {
   try {
     let cards = [];
     try { cards = (await JobCard.findAll({ order: [['createdAt', 'DESC']] })).map(c => c.toJSON()); }
@@ -63,8 +63,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/jobcards/:id — single job card
-router.get('/:id', async (req, res) => {
+// GET /api/jobcards/:id — single job card (Admin, Manager, Accountant & Employee)
+router.get('/:id', authorize(['admin', 'manager', 'accountant', 'employee']), async (req, res) => {
   try {
     let card = null;
     try { card = await JobCard.findByPk(req.params.id); } catch {}

@@ -5,13 +5,13 @@ const { validateBody, createLeadSchema, transitionLeadSchema } = require('../mid
 const { authorize } = require('../middleware/rbacMiddleware');
 
 // GET all leads
-router.get('/', getLeads);
+router.get('/', authorize(['admin', 'manager', 'accountant', 'employee']), getLeads);
 
 // POST create new lead
 router.post('/', authorize(['admin', 'manager', 'employee']), validateBody(createLeadSchema), createLead);
 
 // GET single lead details
-router.get('/:id', getLeadById);
+router.get('/:id', authorize(['admin', 'manager', 'accountant', 'employee']), getLeadById);
 
 // PUT update lead
 router.put('/:id', authorize(['admin', 'manager', 'employee']), updateLead);

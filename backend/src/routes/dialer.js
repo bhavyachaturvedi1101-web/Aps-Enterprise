@@ -4,11 +4,26 @@ const dialerService = require('../services/dialerService');
 const { Lead } = require('../models');
 const { authorize } = require('../middleware/rbacMiddleware');
 
-// GET /api/dialer/queue — full priority queue with stats
-router.get('/queue', async (req, res) => {
+// GET /api/dialer/queue — full priority queue with stats (Admin, Manager & Employee)
+router.get('/queue', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   try {
     const { queue, stats } = dialerService.getQueue();
-    const formattedQueue = queue.map((c, idx) => ({
+    const user = req.user;
+    const isEmployee = user && user.role === 'employee' && !['admin', 'manager'].includes((user.role || '').toLowerCase());
+    const empId = user ? (user.employeeId || user.id) : null;
+
+    let userQueue = queue;
+    if (isEmployee) {
+      userQueue = queue.filter(c => 
+        !c.agent || 
+        !c.assignedEmployeeId ||
+        c.agent === user.name ||
+        c.assignedEmployeeId === empId ||
+        c.assignedEmployeeId === user.id
+      );
+    }
+
+    const formattedQueue = userQueue.map((c, idx) => ({
       ...c,
       queueId: c.id,
       status: idx === 0 ? 'In Progress' : 'Pending'
@@ -25,8 +40,8 @@ router.get('/queue', async (req, res) => {
   }
 });
 
-// GET /api/dialer/stats — live stats only
-router.get('/stats', (req, res) => {
+// GET /api/dialer/stats — live stats only (Admin, Manager & Employee)
+router.get('/stats', authorize(['admin', 'manager', 'employee']), (req, res) => {
   res.json(dialerService.getStats());
 });
 

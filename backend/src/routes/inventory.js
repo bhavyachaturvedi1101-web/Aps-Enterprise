@@ -12,11 +12,11 @@ const {
 
 // @route   GET /api/inventory/summary
 // @desc    Get aggregated stock metrics & top items for dashboard
-router.get('/summary', getInventorySummary);
+router.get('/summary', authorize(['admin', 'manager', 'accountant', 'employee']), getInventorySummary);
 
 // @route   GET /api/inventory
 // @desc    Get all inventory items with optional filters
-router.get('/', getInventory);
+router.get('/', authorize(['admin', 'manager', 'accountant', 'employee']), getInventory);
 
 // @route   POST /api/inventory
 // @desc    Create or update a single inventory item (Admin / Manager)

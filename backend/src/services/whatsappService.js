@@ -2,6 +2,7 @@
 const https = require('https');
 const store = require('../config/inMemoryStore');
 const { Lead, ActivityLog } = require('../models');
+const { maskPhone, maskText } = require('../utils/privacyMasker');
 
 // Ensure arrays exist on the inMemoryStore singleton
 if (!store.mockWhatsAppMessages) store.mockWhatsAppMessages = [];
@@ -199,7 +200,7 @@ class WhatsAppService {
         const from = body.from || body.sender || body.recipient;
 
         if (incomingText && from) {
-          console.log(`[DoubleTick Webhook] Incoming message from ${from}: ${incomingText}`);
+          console.log(`[DoubleTick Webhook] Incoming message from ${maskPhone(String(from))}: ${maskText(incomingText)}`);
           const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(String(from).slice(-10)));
           if (existing) existing.status = 'Replied';
         }
@@ -223,7 +224,7 @@ class WhatsAppService {
       // Incoming messages
       if (changes.messages) {
         for (const msg of changes.messages) {
-          console.log(`[WhatsApp Webhook] Incoming from ${msg.from}: ${msg.text?.body || msg.type}`);
+          console.log(`[WhatsApp Webhook] Incoming from ${maskPhone(msg.from)}: ${maskText(msg.text?.body || msg.type)}`);
           const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(msg.from.slice(-10)));
           if (existing) existing.status = 'Replied';
         }

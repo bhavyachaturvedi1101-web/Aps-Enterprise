@@ -23,6 +23,7 @@ const OPERATOR_PASSWORD = process.env.OPERATOR_PASSWORD || 'aps2026';
 const OPERATORS = [
   {
     id: 'USR-001',
+    employeeId: 'e1',
     name: 'Super Admin',
     email: ADMIN_EMAIL,
     altEmail: 'admin@apsenterprise.com',
@@ -47,6 +48,7 @@ const OPERATORS = [
   },
   {
     id: 'USR-002',
+    employeeId: 'e2',
     name: 'Operations Manager',
     email: 'manager@apsenterprises.in',
     altEmail: 'manager@apsenterprise.com',
@@ -70,6 +72,7 @@ const OPERATORS = [
   },
   {
     id: 'USR-003',
+    employeeId: 'e3',
     name: 'Accounts Officer',
     email: 'accounts@apsenterprises.in',
     altEmail: 'accounts@apsenterprise.com',
@@ -88,6 +91,7 @@ const OPERATORS = [
   },
   {
     id: 'USR-004',
+    employeeId: 'e4',
     name: 'Sales Telecaller',
     email: 'telecaller@apsenterprises.in',
     altEmail: 'telecaller@apsenterprise.com',
@@ -184,11 +188,6 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // Check static API key direct authentication in constant time
-    if (!isMatch && ADMIN_API_KEY && timingSafeCompare(cleanPass, ADMIN_API_KEY)) {
-      isMatch = true;
-    }
-
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -200,6 +199,7 @@ router.post('/login', async (req, res) => {
     // Build user session payload
     const activeUser = operator || {
       id: dbUser.id,
+      employeeId: dbUser.id,
       name: dbUser.name,
       email: dbUser.email,
       role: dbUser.role,
@@ -214,6 +214,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       {
         id: activeUser.id,
+        employeeId: activeUser.employeeId || activeUser.id,
         name: activeUser.name,
         email: activeUser.email,
         role: activeUser.role

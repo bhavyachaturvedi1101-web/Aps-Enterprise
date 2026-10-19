@@ -24,6 +24,11 @@ async function getAnalyticsLeads() {
   return safeLeads();
 }
 
+const { authorize } = require('../middleware/rbacMiddleware');
+
+// Restrict all executive business analytics & forecasting to Admin & Manager roles
+router.use(authorize(['admin', 'manager']));
+
 // ─── GET /api/analytics/overview ─────────────────────────────────────────────
 router.get('/overview', async (req, res) => {
   try {

@@ -13,13 +13,13 @@ const { validateBody, createEmployeeSchema } = require('../middleware/validate')
 const { authorize } = require('../middleware/rbacMiddleware');
 
 // GET all employees (A4 module)
-router.get('/', getEmployees);
+router.get('/', authorize(['admin', 'manager', 'accountant', 'employee']), getEmployees);
 
 // POST create employee (Admin & Manager only)
 router.post('/', authorize(['admin', 'manager']), validateBody(createEmployeeSchema), createEmployee);
 
 // GET employee detailed performance profile (A4 module)
-router.get('/:id/performance', getEmployeePerformance);
+router.get('/:id/performance', authorize(['admin', 'manager', 'employee']), getEmployeePerformance);
 
 // POST mark task complete and auto-assign next task from queue (A4 module)
 router.post('/:id/complete-task', authorize(['admin', 'manager', 'employee']), completeTask);

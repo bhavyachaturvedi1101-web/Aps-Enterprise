@@ -2,6 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const store = require('../config/inMemoryStore');
+const { authorize } = require('../middleware/rbacMiddleware');
+
+router.use(authorize(['admin', 'manager', 'accountant', 'employee']));
 
 // In-memory notifications store initialized with recent system events
 let notifications = [

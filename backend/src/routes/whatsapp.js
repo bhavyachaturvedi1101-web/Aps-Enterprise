@@ -3,26 +3,26 @@ const router = express.Router();
 const whatsappService = require('../services/whatsappService');
 const { authorize } = require('../middleware/rbacMiddleware');
 
-// GET /api/whatsapp/messages — Audit log of sent automated WhatsApp messages
-router.get('/messages', async (req, res) => {
+// GET /api/whatsapp/messages — Audit log of sent automated WhatsApp messages (Admin & Manager only)
+router.get('/messages', authorize(['admin', 'manager']), async (req, res) => {
   const messages = await whatsappService.getMessages();
   res.json({ messages, count: messages.length });
 });
 
-// GET /api/whatsapp/sequences — Active WhatsApp messaging sequences
-router.get('/sequences', async (req, res) => {
+// GET /api/whatsapp/sequences — Active WhatsApp messaging sequences (Admin & Manager only)
+router.get('/sequences', authorize(['admin', 'manager']), async (req, res) => {
   const sequences = await whatsappService.getSequences();
   res.json({ sequences });
 });
 
-// GET /api/whatsapp/templates — Approved Meta WhatsApp message templates
-router.get('/templates', async (req, res) => {
+// GET /api/whatsapp/templates — Approved Meta WhatsApp message templates (Admin & Manager only)
+router.get('/templates', authorize(['admin', 'manager']), async (req, res) => {
   const templates = await whatsappService.getTemplates();
   res.json({ templates });
 });
 
-// GET /api/whatsapp/analytics — WhatsApp deliverability & engagement metrics
-router.get('/analytics', async (req, res) => {
+// GET /api/whatsapp/analytics — WhatsApp deliverability & engagement metrics (Admin & Manager only)
+router.get('/analytics', authorize(['admin', 'manager']), async (req, res) => {
   const analytics = await whatsappService.getAnalytics();
   res.json({ analytics });
 });

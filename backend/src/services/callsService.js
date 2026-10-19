@@ -1,6 +1,7 @@
 // A1 Voice Agent Service — Call Structured Ingestion & Processing
 const { mockCallLogs, mockLeads, mockActivityLogs } = require('../config/inMemoryStore');
 const { Lead, ActivityLog } = require('../models');
+const { maskName } = require('../utils/privacyMasker');
 
 class CallsService {
   async processCallOutcome(callData) {
@@ -96,7 +97,7 @@ class CallsService {
       mockActivityLogs.unshift(logEntry);
     }
 
-    console.log(`[A1 Voice Agent] Call outcome ingested for ${lead.name} (${callId}).`);
+    console.log(`[A1 Voice Agent] Call outcome ingested for ${maskName(lead.name)} (${callId}).`);
     return { success: true, callId, lead };
   }
 

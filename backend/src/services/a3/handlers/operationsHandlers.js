@@ -10,7 +10,7 @@ function getStore() {
 
 async function handleFactoryOptions() {
   return {
-    text: `### 🏭 Factory Operations Controls\nSelect factory operation command:`,
+    text: `### Factory Operations Controls\nSelect factory operation command:`,
     options: [
       'Track assembly progress on active job cards',
       'Check warehouse stock of raw materials & machinery',

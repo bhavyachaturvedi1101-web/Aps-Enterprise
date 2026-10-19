@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
@@ -314,7 +314,68 @@ function MiniTable({ rows }) {
   );
 }
 
-// ─── Markdown Text Renderer ───────────────────────────────────────────────────
+// ─── Native Markdown Table Component ──────────────────────────────────────────
+function MarkdownTable({ headers, rows, isUser }) {
+  if (!headers || headers.length === 0) return null;
+  return (
+    <div style={{
+      margin: '12px 0',
+      overflowX: 'auto',
+      borderRadius: 10,
+      border: '1px solid #e2e8f0',
+      background: '#ffffff',
+      boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)'
+    }}>
+      <table style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        fontSize: '0.82rem',
+        textAlign: 'left',
+        fontFamily: 'Inter, -apple-system, sans-serif'
+      }}>
+        <thead>
+          <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+            {headers.map((h, i) => (
+              <th key={i} style={{
+                padding: '10px 14px',
+                fontWeight: 700,
+                color: '#0f172a',
+                whiteSpace: 'nowrap',
+                letterSpacing: '-0.1px'
+              }}>
+                {parseInlineStyles(h.trim(), isUser)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, rIdx) => (
+            <tr
+              key={rIdx}
+              style={{
+                borderBottom: rIdx === rows.length - 1 ? 'none' : '1px solid #f1f5f9',
+                background: rIdx % 2 === 0 ? '#ffffff' : '#fafafa'
+              }}
+            >
+              {row.map((cell, cIdx) => (
+                <td key={cIdx} style={{
+                  padding: '9px 14px',
+                  color: '#334155',
+                  verticalAlign: 'top',
+                  lineHeight: 1.5
+                }}>
+                  {parseInlineStyles(cell.trim(), isUser)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ─── Enhanced Markdown Text Renderer ───────────────────────────────────────────
 function RenderText({ text, isUser }) {
   if (!text) return null;
 
@@ -385,71 +446,211 @@ function RenderText({ text, isUser }) {
           );
         }
 
-        // Parse regular text block lines
+        // Parse regular text block lines & detect tables, callouts, lists
         const lines = block.split('\n');
+        const elements = [];
+        let i = 0;
+
+        while (i < lines.length) {
+          const rawLine = lines[i];
+          const trimmed = rawLine.trim();
+
+          // 1. Detect Markdown Tables (| Header | Header |)
+          if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2) {
+            const tableLines = [];
+            while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
+              tableLines.push(lines[i].trim());
+              i++;
+            }
+
+            if (tableLines.length >= 2) {
+              const rawHeaders = tableLines[0].split('|').slice(1, -1);
+              const isSep = /^\|[\s\-:|]+\|$/.test(tableLines[1]);
+              const startRowIdx = isSep ? 2 : 1;
+              const rows = tableLines.slice(startRowIdx).map(l => l.split('|').slice(1, -1));
+
+              elements.push({
+                type: 'table',
+                headers: rawHeaders,
+                rows: rows
+              });
+              continue;
+            } else {
+              elements.push({ type: 'text', content: tableLines[0] });
+              continue;
+            }
+          }
+
+          // 2. Executive Callout Box (starts with > or Key Takeaway / Executive Summary)
+          if (trimmed.startsWith('>') || /^\*\*(key takeaway|executive summary|note|warning|tip|protocol)\*\*/i.test(trimmed)) {
+            const calloutText = trimmed.replace(/^>\s*/, '');
+            elements.push({
+              type: 'callout',
+              content: calloutText
+            });
+            i++;
+            continue;
+          }
+
+          // 3. Numbered Step (e.g. 1. text)
+          const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+          if (numMatch) {
+            elements.push({
+              type: 'numbered',
+              num: numMatch[1],
+              content: numMatch[2]
+            });
+            i++;
+            continue;
+          }
+
+          // 4. Bullet Item (•, -, *)
+          const bulletMatch = trimmed.match(/^(\u2022|\-|\*)\s+(.*)/);
+          if (bulletMatch) {
+            elements.push({
+              type: 'bullet',
+              content: bulletMatch[2]
+            });
+            i++;
+            continue;
+          }
+
+          // 5. Headings
+          if (trimmed.startsWith('#### ')) {
+            elements.push({ type: 'heading', level: 4, content: trimmed.replace(/^####\s+/, '') });
+            i++;
+            continue;
+          }
+          if (trimmed.startsWith('### ')) {
+            elements.push({ type: 'heading', level: 3, content: trimmed.replace(/^###\s+/, '') });
+            i++;
+            continue;
+          }
+          if (trimmed.startsWith('## ')) {
+            elements.push({ type: 'heading', level: 2, content: trimmed.replace(/^##\s+/, '') });
+            i++;
+            continue;
+          }
+          if (trimmed.startsWith('# ')) {
+            elements.push({ type: 'heading', level: 1, content: trimmed.replace(/^#\s+/, '') });
+            i++;
+            continue;
+          }
+
+          // 6. Horizontal separator
+          if (trimmed === '---') {
+            elements.push({ type: 'hr' });
+            i++;
+            continue;
+          }
+
+          // 7. Spacer
+          if (!trimmed) {
+            elements.push({ type: 'spacer' });
+            i++;
+            continue;
+          }
+
+          // 8. Plain text paragraph
+          elements.push({ type: 'text', content: rawLine });
+          i++;
+        }
+
         return (
-          <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {lines.map((line, lIdx) => {
-              const trimmed = line.trim();
-              if (trimmed === '---') {
-                return <hr key={lIdx} style={{ border: 0, borderTop: '1px solid #cbd5e1', margin: '8px 0', width: '100%' }} />;
+          <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {elements.map((el, elIdx) => {
+              if (el.type === 'table') {
+                return <MarkdownTable key={elIdx} headers={el.headers} rows={el.rows} isUser={isUser} />;
               }
 
-              // Handle markdown headings
-              let headingLevel = 0;
-              if (trimmed.startsWith('#### ')) headingLevel = 4;
-              else if (trimmed.startsWith('### ')) headingLevel = 3;
-              else if (trimmed.startsWith('## ')) headingLevel = 2;
-              else if (trimmed.startsWith('# ')) headingLevel = 1;
-
-              if (headingLevel > 0) {
-                const headerText = trimmed.replace(/^#+\s+/, '');
-                const HeaderTag = `h${headingLevel}`;
-                const sizes = { 1: '1.3rem', 2: '1.18rem', 3: '1.02rem', 4: '0.9rem' };
+              if (el.type === 'callout') {
                 return (
-                  <HeaderTag key={lIdx} style={{
-                    fontSize: sizes[headingLevel],
-                    fontWeight: 800,
-                    color: isUser ? '#fff' : '#0f172a',
-                    margin: '10px 0 4px 0',
-                    letterSpacing: '-0.2px',
-                    lineHeight: 1.3
+                  <div key={elIdx} style={{
+                    margin: '6px 0',
+                    padding: '10px 14px',
+                    background: isUser ? 'rgba(255,255,255,0.12)' : '#f8fafc',
+                    borderLeft: `3px solid ${isUser ? '#ffffff' : '#0f172a'}`,
+                    borderRadius: '0 8px 8px 0',
+                    fontSize: '0.86rem',
+                    lineHeight: 1.5,
+                    color: isUser ? '#ffffff' : '#0f172a',
+                    boxShadow: isUser ? 'none' : '0 1px 3px rgba(0,0,0,0.02)'
                   }}>
-                    {parseInlineStyles(headerText, isUser)}
-                  </HeaderTag>
+                    {parseInlineStyles(el.content, isUser)}
+                  </div>
                 );
               }
 
-              // Handle list items
-              const isBullet = trimmed.startsWith('• ') || trimmed.startsWith('- ') || trimmed.startsWith('* ');
-              if (isBullet) {
-                const content = trimmed.replace(/^(\u2022|\-|\*)\s+/, '');
+              if (el.type === 'numbered') {
                 return (
-                  <div key={lIdx} style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 6,
-                    paddingLeft: 10,
-                    margin: '2px 0'
-                  }}>
-                    <span style={{ color: isUser ? '#fff' : '#2563eb', fontSize: '0.8rem', lineHeight: 1.5, userSelect: 'none' }}>•</span>
-                    <span style={{ flex: 1, fontSize: '0.86rem', lineHeight: 1.5, color: isUser ? 'rgba(255,255,255,0.95)' : '#334155' }}>
-                      {parseInlineStyles(content, isUser)}
+                  <div key={elIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, margin: '3px 0' }}>
+                    <span style={{
+                      minWidth: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: isUser ? '#ffffff' : '#0f172a',
+                      color: isUser ? '#0f172a' : '#ffffff',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 2,
+                      flexShrink: 0
+                    }}>
+                      {el.num}
+                    </span>
+                    <span style={{ flex: 1, fontSize: '0.86rem', lineHeight: 1.5, color: isUser ? '#ffffff' : '#334155' }}>
+                      {parseInlineStyles(el.content, isUser)}
                     </span>
                   </div>
                 );
               }
 
-              if (!trimmed) return <div key={lIdx} style={{ height: 4 }} />;
+              if (el.type === 'bullet') {
+                return (
+                  <div key={elIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, paddingLeft: 4, margin: '2px 0' }}>
+                    <span style={{ color: isUser ? '#ffffff' : '#0f172a', fontSize: '0.9rem', lineHeight: 1.4, userSelect: 'none' }}>•</span>
+                    <span style={{ flex: 1, fontSize: '0.86rem', lineHeight: 1.5, color: isUser ? '#ffffff' : '#334155' }}>
+                      {parseInlineStyles(el.content, isUser)}
+                    </span>
+                  </div>
+                );
+              }
+
+              if (el.type === 'heading') {
+                const HeaderTag = `h${el.level}`;
+                const sizes = { 1: '1.25rem', 2: '1.14rem', 3: '1.02rem', 4: '0.9rem' };
+                return (
+                  <HeaderTag key={elIdx} style={{
+                    fontSize: sizes[el.level],
+                    fontWeight: 800,
+                    color: isUser ? '#ffffff' : '#0f172a',
+                    margin: el.level <= 2 ? '14px 0 6px 0' : '10px 0 4px 0',
+                    letterSpacing: '-0.3px',
+                    lineHeight: 1.3
+                  }}>
+                    {parseInlineStyles(el.content, isUser)}
+                  </HeaderTag>
+                );
+              }
+
+              if (el.type === 'hr') {
+                return <hr key={elIdx} style={{ border: 0, borderTop: '1px solid #e2e8f0', margin: '8px 0', width: '100%' }} />;
+              }
+
+              if (el.type === 'spacer') {
+                return <div key={elIdx} style={{ height: 4 }} />;
+              }
 
               return (
-                <div key={lIdx} style={{
+                <div key={elIdx} style={{
                   fontSize: '0.86rem',
-                  lineHeight: 1.5,
-                  color: isUser ? '#fff' : '#334155',
+                  lineHeight: 1.55,
+                  color: isUser ? '#ffffff' : '#334155',
                   margin: '1px 0'
                 }}>
-                  {parseInlineStyles(line, isUser)}
+                  {parseInlineStyles(el.content, isUser)}
                 </div>
               );
             })}
@@ -467,7 +668,7 @@ function parseInlineStyles(str, isUser) {
   return tokens.map((token, i) => {
     if (token.startsWith('**') && token.endsWith('**')) {
       return (
-        <strong key={i} style={{ color: isUser ? '#fff' : '#0f172a', fontWeight: 800 }}>
+        <strong key={i} style={{ color: isUser ? '#ffffff' : '#0f172a', fontWeight: 700 }}>
           {token.slice(2, -2)}
         </strong>
       );
@@ -476,7 +677,7 @@ function parseInlineStyles(str, isUser) {
       return (
         <code key={i} style={{
           background: isUser ? 'rgba(255,255,255,0.18)' : '#f1f5f9',
-          color: isUser ? '#fff' : '#0f172a',
+          color: isUser ? '#ffffff' : '#0f172a',
           padding: '2px 5px',
           borderRadius: 4,
           fontSize: '0.78rem',
@@ -1075,18 +1276,27 @@ function ExportFileCard({ exportFile, tableData }) {
 // ─── Message Component ────────────────────────────────────────────────────────
 function MessageCard({ msg, onSelectOption }) {
   const isUser = msg.role === 'user';
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!msg.text) return;
+    navigator.clipboard.writeText(msg.text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start', marginBottom: 18 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start', marginBottom: 20 }}>
       {!isUser && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <div style={s.aiAvatarCircle}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
               <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
               <path d="M8 11h.01M12 11h.01M16 11h.01" strokeWidth="3" />
             </svg>
           </div>
-          <span style={s.aiNameBadge}>Dashboard AI Assistant</span>
+          <span style={s.aiNameBadge}>APS AI Executive</span>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
         </div>
       )}
 
@@ -1096,6 +1306,9 @@ function MessageCard({ msg, onSelectOption }) {
             <span style={s.dot} />
             <span style={{ ...s.dot, animationDelay: '0.15s' }} />
             <span style={{ ...s.dot, animationDelay: '0.3s' }} />
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8', marginLeft: 8, fontWeight: 500 }}>
+              Synthesizing operational intelligence...
+            </span>
           </div>
         ) : (
           <>
@@ -1106,7 +1319,7 @@ function MessageCard({ msg, onSelectOption }) {
               <div style={s.optionsContainer}>
                 {msg.options.map((opt, i) => (
                   <button key={i} className="apsai-option-chip" style={s.optionChip} onClick={() => onSelectOption ? onSelectOption(opt) : null}>
-                    {opt}
+                    {typeof opt === 'string' ? opt.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim() : opt}
                   </button>
                 ))}
               </div>
@@ -1115,14 +1328,58 @@ function MessageCard({ msg, onSelectOption }) {
             {msg.report && <ReportCard report={msg.report} />}
             {msg.table && <MiniTable rows={msg.table} />}
             {msg.chart && <SmartChart chart={msg.chart} />}
-            {msg.processingMs && (
-              <div style={{ fontSize: '0.65rem', color: isUser ? 'rgba(255,255,255,0.6)' : '#94a3b8', marginTop: 8, textAlign: 'right' }}>
-                Latency: {msg.processingMs}ms
+
+            {/* Interactive Action Toolbar for Bot Messages */}
+            {!isUser && msg.text && (
+              <div style={s.msgToolbar}>
+                <button
+                  onClick={handleCopy}
+                  style={{
+                    ...s.actionToolBtn,
+                    background: copied ? '#f0fdf4' : '#f8fafc',
+                    borderColor: copied ? '#bbf7d0' : '#e2e8f0',
+                    color: copied ? '#166534' : '#64748b'
+                  }}
+                  title="Copy answer to clipboard"
+                >
+                  {copied ? (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                      </svg>
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+
+                {msg.processingMs && (
+                  <span style={s.latencyBadge}>
+                    ⚡ {msg.processingMs}ms
+                  </span>
+                )}
+
+                <span style={s.timeBadge}>
+                  {msg.time || 'Just now'}
+                </span>
               </div>
             )}
           </>
         )}
       </div>
+
+      {isUser && (
+        <span style={{ fontSize: '0.66rem', color: '#94a3b8', marginTop: 4, marginRight: 6, fontWeight: 500 }}>
+          {msg.time || 'Just now'}
+        </span>
+      )}
     </div>
   );
 }
@@ -1133,7 +1390,7 @@ function buildWelcomeText() {
   const greet = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
   const date = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const lines = [
-    `### ${greet}, Bhavya 👋`,
+    `### ${greet}, Bhavya`,
     `**${date}** — APS Enterprise AI is fully online.`,
     '',
     '---',
@@ -1141,7 +1398,7 @@ function buildWelcomeText() {
     "I'm your **Autonomous Business Intelligence Co-Pilot** for APS Enterprise.",
     'Ask me anything in **Hindi, English, or Hinglish** — I understand it all.',
     '',
-    '**⚡ Try these right now:**',
+    '**Try these right now:**',
     '',
     '| Capability | Say this |',
     '|---|---|',
@@ -1171,6 +1428,29 @@ const WELCOME_MSG = {
   chart: null
 };
 
+// ─── Curated Common Queries Catalog (Single Source of Truth) ──────────────────
+const SIDEBAR_COMMON_QUERIES = [
+  // Operations
+  { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status', category: 'ops' },
+  { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual', category: 'ops' },
+  { label: 'Warehouse Inventory Stock', query: 'Check warehouse inventory stock', category: 'ops' },
+  { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics', category: 'ops' },
+
+  // Finance & ERP
+  { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000', category: 'finance' },
+  { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order', category: 'finance' },
+  { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report', category: 'finance' },
+
+  // Sales & CRM
+  { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges', category: 'sales' },
+  { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast', category: 'sales' },
+  { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?', category: 'sales' },
+  { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts', category: 'sales' },
+  { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech', category: 'sales' },
+  { label: 'Export Leads Data to Excel', query: 'Export leads to Excel', category: 'sales' },
+  { label: 'Export Leads Data to CSV', query: 'Export leads to CSV', category: 'sales' }
+];
+
 // ─── MAIN APS AI PAGE COMPONENT ───────────────────────────────────────────────
 export default function APSAIPage() {
   const location = useLocation();
@@ -1186,6 +1466,85 @@ export default function APSAIPage() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const convId = useRef(getConversationId());
+
+  // ─── Sidebar Common Queries State (Filter & Search) ──────────────────────
+  const [queryCategory, setQueryCategory] = useState('all');
+  const [querySearch, setQuerySearch] = useState('');
+
+  const filteredQueries = useMemo(() => {
+    return SIDEBAR_COMMON_QUERIES.filter(item => {
+      const matchCat = queryCategory === 'all' || item.category === queryCategory;
+      const matchSearch = !querySearch.trim() ||
+        item.label.toLowerCase().includes(querySearch.toLowerCase()) ||
+        item.query.toLowerCase().includes(querySearch.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [queryCategory, querySearch]);
+
+  // ─── Persistent AI Memory State ──────────────────────────────────────────
+  const [showMemoryModal, setShowMemoryModal] = useState(false);
+  const [memoriesList, setMemoriesList] = useState([]);
+  const [memoryFilter, setMemoryFilter] = useState('ALL');
+  const [memorySearchText, setMemorySearchText] = useState('');
+  const [newMemoryFact, setNewMemoryFact] = useState('');
+  const [newMemoryTarget, setNewMemoryTarget] = useState('');
+  const [memorySaving, setMemorySaving] = useState(false);
+  const [memoryAlert, setMemoryAlert] = useState(null);
+
+  const fetchMemories = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/memory`);
+      if (res.data?.memories) {
+        setMemoriesList(res.data.memories);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchMemories();
+  }, [fetchMemories]);
+
+  const handleSaveMemoryDirect = async (e) => {
+    if (e) e.preventDefault();
+    if (!newMemoryFact || !newMemoryFact.trim() || memorySaving) return;
+    setMemorySaving(true);
+    setMemoryAlert(null);
+    try {
+      const res = await axios.post(`${API}/memory`, {
+        fact: newMemoryFact.trim(),
+        target: newMemoryTarget.trim() || null,
+        type: 'LEARNED_FACT'
+      });
+      if (res.data?.success) {
+        setNewMemoryFact('');
+        setNewMemoryTarget('');
+        setMemoryAlert({ type: 'success', text: 'Knowledge successfully saved to AI persistent memory!' });
+        fetchMemories();
+        setTimeout(() => setMemoryAlert(null), 4000);
+      }
+    } catch {
+      setMemoryAlert({ type: 'error', text: 'Failed to save memory to backend.' });
+    } finally {
+      setMemorySaving(false);
+    }
+  };
+
+  const handleDeleteMemoryItem = async (id) => {
+    try {
+      await axios.delete(`${API}/memory/${id}`);
+      fetchMemories();
+    } catch {}
+  };
+
+  const handleClearAllMemory = async () => {
+    if (!window.confirm('Are you sure you want to reset all AI persistent memories to initial system state?')) return;
+    try {
+      await axios.delete(`${API}/memory`);
+      fetchMemories();
+      setMemoryAlert({ type: 'success', text: 'All memories reset to initial baseline.' });
+      setTimeout(() => setMemoryAlert(null), 3000);
+    } catch {}
+  };
 
   // Save history whenever messages change
   useEffect(() => {
@@ -1210,9 +1569,14 @@ export default function APSAIPage() {
     }
   }, [location.search]);
 
-  // Auto scroll
+  // Auto scroll - strictly scoped to messagesArea container, never scroll outer window/page layout, and never scroll on initial welcome view
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 1 || (messages.length === 1 && !messages[0]?.isWelcome)) {
+      const container = document.getElementById('apsai-page-messages');
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    }
   }, [messages]);
 
   const clearHistory = () => {
@@ -1237,8 +1601,9 @@ export default function APSAIPage() {
     const q = (queryText || input).trim();
     if (!q || loading) return;
 
-    setMessages(prev => [...prev, { role: 'user', text: q }]);
-    setMessages(prev => [...prev, { role: 'bot', text: '', loading: true }]);
+    const timeNow = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    setMessages(prev => [...prev, { role: 'user', text: q, time: timeNow }]);
+    setMessages(prev => [...prev, { role: 'bot', text: '', loading: true, time: timeNow }]);
     setInput('');
     setLoading(true);
 
@@ -1338,17 +1703,20 @@ export default function APSAIPage() {
           window.dispatchEvent(new CustomEvent('aps_whatsapp_updated', { detail: data.sentWhatsAppMessage }));
         } catch {}
       }
+      fetchMemories();
 
       setMessages(prev => [
         ...prev.slice(0, -1),
         {
           role: 'bot',
           text: data.text || data.answer,
+          options: data.options || null,
           table: data.table,
           chart: data.chart,
           report: data.report,
           exportFile: data.exportFile,
-          processingMs: data.processingMs
+          processingMs: data.processingMs,
+          time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         }
       ]);
     } catch {
@@ -1356,7 +1724,8 @@ export default function APSAIPage() {
         ...prev.slice(0, -1),
         {
           role: 'bot',
-          text: 'Could not connect to the backend server. Please verify port 5000 is online.'
+          text: 'Could not connect to the backend server. Please verify port 5000 is online.',
+          time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         }
       ]);
     } finally {
@@ -1408,6 +1777,19 @@ export default function APSAIPage() {
         </div>
 
         <div style={s.headerRight}>
+          <button
+            onClick={() => {
+              setShowMemoryModal(true);
+              fetchMemories();
+            }}
+            style={s.memoryHeaderBtn}
+            title="View & Manage AI Persistent Memory"
+          >
+            <span style={{ fontSize: '1.05rem' }}>🧠</span>
+            <span style={{ fontWeight: 700 }}>AI Memory</span>
+            <span style={s.memoryBadgeCount}>{memoriesList.length}</span>
+          </button>
+
           <button onClick={clearHistory} style={s.actionBtn} title="Reset Chat">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
@@ -1420,35 +1802,108 @@ export default function APSAIPage() {
       {/* ─── Main Workspace Grid ────────────────────────────────────── */}
       <div style={s.mainGrid}>
         {/* Left Side: Quick Query Categories & Live Metrics */}
-        <div style={s.sideNav}>
+        <div style={s.sideNav} id="apsai-side-nav">
           <div style={s.sideCard}>
-            <div style={s.sideCardTitle}>Quick Queries</div>
-            <div style={s.quickList}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+              <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center' }}>
+                <span>Common Queries</span>
+              </div>
+              <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '2px 7px', borderRadius: 10, border: '1px solid #dbeafe' }}>
+                {filteredQueries.length}
+              </span>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div style={{ display: 'flex', gap: 4, marginBottom: '0.6rem', overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
               {[
-                { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status' },
-                { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000' },
-                { label: 'Voice Call Sentiment Audit', query: 'Analyze voice call sentiment and transcripts' },
-                { label: 'WhatsApp Campaign Analytics', query: 'Show WhatsApp campaign performance analytics' },
-                { label: 'Sales Team Leaderboard', query: 'Show sales team leaderboard and badges' },
-                { label: 'Search PDF Catalog (RAG)', query: 'Search CNC 500T specification manual' },
-                { label: 'Predictive Sales Forecast', query: 'Predict September revenue forecast' },
-                { label: 'Lead Churn Risk Audit', query: 'Which leads are at risk of churn?' },
-                { label: 'Send Email Quotation PDF', query: 'Send email quotation PDF to Global Tech' },
-                { label: 'Order Profit Margin Calculator', query: 'Calculate profit margin for 150000 CNC order' },
-                { label: 'Generate PDF Executive Report', query: 'Generate Executive PDF Report' },
-                { label: 'Export Leads Data to CSV', query: 'Export leads to CSV' },
-                { label: 'Export Leads Data to Excel', query: 'Export leads to Excel' }
-              ].map((item, i) => (
+                { id: 'all', label: 'All' },
+                { id: 'ops', label: 'Ops' },
+                { id: 'finance', label: 'Finance' },
+                { id: 'sales', label: 'Sales' }
+              ].map(cat => (
                 <button
-                  key={i}
-                  onClick={() => sendQuery(item.query)}
-                  disabled={loading}
-                  style={s.quickQueryBtn}
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setQueryCategory(cat.id)}
+                  style={{
+                    padding: '3px 8px',
+                    borderRadius: 12,
+                    border: '1px solid',
+                    borderColor: queryCategory === cat.id ? '#2563eb' : '#e2e8f0',
+                    background: queryCategory === cat.id ? '#2563eb' : '#f8fafc',
+                    color: queryCategory === cat.id ? '#ffffff' : '#64748b',
+                    fontSize: '0.68rem',
+                    fontWeight: queryCategory === cat.id ? 700 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
                 >
-                  <span style={s.quickQueryDot}>›</span>
-                  <span>{item.label}</span>
+                  {cat.label}
                 </button>
               ))}
+            </div>
+
+            {/* Quick Search Box */}
+            <div style={{ marginBottom: '0.6rem', position: 'relative' }}>
+              <input
+                type="text"
+                value={querySearch}
+                onChange={e => setQuerySearch(e.target.value)}
+                placeholder="Search queries..."
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  borderRadius: 8,
+                  border: '1px solid #e2e8f0',
+                  background: '#f8fafc',
+                  fontSize: '0.72rem',
+                  color: '#0f172a',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {querySearch && (
+                <button
+                  type="button"
+                  onClick={() => setQuerySearch('')}
+                  style={{
+                    position: 'absolute',
+                    right: 6,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    padding: '2px 4px'
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Categorized Queries List */}
+            <div style={{ ...s.quickList, maxHeight: '200px', overflowY: 'auto', paddingRight: 2 }}>
+              {filteredQueries.length > 0 ? (
+                filteredQueries.map((item, i) => (
+                  <button
+                    key={i}
+                    onClick={() => sendQuery(item.query)}
+                    disabled={loading}
+                    className="apsai-query-btn"
+                    style={s.quickQueryBtn}
+                    title={item.query}
+                  >
+                    <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
+                  </button>
+                ))
+              ) : (
+                <div style={{ padding: '12px 6px', textAlign: 'center', fontSize: '0.72rem', color: '#94a3b8' }}>
+                  No queries match your search
+                </div>
+              )}
             </div>
           </div>
 
@@ -1471,24 +1926,85 @@ export default function APSAIPage() {
               <span style={s.kVal}>5 Active Operators</span>
             </div>
           </div>
+
+          <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+              <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
+                <span>🧠</span>
+                <span>AI Persistent Memory</span>
+              </div>
+              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>
+                {memoriesList.length} items
+              </span>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+              APS AI saves learned facts, employee boundaries, and actions across all sessions.
+            </p>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              <button
+                onClick={() => { setShowMemoryModal(true); fetchMemories(); }}
+                style={{ flex: 1, padding: '6px 10px', borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Open Memory Hub
+              </button>
+              <button
+                onClick={() => sendQuery("Show AI memory")}
+                style={{ padding: '6px 10px', borderRadius: 8, background: '#fff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                title="Print memory in chat"
+              >
+                Log to Chat
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Right Side: Chat Conversation Area */}
         <div style={s.chatContainer}>
           <style>{`
             .apsai-landing-card {
-              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+              cursor: pointer;
             }
             .apsai-landing-card:hover {
               border-color: #2563eb !important;
               background-color: #f8fafc !important;
               box-shadow: 0 4px 14px rgba(37,99,235,0.08) !important;
-              transform: translateY(-2px);
             }
             .apsai-option-chip:hover {
               background-color: #f8fafc !important;
               border-color: #2563eb !important;
               color: #2563eb !important;
+            }
+            .apsai-query-btn {
+              transition: all 0.15s ease;
+            }
+            .apsai-query-btn:hover {
+              background-color: #eff6ff !important;
+              border-color: #93c5fd !important;
+              color: #1d4ed8 !important;
+            }
+            #apsai-page-suggest-row::-webkit-scrollbar {
+              display: none !important;
+              width: 0 !important;
+              height: 0 !important;
+            }
+            #apsai-side-nav::-webkit-scrollbar {
+              display: none !important;
+              width: 0 !important;
+              height: 0 !important;
+            }
+            #apsai-page-messages::-webkit-scrollbar {
+              width: 6px;
+            }
+            #apsai-page-messages::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            #apsai-page-messages::-webkit-scrollbar-thumb {
+              background: #cbd5e1;
+              border-radius: 4px;
+            }
+            #apsai-page-messages::-webkit-scrollbar-thumb:hover {
+              background: #94a3b8;
             }
           `}</style>
           {/* Messages scroll area */}
@@ -1556,6 +2072,28 @@ export default function APSAIPage() {
                       <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
                     </div>
                   </div>
+
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => { setShowMemoryModal(true); fetchMemories(); }}>
+                    <div style={{ ...s.cardIcon, color: '#0284c7', background: '#f0f9ff', borderColor: '#e0f2fe' }}>
+                      <span style={{ fontSize: '1.25rem' }}>🧠</span>
+                    </div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>AI Persistent Memory Space</div>
+                      <div style={s.cardDesc}>View what the AI has remembered, teach new operational directives, or check action logs.</div>
+                    </div>
+                  </div>
+
+                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show WhatsApp campaign performance analytics")}>
+                    <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                      </svg>
+                    </div>
+                    <div style={s.cardContent}>
+                      <div style={s.cardTitle}>WhatsApp Automation</div>
+                      <div style={s.cardDesc}>Broadcast message templates and view real-time delivery logs.</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -1564,23 +2102,6 @@ export default function APSAIPage() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick Suggestions Row */}
-          {suggestions.length > 0 && messages.length <= 2 && (
-            <div style={s.suggestRow}>
-              <span style={s.suggestLabel}>Common queries:</span>
-              {suggestions.map((s2, i) => (
-                <button
-                  key={i}
-                  onClick={() => sendQuery(s2.query)}
-                  disabled={loading}
-                  style={s.chipBtn}
-                >
-                  {s2.label}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Input Box */}
           <div style={s.inputWrapper}>
             <textarea
@@ -1588,7 +2109,7 @@ export default function APSAIPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder={isListening ? "Listening to your voice..." : "Ask APS AI about your sales, pipeline, revenue, leads, or team..."}
+              placeholder={isListening ? "Listening to your voice..." : "Ask APS AI about your sales, pipeline, revenue, leads, or team (or pick a query from the left)..."}
               style={{
                 ...s.inputField,
                 backgroundColor: isListening ? '#fef3c7' : '#f8fafc',
@@ -1637,6 +2158,228 @@ export default function APSAIPage() {
         </div>
       </div>
 
+      {/* ─── AI Persistent Memory Modal & Knowledge Space ────────────────── */}
+      {showMemoryModal && (
+        <div style={s.modalBackdrop} onClick={() => setShowMemoryModal(false)}>
+          <div style={s.modalContainer} onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div style={s.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={s.modalBrainIcon}>🧠</div>
+                <div>
+                  <h2 style={s.modalTitle}>APS AI — Persistent Memory & Knowledge Space</h2>
+                  <div style={s.modalSubtitle}>
+                    All operational actions, learned guidelines, and security boundaries preserved across sessions
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowMemoryModal(false)}
+                style={s.modalCloseBtn}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick KPI Stats Summary */}
+            <div style={s.memoryStatsRow}>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>💡</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'LEARNED_FACT').length}</div>
+                  <div style={s.memoryStatLbl}>Learned Directives</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>📋</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length}</div>
+                  <div style={s.memoryStatLbl}>Tasks Allocated</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                <div>
+                  <div style={s.memoryStatVal}>{memoriesList.filter(m => m.type === 'TASK_REJECTED').length}</div>
+                  <div style={s.memoryStatLbl}>Guarded Actions</div>
+                </div>
+              </div>
+              <div style={s.memoryStatCard}>
+                <span style={{ fontSize: '1.2rem' }}>👥</span>
+                <div>
+                  <div style={s.memoryStatVal}>6 Active</div>
+                  <div style={s.memoryStatLbl}>Registered Employees</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Teach Form */}
+            <form onSubmit={handleSaveMemoryDirect} style={s.teachForm}>
+              <div style={s.teachFormTitle}>
+                <span>💡</span> Teach AI New Memory or Entity Directive
+              </div>
+              {memoryAlert && (
+                <div style={memoryAlert.type === 'success' ? s.alertSuccess : s.alertError}>
+                  {memoryAlert.text}
+                </div>
+              )}
+              <div style={s.teachInputsRow}>
+                <input
+                  type="text"
+                  placeholder="e.g. Animesh is our machinery raw material vendor from Bhopal..."
+                  value={newMemoryFact}
+                  onChange={(e) => setNewMemoryFact(e.target.value)}
+                  style={s.teachInputFact}
+                />
+                <input
+                  type="text"
+                  placeholder="Entity (e.g. Animesh)"
+                  value={newMemoryTarget}
+                  onChange={(e) => setNewMemoryTarget(e.target.value)}
+                  style={s.teachInputTarget}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMemoryFact.trim() || memorySaving}
+                  style={s.teachSubmitBtn}
+                >
+                  {memorySaving ? 'Saving...' : 'Save to Memory'}
+                </button>
+              </div>
+            </form>
+
+            {/* Search and Category Filters */}
+            <div style={s.filterBar}>
+              <div style={s.filterChips}>
+                {[
+                  { key: 'ALL', label: `All (${memoriesList.length})` },
+                  { key: 'LEARNED_FACT', label: `💡 Learned (${memoriesList.filter(m => m.type === 'LEARNED_FACT').length})` },
+                  { key: 'TASK_ASSIGNED', label: `📋 Tasks (${memoriesList.filter(m => m.type === 'TASK_ASSIGNED').length})` },
+                  { key: 'TASK_REJECTED', label: `⚠️ Guarded (${memoriesList.filter(m => m.type === 'TASK_REJECTED').length})` }
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setMemoryFilter(tab.key)}
+                    style={{
+                      ...s.filterChip,
+                      ...(memoryFilter === tab.key ? s.filterChipActive : {})
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Search memories..."
+                value={memorySearchText}
+                onChange={(e) => setMemorySearchText(e.target.value)}
+                style={s.filterSearchInput}
+              />
+            </div>
+
+            {/* Memories Scrollable List */}
+            <div style={s.memoriesScrollList}>
+              {(() => {
+                const filtered = memoriesList.filter(m => {
+                  if (memoryFilter !== 'ALL' && m.type !== memoryFilter) return false;
+                  if (memorySearchText && memorySearchText.trim()) {
+                    const q = memorySearchText.toLowerCase();
+                    return (
+                      (m.summary && m.summary.toLowerCase().includes(q)) ||
+                      (m.target && m.target.toLowerCase().includes(q)) ||
+                      (m.type && m.type.toLowerCase().includes(q))
+                    );
+                  }
+                  return true;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div style={s.emptyMemoryState}>
+                      <div style={{ fontSize: '2.2rem', marginBottom: 8 }}>🧠</div>
+                      <div style={{ fontWeight: 700, color: '#1e293b' }}>No memories found</div>
+                      <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                        Teach the AI a new rule above or perform operational tasks to populate persistent memory.
+                      </div>
+                    </div>
+                  );
+                }
+
+                return filtered.map((m, idx) => {
+                  const isLearned = m.type === 'LEARNED_FACT';
+                  const isTask = m.type === 'TASK_ASSIGNED';
+                  const isRejected = m.type === 'TASK_REJECTED';
+                  const dateStr = new Date(m.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                  const timeStr = new Date(m.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                  return (
+                    <div key={m.id || idx} style={s.memoryItemCard}>
+                      <div style={s.memoryItemHeader}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{
+                            ...s.typeBadge,
+                            ...(isLearned ? s.typeBadgeLearned : (isTask ? s.typeBadgeTask : (isRejected ? s.typeBadgeRejected : s.typeBadgeSystem)))
+                          }}>
+                            {isLearned ? '💡 LEARNED FACT' : (isTask ? '📋 TASK ASSIGNED' : (isRejected ? '⚠️ GUARDED REJECTION' : '⚡ SYSTEM'))}
+                          </span>
+                          {m.target && (
+                            <span style={s.targetBadge}>
+                              Target: <strong>{m.target}</strong>
+                            </span>
+                          )}
+                          <span style={s.memoryTime}>{dateStr} {timeStr}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteMemoryItem(m.id)}
+                          style={s.deleteMemoryBtn}
+                          title="Delete memory entry"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                      <div style={s.memorySummaryText}>{m.summary}</div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={s.modalFooter}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={handleClearAllMemory}
+                  style={s.footerSecondaryBtn}
+                >
+                  Reset Memory
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMemoryModal(false);
+                    sendQuery("Show AI memory");
+                  }}
+                  style={s.footerQueryBtn}
+                >
+                  Recall in Chat
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMemoryModal(false)}
+                style={s.footerCloseBtn}
+              >
+                Close Space
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes apsai-page-dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
         #apsai-page-messages::-webkit-scrollbar { width: 6px }
@@ -1656,53 +2399,52 @@ const s = {
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    minHeight: '85%',
-    padding: '2rem 1.5rem',
+    padding: '1.25rem 1rem',
     boxSizing: 'border-box'
   },
   welcomeHeader: {
-    fontSize: '2.4rem',
+    fontSize: '1.85rem',
     fontWeight: 800,
-    margin: '0 0 0.8rem 0',
-    letterSpacing: '-0.8px',
-    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #4f46e5 100%)',
+    margin: '0 0 0.4rem 0',
+    letterSpacing: '-0.6px',
+    background: 'linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #4f46e5 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     fontFamily: 'Inter, -apple-system, sans-serif'
   },
   welcomeSub: {
-    fontSize: '0.94rem',
+    fontSize: '0.88rem',
     color: '#64748b',
-    maxWidth: '540px',
-    margin: '0 0 2.8rem 0',
-    lineHeight: 1.6
+    maxWidth: '560px',
+    margin: '0 0 1.5rem 0',
+    lineHeight: 1.5
   },
   landingGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '1.2rem',
+    gap: '0.85rem',
     width: '100%',
-    maxWidth: '680px',
+    maxWidth: '720px',
     boxSizing: 'border-box'
   },
   landingCard: {
     display: 'flex',
-    alignItems: 'flex-start',
-    gap: '14px',
+    alignItems: 'center',
+    gap: '12px',
     background: '#ffffff',
     border: '1px solid #e2e8f0',
-    borderRadius: '16px',
-    padding: '18px 20px',
+    borderRadius: '12px',
+    padding: '12px 16px',
     cursor: 'pointer',
     textAlign: 'left',
     boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
     boxSizing: 'border-box'
   },
   cardIcon: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 38,
     background: '#f8fafc',
-    borderRadius: '12px',
+    borderRadius: '10px',
     border: '1px solid #e2e8f0',
     display: 'flex',
     alignItems: 'center',
@@ -1712,26 +2454,28 @@ const s = {
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px'
+    gap: '2px'
   },
   cardTitle: {
-    fontSize: '0.9rem',
+    fontSize: '0.86rem',
     fontWeight: 700,
     color: '#0f172a'
   },
   cardDesc: {
-    fontSize: '0.76rem',
+    fontSize: '0.74rem',
     color: '#64748b',
-    lineHeight: 1.45
+    lineHeight: 1.35
   },
 
   pageWrapper: {
-    padding: '1.5rem 2rem 2rem',
+    padding: '1rem 1.5rem 1.25rem',
     fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-    height: 'calc(100vh - 72px)',
+    height: '100%',
+    maxHeight: 'calc(100vh - 62px)',
     display: 'flex',
     flexDirection: 'column',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    overflow: 'hidden'
   },
 
   // Header Banner
@@ -1740,11 +2484,11 @@ const s = {
     alignItems: 'center',
     justifyContent: 'space-between',
     background: '#fff',
-    padding: '1.2rem 1.6rem',
-    borderRadius: 16,
+    padding: '0.9rem 1.25rem',
+    borderRadius: 14,
     border: '1px solid #e2e8f0',
     boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-    marginBottom: '1.2rem',
+    marginBottom: '0.85rem',
     flexShrink: 0
   },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 14 },
@@ -1792,13 +2536,22 @@ const s = {
   mainGrid: {
     display: 'grid',
     gridTemplateColumns: '290px 1fr',
-    gap: '1.2rem',
+    gap: '1rem',
     flex: 1,
-    minHeight: 0
+    minHeight: 0,
+    overflow: 'hidden'
   },
 
   // Side Nav
-  sideNav: { display: 'flex', flexDirection: 'column' },
+  sideNav: {
+    display: 'flex',
+    flexDirection: 'column',
+    overflowY: 'auto',
+    maxHeight: '100%',
+    paddingRight: 4,
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none'
+  },
   sideCard: {
     background: '#fff',
     borderRadius: 16,
@@ -1836,53 +2589,93 @@ const s = {
     boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    height: '100%',
+    minHeight: 0
   },
   messagesArea: {
     flex: 1,
     overflowY: 'auto',
-    padding: '1.5rem',
-    background: '#f8fafc'
+    padding: '1.25rem 1.5rem',
+    background: '#f8fafc',
+    minHeight: 0
   },
 
   // Message Cards & Bubbles
   aiAvatarCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    background: '#2563eb',
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    background: '#0f172a',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   },
-  aiNameBadge: { fontSize: '0.76rem', fontWeight: 800, color: '#09090b' },
-  onlineBadge: { fontSize: '0.66rem', color: '#71717a', fontWeight: 600 },
+  aiNameBadge: { fontSize: '0.78rem', fontWeight: 700, color: '#0f172a' },
+  onlineBadge: { fontSize: '0.66rem', color: '#10b981', fontWeight: 600 },
 
   userBubble: {
-    maxWidth: '75%',
-    padding: '12px 16px',
-    borderRadius: '20px 20px 4px 20px',
-    background: '#2563eb',
-    color: '#fff',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+    maxWidth: '78%',
+    padding: '12px 18px',
+    borderRadius: '18px 18px 4px 18px',
+    background: '#0f172a',
+    color: '#ffffff',
+    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.12)'
   },
   botBubble: {
-    maxWidth: '88%',
-    padding: '14px 18px',
+    maxWidth: '92%',
+    padding: '16px 22px',
     borderRadius: '4px 20px 20px 20px',
     background: '#ffffff',
-    border: '1px solid #e4e4e7',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.02)'
   },
 
   dotsContainer: { display: 'flex', gap: 6, padding: '4px 0', alignItems: 'center' },
   dot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: '50%',
-    background: '#09090b',
+    background: '#0f172a',
     display: 'inline-block',
     animation: 'apsai-page-dot 1.2s infinite ease-in-out'
+  },
+
+  msgToolbar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 8,
+    borderTop: '1px solid #f1f5f9'
+  },
+  actionToolBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 5,
+    padding: '4px 10px',
+    borderRadius: 6,
+    border: '1px solid #e2e8f0',
+    background: '#f8fafc',
+    color: '#64748b',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.15s ease'
+  },
+  timeBadge: {
+    fontSize: '0.68rem',
+    color: '#94a3b8',
+    fontWeight: 500,
+    marginLeft: 'auto'
+  },
+  latencyBadge: {
+    fontSize: '0.66rem',
+    color: '#64748b',
+    background: '#f1f5f9',
+    padding: '2px 7px',
+    borderRadius: 4,
+    fontWeight: 600
   },
 
   // Suggestions row
@@ -1890,10 +2683,12 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
-    padding: '8px 1.5rem',
+    padding: '8px 1.25rem',
     background: '#fff',
     borderTop: '1px solid #f4f4f5',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none'
   },
   suggestLabel: { fontSize: '0.68rem', fontWeight: 700, color: '#71717a', textTransform: 'uppercase', whiteSpace: 'nowrap' },
   chipBtn: {
@@ -1910,22 +2705,23 @@ const s = {
 
   // Input wrapper
   inputWrapper: {
-    padding: '1rem 1.4rem',
-    borderTop: '1px solid #e4e4e7',
+    padding: '1rem 1.5rem',
+    borderTop: '1px solid #e2e8f0',
     background: '#fff'
   },
   inputField: {
     width: '100%',
-    padding: '10px 14px',
-    borderRadius: 12,
-    fontSize: '0.86rem',
-    color: '#09090b',
+    padding: '12px 16px',
+    borderRadius: 14,
+    fontSize: '0.88rem',
+    color: '#0f172a',
     outline: 'none',
     fontFamily: 'Inter, sans-serif',
     resize: 'none',
     boxSizing: 'border-box',
-    border: '1px solid #e4e4e7',
-    transition: 'border-color 0.15s, background-color 0.15s'
+    border: '1px solid #cbd5e1',
+    background: '#f8fafc',
+    transition: 'border-color 0.15s, background-color 0.15s, box-shadow 0.15s'
   },
   inputActions: {
     display: 'flex',
@@ -2207,5 +3003,350 @@ const s = {
     display: 'block',
     width: '100%',
     fontFamily: 'inherit'
+  },
+
+  // ── Persistent AI Memory Styles ──
+  memoryHeaderBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '7px 14px',
+    borderRadius: 10,
+    background: 'linear-gradient(135deg, #1e3a8a, #2563eb)',
+    border: 'none',
+    color: '#ffffff',
+    fontSize: '0.78rem',
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
+    transition: 'all 0.15s'
+  },
+  memoryBadgeCount: {
+    padding: '2px 7px',
+    borderRadius: 12,
+    background: 'rgba(255,255,255,0.25)',
+    color: '#ffffff',
+    fontSize: '0.7rem',
+    fontWeight: 800
+  },
+  modalBackdrop: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(15, 23, 42, 0.65)',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 99999,
+    padding: '1.5rem',
+    boxSizing: 'border-box'
+  },
+  modalContainer: {
+    background: '#ffffff',
+    borderRadius: 20,
+    width: '100%',
+    maxWidth: '760px',
+    maxHeight: '88vh',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+    overflow: 'hidden'
+  },
+  modalHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '1.2rem 1.6rem',
+    borderBottom: '1px solid #e2e8f0',
+    background: '#f8fafc'
+  },
+  modalBrainIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.35rem',
+    color: '#fff',
+    boxShadow: '0 4px 10px rgba(37,99,235,0.25)'
+  },
+  modalTitle: {
+    margin: 0,
+    fontSize: '1.08rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  modalSubtitle: {
+    fontSize: '0.74rem',
+    color: '#64748b',
+    marginTop: 2
+  },
+  modalCloseBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.1rem',
+    color: '#94a3b8',
+    cursor: 'pointer',
+    padding: 6,
+    borderRadius: 8,
+    transition: 'color 0.15s'
+  },
+  memoryStatsRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: 10,
+    padding: '1rem 1.6rem 0.6rem',
+    background: '#ffffff'
+  },
+  memoryStatCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '10px 12px',
+    borderRadius: 12,
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0'
+  },
+  memoryStatVal: {
+    fontSize: '1rem',
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+  memoryStatLbl: {
+    fontSize: '0.66rem',
+    fontWeight: 600,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: '0.3px'
+  },
+  teachForm: {
+    padding: '0.8rem 1.6rem',
+    background: '#f8fafc',
+    borderTop: '1px solid #e2e8f0',
+    borderBottom: '1px solid #e2e8f0'
+  },
+  teachFormTitle: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: '#334155',
+    marginBottom: 8,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  },
+  alertSuccess: {
+    padding: '7px 12px',
+    borderRadius: 8,
+    background: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    color: '#065f46',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    marginBottom: 8
+  },
+  alertError: {
+    padding: '7px 12px',
+    borderRadius: 8,
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
+    color: '#991b1b',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    marginBottom: 8
+  },
+  teachInputsRow: {
+    display: 'flex',
+    gap: 8,
+    alignItems: 'center'
+  },
+  teachInputFact: {
+    flex: 2,
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.78rem',
+    outline: 'none',
+    boxSizing: 'border-box'
+  },
+  teachInputTarget: {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: 8,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.78rem',
+    outline: 'none',
+    boxSizing: 'border-box'
+  },
+  teachSubmitBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    fontSize: '0.76rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap'
+  },
+  filterBar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0.8rem 1.6rem 0.4rem',
+    gap: 12
+  },
+  filterChips: {
+    display: 'flex',
+    gap: 6,
+    flexWrap: 'wrap'
+  },
+  filterChip: {
+    padding: '5px 10px',
+    borderRadius: 20,
+    background: '#f1f5f9',
+    border: '1px solid #e2e8f0',
+    color: '#64748b',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    cursor: 'pointer'
+  },
+  filterChipActive: {
+    background: '#2563eb',
+    borderColor: '#2563eb',
+    color: '#ffffff'
+  },
+  filterSearchInput: {
+    padding: '6px 12px',
+    borderRadius: 20,
+    border: '1px solid #cbd5e1',
+    fontSize: '0.72rem',
+    outline: 'none',
+    width: '180px'
+  },
+  memoriesScrollList: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '0.6rem 1.6rem 1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    minHeight: '220px'
+  },
+  memoryItemCard: {
+    padding: '10px 14px',
+    borderRadius: 10,
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4
+  },
+  memoryItemHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  typeBadge: {
+    fontSize: '0.64rem',
+    fontWeight: 800,
+    letterSpacing: '0.3px',
+    padding: '3px 8px',
+    borderRadius: 6
+  },
+  typeBadgeLearned: {
+    background: '#ecfdf5',
+    color: '#065f46',
+    border: '1px solid #a7f3d0'
+  },
+  typeBadgeTask: {
+    background: '#eff6ff',
+    color: '#1e40af',
+    border: '1px solid #bfdbfe'
+  },
+  typeBadgeRejected: {
+    background: '#fef2f2',
+    color: '#991b1b',
+    border: '1px solid #fecaca'
+  },
+  typeBadgeSystem: {
+    background: '#f5f3ff',
+    color: '#6b21a8',
+    border: '1px solid #ddd6fe'
+  },
+  targetBadge: {
+    fontSize: '0.68rem',
+    color: '#475569',
+    background: '#f1f5f9',
+    padding: '2px 6px',
+    borderRadius: 4
+  },
+  memoryTime: {
+    fontSize: '0.68rem',
+    color: '#94a3b8'
+  },
+  deleteMemoryBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    opacity: 0.6,
+    fontSize: '0.78rem',
+    padding: '2px 4px'
+  },
+  memorySummaryText: {
+    fontSize: '0.8rem',
+    color: '#1e293b',
+    lineHeight: 1.45,
+    marginTop: 2
+  },
+  emptyMemoryState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '3rem 1rem',
+    textAlign: 'center'
+  },
+  modalFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '1rem 1.6rem',
+    borderTop: '1px solid #e2e8f0',
+    background: '#f8fafc'
+  },
+  footerSecondaryBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#fee2e2',
+    color: '#991b1b',
+    border: 'none',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
+  },
+  footerQueryBtn: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    background: '#eff6ff',
+    color: '#1d4ed8',
+    border: '1px solid #bfdbfe',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
+  },
+  footerCloseBtn: {
+    padding: '8px 16px',
+    borderRadius: 8,
+    background: '#0f172a',
+    color: '#ffffff',
+    border: 'none',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    cursor: 'pointer'
   }
 };

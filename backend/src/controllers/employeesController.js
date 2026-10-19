@@ -4,6 +4,7 @@ const { Employee, ActivityLog, Lead, User } = require('../models');
 const { isDbConnected, sequelize } = require('../config/db');
 const { withDb, isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const store = require('../config/inMemoryStore');
+const { canAccessEmployeePerformance, getEmployeeId } = require('../middleware/rbacMiddleware');
 
 const EMPLOYEES_FILE = path.join(__dirname, '../../employees_data.json');
 const USERS_FILE = path.join(__dirname, '../../users_data.json');
@@ -104,10 +105,19 @@ const getEmployees = async (req, res, next) => {
   }
 };
 
-// GET /api/employees/:id/performance — Detailed profile per employee (A4 Module)
+// GET /api/employees/:id/performance — Detailed profile per employee with BOLA check
 const getEmployeePerformance = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    // BOLA Check: employees can only view their own performance metrics
+    if (!canAccessEmployeePerformance(req.user, id)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        code: 'FORBIDDEN',
+        message: 'Access denied: You can only view your own performance metrics and assigned deals.'
+      });
+    }
 
     const data = await withDb(
       async () => {
@@ -339,10 +349,19 @@ const createEmployee = async (req, res, next) => {
   }
 };
 
-// POST /api/employees/:id/complete-task — Mark current task complete
+// POST /api/employees/:id/complete-task — Mark current task complete with BOLA check
 const completeTask = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    // BOLA Check: employees can only complete their own assigned tasks
+    if (!canAccessEmployeePerformance(req.user, id)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        code: 'FORBIDDEN',
+        message: 'Access denied: You can only complete your own assigned tasks.'
+      });
+    }
 
     const result = await withDb(
       async () => {
@@ -510,15 +529,33 @@ const assignTask = async (req, res, next) => {
   }
 };
 
-// GET /api/activity — Audit log
+// GET /api/activity — Audit log with horizontal isolation
 const getActivityLogs = async (req, res, next) => {
   try {
+    const user = req.user;
+    const isEmployee = user && user.role === 'employee' && !['admin', 'manager', 'accountant'].includes((user.role || '').toLowerCase());
+    const empId = getEmployeeId(user);
+
     const logs = await withDb(
       async () => {
-        return await ActivityLog.findAll({ order: [['createdAt', 'DESC']], limit: 100 });
+        const queryOptions = { order: [['createdAt', 'DESC']], limit: 100 };
+        if (isEmployee) {
+          const { Op } = require('sequelize');
+          queryOptions.where = {
+            [Op.or]: [
+              { employeeId: empId },
+              { employeeId: user.id }
+            ]
+          };
+        }
+        return await ActivityLog.findAll(queryOptions);
       },
       () => {
-        return store.mockActivityLogs || [];
+        const allLogs = store.mockActivityLogs || [];
+        if (isEmployee) {
+          return allLogs.filter(l => l.employeeId === empId || l.employeeId === user.id);
+        }
+        return allLogs;
       }
     );
 

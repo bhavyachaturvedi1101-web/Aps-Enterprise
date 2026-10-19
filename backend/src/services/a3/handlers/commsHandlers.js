@@ -10,7 +10,7 @@ function getStore() {
 
 async function handleVoiceDialerOptions() {
   return {
-    text: `### 📞 Voice Dialer Controls\nSelect voice calling operation:`,
+    text: `### Voice Dialer Controls\nSelect voice calling operation:`,
     options: [
       'Trigger automated outbound dialer queue',
       'Review latest voice call transcripts & sentiment',

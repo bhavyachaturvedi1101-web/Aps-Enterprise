@@ -33,6 +33,13 @@ function resolveReadPath(filePath) {
   if (fs.existsSync(serverlessPath)) {
     return serverlessPath;
   }
+  if (fs.existsSync(filePath)) {
+    return filePath;
+  }
+  const seedPath = path.join(__dirname, '../../seeds', filename);
+  if (fs.existsSync(seedPath)) {
+    return seedPath;
+  }
   return filePath;
 }
 

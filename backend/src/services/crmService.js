@@ -1,5 +1,6 @@
 // Teleforce CRM Integration Service for APS Enterprise
 const axios = require('axios');
+const { maskName, maskPhone } = require('../utils/privacyMasker');
 
 class CRMService {
   constructor() {
@@ -17,7 +18,7 @@ class CRMService {
     }
 
     try {
-      console.log(`[Teleforce CRM] Creating lead "${leadData.name}" (${leadData.phone}) in Teleforce CRM...`);
+      console.log(`[Teleforce CRM] Creating lead "${maskName(leadData.name)}" (${maskPhone(leadData.phone)}) in Teleforce CRM...`);
 
       const payload = {
         name: leadData.name,
@@ -40,7 +41,7 @@ class CRMService {
         timeout: 8000
       });
 
-      console.log(`[Teleforce CRM] Lead "${leadData.name}" synced successfully. Response:`, response.status);
+      console.log(`[Teleforce CRM] Lead "${maskName(leadData.name)}" synced successfully. Response:`, response.status);
       return { success: true, syncedAt: new Date(), data: response.data };
     } catch (err) {
       console.warn(`[Teleforce CRM Warning] Failed to push to Teleforce (${err.message}). Local record retained.`);

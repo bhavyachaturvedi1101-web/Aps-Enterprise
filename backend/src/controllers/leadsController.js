@@ -2,19 +2,37 @@ const { Lead, ActivityLog } = require('../models');
 const { isValidTransition, executeTransition } = require('../stateMachine/leadStateMachine');
 const { withDb, isStrictDbMode } = require('../utils/dbPolicy');
 const crmService = require('../services/crmService');
+const { getEmployeeId, isPrivileged, canAccessLead, canModifyLead } = require('../middleware/rbacMiddleware');
+const { Op } = require('sequelize');
 
-// GET /api/leads — List all leads
+// GET /api/leads — List leads with horizontal tenant/employee isolation
 const getLeads = async (req, res, next) => {
   try {
+    const user = req.user;
+    const isEmployee = user && user.role === 'employee' && !isPrivileged(user);
+    const empId = getEmployeeId(user);
+
     const leads = await withDb(
       async () => {
-        return await Lead.findAll({
-          order: [['createdAt', 'DESC']]
-        });
+        const queryOptions = { order: [['createdAt', 'DESC']] };
+        if (isEmployee) {
+          queryOptions.where = {
+            [Op.or]: [
+              { assignedEmployeeId: empId },
+              { assignedEmployeeId: user.id },
+              { assignedEmployeeId: null }
+            ]
+          };
+        }
+        return await Lead.findAll(queryOptions);
       },
       () => {
         const { mockLeads } = require('../config/inMemoryStore');
-        return mockLeads || [];
+        const list = mockLeads || [];
+        if (isEmployee) {
+          return list.filter(l => canAccessLead(user, l));
+        }
+        return list;
       }
     );
     res.json({ leads });
@@ -23,7 +41,7 @@ const getLeads = async (req, res, next) => {
   }
 };
 
-// GET /api/leads/:id — Get single lead details
+// GET /api/leads/:id — Get single lead details with BOLA validation
 const getLeadById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -45,6 +63,16 @@ const getLeadById = async (req, res, next) => {
     );
 
     if (!lead) return res.status(404).json({ error: 'Lead not found', code: 'RESOURCE_NOT_FOUND' });
+
+    // BOLA Horizontal Access Control Check
+    if (!canAccessLead(req.user, lead)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        code: 'FORBIDDEN',
+        message: 'Access denied: You do not have permission to view leads assigned to other operators.'
+      });
+    }
+
     res.json({ lead });
   } catch (error) {
     next(error);
@@ -135,11 +163,37 @@ const createLead = async (req, res, next) => {
   }
 };
 
-// PUT /api/leads/:id — Update existing lead
+// PUT /api/leads/:id — Update existing lead with BOLA check
 const updateLead = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, phone, company, interest, budget, notes, source, stage, priority } = req.body;
+
+    // Step 1: Pre-fetch lead for BOLA authorization
+    const existing = await withDb(
+      async () => {
+        let found = await Lead.findByPk(id);
+        if (!found) found = await Lead.findByPk(`LEAD-${id.padStart(3, '0')}`);
+        return found;
+      },
+      () => {
+        const { mockLeads } = require('../config/inMemoryStore');
+        if (!mockLeads) return null;
+        const cleanId = String(id).replace(/^LEAD-/, '').padStart(3, '0');
+        return mockLeads.find(l => l.id === id || l.id === `LEAD-${cleanId}` || String(l.id).endsWith(String(id))) || null;
+      }
+    );
+
+    if (!existing) return res.status(404).json({ error: 'Lead not found' });
+
+    // BOLA check: only assigned operator, accountant or admin/manager can modify
+    if (!canModifyLead(req.user, existing)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        code: 'FORBIDDEN',
+        message: 'Access denied: You can only modify leads assigned to you.'
+      });
+    }
 
     const lead = await withDb(
       async () => {
@@ -180,7 +234,6 @@ const updateLead = async (req, res, next) => {
       }
     );
 
-    if (!lead) return res.status(404).json({ error: 'Lead not found' });
     res.json({ success: true, lead });
   } catch (error) {
     next(error);
@@ -248,6 +301,15 @@ const transitionLead = async (req, res, next) => {
     );
 
     if (!lead) return res.status(404).json({ error: 'Lead not found', code: 'RESOURCE_NOT_FOUND' });
+
+    // BOLA check: ensure employee has authority to transition this specific lead
+    if (!canModifyLead(req.user, lead)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        code: 'FORBIDDEN',
+        message: 'Access denied: You can only transition leads assigned to you.'
+      });
+    }
 
     // Step 2: Validate state machine transition rules
     if (!isValidTransition(lead.stage, toStage)) {

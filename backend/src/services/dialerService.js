@@ -6,6 +6,7 @@ const { mockLeads } = require('../config/inMemoryStore');
 const { isDbConnected } = require('../config/db');
 const { isStrictDbMode, DatabaseUnavailableError } = require('../utils/dbPolicy');
 const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+const { maskName, maskPhone } = require('../utils/privacyMasker');
 
 const DIALER_QUEUE_FILE = path.join(__dirname, '../../dialer_queue.json');
 
@@ -172,7 +173,7 @@ class DialerService {
     if (DIALER_PROVIDER === 'teleforce' && TELEFORCE_URL) {
       try {
         const axios = require('axios');
-        console.log(`[Teleforce Dialer] Initiating outbound call to ${call.name} (${call.phone}) via Caller ID ${TELEFORCE_CALLER_ID}...`);
+        console.log(`[Teleforce Dialer] Initiating outbound call to ${maskName(call.name)} (${maskPhone(call.phone)}) via Caller ID ${TELEFORCE_CALLER_ID}...`);
         const resp = await axios.post(`${TELEFORCE_URL}/call`, {
           account_sid: TELEFORCE_SID,
           caller_id: TELEFORCE_CALLER_ID,
@@ -202,12 +203,12 @@ class DialerService {
             twiml: `<Response><Say voice="alice" language="en-IN">Hello ${call.name}, this is APS Enterprises calling regarding your inquiry for ${call.product}. Please hold while we connect you to our sales team.</Say><Pause length="2"/><Say voice="alice">Thank you for your interest. Our team will follow up shortly.</Say></Response>`
           });
           call.callSid = twilioCall.sid;
-          console.log(`[Dialer] Twilio call initiated: ${twilioCall.sid} → ${call.phone}`);
+          console.log(`[Dialer] Twilio call initiated: ${twilioCall.sid} → ${maskPhone(call.phone)}`);
         } catch (err) {
           console.warn('[Dialer] Twilio call failed:', err.message);
         }
       } else {
-        console.log(`[Dialer] Operating call to ${call.name} (${call.phone})`);
+        console.log(`[Dialer] Operating call to ${maskName(call.name)} (${maskPhone(call.phone)})`);
         call.callSid = `CALL-${Date.now()}`;
       }
     }

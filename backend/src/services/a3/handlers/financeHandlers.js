@@ -10,7 +10,7 @@ function getStore() {
 
 async function handleInvoicesOptions() {
   return {
-    text: `### 🧾 Financial Billing Controls\nSelect invoicing operation:`,
+    text: `### Financial Billing Controls\nSelect invoicing operation:`,
     options: [
       'Generate GST tax invoice for lead deposit',
       'Review pending 10% payment vouchers in Tally',

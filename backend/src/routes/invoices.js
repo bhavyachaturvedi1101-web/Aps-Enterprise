@@ -4,8 +4,8 @@ const ctrl = require('../controllers/invoiceController');
 const { validateBody, createInvoiceSchema } = require('../middleware/validate');
 const { authorize } = require('../middleware/rbacMiddleware');
 
-// GET  /api/invoices          — list all invoices
-router.get('/', ctrl.getInvoices);
+// GET  /api/invoices          — list all invoices (Admin, Manager & Accountant only)
+router.get('/', authorize(['admin', 'manager', 'accountant']), ctrl.getInvoices);
 
 // POST /api/invoices          — create new invoice
 router.post('/', authorize(['admin', 'manager', 'accountant']), validateBody(createInvoiceSchema), ctrl.createInvoice);
@@ -13,8 +13,8 @@ router.post('/', authorize(['admin', 'manager', 'accountant']), validateBody(cre
 // PATCH /api/invoices/:id/status — update status (Draft/Sent/Paid/Overdue)
 router.patch('/:id/status', authorize(['admin', 'manager', 'accountant']), ctrl.updateStatus);
 
-// GET /api/invoices/:id/pdf   — stream real GST PDF
-router.get('/:id/pdf', ctrl.downloadPdf);
+// GET /api/invoices/:id/pdf   — stream real GST PDF (Admin, Manager & Accountant only)
+router.get('/:id/pdf', authorize(['admin', 'manager', 'accountant']), ctrl.downloadPdf);
 
 // POST /api/invoices/:id/dispatch — dispatch PDF via WhatsApp
 router.post('/:id/dispatch', authorize(['admin', 'manager', 'accountant']), ctrl.dispatchWhatsApp);

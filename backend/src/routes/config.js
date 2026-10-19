@@ -20,8 +20,8 @@ function saveToDisk(data) {
   safeWriteJson(SETTINGS_FILE, data);
 }
 
-// GET /api/config — Get system configuration & business rules
-router.get('/', (req, res) => {
+// GET /api/config — Get system configuration & business rules (Admin & Manager only)
+router.get('/', authorize(['admin', 'manager']), (req, res) => {
   let diskData = {};
   try {
     if (fs.existsSync(SETTINGS_FILE)) {

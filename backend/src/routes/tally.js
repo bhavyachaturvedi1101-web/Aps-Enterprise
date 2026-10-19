@@ -3,8 +3,8 @@ const router = express.Router();
 const tallyService = require('../services/tallyService');
 const { authorize } = require('../middleware/rbacMiddleware');
 
-// GET /api/tally/status — ping Tally server health
-router.get('/status', async (req, res) => {
+// GET /api/tally/status — ping Tally server health (Admin, Manager & Accountant only)
+router.get('/status', authorize(['admin', 'manager', 'accountant']), async (req, res) => {
   try {
     const status = await tallyService.getStatus();
     res.json(status);
@@ -13,8 +13,8 @@ router.get('/status', async (req, res) => {
   }
 });
 
-// GET /api/tally/vouchers — fetch vouchers (Tally or cached)
-router.get('/vouchers', async (req, res) => {
+// GET /api/tally/vouchers — fetch vouchers (Admin, Manager & Accountant only)
+router.get('/vouchers', authorize(['admin', 'manager', 'accountant']), async (req, res) => {
   try {
     const { from, to } = req.query;
     const vouchers = await tallyService.fetchVouchers(from, to);

@@ -94,23 +94,5 @@
     "module": "Voice AI & CRM Dialer",
     "lastLogin": "Active",
     "status": "Online"
-  },
-  {
-    "id": "u5",
-    "name": "Amit Patidar",
-    "email": "amit.patidar@apsenterprises.in",
-    "role": "Employee",
-    "module": "CRM & Client Visits",
-    "lastLogin": "Active",
-    "status": "Online"
-  },
-  {
-    "id": "u6",
-    "name": "Vikram Rathore",
-    "email": "vikram.rathore@apsenterprises.in",
-    "role": "Operations",
-    "module": "Production ERP & Job Cards",
-    "lastLogin": "Active",
-    "status": "Online"
   }
 ]

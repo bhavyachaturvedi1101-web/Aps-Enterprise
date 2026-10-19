@@ -17,17 +17,23 @@ logs/
 *.log
 npm-debug.log*
 
-# Database & SQLite
+# Database & SQLite & Runtime Data Stores (PII Protection)
 *.sqlite
 *.sqlite3
 *.db
 *.dump
+*_data.json
+dialer_queue.json
+!seeds/
+!seeds/**
 
 # Temporary / Uploads
 uploads/
 temp/
 tmp/
 coverage/
+*.tmp
+.*.tmp
 
 # OS / Editor
 .DS_Store

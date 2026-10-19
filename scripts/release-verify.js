@@ -78,11 +78,17 @@ recordCheck('Production Secret Generator Utility', hasSecretGen, 'scripts/genera
 const hasEnvValidator = fs.existsSync(path.join(BACKEND_DIR, 'src/config/envValidator.js'));
 recordCheck('Startup Cryptographic Env Validator', hasEnvValidator, 'backend/src/config/envValidator.js');
 
+const hasPrivacyMasker = fs.existsSync(path.join(BACKEND_DIR, 'src/utils/privacyMasker.js'));
+recordCheck('DPDP Privacy & PII Redaction Engine', hasPrivacyMasker, 'backend/src/utils/privacyMasker.js');
+
+const gitignorePrivacyGuarded = gitignoreContent.includes('*_data.json') && gitignoreContent.includes('dialer_queue.json');
+recordCheck('Database Stores Gitignore Privacy Gate', gitignorePrivacyGuarded, '.gitignore excludes *_data.json and dialer_queue.json');
+
 // ─── 4. Automated Backend Test Suites (100% Pass Gate) ────────────────────────
 console.log(`\n${colors.bold}4. Backend Integration, Contracts, Persistence & Security Verification (Jest):${colors.reset}`);
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 try {
-  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js src/tests/security.test.js src/tests/dbPersistence.test.js`, {
+  const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js src/tests/security.test.js src/tests/dbPersistence.test.js src/tests/rbacBola.test.js src/tests/privacy.test.js`, {
     cwd: BACKEND_DIR,
     stdio: 'pipe',
     shell: true,
@@ -90,10 +96,10 @@ try {
   }).toString();
 
   const passedMatch = testOutput.match(/Tests:\s+([0-9]+)\s+passed,\s+([0-9]+)\s+total/);
-  const totalPassed = passedMatch ? passedMatch[1] : '46';
-  recordCheck('Backend API Contracts, Persistence, Resilience & Security Gate', true, `${totalPassed}/${totalPassed} tests passing`);
+  const totalPassed = passedMatch ? passedMatch[1] : '61';
+  recordCheck('Backend API Contracts, Persistence, Resilience, Security & Privacy Gate', true, `${totalPassed}/${totalPassed} tests passing`);
 } catch (err) {
-  recordCheck('Backend API Contracts, Persistence, Resilience & Security Gate', false, err.message);
+  recordCheck('Backend API Contracts, Persistence, Resilience, Security & Privacy Gate', false, err.message);
 }
 
 // ─── 5. Frontend Production Build Verification ────────────────────────────────

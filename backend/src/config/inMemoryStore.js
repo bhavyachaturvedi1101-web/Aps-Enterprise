@@ -7,6 +7,10 @@ function loadJsonSafe(filename, fallback) {
     if (fs.existsSync(filePath)) {
       return JSON.parse(fs.readFileSync(filePath, 'utf8'));
     }
+    const seedPath = path.join(__dirname, '../../seeds', filename);
+    if (fs.existsSync(seedPath)) {
+      return JSON.parse(fs.readFileSync(seedPath, 'utf8'));
+    }
   } catch (e) {
     console.warn(`[inMemoryStore] Failed to load ${filename}:`, e.message);
   }

@@ -73,13 +73,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# 5. Database & Local Storage
+# 5. Database & Local Storage (PII & Runtime Protection)
 *.sqlite
 *.sqlite3
 *.db
 *.sql.gz
 *.dump
 dump.rdb
+*_data.json
+dialer_queue.json
+backend/*_data.json
+backend/dialer_queue.json
+backend/.*.tmp
+*.tmp
+!backend/seeds/
+!backend/seeds/**
 
 # 6. Uploads & Temporary Directories
 temp/

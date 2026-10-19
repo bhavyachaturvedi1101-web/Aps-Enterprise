@@ -14,9 +14,24 @@ router.post('/outcome', authorize(['admin', 'manager', 'employee']), async (req,
   }
 });
 
-// GET /api/calls — Fetch all voice call logs
-router.get('/', async (req, res) => {
+// GET /api/calls — Fetch voice call logs (Admin, Manager & Employee)
+router.get('/', authorize(['admin', 'manager', 'employee']), async (req, res) => {
   const calls = await callsService.getCalls();
+  const user = req.user;
+  const isEmployee = user && user.role === 'employee' && !['admin', 'manager'].includes((user.role || '').toLowerCase());
+  const empId = user ? (user.employeeId || user.id) : null;
+
+  if (isEmployee) {
+    const userCalls = (calls || []).filter(c =>
+      !c.agent ||
+      !c.employeeId ||
+      c.agent === user.name ||
+      c.employeeId === empId ||
+      c.employeeId === user.id
+    );
+    return res.json({ calls: userCalls });
+  }
+
   res.json({ calls });
 });
 

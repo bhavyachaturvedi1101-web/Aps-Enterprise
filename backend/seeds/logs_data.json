@@ -98,55 +98,5 @@
     "fromStage": "In Production",
     "toStage": "In Production",
     "createdAt": "2026-10-13T15:00:00.000Z"
-  },
-  {
-    "id": "log-111",
-    "leadId": "LEAD-011",
-    "employeeId": "e4",
-    "employeeName": "Sales Telecaller",
-    "action": "Deal locked with Mahesh Sharma (Dewas) for Double Die Dona Pattal Machine (₹1,25,000).",
-    "fromStage": "Quoted",
-    "toStage": "Booked",
-    "createdAt": "2026-10-12T16:00:00.000Z"
-  },
-  {
-    "id": "log-112",
-    "leadId": "LEAD-017",
-    "employeeId": "e2",
-    "employeeName": "Operations Manager",
-    "action": "Job Card JC-0993 milestone 'CNC Assembly' completed by Assembly Floor B for Dinesh Prajapat.",
-    "fromStage": "In Production",
-    "toStage": "In Production",
-    "createdAt": "2026-10-12T11:45:00.000Z"
-  },
-  {
-    "id": "log-113",
-    "leadId": "LEAD-003",
-    "employeeId": "e1",
-    "employeeName": "Super Admin",
-    "action": "High-value enquiry assigned from Google Ads: Amit Verma interested in 100 BPM Paper Cup Machine.",
-    "fromStage": "None",
-    "toStage": "Enquiry",
-    "createdAt": "2026-10-11T11:00:00.000Z"
-  },
-  {
-    "id": "log-114",
-    "leadId": "LEAD-019",
-    "employeeId": "e2",
-    "employeeName": "Operations Manager",
-    "action": "Semi-Automatic Heavy Paper Cutter Machine delivered and commissioned at Rathore Machinery (Gwalior).",
-    "fromStage": "In Production",
-    "toStage": "Dispatched",
-    "createdAt": "2026-10-10T14:30:00.000Z"
-  },
-  {
-    "id": "log-115",
-    "leadId": "LEAD-013",
-    "employeeId": "e1",
-    "employeeName": "Super Admin",
-    "action": "Proforma invoice generated for Gaurav Singhania (Singhania Agro, Raipur). Total deal: ₹7,50,000.",
-    "fromStage": "Booked",
-    "toStage": "Confirmed Lead",
-    "createdAt": "2026-10-10T12:00:00.000Z"
   }
 ]
