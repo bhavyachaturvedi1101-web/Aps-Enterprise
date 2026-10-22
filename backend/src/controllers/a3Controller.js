@@ -134,7 +134,7 @@ async function exportFile(req, res) {
     let leads = [];
     try {
       const leadsData = await Lead.findAll();
-      leads = leadsData.map(l => l.toJSON());
+      leads = leadsData.map(l => (l.toJSON ? l.toJSON() : l));
     } catch {
       const { mockLeads } = require('../config/inMemoryStore');
       leads = mockLeads || [];

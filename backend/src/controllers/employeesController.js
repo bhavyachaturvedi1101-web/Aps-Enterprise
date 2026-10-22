@@ -158,7 +158,6 @@ const getEmployeePerformance = async (req, res) => {
     } catch {
       employeeLogs = (store.mockActivityLogs || []).filter(l => l.employeeId === id);
     }
-
     const totalAssignedBudget = assignedLeads.reduce((sum, l) => sum + (parseFloat(l.budget) || 0), 0);
 
     return res.json({
@@ -439,7 +438,7 @@ const getActivityLogs = async (req, res) => {
     } catch {
       logs = store.mockActivityLogs || [];
     }
-    return res.json({ 
+    return res.json({
       activityLogs: logs,
       totalLogs: logs.length
     });
