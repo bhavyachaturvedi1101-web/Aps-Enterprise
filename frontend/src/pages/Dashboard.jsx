@@ -433,19 +433,7 @@ export default function Dashboard() {
     return showAllInventory ? filteredInventory : filteredInventory.slice(0, 6);
   }, [isScrollMode, filteredInventory, showAllInventory]);
 
-  const fileInputRef = useRef(null);
-  const imageInputRef = useRef(null);
-  const [activeFilters, setActiveFilters] = useState(['Last Month', 'All Campaigns', 'Global']);
-  const [filterModalOpen, setFilterModalOpen] = useState(false);
-  const [selDate, setSelDate] = useState('Last Month');
-  const [selCampaign, setSelCampaign] = useState('All Campaigns');
-  const [selGeo, setSelGeo] = useState('Global');
-  const [isListening, setIsListening] = useState(false);
-
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState([
-    { id: 1, text: 'How Can I Assist You Today', sender: 'ai', isHeader: true }
-  ]);
 
   // Fetch leads, activities, and inventory summary
   useEffect(() => {
@@ -483,128 +471,6 @@ export default function Dashboard() {
     fetchData();
   }, [activeTab]);
 
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    const userMsg = { id: Date.now(), text: chatInput, sender: 'user' };
-    setChatMessages(prev => [...prev, userMsg]);
-    const currentInput = chatInput;
-    setChatInput('');
-
-    try {
-      const res = await fetch(`${API}/chat/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: currentInput })
-      });
-      const data = await res.json();
-      if (data && data.answer) {
-        setChatMessages(prev => [
-          ...prev,
-          {
-            id: Date.now() + 1,
-            text: data.answer,
-            sender: 'ai',
-            chartData: data.chartData,
-            actionSuggestions: data.actionSuggestions
-          }
-        ]);
-        return;
-      }
-    } catch (err) {
-      console.error('Error contacting APS AI backend:', err);
-    }
-
-    // Smart fallback response
-    const input = currentInput.toLowerCase().trim();
-    let reply = "";
-    if (['hi', 'hello', 'hiii', 'hey', 'hii', 'greetings'].some(w => input.startsWith(w) || input === w)) {
-      reply = `Hello! I am your APS Enterprise AI Assistant. Currently, you have ${leads.length} active leads across 7 pipeline stages. How can I help you manage operations today?`;
-    } else if (input.includes('payment') || input.includes('tally') || input.includes('gate') || input.includes('advance')) {
-      const pendingVerify = leads.filter(l => l.stage === 'Confirmed Lead');
-      if (pendingVerify.length > 0) {
-        reply = `Tally Gate Alert: ${pendingVerify.length} lead(s) require 10% advance verification: ${pendingVerify.map(l => `${l.name} (₹${parseFloat(l.budget).toLocaleString('en-IN')})`).join(', ')}. Recommend verifying via the Payment Gate.`;
-      } else {
-        reply = "All payment gates are verified. 0 leads pending Tally 10% advance verification.";
-      }
-    } else if (input.includes('lead') || input.includes('pipeline') || input.includes('stage')) {
-      const stageCounts = PIPELINE_STAGES.reduce((acc, stage) => {
-        acc[stage.key] = leads.filter(l => l.stage === stage.key).length;
-        return acc;
-      }, {});
-      reply = `Pipeline Summary (${leads.length} Total Leads):\n` +
-        PIPELINE_STAGES.map(s => `• ${s.title}: ${stageCounts[s.key] || 0}`).join('\n');
-    } else if (input.includes('crm')) {
-      reply = `CRM Connector is active. All ${leads.length} leads are synchronized in real-time with state machine enforcement.`;
-    } else if (input.includes('erp') || input.includes('factory') || input.includes('order')) {
-      const booked = leads.filter(l => ['Booked', 'Confirmed Lead', 'Client (Paid)', 'In Production', 'Dispatched'].includes(l.stage)).length;
-      const inProd = leads.filter(l => l.stage === 'In Production').length;
-      reply = `ERP Layer Status: ${booked} bookings created, ${inProd} released to manufacturing floor.`;
-    } else if (input.includes('dialer') || input.includes('call') || input.includes('voice')) {
-      reply = "AI Voice Agent & Dialer: 7 callbacks queued for today. Average call conversion rate is 42%.";
-    } else if (input.includes('employee') || input.includes('team') || input.includes('kpi')) {
-      reply = "Team KPIs: 5 active operators. Bhavya leading at 98% KPI score.";
-    } else {
-      reply = `I have analyzed your query "${currentInput}". The APS Operating System is fully synchronized with ${leads.length} active leads. You can check CRM pipeline, ERP bookings, or Tally payment gates anytime.`;
-    }
-
-
-    setChatMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'ai' }]);
-  };
-
-  const handleFileAttachClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleImageAttachClick = () => {
-    imageInputRef.current?.click();
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setChatMessages(prev => [
-      ...prev,
-      { id: Date.now(), text: `Attached file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, sender: 'user' },
-      { id: Date.now() + 1, text: `Received file "${file.name}". Processing attachment with APS Document AI...`, sender: 'ai' }
-    ]);
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setChatMessages(prev => [
-      ...prev,
-      { id: Date.now(), text: `Attached image: ${file.name}`, sender: 'user' },
-      { id: Date.now() + 1, text: `Analyzing image "${file.name}" for equipment specifications and invoice data...`, sender: 'ai' }
-    ]);
-  };
-
-  const handleClearChat = () => {
-    setChatMessages([{ id: Date.now(), text: 'Chat history cleared. How can I assist you today?', sender: 'ai', isHeader: true }]);
-  };
-
-  const handleVoiceToggle = () => {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      setChatInput('Show me all confirmed leads pending Tally payment verification');
-      setIsListening(true);
-      setTimeout(() => setIsListening(false), 2000);
-      return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    setIsListening(true);
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setChatInput(transcript);
-      setIsListening(false);
-    };
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
-    recognition.start();
-  };
 
 
   // Compute stats dynamically
@@ -1318,6 +1184,29 @@ export default function Dashboard() {
           {/* Overview Header */}
           <div style={s.secHead}>
             <h2 style={s.secTitle}>Overview</h2>
+            <button
+              type="button"
+              id="btn-add-lead"
+              onClick={() => setShowAddModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '7px 16px',
+                borderRadius: 10,
+                backgroundColor: '#09090b',
+                color: '#ffffff',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Add Lead</span>
+            </button>
           </div>
 
 
@@ -1689,59 +1578,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── Filter Options Modal ───────────────────────────────────────── */}
-      {filterModalOpen && (
-        <div style={s.modalOverlay}>
-          <div style={s.modalContent}>
-            <div style={s.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Analytics Filter Settings</h3>
-              <button onClick={() => setFilterModalOpen(false)} style={s.closeModalBtn}>✕</button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div>
-                <label style={s.label}>Date Range Filter</label>
-                <select style={s.modalInput} value={selDate} onChange={e => setSelDate(e.target.value)}>
-                  <option value="Today">Today</option>
-                  <option value="Last 7 Days">Last 7 Days</option>
-                  <option value="Last Month">Last Month</option>
-                  <option value="Year to Date">Year to Date</option>
-                </select>
-              </div>
-              <div>
-                <label style={s.label}>Campaign Source</label>
-                <select style={s.modalInput} value={selCampaign} onChange={e => setSelCampaign(e.target.value)}>
-                  <option value="All Campaigns">All Campaigns</option>
-                  <option value="Meta Ads">Meta Ads</option>
-                  <option value="Voice Telecaller">Voice Telecaller</option>
-                  <option value="Direct Web">Direct Web</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={s.label}>Geography / Region</label>
-                <select style={s.modalInput} value={selGeo} onChange={e => setSelGeo(e.target.value)}>
-                  <option value="Global">Global</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Delhi NCR">Delhi NCR</option>
-                </select>
-              </div>
-            </div>
-            <div style={s.modalActions}>
-              <button onClick={() => setFilterModalOpen(false)} style={s.cancelBtn}>Cancel</button>
-              <button
-                onClick={() => {
-                  setActiveFilters([selDate, selCampaign, selGeo]);
-                  setFilterModalOpen(false);
-                }}
-                style={s.submitBtn}
-              >
-                Apply Filters
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Add / Edit Stock Modal ────────────────────────────────────── */}
       {showAddStockModal && (
