@@ -67,7 +67,7 @@ async function testInventory() {
   console.log('4. PATCH /api/inventory adjust Status:', adjustRes.status, '| New Available:', adjustRes.data.item?.availableUnits);
 
   server.close();
-  console.log('\n✅ INVENTORY TESTS COMPLETED SUCCESSFULLY!');
+  console.log('\nINVENTORY TESTS COMPLETED SUCCESSFULLY!');
 }
 
 testInventory().catch(err => {

@@ -11,12 +11,21 @@ const Lead = sequelize.define('Lead', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '+91 98765 43210'
+  },
+  company: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   interest: {
     type: DataTypes.STRING,
     allowNull: false
   },
   budget: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.DECIMAL(12, 2),
     allowNull: false,
     defaultValue: 0.00
   },
@@ -32,6 +41,30 @@ const Lead = sequelize.define('Lead', {
     ),
     allowNull: false,
     defaultValue: 'Enquiry'
+  },
+  priority: {
+    type: DataTypes.STRING,
+    defaultValue: 'Warm'
+  },
+  notes: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  source: {
+    type: DataTypes.STRING,
+    defaultValue: 'Direct Web'
+  },
+  crmSynced: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  erpBookingCreated: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  tallyPaymentVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
   assignedEmployeeId: {
     type: DataTypes.STRING,

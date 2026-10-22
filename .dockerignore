@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+*/node_modules
+logs
+*/logs
+dist
+*/dist
+*.log
+scratch
+*.docx
+.env.local

@@ -1,17 +1,17 @@
 const { sequelize } = require('../src/config/db');
-const { mockLeads, mockEmployees, mockActivityLogs } = require('../src/config/inMemoryStore');
-const { Employee, Lead, ActivityLog, Booking, Payment } = require('../src/models');
+const inMemoryStore = require('../src/config/inMemoryStore');
+const { Employee, Lead, ActivityLog, Booking, Payment, Inventory, Invoice, User } = require('../src/models');
 require('dotenv').config();
 
 const seedDatabase = async () => {
   try {
     console.log('Connecting to database...');
     await sequelize.authenticate();
-    console.log('Syncing models...');
-    await sequelize.sync({ force: true }); // Drop all tables and recreate them
+    console.log('Synchronizing tables safely...');
+    await sequelize.sync(); // Create tables if not existing, preserves data
 
     console.log('Seeding employees...');
-    const employeesToInsert = mockEmployees.map(e => ({
+    const employeesToInsert = (inMemoryStore.mockEmployees || []).map(e => ({
       id: e.id,
       name: e.name,
       role: e.role,
@@ -19,11 +19,38 @@ const seedDatabase = async () => {
       department: e.department,
       status: e.status || 'Active'
     }));
-    await Employee.bulkCreate(employeesToInsert, { ignoreDuplicates: true });
+    if (employeesToInsert.length > 0) {
+      await Employee.bulkCreate(employeesToInsert, { ignoreDuplicates: true });
+    }
+
+    console.log('Seeding users & operators...');
+    const usersToInsert = [
+      { id: 'USR-001', name: 'Super Admin', email: 'admin@apsenterprises.in', role: 'admin', title: 'System Administrator' },
+      { id: 'USR-002', name: 'Operations Manager', email: 'manager@apsenterprises.in', role: 'manager', title: 'Operations Lead' },
+      { id: 'USR-003', name: 'Accounts Officer', email: 'accounts@apsenterprises.in', role: 'accountant', title: 'Senior Accountant' },
+      { id: 'USR-004', name: 'Sales Telecaller', email: 'telecaller@apsenterprises.in', role: 'employee', title: 'Equipment Sales' }
+    ];
+    await User.bulkCreate(usersToInsert, { ignoreDuplicates: true });
+
+    console.log('Seeding inventory machinery...');
+    const inventoryToInsert = (inMemoryStore.mockInventory || []).map(i => ({
+      id: i.id,
+      sku: i.sku,
+      name: i.name,
+      category: i.category || 'Machinery',
+      totalStock: Number(i.totalStock || i.stockUnits || 0),
+      bookedStock: Number(i.bookedStock || 0),
+      minStockThreshold: Number(i.minStockThreshold || 3),
+      unitPrice: Number(i.unitPrice || 0),
+      status: (i.totalStock > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK'),
+      location: i.location || i.warehouse || 'Main Warehouse - Plant 1'
+    }));
+    if (inventoryToInsert.length > 0) {
+      await Inventory.bulkCreate(inventoryToInsert, { ignoreDuplicates: true });
+    }
 
     console.log('Seeding leads...');
-    // We must ensure the assignedEmployeeId actually exists, but since we just seeded employees, it should.
-    const leadsToInsert = mockLeads.map(l => ({
+    const leadsToInsert = (inMemoryStore.mockLeads || []).map(l => ({
       id: l.id,
       name: l.name,
       interest: l.interest,
@@ -32,14 +59,16 @@ const seedDatabase = async () => {
       assignedEmployeeId: l.assignedEmployeeId || 'e1',
       createdAt: l.createdAt || new Date()
     }));
-    await Lead.bulkCreate(leadsToInsert, { ignoreDuplicates: true });
+    if (leadsToInsert.length > 0) {
+      await Lead.bulkCreate(leadsToInsert, { ignoreDuplicates: true });
+    }
 
     console.log('Seeding activity logs...');
     const validEmpIds = new Set(employeesToInsert.map(e => e.id));
     const validLeadIds = new Set(leadsToInsert.map(l => l.id));
     
-    const logsToInsert = mockActivityLogs
-      .filter(a => validLeadIds.has(a.leadId)) // ensure lead exists
+    const logsToInsert = (inMemoryStore.mockActivityLogs || [])
+      .filter(a => validLeadIds.has(a.leadId))
       .map(a => ({
         id: a.id,
         leadId: a.leadId,
@@ -49,9 +78,11 @@ const seedDatabase = async () => {
         toStage: a.toStage || null,
         createdAt: a.createdAt || new Date()
       }));
-    await ActivityLog.bulkCreate(logsToInsert, { ignoreDuplicates: true });
+    if (logsToInsert.length > 0) {
+      await ActivityLog.bulkCreate(logsToInsert, { ignoreDuplicates: true });
+    }
 
-    console.log('Database seeded successfully with 350+ leads!');
+    console.log('Database seeded successfully across all entities (Users, Employees, Inventory, Leads, ActivityLogs)!');
     process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);

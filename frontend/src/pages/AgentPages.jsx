@@ -22,8 +22,10 @@ export function VoiceAgent() {
   const [phone, setPhone] = useState('');
   const [leadName, setLeadName] = useState('');
   const [logs, setLogs] = useState([
-    { id: 1, phone: '+91 98765 43210', name: 'Acme Corp', status: 'Completed', outcome: 'Interested — Demo Scheduled' },
-    { id: 2, phone: '+91 87654 32109', name: 'Global Tech', status: 'Completed', outcome: 'Callback Requested' }
+    { id: 1, phone: '+91 98260 12345', name: 'Rajesh Sharma (Sharma Dona Udhyog)', status: 'Completed', outcome: 'Interested — Machinery Video Demo Sent' },
+    { id: 2, phone: '+91 98290 56789', name: 'Vikram Singh (Rajput Paper Cups)', status: 'Completed', outcome: 'Qualified — 100 BPM Paper Cup Machine' },
+    { id: 3, phone: '+91 98270 67890', name: 'Manoj Kumar (Kisan Disposable Center)', status: 'Completed', outcome: 'Interested — Hydraulic Buffet Plate Press' },
+    { id: 4, phone: '+91 98930 89012', name: 'Deepak Agarwal (Agarwal Disposable)', status: 'Completed', outcome: 'Quoted — Double Cylinder Press ₹2.45L' }
   ]);
   const [calling, setCalling] = useState(false);
 

@@ -1,1621 +1,4583 @@
 [
   {
-    "id": "e1",
-    "name": "Animesh",
-    "email": "rahul.pathak@aps-enterprise.com",
-    "phone": "+91 9183073592",
-    "role": "Voice Operations & Sales Lead",
-    "department": "Sales",
-    "kpiScore": "98%",
-    "kpiScoreNum": 98,
+    "id": "e116",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Scheduling Demo",
-    "tasksCompleted": 25,
-    "callsHandled": 90,
-    "salesClosed": 8,
-    "totalRevenue": 679952,
-    "targetSales": 9,
-    "conversionRate": "8.9%",
-    "avgCallDurationSec": 144,
-    "avgResponseTimeMin": "4.0",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      91,
-      91,
-      97,
-      98
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 50,
-      "qualifiedToBooked": 38,
-      "bookedToConfirmed": 18,
-      "confirmedToPaid": 8
-    },
-    "activeTask": {
-      "id": "task-e1-1",
-      "title": "Follow up on field demo schedule for Kumar Traders",
-      "leadId": "LEAD-615",
-      "leadName": "Kumar Traders",
-      "priority": "Normal",
-      "type": "Field Sales",
-      "stage": "Qualified",
-      "dueIn": "11 mins",
-      "assignedAt": "2026-08-24T09:13:50.791Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e1-2",
-        "title": "Negotiate final pricing and discount for Kumar Traders",
-        "leadId": "LEAD-615",
-        "leadName": "Kumar Traders",
-        "priority": "High",
-        "type": "Sales Negotiation",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e2",
-    "name": "Sneha",
-    "email": "rakesh.bansal@aps-enterprise.com",
-    "phone": "+91 9605758384",
-    "role": "Core Systems Architect & Admin",
-    "department": "Operations & Administration",
-    "kpiScore": "93%",
-    "kpiScoreNum": 93,
-    "status": "Active",
-    "currentActivity": "Scheduling Demo",
-    "tasksCompleted": 24,
-    "callsHandled": 129,
-    "salesClosed": 11,
-    "totalRevenue": 618310,
-    "targetSales": 15,
-    "conversionRate": "8.5%",
-    "avgCallDurationSec": 181,
-    "avgResponseTimeMin": "5.7",
-    "weeklyKpiHistory": [
-      92,
-      97,
+      85,
+      88,
       90,
-      93
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 28,
-      "qualifiedToBooked": 28,
-      "bookedToConfirmed": 11,
-      "confirmedToPaid": 11
-    },
     "activeTask": {
-      "id": "task-e2-1",
-      "title": "Follow up on field demo schedule for Iyer Packers",
-      "leadId": "LEAD-910",
-      "leadName": "Iyer Packers",
+      "id": "task-e116-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
       "priority": "Normal",
-      "type": "Field Sales",
-      "stage": "Qualified",
-      "dueIn": "23 mins",
-      "assignedAt": "2026-08-24T09:03:21.618Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:43:30.916Z"
     },
     "taskQueue": [
       {
-        "id": "task-e2-2",
-        "title": "Follow up on field demo schedule for Iyer Packers",
-        "leadId": "LEAD-910",
-        "leadName": "Iyer Packers",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified"
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
-    "id": "e3",
-    "name": "Aaditya",
-    "email": "suresh.verma@aps-enterprise.com",
-    "phone": "+91 9141026894",
-    "role": "Analytics & WhatsApp Lead",
-    "department": "Operations & Administration",
-    "kpiScore": "90%",
-    "kpiScoreNum": 90,
+    "id": "e115",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Drafting Quotation",
-    "tasksCompleted": 19,
-    "callsHandled": 122,
-    "salesClosed": 10,
-    "totalRevenue": 371760,
-    "targetSales": 14,
-    "conversionRate": "8.2%",
-    "avgCallDurationSec": 123,
-    "avgResponseTimeMin": "6.5",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      98,
-      93,
-      91,
-      90
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 29,
-      "qualifiedToBooked": 32,
-      "bookedToConfirmed": 14,
-      "confirmedToPaid": 10
-    },
-    "activeTask": {
-      "id": "task-e3-1",
-      "title": "Share quotation and ROI video for Dona Pattal setup with Bose Polymers",
-      "leadId": "LEAD-763",
-      "leadName": "Bose Polymers",
-      "priority": "Normal",
-      "type": "Sales Follow-up",
-      "stage": "Qualified",
-      "dueIn": "37 mins",
-      "assignedAt": "2026-08-24T09:00:38.211Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e3-2",
-        "title": "Follow up on field demo schedule for Bose Polymers",
-        "leadId": "LEAD-763",
-        "leadName": "Bose Polymers",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e4",
-    "name": "Pooja Sharma",
-    "email": "kunal.sen@aps-enterprise.com",
-    "phone": "+91 9475613762",
-    "role": "Senior Telecaller & Conversion Spec",
-    "department": "Sales",
-    "kpiScore": "67%",
-    "kpiScoreNum": 67,
-    "status": "Active",
-    "currentActivity": "Scheduling Demo",
-    "tasksCompleted": 67,
-    "callsHandled": 74,
-    "salesClosed": 4,
-    "totalRevenue": 341056,
-    "targetSales": 14,
-    "conversionRate": "5.4%",
-    "avgCallDurationSec": 151,
-    "avgResponseTimeMin": "8.5",
-    "weeklyKpiHistory": [
-      64,
-      66,
-      63,
-      67
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 52,
-      "qualifiedToBooked": 29,
-      "bookedToConfirmed": 13,
-      "confirmedToPaid": 4
-    },
-    "activeTask": {
-      "id": "task-e4-1",
-      "title": "Follow up on field demo schedule for Das Global",
-      "leadId": "LEAD-115",
-      "leadName": "Das Global",
-      "priority": "Normal",
-      "type": "Field Sales",
-      "stage": "Qualified",
-      "dueIn": "17 mins",
-      "assignedAt": "2026-08-24T08:35:27.945Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e4-2",
-        "title": "Negotiate final pricing and discount for Das Global",
-        "leadId": "LEAD-115",
-        "leadName": "Das Global",
-        "priority": "High",
-        "type": "Sales Negotiation",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e5",
-    "name": "Rohan Mehta",
-    "email": "harsh.dixit@aps-enterprise.com",
-    "phone": "+91 9716940960",
-    "role": "ERP & Factory Dispatch Officer",
-    "department": "Operations & Administration",
-    "kpiScore": "64%",
-    "kpiScoreNum": 64,
-    "status": "Active",
-    "currentActivity": "Packing Spare Parts",
-    "tasksCompleted": 99,
-    "callsHandled": 152,
-    "salesClosed": 9,
-    "totalRevenue": 405234,
-    "targetSales": 10,
-    "conversionRate": "5.9%",
-    "avgCallDurationSec": 138,
-    "avgResponseTimeMin": "1.2",
-    "weeklyKpiHistory": [
-      65,
-      63,
-      64,
-      64
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 44,
-      "qualifiedToBooked": 33,
-      "bookedToConfirmed": 18,
-      "confirmedToPaid": 9
-    },
-    "activeTask": {
-      "id": "task-e5-1",
-      "title": "Pack spare parts kit (dies and heaters) for Bose Solutions",
-      "leadId": "LEAD-930",
-      "leadName": "Bose Solutions",
-      "priority": "Normal",
-      "type": "Spare Parts Allocation",
-      "stage": "In Production",
-      "dueIn": "37 mins",
-      "assignedAt": "2026-08-24T09:00:55.370Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e5-2",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Bose Solutions",
-        "leadId": "LEAD-930",
-        "leadName": "Bose Solutions",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e6",
-    "name": "Dhruv Bhatia",
-    "email": "dhruv.bhatia@aps-enterprise.com",
-    "phone": "+91 9312518082",
-    "role": "Machine Fitter",
-    "department": "Production & Assembly",
-    "kpiScore": "82%",
-    "kpiScoreNum": 82,
-    "status": "Offline",
-    "currentActivity": "Booking Transport",
-    "tasksCompleted": 70,
-    "callsHandled": 233,
-    "salesClosed": 19,
-    "totalRevenue": 642105,
-    "targetSales": 29,
-    "conversionRate": "8.2%",
-    "avgCallDurationSec": 216,
-    "avgResponseTimeMin": "2.2",
-    "weeklyKpiHistory": [
-      82,
-      83,
-      75,
-      82
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 20,
-      "qualifiedToBooked": 33,
-      "bookedToConfirmed": 19,
-      "confirmedToPaid": 19
-    },
-    "activeTask": {
-      "id": "task-e6-1",
-      "title": "Coordinate with transport vendor for pickup for Nair Enterprises",
-      "leadId": "LEAD-136",
-      "leadName": "Nair Enterprises",
-      "priority": "Normal",
-      "type": "Logistics",
-      "stage": "In Production",
-      "dueIn": "33 mins",
-      "assignedAt": "2026-08-24T09:08:11.394Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e6-2",
-        "title": "Pack spare parts kit (dies and heaters) for Nair Enterprises",
-        "leadId": "LEAD-136",
-        "leadName": "Nair Enterprises",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e7",
-    "name": "Animesh Saini",
-    "email": "animesh.saini@aps-enterprise.com",
-    "phone": "+91 9768854464",
-    "role": "Quality Testing Engineer",
-    "department": "Production & Assembly",
-    "kpiScore": "75%",
-    "kpiScoreNum": 75,
-    "status": "Active",
-    "currentActivity": "Validating Assembly",
-    "tasksCompleted": 62,
-    "callsHandled": 197,
-    "salesClosed": 14,
-    "totalRevenue": 878976,
-    "targetSales": 22,
-    "conversionRate": "7.1%",
-    "avgCallDurationSec": 126,
-    "avgResponseTimeMin": "5.7",
-    "weeklyKpiHistory": [
-      76,
-      75,
-      78,
-      75
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 71,
-      "qualifiedToBooked": 37,
-      "bookedToConfirmed": 18,
-      "confirmedToPaid": 14
-    },
-    "activeTask": {
-      "id": "task-e7-1",
-      "title": "Verify motor and heating coil assembly for Goel Solutions",
-      "leadId": "LEAD-135",
-      "leadName": "Goel Solutions",
-      "priority": "Normal",
-      "type": "Assembly Check",
-      "stage": "In Production",
-      "dueIn": "57 mins",
-      "assignedAt": "2026-08-24T08:49:38.099Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e7-2",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Goel Solutions",
-        "leadId": "LEAD-135",
-        "leadName": "Goel Solutions",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e8",
-    "name": "Rahul Choudhary",
-    "email": "rahul.choudhary@aps-enterprise.com",
-    "phone": "+91 9969424283",
-    "role": "Dispatch Coordinator",
-    "department": "Logistics & Service",
-    "kpiScore": "95%",
-    "kpiScoreNum": 95,
-    "status": "Active",
-    "currentActivity": "Packing Spare Parts",
-    "tasksCompleted": 16,
-    "callsHandled": 135,
-    "salesClosed": 12,
-    "totalRevenue": 433644,
-    "targetSales": 14,
-    "conversionRate": "8.9%",
-    "avgCallDurationSec": 81,
-    "avgResponseTimeMin": "8.7",
-    "weeklyKpiHistory": [
-      95,
-      93,
-      99,
-      95
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 70,
-      "qualifiedToBooked": 34,
-      "bookedToConfirmed": 9,
-      "confirmedToPaid": 12
-    },
-    "activeTask": {
-      "id": "task-e8-1",
-      "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
-      "leadId": "LEAD-758",
-      "leadName": "Singh Polymers",
-      "priority": "Normal",
-      "type": "Spare Parts Allocation",
-      "stage": "In Production",
-      "dueIn": "14 mins",
-      "assignedAt": "2026-08-24T09:09:55.899Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e8-2",
-        "title": "Pack spare parts kit (dies and heaters) for Singh Polymers",
-        "leadId": "LEAD-758",
-        "leadName": "Singh Polymers",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e9",
-    "name": "Manish Mahajan",
-    "email": "manish.mahajan@aps-enterprise.com",
-    "phone": "+91 9606890406",
-    "role": "Inventory Clerk",
-    "department": "Logistics & Service",
-    "kpiScore": "77%",
-    "kpiScoreNum": 77,
-    "status": "Active",
-    "currentActivity": "Validating Assembly",
-    "tasksCompleted": 64,
-    "callsHandled": 91,
-    "salesClosed": 7,
-    "totalRevenue": 316512,
-    "targetSales": 6,
-    "conversionRate": "7.7%",
-    "avgCallDurationSec": 165,
-    "avgResponseTimeMin": "2.9",
-    "weeklyKpiHistory": [
-      81,
-      75,
-      81,
-      77
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 38,
-      "qualifiedToBooked": 40,
-      "bookedToConfirmed": 17,
-      "confirmedToPaid": 7
-    },
-    "activeTask": {
-      "id": "task-e9-1",
-      "title": "Verify motor and heating coil assembly for Garg Packers",
-      "leadId": "LEAD-289",
-      "leadName": "Garg Packers",
-      "priority": "Normal",
-      "type": "Assembly Check",
-      "stage": "In Production",
-      "dueIn": "54 mins",
-      "assignedAt": "2026-08-24T08:37:42.316Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e9-2",
-        "title": "Dispatch fully automatic machine via transport for Garg Packers",
-        "leadId": "LEAD-289",
-        "leadName": "Garg Packers",
-        "priority": "High",
-        "type": "Factory Dispatch",
-        "stage": "Dispatched"
-      }
-    ]
-  },
-  {
-    "id": "e10",
-    "name": "Dev Patel",
-    "email": "dev.patel@aps-enterprise.com",
-    "phone": "+91 9434695766",
-    "role": "Accounts Executive",
-    "department": "Operations & Administration",
-    "kpiScore": "75%",
-    "kpiScoreNum": 75,
-    "status": "Active",
-    "currentActivity": "Creating Tax Invoice",
-    "tasksCompleted": 57,
-    "callsHandled": 284,
-    "salesClosed": 21,
-    "totalRevenue": 1530984,
-    "targetSales": 29,
-    "conversionRate": "7.4%",
-    "avgCallDurationSec": 177,
-    "avgResponseTimeMin": "1.1",
-    "weeklyKpiHistory": [
-      82,
-      84,
-      76,
-      75
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 50,
-      "qualifiedToBooked": 38,
-      "bookedToConfirmed": 16,
-      "confirmedToPaid": 21
-    },
-    "activeTask": {
-      "id": "task-e10-1",
-      "title": "Generate GST Tax Invoice for Chaturvedi Creations",
-      "leadId": "LEAD-694",
-      "leadName": "Chaturvedi Creations",
-      "priority": "High",
-      "type": "Invoicing",
-      "stage": "Client (Paid)",
-      "dueIn": "9 mins",
-      "assignedAt": "2026-08-24T08:49:01.275Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e10-2",
-        "title": "Approve final dispatch invoice & transport LR for Chaturvedi Creations",
-        "leadId": "LEAD-694",
-        "leadName": "Chaturvedi Creations",
-        "priority": "Normal",
-        "type": "Factory Release Authorization",
-        "stage": "Client (Paid)"
-      }
-    ]
-  },
-  {
-    "id": "e11",
-    "name": "Kabir Mahajan",
-    "email": "kabir.mahajan@aps-enterprise.com",
-    "phone": "+91 9875417161",
-    "role": "ERP Operations Admin",
-    "department": "Operations & Administration",
-    "kpiScore": "68%",
-    "kpiScoreNum": 68,
-    "status": "Active",
-    "currentActivity": "Verifying Invoices",
-    "tasksCompleted": 59,
-    "callsHandled": 100,
-    "salesClosed": 6,
-    "totalRevenue": 458970,
-    "targetSales": 13,
-    "conversionRate": "6.0%",
-    "avgCallDurationSec": 122,
-    "avgResponseTimeMin": "0.1",
-    "weeklyKpiHistory": [
-      63,
-      65,
-      65,
-      68
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 34,
-      "qualifiedToBooked": 13,
-      "bookedToConfirmed": 17,
-      "confirmedToPaid": 6
-    },
-    "activeTask": {
-      "id": "task-e11-1",
-      "title": "Approve final dispatch invoice & transport LR for Choudhary Paper Products",
-      "leadId": "LEAD-689",
-      "leadName": "Choudhary Paper Products",
-      "priority": "Normal",
-      "type": "Factory Release Authorization",
-      "stage": "Client (Paid)",
-      "dueIn": "50 mins",
-      "assignedAt": "2026-08-24T09:08:07.225Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e11-2",
-        "title": "Review Booking Specs & Dual-Approval Countersign for Choudhary Paper Products",
-        "leadId": "LEAD-689",
-        "leadName": "Choudhary Paper Products",
-        "priority": "Urgent",
-        "type": "Admin Dual-Approval",
-        "stage": "Booked"
-      }
-    ]
-  },
-  {
-    "id": "e12",
-    "name": "Bhumika Rao",
-    "email": "bhumika.rao@aps-enterprise.com",
-    "phone": "+91 9670349626",
-    "role": "Spare Parts Manager",
-    "department": "Logistics & Service",
-    "kpiScore": "60%",
-    "kpiScoreNum": 60,
-    "status": "Active",
-    "currentActivity": "Creating Tax Invoice",
-    "tasksCompleted": 46,
-    "callsHandled": 254,
-    "salesClosed": 15,
-    "totalRevenue": 552585,
-    "targetSales": 13,
-    "conversionRate": "5.9%",
-    "avgCallDurationSec": 191,
-    "avgResponseTimeMin": "8.8",
-    "weeklyKpiHistory": [
-      60,
-      67,
-      61,
-      60
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 74,
-      "qualifiedToBooked": 33,
-      "bookedToConfirmed": 18,
-      "confirmedToPaid": 15
-    },
-    "activeTask": {
-      "id": "task-e12-1",
-      "title": "Generate GST Tax Invoice for Dixit Disposables",
-      "leadId": "LEAD-308",
-      "leadName": "Dixit Disposables",
-      "priority": "High",
-      "type": "Invoicing",
-      "stage": "Client (Paid)",
-      "dueIn": "45 mins",
-      "assignedAt": "2026-08-24T08:56:10.749Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e12-2",
-        "title": "Review Booking Specs & Dual-Approval Countersign for Dixit Disposables",
-        "leadId": "LEAD-308",
-        "leadName": "Dixit Disposables",
-        "priority": "Urgent",
-        "type": "Admin Dual-Approval",
-        "stage": "Booked"
-      }
-    ]
-  },
-  {
-    "id": "e13",
-    "name": "Rajesh Khatri",
-    "email": "rajesh.khatri@aps-enterprise.com",
-    "phone": "+91 9410859666",
-    "role": "Field Sales Manager",
-    "department": "Sales",
-    "kpiScore": "84%",
-    "kpiScoreNum": 84,
-    "status": "Active",
-    "currentActivity": "Negotiating Pricing",
-    "tasksCompleted": 64,
-    "callsHandled": 206,
-    "salesClosed": 17,
-    "totalRevenue": 795940,
-    "targetSales": 25,
-    "conversionRate": "8.3%",
-    "avgCallDurationSec": 169,
-    "avgResponseTimeMin": "1.3",
-    "weeklyKpiHistory": [
-      75,
-      77,
-      76,
-      84
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 80,
-      "qualifiedToBooked": 30,
-      "bookedToConfirmed": 19,
-      "confirmedToPaid": 17
-    },
-    "activeTask": {
-      "id": "task-e13-1",
-      "title": "Negotiate final pricing and discount for Patel Industries",
-      "leadId": "LEAD-380",
-      "leadName": "Patel Industries",
-      "priority": "High",
-      "type": "Sales Negotiation",
-      "stage": "Qualified",
-      "dueIn": "25 mins",
-      "assignedAt": "2026-08-24T08:46:27.399Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e13-2",
-        "title": "Negotiate final pricing and discount for Patel Industries",
-        "leadId": "LEAD-380",
-        "leadName": "Patel Industries",
-        "priority": "High",
-        "type": "Sales Negotiation",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e14",
-    "name": "Bhavya Chauhan",
-    "email": "bhavya.chauhan@aps-enterprise.com",
-    "phone": "+91 9686985337",
-    "role": "Direct Sales Executive",
-    "department": "Sales",
-    "kpiScore": "98%",
-    "kpiScoreNum": 98,
-    "status": "Active",
-    "currentActivity": "Handling Operations",
-    "tasksCompleted": 26,
-    "callsHandled": 199,
-    "salesClosed": 19,
-    "totalRevenue": 647577,
-    "targetSales": 25,
-    "conversionRate": "9.5%",
-    "avgCallDurationSec": 121,
-    "avgResponseTimeMin": "7.9",
-    "weeklyKpiHistory": [
-      95,
-      96,
-      92,
-      98
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 54,
-      "qualifiedToBooked": 25,
-      "bookedToConfirmed": 17,
-      "confirmedToPaid": 19
-    },
-    "activeTask": {
-      "id": "task-e14-1",
-      "title": "Conduct secondary telecaller qualification for Pandey Global",
-      "leadId": "LEAD-258",
-      "leadName": "Pandey Global",
-      "priority": "Normal",
-      "type": "Telecalling",
-      "stage": "Enquiry",
-      "dueIn": "28 mins",
-      "assignedAt": "2026-08-24T09:01:58.778Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e14-2",
-        "title": "Share quotation and ROI video for Dona Pattal setup with Pandey Global",
-        "leadId": "LEAD-258",
-        "leadName": "Pandey Global",
-        "priority": "Normal",
-        "type": "Sales Follow-up",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e15",
-    "name": "Ravi Reddy",
-    "email": "ravi.reddy@aps-enterprise.com",
-    "phone": "+91 9270888073",
-    "role": "Lead Qualification Specialist",
-    "department": "Operations & Administration",
-    "kpiScore": "80%",
-    "kpiScoreNum": 80,
-    "status": "Active",
-    "currentActivity": "Handling Operations",
-    "tasksCompleted": 18,
-    "callsHandled": 213,
-    "salesClosed": 17,
-    "totalRevenue": 1129701,
-    "targetSales": 15,
-    "conversionRate": "8.0%",
-    "avgCallDurationSec": 191,
-    "avgResponseTimeMin": "8.1",
-    "weeklyKpiHistory": [
-      82,
-      83,
-      77,
-      80
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 49,
-      "qualifiedToBooked": 12,
-      "bookedToConfirmed": 9,
-      "confirmedToPaid": 17
-    },
-    "activeTask": {
-      "id": "task-e15-1",
-      "title": "Conduct secondary telecaller qualification for Pathak Paper Products",
-      "leadId": "LEAD-785",
-      "leadName": "Pathak Paper Products",
-      "priority": "Normal",
-      "type": "Telecalling",
-      "stage": "Enquiry",
-      "dueIn": "31 mins",
-      "assignedAt": "2026-08-24T08:37:38.226Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e15-2",
-        "title": "Outbound follow-up for Double Die Machine enquiry from Pathak Paper Products",
-        "leadId": "LEAD-785",
-        "leadName": "Pathak Paper Products",
-        "priority": "High",
-        "type": "Sales Qualification",
-        "stage": "Enquiry"
-      }
-    ]
-  },
-  {
-    "id": "e16",
-    "name": "Karan Bose",
-    "email": "karan.bose@aps-enterprise.com",
-    "phone": "+91 9152734797",
-    "role": "Lead Qualification Specialist",
-    "department": "Operations & Administration",
-    "kpiScore": "60%",
-    "kpiScoreNum": 60,
-    "status": "Active",
-    "currentActivity": "Live Outbound Telecall",
-    "tasksCompleted": 39,
-    "callsHandled": 192,
-    "salesClosed": 11,
-    "totalRevenue": 589105,
-    "targetSales": 10,
-    "conversionRate": "5.7%",
-    "avgCallDurationSec": 83,
-    "avgResponseTimeMin": "9.6",
-    "weeklyKpiHistory": [
-      66,
-      67,
-      69,
-      60
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 32,
-      "qualifiedToBooked": 34,
-      "bookedToConfirmed": 19,
-      "confirmedToPaid": 11
-    },
-    "activeTask": {
-      "id": "task-e16-1",
-      "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
-      "leadId": "LEAD-977",
-      "leadName": "Thakur Packaging",
-      "priority": "High",
-      "type": "Sales Qualification",
-      "stage": "Enquiry",
-      "dueIn": "45 mins",
-      "assignedAt": "2026-08-24T08:51:02.182Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e16-2",
-        "title": "Outbound follow-up for Double Die Machine enquiry from Thakur Packaging",
-        "leadId": "LEAD-977",
-        "leadName": "Thakur Packaging",
-        "priority": "High",
-        "type": "Sales Qualification",
-        "stage": "Enquiry"
-      }
-    ]
-  },
-  {
-    "id": "e17",
-    "name": "Suresh Soni",
-    "email": "suresh.soni@aps-enterprise.com",
-    "phone": "+91 9852033735",
-    "role": "Assembly Supervisor",
-    "department": "Production & Assembly",
-    "kpiScore": "99%",
-    "kpiScoreNum": 99,
-    "status": "Active",
-    "currentActivity": "Packing Spare Parts",
-    "tasksCompleted": 65,
-    "callsHandled": 172,
-    "salesClosed": 17,
-    "totalRevenue": 1663705,
-    "targetSales": 18,
-    "conversionRate": "9.9%",
-    "avgCallDurationSec": 159,
-    "avgResponseTimeMin": "9.0",
-    "weeklyKpiHistory": [
-      98,
-      91,
-      99,
-      99
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 27,
-      "qualifiedToBooked": 13,
-      "bookedToConfirmed": 11,
-      "confirmedToPaid": 17
-    },
-    "activeTask": {
-      "id": "task-e17-1",
-      "title": "Pack spare parts kit (dies and heaters) for Mehta Solutions",
-      "leadId": "LEAD-462",
-      "leadName": "Mehta Solutions",
-      "priority": "Normal",
-      "type": "Spare Parts Allocation",
-      "stage": "In Production",
-      "dueIn": "57 mins",
-      "assignedAt": "2026-08-24T09:08:50.177Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e17-2",
-        "title": "Generate Production Job Card for Hydraulic Press Machine for Mehta Solutions",
-        "leadId": "LEAD-462",
-        "leadName": "Mehta Solutions",
-        "priority": "High",
-        "type": "ERP Factory Release",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e18",
-    "name": "Nikhil Patel",
-    "email": "nikhil.patel@aps-enterprise.com",
-    "phone": "+91 9998795437",
-    "role": "Quality Testing Engineer",
-    "department": "Production & Assembly",
-    "kpiScore": "98%",
-    "kpiScoreNum": 98,
-    "status": "Active",
-    "currentActivity": "Booking Transport",
-    "tasksCompleted": 99,
-    "callsHandled": 151,
-    "salesClosed": 14,
-    "totalRevenue": 961926,
-    "targetSales": 13,
-    "conversionRate": "9.3%",
-    "avgCallDurationSec": 199,
-    "avgResponseTimeMin": "3.6",
-    "weeklyKpiHistory": [
-      94,
-      94,
-      94,
-      98
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 37,
-      "qualifiedToBooked": 18,
-      "bookedToConfirmed": 7,
-      "confirmedToPaid": 14
-    },
-    "activeTask": {
-      "id": "task-e18-1",
-      "title": "Coordinate with transport vendor for pickup for Soni Ventures",
-      "leadId": "LEAD-560",
-      "leadName": "Soni Ventures",
-      "priority": "Normal",
-      "type": "Logistics",
-      "stage": "In Production",
-      "dueIn": "21 mins",
-      "assignedAt": "2026-08-24T09:03:29.589Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e18-2",
-        "title": "Pack spare parts kit (dies and heaters) for Soni Ventures",
-        "leadId": "LEAD-560",
-        "leadName": "Soni Ventures",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e19",
-    "name": "Karthik Verma",
-    "email": "karthik.verma@aps-enterprise.com",
-    "phone": "+91 9180426475",
-    "role": "Accounts Executive",
-    "department": "Operations & Administration",
-    "kpiScore": "83%",
-    "kpiScoreNum": 83,
-    "status": "Offline",
-    "currentActivity": "Creating Tax Invoice",
-    "tasksCompleted": 32,
-    "callsHandled": 50,
-    "salesClosed": 4,
-    "totalRevenue": 165472,
-    "targetSales": 8,
-    "conversionRate": "8.0%",
-    "avgCallDurationSec": 194,
-    "avgResponseTimeMin": "2.4",
-    "weeklyKpiHistory": [
-      81,
-      77,
-      80,
-      83
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 46,
-      "qualifiedToBooked": 24,
-      "bookedToConfirmed": 19,
-      "confirmedToPaid": 4
-    },
-    "activeTask": {
-      "id": "task-e19-1",
-      "title": "Generate GST Tax Invoice for Chaturvedi Manufacturing",
-      "leadId": "LEAD-596",
-      "leadName": "Chaturvedi Manufacturing",
-      "priority": "High",
-      "type": "Invoicing",
-      "stage": "Client (Paid)",
-      "dueIn": "41 mins",
-      "assignedAt": "2026-08-24T08:45:35.475Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e19-2",
-        "title": "Approve final dispatch invoice & transport LR for Chaturvedi Manufacturing",
-        "leadId": "LEAD-596",
-        "leadName": "Chaturvedi Manufacturing",
-        "priority": "Normal",
-        "type": "Factory Release Authorization",
-        "stage": "Client (Paid)"
-      }
-    ]
-  },
-  {
-    "id": "e20",
-    "name": "Ramesh Goel",
-    "email": "ramesh.goel@aps-enterprise.com",
-    "phone": "+91 9721462050",
-    "role": "Telecaller Executive",
-    "department": "Sales",
-    "kpiScore": "77%",
-    "kpiScoreNum": 77,
-    "status": "Active",
-    "currentActivity": "Scheduling Demo",
-    "tasksCompleted": 21,
-    "callsHandled": 107,
-    "salesClosed": 8,
-    "totalRevenue": 525968,
-    "targetSales": 11,
-    "conversionRate": "7.5%",
-    "avgCallDurationSec": 145,
-    "avgResponseTimeMin": "6.1",
-    "weeklyKpiHistory": [
-      78,
-      79,
-      81,
-      77
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 78,
-      "qualifiedToBooked": 29,
-      "bookedToConfirmed": 13,
-      "confirmedToPaid": 8
-    },
-    "activeTask": {
-      "id": "task-e20-1",
-      "title": "Follow up on field demo schedule for Pandey Paper Cups",
-      "leadId": "LEAD-715",
-      "leadName": "Pandey Paper Cups",
-      "priority": "Normal",
-      "type": "Field Sales",
-      "stage": "Qualified",
-      "dueIn": "26 mins",
-      "assignedAt": "2026-08-24T08:54:35.310Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e20-2",
-        "title": "Follow up on field demo schedule for Pandey Paper Cups",
-        "leadId": "LEAD-715",
-        "leadName": "Pandey Paper Cups",
-        "priority": "Normal",
-        "type": "Field Sales",
-        "stage": "Qualified"
-      }
-    ]
-  },
-  {
-    "id": "e21",
-    "name": "Nikhil Nair",
-    "email": "nikhil.nair@aps-enterprise.com",
-    "phone": "+91 9940046837",
-    "role": "Direct Sales Executive",
-    "department": "Sales",
-    "kpiScore": "78%",
-    "kpiScoreNum": 78,
-    "status": "Active",
-    "currentActivity": "Scheduling Demo",
-    "tasksCompleted": 22,
-    "callsHandled": 292,
-    "salesClosed": 22,
-    "totalRevenue": 1931864,
-    "targetSales": 17,
-    "conversionRate": "7.5%",
-    "avgCallDurationSec": 196,
-    "avgResponseTimeMin": "2.7",
-    "weeklyKpiHistory": [
-      79,
-      77,
-      79,
-      78
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 53,
-      "qualifiedToBooked": 12,
-      "bookedToConfirmed": 7,
-      "confirmedToPaid": 22
-    },
-    "activeTask": {
-      "id": "task-e21-1",
-      "title": "Follow up on field demo schedule for Rao Creations",
-      "leadId": "LEAD-159",
-      "leadName": "Rao Creations",
-      "priority": "Normal",
-      "type": "Field Sales",
-      "stage": "Qualified",
-      "dueIn": "49 mins",
-      "assignedAt": "2026-08-24T08:33:41.837Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e21-2",
-        "title": "Conduct secondary telecaller qualification for Rao Creations",
-        "leadId": "LEAD-159",
-        "leadName": "Rao Creations",
-        "priority": "Normal",
-        "type": "Telecalling",
-        "stage": "Enquiry"
-      }
-    ]
-  },
-  {
-    "id": "e22",
-    "name": "Manish Mahajan",
-    "email": "manish.mahajan@aps-enterprise.com",
-    "phone": "+91 9549036488",
-    "role": "ERP Operations Admin",
-    "department": "Operations & Administration",
-    "kpiScore": "97%",
-    "kpiScoreNum": 97,
-    "status": "Active",
-    "currentActivity": "Reconciling Ledger",
-    "tasksCompleted": 89,
-    "callsHandled": 177,
-    "salesClosed": 17,
-    "totalRevenue": 1135668,
-    "targetSales": 27,
-    "conversionRate": "9.6%",
-    "avgCallDurationSec": 200,
-    "avgResponseTimeMin": "9.4",
-    "weeklyKpiHistory": [
+      85,
+      88,
       90,
-      98,
-      97,
-      97
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 56,
-      "qualifiedToBooked": 35,
-      "bookedToConfirmed": 12,
-      "confirmedToPaid": 17
-    },
     "activeTask": {
-      "id": "task-e22-1",
-      "title": "Verify Tally advance payment for machine booking by Shah Ventures",
-      "leadId": "LEAD-870",
-      "leadName": "Shah Ventures",
-      "priority": "High",
-      "type": "Payment Gate Verification",
-      "stage": "Confirmed Lead",
-      "dueIn": "21 mins",
-      "assignedAt": "2026-08-24T08:39:07.294Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e22-2",
-        "title": "Send WhatsApp payment reminder for pending dispatch to Shah Ventures",
-        "leadId": "LEAD-870",
-        "leadName": "Shah Ventures",
-        "priority": "High",
-        "type": "Payment Reminder",
-        "stage": "Confirmed Lead"
-      }
-    ]
-  },
-  {
-    "id": "e23",
-    "name": "Sneha Pillai",
-    "email": "sneha.pillai@aps-enterprise.com",
-    "phone": "+91 9690455053",
-    "role": "Dispatch Coordinator",
-    "department": "Logistics & Service",
-    "kpiScore": "79%",
-    "kpiScoreNum": 79,
-    "status": "Active",
-    "currentActivity": "Validating Assembly",
-    "tasksCompleted": 56,
-    "callsHandled": 105,
-    "salesClosed": 8,
-    "totalRevenue": 224024,
-    "targetSales": 6,
-    "conversionRate": "7.6%",
-    "avgCallDurationSec": 234,
-    "avgResponseTimeMin": "1.4",
-    "weeklyKpiHistory": [
-      82,
-      76,
-      80,
-      79
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 60,
-      "qualifiedToBooked": 25,
-      "bookedToConfirmed": 14,
-      "confirmedToPaid": 8
-    },
-    "activeTask": {
-      "id": "task-e23-1",
-      "title": "Verify motor and heating coil assembly for Bansal Paper Products",
-      "leadId": "LEAD-969",
-      "leadName": "Bansal Paper Products",
+      "id": "task-e115-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
       "priority": "Normal",
-      "type": "Assembly Check",
-      "stage": "In Production",
-      "dueIn": "40 mins",
-      "assignedAt": "2026-08-24T08:57:32.303Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:40:03.387Z"
     },
     "taskQueue": [
       {
-        "id": "task-e23-2",
-        "title": "Coordinate with transport vendor for pickup for Bansal Paper Products",
-        "leadId": "LEAD-969",
-        "leadName": "Bansal Paper Products",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production"
+        "title": "Review Operations SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
-    "id": "e24",
-    "name": "Karan Kapoor",
-    "email": "karan.kapoor@aps-enterprise.com",
-    "phone": "+91 9756198198",
-    "role": "Assembly Supervisor",
-    "department": "Production & Assembly",
-    "kpiScore": "95%",
-    "kpiScoreNum": 95,
+    "id": "e114",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Booking Transport",
-    "tasksCompleted": 57,
-    "callsHandled": 80,
-    "salesClosed": 7,
-    "totalRevenue": 498512,
-    "targetSales": 10,
-    "conversionRate": "8.8%",
-    "avgCallDurationSec": 219,
-    "avgResponseTimeMin": "9.4",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      92,
-      95,
-      99,
-      95
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 29,
-      "qualifiedToBooked": 23,
-      "bookedToConfirmed": 16,
-      "confirmedToPaid": 7
-    },
-    "activeTask": {
-      "id": "task-e24-1",
-      "title": "Coordinate with transport vendor for pickup for Saini Polymers",
-      "leadId": "LEAD-846",
-      "leadName": "Saini Polymers",
-      "priority": "Normal",
-      "type": "Logistics",
-      "stage": "In Production",
-      "dueIn": "20 mins",
-      "assignedAt": "2026-08-24T09:07:01.806Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e24-2",
-        "title": "Verify motor and heating coil assembly for Saini Polymers",
-        "leadId": "LEAD-846",
-        "leadName": "Saini Polymers",
-        "priority": "Normal",
-        "type": "Assembly Check",
-        "stage": "In Production"
-      }
-    ]
-  },
-  {
-    "id": "e25",
-    "name": "Kunal Das",
-    "email": "kunal.das@aps-enterprise.com",
-    "phone": "+91 9731488013",
-    "role": "ERP Operations Admin",
-    "department": "Operations & Administration",
-    "kpiScore": "77%",
-    "kpiScoreNum": 77,
-    "status": "Active",
-    "currentActivity": "Verifying Invoices",
-    "tasksCompleted": 84,
-    "callsHandled": 173,
-    "salesClosed": 13,
-    "totalRevenue": 478972,
-    "targetSales": 10,
-    "conversionRate": "7.5%",
-    "avgCallDurationSec": 235,
-    "avgResponseTimeMin": "6.9",
-    "weeklyKpiHistory": [
-      77,
-      80,
-      76,
-      77
-    ],
-    "stageConversions": {
-      "enquiryToQualified": 34,
-      "qualifiedToBooked": 14,
-      "bookedToConfirmed": 5,
-      "confirmedToPaid": 13
-    },
-    "activeTask": {
-      "id": "task-e25-1",
-      "title": "Approve final dispatch invoice & transport LR for Roy Packers",
-      "leadId": "LEAD-969",
-      "leadName": "Roy Packers",
-      "priority": "Normal",
-      "type": "Factory Release Authorization",
-      "stage": "Client (Paid)",
-      "dueIn": "37 mins",
-      "assignedAt": "2026-08-24T08:48:23.203Z"
-    },
-    "taskQueue": [
-      {
-        "id": "task-e25-2",
-        "title": "Verify Tally advance payment for machine booking by Roy Packers",
-        "leadId": "LEAD-969",
-        "leadName": "Roy Packers",
-        "priority": "High",
-        "type": "Payment Gate Verification",
-        "stage": "Confirmed Lead"
-      }
-    ]
-  },
-  {
-    "id": "e26",
-    "name": "Rohan Kapoor",
-    "email": "rohan.kapoor@aps-enterprise.com",
-    "phone": "+91 9440809262",
-    "role": "Inventory Clerk",
-    "department": "Logistics & Service",
-    "kpiScore": "99%",
-    "kpiScoreNum": 99,
-    "status": "Active",
-    "currentActivity": "Booking Transport",
-    "tasksCompleted": 98,
-    "callsHandled": 292,
-    "salesClosed": 28,
-    "totalRevenue": 1660344,
-    "targetSales": 23,
-    "conversionRate": "9.6%",
-    "avgCallDurationSec": 168,
-    "avgResponseTimeMin": "7.8",
-    "weeklyKpiHistory": [
-      96,
+      85,
+      88,
       90,
-      99,
-      99
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 71,
-      "qualifiedToBooked": 40,
-      "bookedToConfirmed": 17,
-      "confirmedToPaid": 28
-    },
     "activeTask": {
-      "id": "task-e26-1",
-      "title": "Coordinate with transport vendor for pickup for Mishra Manufacturing",
-      "leadId": "LEAD-465",
-      "leadName": "Mishra Manufacturing",
+      "id": "task-e114-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
       "priority": "Normal",
-      "type": "Logistics",
-      "stage": "In Production",
-      "dueIn": "36 mins",
-      "assignedAt": "2026-08-24T09:03:16.553Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:40:03.353Z"
     },
     "taskQueue": [
       {
-        "id": "task-e26-2",
-        "title": "Pack spare parts kit (dies and heaters) for Mishra Manufacturing",
-        "leadId": "LEAD-465",
-        "leadName": "Mishra Manufacturing",
-        "priority": "Normal",
-        "type": "Spare Parts Allocation",
-        "stage": "In Production"
+        "title": "Review Operations SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
-    "id": "e27",
-    "name": "Meera Rathore",
-    "email": "meera.rathore@aps-enterprise.com",
-    "phone": "+91 9536112922",
-    "role": "Inventory Clerk",
-    "department": "Logistics & Service",
-    "kpiScore": "81%",
-    "kpiScoreNum": 81,
+    "id": "e113",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Testing Machinery",
-    "tasksCompleted": 93,
-    "callsHandled": 193,
-    "salesClosed": 15,
-    "totalRevenue": 452955,
-    "targetSales": 20,
-    "conversionRate": "7.8%",
-    "avgCallDurationSec": 70,
-    "avgResponseTimeMin": "0.0",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      81,
-      77,
-      83,
-      81
+      85,
+      88,
+      90,
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 57,
-      "qualifiedToBooked": 30,
-      "bookedToConfirmed": 17,
-      "confirmedToPaid": 15
-    },
     "activeTask": {
-      "id": "task-e27-1",
-      "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
-      "leadId": "LEAD-416",
-      "leadName": "Tiwari Enterprises",
+      "id": "task-e113-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
       "priority": "Normal",
-      "type": "Quality Testing",
-      "stage": "In Production",
-      "dueIn": "10 mins",
-      "assignedAt": "2026-08-24T09:02:55.752Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:40:03.343Z"
     },
     "taskQueue": [
       {
-        "id": "task-e27-2",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Tiwari Enterprises",
-        "leadId": "LEAD-416",
-        "leadName": "Tiwari Enterprises",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production"
+        "title": "Review Operations SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
-    "id": "e28",
-    "name": "Ramesh Chauhan",
-    "email": "ramesh.chauhan@aps-enterprise.com",
-    "phone": "+91 9507516396",
-    "role": "Inventory Clerk",
-    "department": "Logistics & Service",
-    "kpiScore": "98%",
-    "kpiScoreNum": 98,
+    "id": "e112",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Testing Machinery",
-    "tasksCompleted": 20,
-    "callsHandled": 174,
-    "salesClosed": 17,
-    "totalRevenue": 422875,
-    "targetSales": 26,
-    "conversionRate": "9.8%",
-    "avgCallDurationSec": 96,
-    "avgResponseTimeMin": "3.0",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      94,
-      93,
-      91,
-      98
+      85,
+      88,
+      90,
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 58,
-      "qualifiedToBooked": 34,
-      "bookedToConfirmed": 18,
-      "confirmedToPaid": 17
-    },
     "activeTask": {
-      "id": "task-e28-1",
-      "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
-      "leadId": "LEAD-357",
-      "leadName": "Patel Enterprises",
+      "id": "task-e112-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
       "priority": "Normal",
-      "type": "Quality Testing",
-      "stage": "In Production",
-      "dueIn": "33 mins",
-      "assignedAt": "2026-08-24T08:36:30.556Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:40:03.332Z"
     },
     "taskQueue": [
       {
-        "id": "task-e28-2",
-        "title": "Test and calibrate hydraulics for Double Die Machine for Patel Enterprises",
-        "leadId": "LEAD-357",
-        "leadName": "Patel Enterprises",
-        "priority": "Normal",
-        "type": "Quality Testing",
-        "stage": "In Production"
+        "title": "Review Sales SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
-    "id": "e29",
-    "name": "Akshay Thakur",
-    "email": "akshay.thakur@aps-enterprise.com",
-    "phone": "+91 9246769411",
-    "role": "Lead Qualification Specialist",
-    "department": "Operations & Administration",
-    "kpiScore": "97%",
-    "kpiScoreNum": 97,
+    "id": "e111",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Handling Operations",
-    "tasksCompleted": 66,
-    "callsHandled": 224,
-    "salesClosed": 21,
-    "totalRevenue": 1493604,
-    "targetSales": 22,
-    "conversionRate": "9.4%",
-    "avgCallDurationSec": 182,
-    "avgResponseTimeMin": "5.4",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
-      96,
-      93,
-      94,
-      97
+      85,
+      88,
+      90,
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 49,
-      "qualifiedToBooked": 13,
-      "bookedToConfirmed": 9,
-      "confirmedToPaid": 21
-    },
     "activeTask": {
-      "id": "task-e29-1",
-      "title": "Conduct secondary telecaller qualification for Shah Plastics",
-      "leadId": "LEAD-485",
-      "leadName": "Shah Plastics",
+      "id": "task-e111-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
       "priority": "Normal",
-      "type": "Telecalling",
-      "stage": "Enquiry",
-      "dueIn": "48 mins",
-      "assignedAt": "2026-08-24T08:43:16.889Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:39:58.111Z"
     },
     "taskQueue": [
       {
-        "id": "task-e29-2",
-        "title": "Share quotation and ROI video for Dona Pattal setup with Shah Plastics",
-        "leadId": "LEAD-485",
-        "leadName": "Shah Plastics",
-        "priority": "Normal",
-        "type": "Sales Follow-up",
-        "stage": "Qualified"
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e110",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e110-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:38:08.033Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e109",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e109-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:25:10.416Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e108",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e108-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:39.586Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e107",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e107-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:39.513Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e106",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e106-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:39.493Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e105",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e105-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:39.470Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e104",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e104-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:31.865Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e103",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e103-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:24:07.709Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e102",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e102-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:20:47.827Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e101",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e101-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:20:42.909Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e100",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e100-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:20:42.773Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e99",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e99-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:20:42.738Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e98",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e98-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:20:42.703Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e97",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e97-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:18:10.829Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e96",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e96-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:18:10.783Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e95",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e95-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:18:10.771Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e94",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e94-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:18:10.756Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e93",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e93-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:17:58.857Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e92",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e92-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:35.541Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e91",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e91-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:24.405Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e90",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e90-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:20.460Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e89",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e89-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:20.441Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e88",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e88-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:20.435Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e87",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e87-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T06:01:20.429Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e86",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e86-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:50:42.715Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e85",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e85-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:50:38.681Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e84",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e84-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:50:38.657Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e83",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e83-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:50:38.651Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e82",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e82-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:50:38.641Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e81",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e81-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:41:39.857Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e80",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e80-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:41:39.777Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e79",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e79-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:41:39.756Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e78",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e78-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:41:39.735Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e77",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e77-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:41:37.685Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e76",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e76-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:40:02.017Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e75",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e75-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:39:55.462Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e74",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e74-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:39:55.385Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e73",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e73-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:39:55.363Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e72",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e72-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:39:55.340Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e71",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e71-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:38:35.428Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e70",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e70-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:38:31.341Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e69",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e69-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:38:31.270Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e68",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e68-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:38:31.253Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e67",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e67-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:38:31.235Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e66",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e66-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:22:44.646Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e65",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e65-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:22:42.304Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e64",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e64-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:22:42.232Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e63",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e63-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:22:42.217Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e62",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e62-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:22:42.200Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e61",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e61-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:18:08.680Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e60",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e60-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:18:08.601Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e59",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e59-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:18:08.582Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e58",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e58-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:18:08.550Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e57",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e57-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:18:01.895Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e56",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e56-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:27.910Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e55",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e55-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:27.823Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e54",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e54-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:27.805Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e53",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e53-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:27.786Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e52",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e52-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:15.723Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e51",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e51-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:13:02.103Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e50",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e50-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:06:46.764Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e49",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e49-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:06:46.693Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e48",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e48-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:06:46.677Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e47",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e47-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:06:46.660Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e46",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e46-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T05:06:35.159Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e45",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e45-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-17T04:59:13.259Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e44",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e44-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T17:06:26.137Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e43",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e43-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T17:06:26.109Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e42",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e42-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T17:06:26.102Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e41",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e41-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T17:06:26.094Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e40",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e40-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T17:06:22.774Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e39",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e39-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:52:56.477Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e38",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e38-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:50:49.659Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e37",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e37-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:50:16.724Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e36",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e36-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:44:18.788Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e35",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e35-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:44:15.730Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e34",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e34-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:44:15.705Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e33",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e33-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:44:15.698Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e32",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e32-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:44:15.692Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e31",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e31-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:39:34.668Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
       }
     ]
   },
   {
     "id": "e30",
-    "name": "Siddharth Desai",
-    "email": "siddharth.desai@aps-enterprise.com",
-    "phone": "+91 9539433776",
-    "role": "Quality Testing Engineer",
-    "department": "Production & Assembly",
-    "kpiScore": "91%",
-    "kpiScoreNum": 91,
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
     "status": "Active",
-    "currentActivity": "Packing Spare Parts",
-    "tasksCompleted": 51,
-    "callsHandled": 234,
-    "salesClosed": 21,
-    "totalRevenue": 1878429,
-    "targetSales": 23,
-    "conversionRate": "9.0%",
-    "avgCallDurationSec": 149,
-    "avgResponseTimeMin": "5.0",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
     "weeklyKpiHistory": [
+      85,
+      88,
       90,
-      93,
-      98,
-      91
+      92
     ],
-    "stageConversions": {
-      "enquiryToQualified": 48,
-      "qualifiedToBooked": 30,
-      "bookedToConfirmed": 7,
-      "confirmedToPaid": 21
-    },
     "activeTask": {
       "id": "task-e30-1",
-      "title": "Pack spare parts kit (dies and heaters) for Kapoor Paper Cups",
-      "leadId": "LEAD-887",
-      "leadName": "Kapoor Paper Cups",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
       "priority": "Normal",
-      "type": "Spare Parts Allocation",
-      "stage": "In Production",
-      "dueIn": "56 mins",
-      "assignedAt": "2026-08-24T09:05:54.295Z"
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:39:22.506Z"
     },
     "taskQueue": [
       {
-        "id": "task-e30-2",
-        "title": "Coordinate with transport vendor for pickup for Kapoor Paper Cups",
-        "leadId": "LEAD-887",
-        "leadName": "Kapoor Paper Cups",
-        "priority": "Normal",
-        "type": "Logistics",
-        "stage": "In Production"
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e29",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e29-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:39:22.471Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e28",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e28-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:39:22.461Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e27",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e27-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:39:22.447Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e26",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e26-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:59.749Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e25",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e25-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:58.309Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e24",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e24-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:58.276Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e23",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e23-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:58.270Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e22",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e22-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:58.263Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e21",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e21-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:38:31.481Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e20",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e20-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:37:39.505Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e19",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e19-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:31:09.566Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e18",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e18-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:31:09.534Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e17",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e17-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:31:09.526Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e16",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e16-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:31:09.516Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e15",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e15-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:30:10.760Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e14",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e14-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:30:10.673Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e13",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e13-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:30:10.654Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e12",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e12-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:30:10.633Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e11",
+    "name": "Rohan Verma",
+    "email": "rohan.1792167078320@aps-enterprise.com",
+    "phone": "+91 91234 56789",
+    "role": "Sales Executive",
+    "department": "Sales & CRM",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e11-1",
+      "title": "Onboarding & initial pipeline sync for Rohan Verma",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T16:11:18.326Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales & CRM SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e10",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e10-1",
+      "title": "Onboarding & initial pipeline sync for Count Test Emp",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T15:37:15.348Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e9",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e9-1",
+      "title": "Onboarding & initial pipeline sync for Default Role Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T15:37:15.295Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e8",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "phone": "+91 98765 43210",
+    "role": "Sales & Operations Associate",
+    "department": "Sales & Operations",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e8-1",
+      "title": "Onboarding & initial pipeline sync for Fresh Employee",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T15:37:15.279Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Operations SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e7",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "phone": "+91 88888 77777",
+    "role": "Sales Manager",
+    "department": "Sales",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e7-1",
+      "title": "Onboarding & initial pipeline sync for Test Employee One",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-16T15:37:15.258Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Sales SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
+    "id": "e1",
+    "name": "Super Admin",
+    "email": "admin@apsenterprises.in",
+    "phone": "+91 99880 01122",
+    "role": "Super Admin",
+    "department": "Executive & AI Management",
+    "systemRole": "Super Admin",
+    "moduleScope": "All Modules",
+    "kpiScore": "99%",
+    "kpiScoreNum": 99,
+    "tasksCompleted": 48,
+    "callsHandled": 38,
+    "salesClosed": 14,
+    "totalRevenue": 3450000,
+    "targetSales": 15,
+    "conversionRate": "42%",
+    "avgCallDurationSec": 130,
+    "avgResponseTimeMin": "1.2",
+    "weeklyKpiHistory": [
+      96,
+      98,
+      98,
+      99
+    ],
+    "status": "Online",
+    "avatar": "A",
+    "avatarBg": "#09090b",
+    "currentActivity": "Reviewing executive sales pipeline and AI automation sequences",
+    "activeTask": {
+      "id": "task-e1-default",
+      "title": "Executive Sales Pipeline & AI Automation Audit",
+      "priority": "HIGH",
+      "dueIn": "45 mins",
+      "leadName": "Executive Deck",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Audit weekly team KPI leaderboard and badges",
+        "priority": "MEDIUM"
+      },
+      {
+        "title": "Review enterprise access permissions across departments",
+        "priority": "LOW"
+      }
+    ]
+  },
+  {
+    "id": "e2",
+    "name": "Operations Manager",
+    "email": "manager@apsenterprises.in",
+    "phone": "+91 98202 33445",
+    "role": "Operations & Production Lead",
+    "department": "Factory Operations & Manufacturing",
+    "systemRole": "Admin",
+    "moduleScope": "Operations & Production ERP",
+    "kpiScore": "96%",
+    "kpiScoreNum": 96,
+    "tasksCompleted": 63,
+    "callsHandled": 28,
+    "salesClosed": 12,
+    "totalRevenue": 2890000,
+    "targetSales": 12,
+    "conversionRate": "38%",
+    "avgCallDurationSec": 110,
+    "avgResponseTimeMin": "2.4",
+    "weeklyKpiHistory": [
+      94,
+      95,
+      96,
+      96
+    ],
+    "status": "Online",
+    "avatar": "OM",
+    "avatarBg": "#2563eb",
+    "currentActivity": "Working on: Verify raw material stock levels (steel sheets & copper coils) before next batch",
+    "activeTask": {
+      "id": "task-e2-1792394451866-0",
+      "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+      "priority": "HIGH",
+      "dueIn": "35 mins",
+      "leadName": "Operations Manager",
+      "assignedAt": "2026-10-19T07:20:51.866Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Conduct safety audit of Indore plant component storage zone",
+        "priority": "LOW"
+      },
+      {
+        "title": "Log daily output metrics in manufacturing dashboard",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "id": "e3",
+    "name": "Accounts Officer",
+    "email": "accounts@apsenterprises.in",
+    "phone": "+91 98203 44556",
+    "role": "Senior Accountant",
+    "department": "Finance & Accounting",
+    "systemRole": "Accountant",
+    "moduleScope": "Tally Sync & Invoicing",
+    "kpiScore": "98%",
+    "kpiScoreNum": 98,
+    "tasksCompleted": 75,
+    "callsHandled": 15,
+    "salesClosed": 8,
+    "totalRevenue": 1940000,
+    "targetSales": 10,
+    "conversionRate": "50%",
+    "avgCallDurationSec": 95,
+    "avgResponseTimeMin": "1.8",
+    "weeklyKpiHistory": [
+      97,
+      98,
+      98,
+      98
+    ],
+    "status": "Online",
+    "avatar": "AO",
+    "avatarBg": "#7c3aed",
+    "currentActivity": "Reconciling Tally ERP advance payments & issuing GST invoices",
+    "activeTask": {
+      "id": "task-e3-default",
+      "title": "Reconcile 10% Tally advance deposit vouchers for Confirmed Leads",
+      "priority": "URGENT",
+      "dueIn": "20 mins",
+      "leadName": "Tally Advance Gate",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Generate GST Tax Invoices (HSN 8466) for Client orders",
+        "priority": "HIGH"
+      },
+      {
+        "title": "Verify bank RTGS advance deposits above ₹1.5L",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "id": "e4",
+    "name": "Sales Telecaller",
+    "email": "telecaller@apsenterprises.in",
+    "phone": "+91 98204 55667",
+    "role": "Senior Telecaller",
+    "department": "Voice Operations & Telecalling",
+    "systemRole": "Telecaller",
+    "moduleScope": "Voice AI & CRM Dialer",
+    "kpiScore": "92%",
+    "kpiScoreNum": 92,
+    "tasksCompleted": 89,
+    "callsHandled": 142,
+    "salesClosed": 9,
+    "totalRevenue": 1365000,
+    "targetSales": 10,
+    "conversionRate": "28%",
+    "avgCallDurationSec": 145,
+    "avgResponseTimeMin": "3.1",
+    "weeklyKpiHistory": [
+      90,
+      91,
+      92,
+      92
+    ],
+    "status": "Online",
+    "avatar": "ST",
+    "avatarBg": "#059669",
+    "currentActivity": "Calling qualified IndiaMart inbound leads",
+    "activeTask": {
+      "id": "task-e4-default",
+      "title": "Call 12 high-priority IndiaMart inquiries for Double Die Dona Machine",
+      "priority": "HIGH",
+      "dueIn": "30 mins",
+      "leadName": "IndiaMart Inbound Queue",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Log call outcomes & speech sentiments in CRM system",
+        "priority": "MEDIUM"
+      },
+      {
+        "title": "Follow up with cold leads unresponsive for 3+ days",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "id": "e5",
+    "name": "Amit Patidar",
+    "email": "amit.patidar@apsenterprises.in",
+    "phone": "+91 98205 66778",
+    "role": "Field Sales Executive",
+    "department": "Field Sales & Plant Demonstrations",
+    "systemRole": "Employee",
+    "moduleScope": "CRM & Client Visits",
+    "kpiScore": "90%",
+    "kpiScoreNum": 90,
+    "tasksCompleted": 49,
+    "callsHandled": 64,
+    "salesClosed": 7,
+    "totalRevenue": 1120000,
+    "targetSales": 8,
+    "conversionRate": "25%",
+    "avgCallDurationSec": 160,
+    "avgResponseTimeMin": "4.5",
+    "weeklyKpiHistory": [
+      88,
+      89,
+      90,
+      90
+    ],
+    "status": "Online",
+    "avatar": "AP",
+    "avatarBg": "#ea580c",
+    "currentActivity": "Working on: Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+    "activeTask": {
+      "id": "task-e5-1792235150307-0",
+      "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+      "priority": "HIGH",
+      "dueIn": "40 mins",
+      "leadName": "Amit Patidar",
+      "assignedAt": "2026-10-17T11:05:50.307Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Update CRM pipeline stages for leads that have responded",
+        "priority": "HIGH"
+      },
+      {
+        "title": "Draft custom commercial quotation for top 3 Qualified leads",
+        "priority": "HIGH"
+      },
+      {
+        "title": "Review weekly sales KPI report & submit to management",
+        "priority": "LOW"
+      }
+    ]
+  },
+  {
+    "id": "e6",
+    "name": "Vikram Rathore",
+    "email": "vikram.rathore@apsenterprises.in",
+    "phone": "+91 98206 77889",
+    "role": "Plant Assembly Supervisor",
+    "department": "Plant Quality Control & Assembly",
+    "systemRole": "Operations",
+    "moduleScope": "Production ERP & Job Cards",
+    "kpiScore": "97%",
+    "kpiScoreNum": 97,
+    "tasksCompleted": 71,
+    "callsHandled": 12,
+    "salesClosed": 6,
+    "totalRevenue": 850000,
+    "targetSales": 6,
+    "conversionRate": "33%",
+    "avgCallDurationSec": 80,
+    "avgResponseTimeMin": "1.5",
+    "weeklyKpiHistory": [
+      95,
+      96,
+      97,
+      97
+    ],
+    "status": "Online",
+    "avatar": "VR",
+    "avatarBg": "#0891b2",
+    "currentActivity": "Supervising Line B spindle alignment and pressure tolerances",
+    "activeTask": {
+      "id": "task-e6-default",
+      "title": "Inspect Assembly Line B spindle alignment & verify RPM output on Machine #MAC-4412",
+      "priority": "HIGH",
+      "dueIn": "40 mins",
+      "leadName": "Assembly Line B",
+      "assignedAt": "2026-10-17T06:00:00.000Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Audit bearing mounting tolerances & lubrication points on Line 2 chassis",
+        "priority": "MEDIUM"
+      },
+      {
+        "title": "Verify mechanical torque specifications on 4-Die Dona machine gearboxes",
+        "priority": "HIGH"
       }
     ]
   }

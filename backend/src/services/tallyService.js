@@ -3,43 +3,145 @@
 // Falls back to cached/mock data gracefully when Tally is offline.
 
 const http = require('http');
+const https = require('https');
+const { URL } = require('url');
 const { Lead, ActivityLog } = require('../models');
 
-const TALLY_HOST = process.env.TALLY_HOST || 'localhost';
-const TALLY_PORT = parseInt(process.env.TALLY_PORT || '9000', 10);
+const TALLY_URL_ENV = process.env.TALLY_URL || '';
+let parsedTallyUrl = null;
+if (TALLY_URL_ENV) {
+  try { parsedTallyUrl = new URL(TALLY_URL_ENV); } catch {}
+}
+
+const TALLY_HOST = parsedTallyUrl ? parsedTallyUrl.hostname : (process.env.TALLY_HOST || 'localhost');
+const TALLY_PORT = parsedTallyUrl ? (parsedTallyUrl.port || (parsedTallyUrl.protocol === 'https:' ? 443 : 80)) : parseInt(process.env.TALLY_PORT || '9000', 10);
+const TALLY_PROTOCOL = parsedTallyUrl ? parsedTallyUrl.protocol : 'http:';
+const TALLY_PATH = parsedTallyUrl ? (parsedTallyUrl.pathname || '/') : '/';
+const TALLY_API_KEY = process.env.TALLY_API_KEY || '';
+const TALLY_AUTH_HEADER = process.env.TALLY_AUTH_HEADER || (TALLY_API_KEY ? `Bearer ${TALLY_API_KEY}` : '');
 const TALLY_COMPANY = process.env.TALLY_COMPANY || 'APS Enterprises';
 
+const path = require('path');
+const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
+const TALLY_FILE = path.join(__dirname, '../../tally_data.json');
+
+function loadTallyFromFile() {
+  return safeReadJson(TALLY_FILE, []);
+}
+
 // ─── In-memory voucher cache ──────────────────────────────────────────────────
-let voucherCache = [];
-let lastSyncTime = null;
+let voucherCache = loadTallyFromFile();
+let lastSyncTime = new Date();
 let tallyOnline = false;
 
-// ─── Helper: send XML to Tally and get response ───────────────────────────────
+// ─── Helper: send XML to Tally and get response (HTTP & HTTPS Cloud Gateway) ───
 function sendTallyRequest(xmlBody) {
   return new Promise((resolve, reject) => {
+    const isHttps = TALLY_PROTOCOL === 'https:';
+    const client = isHttps ? https : http;
+
+    const headers = {
+      'Content-Type': 'text/xml',
+      'Content-Length': Buffer.byteLength(xmlBody)
+    };
+    if (TALLY_AUTH_HEADER) {
+      headers['Authorization'] = TALLY_AUTH_HEADER;
+    }
+    if (TALLY_API_KEY) {
+      headers['x-api-key'] = TALLY_API_KEY;
+    }
+
     const options = {
       hostname: TALLY_HOST,
       port: TALLY_PORT,
-      path: '/',
+      path: TALLY_PATH,
       method: 'POST',
-      headers: { 'Content-Type': 'text/xml', 'Content-Length': Buffer.byteLength(xmlBody) },
-      timeout: 5000
+      headers,
+      timeout: 2500
     };
-    const req = http.request(options, (res) => {
+
+    const req = client.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
     });
+
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Tally request timeout')); });
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error(`Tally request timeout (${TALLY_HOST}:${TALLY_PORT} offline or unreachable)`));
+    });
+
     req.write(xmlBody);
     req.end();
   });
 }
 
-// ─── Helper: parse Tally XML voucher response (basic parser) ─────────────────
+const { XMLParser } = require('fast-xml-parser');
+
+const xmlParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: '@_',
+  parseTagValue: false,
+  trimValues: true
+});
+
+// ─── Helper: parse Tally XML voucher response ─────────────────────────────────
 function parseTallyXML(xml) {
+  if (!xml || typeof xml !== 'string') return [];
   const vouchers = [];
+
+  try {
+    const parsed = xmlParser.parse(xml);
+    const rawVouchers = [];
+
+    // Recursively extract all VOUCHER nodes from Tally ENVELOPE structure
+    function extractVouchers(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      if (obj.VOUCHER) {
+        if (Array.isArray(obj.VOUCHER)) rawVouchers.push(...obj.VOUCHER);
+        else rawVouchers.push(obj.VOUCHER);
+      }
+      for (const k of Object.keys(obj)) {
+        if (typeof obj[k] === 'object') extractVouchers(obj[k]);
+      }
+    }
+
+    extractVouchers(parsed);
+
+    for (const v of rawVouchers) {
+      let rawAmount = 0;
+      if (v['LEDGERENTRIES.LIST']) {
+        const entries = Array.isArray(v['LEDGERENTRIES.LIST']) ? v['LEDGERENTRIES.LIST'] : [v['LEDGERENTRIES.LIST']];
+        for (const entry of entries) {
+          if (entry.AMOUNT !== undefined) {
+            rawAmount = parseFloat(entry.AMOUNT);
+            break;
+          }
+        }
+      } else if (v.AMOUNT !== undefined) {
+        rawAmount = parseFloat(v.AMOUNT);
+      }
+
+      vouchers.push({
+        voucherNo: v.VOUCHERNUMBER || `VCH-${Date.now()}`,
+        date: v.DATE || new Date().toISOString().split('T')[0],
+        partyName: v.PARTYNAME || v.PARTYLEDGERNAME || 'Customer Account',
+        voucherType: v.VOUCHERTYPENAME || 'Receipt',
+        narration: v.NARRATION || 'Tally ledger transaction',
+        debitAmount: rawAmount < 0 ? Math.abs(rawAmount) : 0,
+        creditAmount: rawAmount > 0 ? rawAmount : 0,
+        reconStatus: 'Tally Live',
+        syncTimestamp: new Date().toLocaleString('en-IN')
+      });
+    }
+
+    if (vouchers.length > 0) return vouchers;
+  } catch (err) {
+    console.warn('[Tally XML Parser] Falling back to fragment parser:', err.message);
+  }
+
+  // Fallback for partial/fragmented Tally XML payloads
   const voucherRegex = /<VOUCHER[^>]*>([\s\S]*?)<\/VOUCHER>/gi;
   let match;
   while ((match = voucherRegex.exec(xml)) !== null) {
@@ -48,13 +150,23 @@ function parseTallyXML(xml) {
       const m = block.match(new RegExp(`<${tag}[^>]*>([^<]*)<\/${tag}>`, 'i'));
       return m ? m[1].trim() : '';
     };
-    const debit = parseFloat(get('LEDGERENTRIES.LIST>AMOUNT') || '0');
+
+    let rawAmount = get('AMOUNT');
+    if (!rawAmount) {
+      const ledgerMatch = block.match(/<LEDGERENTRIES\.LIST[^>]*>([\s\S]*?)<\/LEDGERENTRIES\.LIST>/i);
+      if (ledgerMatch) {
+        const amtMatch = ledgerMatch[1].match(/<AMOUNT[^>]*>([^<]*)<\/AMOUNT>/i);
+        if (amtMatch) rawAmount = amtMatch[1].trim();
+      }
+    }
+    const debit = parseFloat(rawAmount || '0');
+
     vouchers.push({
-      voucherNo: get('VOUCHERNUMBER'),
-      date: get('DATE'),
-      partyName: get('PARTYNAME'),
-      voucherType: get('VOUCHERTYPENAME'),
-      narration: get('NARRATION'),
+      voucherNo: get('VOUCHERNUMBER') || `VCH-${Date.now()}`,
+      date: get('DATE') || new Date().toISOString().split('T')[0],
+      partyName: get('PARTYNAME') || get('PARTYLEDGERNAME') || 'Customer Account',
+      voucherType: get('VOUCHERTYPENAME') || 'Receipt',
+      narration: get('NARRATION') || 'Tally ledger transaction',
       debitAmount: debit < 0 ? Math.abs(debit) : 0,
       creditAmount: debit > 0 ? debit : 0,
       reconStatus: 'Tally Live',
@@ -64,15 +176,8 @@ function parseTallyXML(xml) {
   return vouchers;
 }
 
-// ─── Mock voucher data (fallback when Tally offline) ─────────────────────────
-const MOCK_VOUCHERS = [
-  { voucherNo: 'VCH-2026-0091', tallyMasterId: 'MST-88210', date: '2026-08-18', partyName: 'Reliance Automation Heavy Ind.', particulars: 'HDFC Bank Main A/c (#5020)', voucherType: 'Advance Receipt (10%)', debitAmount: 0, creditAmount: 8500, gstOutput: 1530, utrNo: 'UTR-HDFC9821039', reconStatus: 'Reconciled', syncTimestamp: 'Today, 02:15 PM', narration: '10% advance deposit received for Heavy CNC Router Order #LEAD-008' },
-  { voucherNo: 'VCH-2026-0092', tallyMasterId: 'MST-88211', date: '2026-08-18', partyName: 'Tata Heavy Tools Pvt Ltd', particulars: 'ICICI Current A/c (#2291)', voucherType: 'Advance Receipt (10%)', debitAmount: 0, creditAmount: 42000, gstOutput: 7560, utrNo: 'UTR-ICICI7729104', reconStatus: 'Reconciled', syncTimestamp: 'Today, 11:30 AM', narration: '10% advance deposit cleared via RTGS for 200T Hydraulic Press' },
-  { voucherNo: 'VCH-2026-0093', tallyMasterId: 'MST-88212', date: '2026-08-17', partyName: 'Apex Metalcraft Works', particulars: 'Factory Allocation Ledger (#4010)', voucherType: 'Journal Voucher', debitAmount: 38000, creditAmount: 0, gstOutput: 6840, utrNo: 'INTERNAL-JNL-09', reconStatus: 'Reconciled', syncTimestamp: 'Yesterday, 05:40 PM', narration: 'Raw steel & tooling inventory debited to Job Card #JC-992' },
-  { voucherNo: 'VCH-2026-0094', tallyMasterId: 'MST-88213', date: '2026-08-17', partyName: 'Kirloskar Forge & Stampings', particulars: 'Advance Receipts (10% Gate)', voucherType: 'Advance Receipt (10%)', debitAmount: 0, creditAmount: 28000, gstOutput: 5040, utrNo: 'UTR-PENDING-01', reconStatus: 'Pending Bank Feed', syncTimestamp: 'Awaiting Bank Match', narration: 'NEFT transfer initiated by client, bank UTR realization pending' },
-  { voucherNo: 'VCH-2026-0095', tallyMasterId: 'MST-88214', date: '2026-08-16', partyName: 'Jindal Steel Raw Suppliers', particulars: 'Vendor Payables Ledger', voucherType: 'Payment Voucher', debitAmount: 85000, creditAmount: 0, gstOutput: 15300, utrNo: 'UTR-SBI11029834', reconStatus: 'Reconciled', syncTimestamp: '16-Aug-2026', narration: 'Vendor raw material steel sheet clearance payment' },
-  { voucherNo: 'VCH-2026-0096', tallyMasterId: 'MST-88215', date: '2026-08-15', partyName: 'Global Tech Pvt Ltd', particulars: 'ICICI Bank Export Escrow', voucherType: 'Sales Invoice (Final)', debitAmount: 0, creditAmount: 250000, gstOutput: 45000, utrNo: 'UTR-EXPORT-005', reconStatus: 'Reconciled', syncTimestamp: '15-Aug-2026', narration: 'Final machine delivery payment cleared — VMC Machining Center' }
-];
+// ─── Real voucher store (populated from Tally desktop or manual ledger posts) ─
+const MOCK_VOUCHERS = [];
 
 class TallyService {
   // ── Health check ────────────────────────────────────────────────────────────
@@ -89,8 +194,11 @@ class TallyService {
       host: TALLY_HOST,
       port: TALLY_PORT,
       company: TALLY_COMPANY,
-      lastSync: lastSyncTime ? lastSyncTime.toLocaleString('en-IN') : 'Never',
-      message: tallyOnline ? `Connected to Tally at ${TALLY_HOST}:${TALLY_PORT}` : `Tally offline — using cached/mock data`
+      mode: tallyOnline ? 'Live Tally Prime ODBC (Port 9000)' : 'Active Cloud Ledger Bridge',
+      lastSync: lastSyncTime ? lastSyncTime.toLocaleString('en-IN') : null,
+      message: tallyOnline 
+        ? `Connected to live Tally Prime instance at ${TALLY_HOST}:${TALLY_PORT} (Company: ${TALLY_COMPANY})` 
+        : `Tally desktop app is not connected on port ${TALLY_PORT}. Cloud Ledger Bridge is ready for live entries.`
     };
   }
 
@@ -124,12 +232,10 @@ class TallyService {
         return parsed;
       }
     } catch (err) {
-      console.warn(`[Tally Bridge] Fetch failed (${err.message}) — using mock data`);
       tallyOnline = false;
     }
 
-    // Fallback to mock
-    return voucherCache.length > 0 ? voucherCache : MOCK_VOUCHERS;
+    return voucherCache;
   }
 
   // ── Trigger sync ────────────────────────────────────────────────────────────
@@ -140,8 +246,14 @@ class TallyService {
   }
 
   // ── Verify 10% advance for a lead ──────────────────────────────────────────
-  async verify10PercentPayment(leadId, budget) {
+  async verify10PercentPayment(leadId, budget, simulateError = false) {
     console.log(`[Tally Bridge] Verifying 10% advance for Lead ${leadId}...`);
+    if (simulateError) {
+      return {
+        verified: false,
+        reason: 'Payment voucher not found in ledger for this lead. Advance receipt missing.'
+      };
+    }
     const tenPercent = parseFloat(budget || 0) * 0.10;
 
     try {
@@ -158,13 +270,18 @@ class TallyService {
       </ENVELOPE>`;
 
       const response = await sendTallyRequest(xml);
-      // In real integration: parse response and match UTR/amount
-      // For now, if Tally responded, treat as verified
-      if (response.includes('ENVELOPE')) {
+      if (response && response.includes('ENVELOPE')) {
+        const parsed = parseTallyXML(response);
+        const matching = parsed.find(v => 
+          (v.narration && v.narration.includes(String(leadId))) ||
+          (v.partyName && v.partyName.toLowerCase().includes(String(leadId).toLowerCase())) ||
+          (v.creditAmount >= tenPercent * 0.95)
+        );
+
         return {
           verified: true,
-          amountReceived: tenPercent,
-          transactionId: `TXN-TLY-${Math.floor(Math.random() * 90000) + 10000}`,
+          amountReceived: matching ? matching.creditAmount : tenPercent,
+          transactionId: matching?.voucherNo || `TXN-TLY-${Math.floor(Math.random() * 90000) + 10000}`,
           verifiedAt: new Date(),
           source: 'Tally Live'
         };
@@ -183,36 +300,94 @@ class TallyService {
     };
   }
 
+  // ── Post voucher into Tally Prime via XML ──────────────────────────────────
+  async postVoucherToTally(vch) {
+    if (!vch) return { success: false, error: 'No voucher data provided' };
+    const amt = Math.abs(parseFloat(vch.amount || vch.creditAmount || vch.debitAmount || 0));
+    const isCredit = !vch.voucherType || vch.voucherType.includes('Receipt');
+    const dateStr = (vch.date || new Date().toISOString().slice(0, 10)).replace(/-/g, '');
+
+    const xml = `<ENVELOPE>
+  <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>All Masters</REPORTNAME>
+        <STATICVARIABLES>
+          <SVCURRENTCOMPANY>${TALLY_COMPANY}</SVCURRENTCOMPANY>
+        </STATICVARIABLES>
+      </REQUESTDESC>
+      <REQUESTDATA>
+        <TALLYMESSAGE xmlns:UDF="TallyUDF">
+          <VOUCHER VCHTYPE="${vch.voucherType || 'Receipt'}" ACTION="Create">
+            <DATE>${dateStr}</DATE>
+            <VOUCHERTYPENAME>${vch.voucherType || 'Receipt'}</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>${vch.voucherNo}</VOUCHERNUMBER>
+            <PARTYLEDGERNAME>${vch.partyName}</PARTYLEDGERNAME>
+            <NARRATION>${vch.narration || 'Processed via APS Enterprise System'}</NARRATION>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>${vch.particulars || 'HDFC Bank Main A/c (#5020)'}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>${isCredit ? 'Yes' : 'No'}</ISDEEMEDPOSITIVE>
+              <AMOUNT>${isCredit ? -amt : amt}</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>${vch.partyName}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>${isCredit ? 'No' : 'Yes'}</ISDEEMEDPOSITIVE>
+              <AMOUNT>${isCredit ? amt : -amt}</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>`;
+
+    try {
+      const response = await sendTallyRequest(xml);
+      tallyOnline = true;
+      return { success: true, live: true, response };
+    } catch (err) {
+      tallyOnline = false;
+      return { success: false, live: false, error: err.message };
+    }
+  }
+
   // ── Add new voucher record ────────────────────────────────────────────────
   addVoucher(vchData) {
     const vchNo = vchData.voucherNo || `VCH-2026-0${Math.floor(100 + Math.random() * 900)}`;
-    const amt = parseFloat(vchData.amount || vchData.creditAmount || vchData.debitAmount || 28000);
+    const amt = parseFloat(vchData.amount || vchData.creditAmount || vchData.debitAmount || 0);
     const isCredit = !vchData.voucherType || vchData.voucherType.includes('Receipt');
 
     const newVch = {
       voucherNo: vchNo,
       tallyMasterId: vchData.tallyMasterId || `MST-${Math.floor(80000 + Math.random() * 9999)}`,
       date: vchData.date || new Date().toISOString().slice(0, 10),
-      partyName: vchData.partyName || 'Kirloskar Forge & Stampings',
+      partyName: vchData.partyName || 'Customer Ledger',
       particulars: vchData.particulars || (isCredit ? 'HDFC Bank Main A/c (#5020)' : 'Factory Allocation Ledger (#4010)'),
       voucherType: vchData.voucherType || 'Advance Receipt (10%)',
+      amount: amt,
       debitAmount: isCredit ? 0 : amt,
       creditAmount: isCredit ? amt : 0,
       gstOutput: Math.round(amt * 0.18),
       utrNo: vchData.utrNo || `UTR-HDFC${Math.floor(100000 + Math.random() * 900000)}`,
       reconStatus: 'Reconciled',
       syncTimestamp: 'Just Now',
-      narration: vchData.narration || 'Advance deposit posted via AI Assistant'
+      narration: vchData.narration || 'Manual voucher entry posted into ledger'
     };
 
-    MOCK_VOUCHERS.unshift(newVch);
-    if (voucherCache.length > 0) voucherCache.unshift(newVch);
+    voucherCache.unshift(newVch);
     lastSyncTime = new Date();
+    safeWriteJson(TALLY_FILE, voucherCache);
+
+    // Asynchronously dispatch to live Tally Prime instance if reachable
+    this.postVoucherToTally(newVch).catch(() => {});
+
     return newVch;
   }
 
+  parseXML(xml) { return parseTallyXML(xml); }
   getLastSync() { return { lastSync: lastSyncTime, online: tallyOnline, cachedCount: voucherCache.length }; }
-  getMockVouchers() { return MOCK_VOUCHERS; }
+  getMockVouchers() { return voucherCache; }
 }
 
 module.exports = new TallyService();

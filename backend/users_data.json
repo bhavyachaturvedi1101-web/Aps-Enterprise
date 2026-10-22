@@ -1,0 +1,116 @@
+[
+  {
+    "id": "u1792168659507",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T16:37:39.507Z"
+  },
+  {
+    "id": "u1792167078328",
+    "name": "Rohan Verma",
+    "email": "rohan.1792167078320@aps-enterprise.com",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T16:11:18.328Z"
+  },
+  {
+    "id": "u1792165035423",
+    "name": "Count Test Emp",
+    "email": "count@aps.com",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T15:37:15.423Z"
+  },
+  {
+    "id": "u1792165035300",
+    "name": "Default Role Employee",
+    "email": "defaul@aps.com",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T15:37:15.300Z"
+  },
+  {
+    "id": "u1792165035286",
+    "name": "Fresh Employee",
+    "email": "fresh@aps.com",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T15:37:15.286Z"
+  },
+  {
+    "id": "u1792165035267",
+    "name": "Test Employee One",
+    "email": "test.emp@aps.com",
+    "role": "Operations",
+    "module": "Operations & CRM",
+    "lastLogin": "Just now",
+    "status": "Online",
+    "createdAt": "2026-10-16T15:37:15.267Z"
+  },
+  {
+    "id": "u1",
+    "name": "Super Admin",
+    "email": "admin@apsenterprises.in",
+    "role": "Super Admin",
+    "module": "All Modules",
+    "lastLogin": "Active",
+    "status": "Online"
+  },
+  {
+    "id": "u2",
+    "name": "Operations Manager",
+    "email": "manager@apsenterprises.in",
+    "role": "Admin",
+    "module": "Operations & Production ERP",
+    "lastLogin": "Active",
+    "status": "Online"
+  },
+  {
+    "id": "u3",
+    "name": "Accounts Officer",
+    "email": "accounts@apsenterprises.in",
+    "role": "Accountant",
+    "module": "Tally Sync & Invoicing",
+    "lastLogin": "Active",
+    "status": "Online"
+  },
+  {
+    "id": "u4",
+    "name": "Sales Telecaller",
+    "email": "telecaller@apsenterprises.in",
+    "role": "Telecaller",
+    "module": "Voice AI & CRM Dialer",
+    "lastLogin": "Active",
+    "status": "Online"
+  },
+  {
+    "id": "u5",
+    "name": "Amit Patidar",
+    "email": "amit.patidar@apsenterprises.in",
+    "role": "Employee",
+    "module": "CRM & Client Visits",
+    "lastLogin": "Active",
+    "status": "Online"
+  },
+  {
+    "id": "u6",
+    "name": "Vikram Rathore",
+    "email": "vikram.rathore@apsenterprises.in",
+    "role": "Operations",
+    "module": "Production ERP & Job Cards",
+    "lastLogin": "Active",
+    "status": "Online"
+  }
+]

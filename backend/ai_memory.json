@@ -1,0 +1,248 @@
+[
+  {
+    "id": "mem-1792394451874-d5f8",
+    "timestamp": "2026-10-19T07:20:51.874Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "give task to manager",
+    "summary": "Assigned task \"Verify raw material stock levels (steel sheets & copper coils) before next batch\" (HIGH) to Operations Manager (Operations & Production Lead)",
+    "target": "Operations Manager",
+    "status": "completed",
+    "details": {
+      "employeeId": "e2",
+      "task": {
+        "id": "task-e2-1792394451866-0",
+        "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+        "priority": "HIGH",
+        "dueIn": "35 mins",
+        "leadName": "Operations Manager",
+        "assignedAt": "2026-10-19T07:20:51.866Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792392843072-rgbs",
+    "timestamp": "2026-10-19T06:54:03.072Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Bhavya ko urgent task assign kardo: Review Global Tech advance payment",
+    "summary": "Task assignment to \"Kardo\" rejected: \"Kardo\" is not an employee or team member of APS Enterprise.",
+    "target": "Kardo",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Kardo",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 116
+    }
+  },
+  {
+    "id": "mem-1792235857950-4lwn",
+    "timestamp": "2026-10-17T11:17:37.950Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "assign task to manager",
+    "summary": "Assigned task \"Verify raw material stock levels (steel sheets & copper coils) before next batch\" (HIGH) to Operations Manager (Operations & Production Lead)",
+    "target": "Operations Manager",
+    "status": "completed",
+    "details": {
+      "employeeId": "e2",
+      "task": {
+        "id": "task-e2-1792235857946-0",
+        "title": "Verify raw material stock levels (steel sheets & copper coils) before next batch",
+        "priority": "HIGH",
+        "dueIn": "35 mins",
+        "leadName": "Operations Manager",
+        "assignedAt": "2026-10-17T11:17:37.946Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792235150347-o0gm",
+    "timestamp": "2026-10-17T11:05:50.347Z",
+    "type": "LEARNED_FACT",
+    "topic": "business_knowledge",
+    "query": "Remember that Indore factory opens at 8 AM",
+    "summary": "Indore factory opens at 8 AM",
+    "target": "Indore",
+    "status": "saved",
+    "details": {
+      "learnedAt": "2026-10-17T11:05:50.323Z",
+      "source": "user_direct_input"
+    }
+  },
+  {
+    "id": "mem-1792235150317-vkwl",
+    "timestamp": "2026-10-17T11:05:50.317Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "Amit Patidar ko task do: Finalize quotation",
+    "summary": "Assigned task \"Draft custom multi-unit machine quotation for Bharat Forge industrial order\" (HIGH) to Amit Patidar (Field Sales Executive)",
+    "target": "Amit Patidar",
+    "status": "completed",
+    "details": {
+      "employeeId": "e5",
+      "task": {
+        "id": "task-e5-1792235150307-0",
+        "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+        "priority": "HIGH",
+        "dueIn": "40 mins",
+        "leadName": "Amit Patidar",
+        "assignedAt": "2026-10-17T11:05:50.307Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792235150278-7nq8",
+    "timestamp": "2026-10-17T11:05:50.278Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Animesh ko task do: complete documentation",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 116
+    }
+  },
+  {
+    "id": "mem-1792235072374-ro0f",
+    "timestamp": "2026-10-17T11:04:32.374Z",
+    "type": "LEARNED_FACT",
+    "topic": "business_knowledge",
+    "query": "Remember that Indore factory opens at 8 AM",
+    "summary": "Indore factory opens at 8 AM",
+    "target": "Indore",
+    "status": "saved",
+    "details": {
+      "learnedAt": "2026-10-17T11:04:32.367Z",
+      "source": "user_direct_input"
+    }
+  },
+  {
+    "id": "mem-1792235072361-ta7b",
+    "timestamp": "2026-10-17T11:04:32.361Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "Amit Patidar ko task do: Finalize quotation",
+    "summary": "Assigned task \"Draft custom multi-unit machine quotation for Bharat Forge industrial order\" (HIGH) to Amit Patidar (Field Sales Executive)",
+    "target": "Amit Patidar",
+    "status": "completed",
+    "details": {
+      "employeeId": "e5",
+      "task": {
+        "id": "task-e5-1792235072353-0",
+        "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+        "priority": "HIGH",
+        "dueIn": "40 mins",
+        "leadName": "Amit Patidar",
+        "assignedAt": "2026-10-17T11:04:32.353Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792220815863-31k8",
+    "timestamp": "2026-10-17T07:06:55.863Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "Amit Patidar ko task assign karo: follow up with Surat client",
+    "summary": "Assigned task \"Draft custom multi-unit machine quotation for Bharat Forge industrial order\" (HIGH) to Amit Patidar (Field Sales Executive)",
+    "target": "Amit Patidar",
+    "status": "completed",
+    "details": {
+      "employeeId": "e5",
+      "task": {
+        "id": "task-e5-1792220815858-0",
+        "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+        "priority": "HIGH",
+        "dueIn": "40 mins",
+        "leadName": "Amit Patidar",
+        "assignedAt": "2026-10-17T07:06:55.858Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792220815844-36us",
+    "timestamp": "2026-10-17T07:06:55.844Z",
+    "type": "LEARNED_FACT",
+    "topic": "entity_profile",
+    "query": "Yaad rakhna ki Animesh hamara machinery raw material supplier hai Bhopal se",
+    "summary": "Animesh hamara machinery raw material supplier hai Bhopal se",
+    "target": "Animesh",
+    "status": "saved",
+    "details": {
+      "learnedAt": "2026-10-17T07:06:55.840Z",
+      "source": "user_direct_input"
+    }
+  },
+  {
+    "id": "mem-1792220815780-bhv9",
+    "timestamp": "2026-10-17T07:06:55.780Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Animesh ko task assign karo: complete video demo",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 6
+    }
+  },
+  {
+    "id": "mem-1792220750583-mher",
+    "timestamp": "2026-10-17T07:05:50.583Z",
+    "type": "TASK_ASSIGNED",
+    "topic": "task_assignment",
+    "query": "Amit Patidar ko task assign karo: follow up with Surat client",
+    "summary": "Assigned task \"Draft custom multi-unit machine quotation for Bharat Forge industrial order\" (HIGH) to Amit Patidar (Field Sales Executive)",
+    "target": "Amit Patidar",
+    "status": "completed",
+    "details": {
+      "employeeId": "e5",
+      "task": {
+        "id": "task-e5-1792220750579-0",
+        "title": "Draft custom multi-unit machine quotation for Bharat Forge industrial order",
+        "priority": "HIGH",
+        "dueIn": "40 mins",
+        "leadName": "Amit Patidar",
+        "assignedAt": "2026-10-17T07:05:50.579Z"
+      }
+    }
+  },
+  {
+    "id": "mem-1792220750385-e1gz",
+    "timestamp": "2026-10-17T07:05:50.385Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Animesh ko task assign karo: complete video demo",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 6
+    }
+  },
+  {
+    "id": "mem-init-1",
+    "timestamp": "2026-10-17T06:00:00.000Z",
+    "type": "SYSTEM",
+    "topic": "system_initialization",
+    "summary": "APS Enterprise AI Assistant memory initialized with 6 registered team members and full CRM catalog.",
+    "details": {
+      "registeredMembers": [
+        "Super Admin",
+        "Operations Manager",
+        "Accounts Officer",
+        "Sales Telecaller",
+        "Amit Patidar",
+        "Vikram Rathore"
+      ],
+      "status": "active"
+    }
+  }
+]

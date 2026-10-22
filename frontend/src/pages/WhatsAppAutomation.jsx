@@ -6,56 +6,74 @@ const API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 const DEFAULT_MESSAGES = [
   {
-    id: 'msg-001',
-    leadId: 'LEAD-004',
-    recipientName: 'Global Tech (Vikram Singhal)',
-    phone: '+91 98112 33445',
-    templateId: 'payment_reminder_advance_10pct',
-    sequenceType: 'Payment Reminder (10% Advance)',
-    product: 'Hydraulic Press 200T',
-    advanceAmount: '₹4,200',
-    status: 'Delivered',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    responseRate: 'Opened & Read'
+    messageId: "WA-001",
+    leadId: "LEAD-012",
+    leadName: "Harish Choudhary",
+    phone: "+91 98260 11223",
+    sequenceType: "PAYMENT_REMINDER",
+    product: "Heavy Duty Hydraulic Paper Plate & Thali Press",
+    advanceAmount: "24,500",
+    totalBudget: "2,45,000",
+    status: "Delivered",
+    sentAt: "2026-10-15T16:30:00.000Z",
+    preview: "Dear Harish Choudhary, your 10% advance invoice (₹24,500) for Heavy Duty Hydraulic Press is ready.",
+    lastEvent: "Delivered to handset"
   },
   {
-    id: 'msg-002',
-    leadId: 'LEAD-001',
-    recipientName: 'Acme Machinery (Rajesh Kumar)',
-    phone: '+91 98223 44556',
-    templateId: 'order_booking_confirmation',
-    sequenceType: 'Booking & Dispatch Confirmation',
-    product: 'CNC Milling Center 5-Axis',
-    advanceAmount: '₹25,000',
-    status: 'Read',
-    timestamp: new Date(Date.now() - 14400000).toISOString(),
-    responseRate: 'Acknowledged'
+    messageId: "WA-002",
+    leadId: "LEAD-016",
+    leadName: "Neeraj Malviya",
+    phone: "+91 94250 88771",
+    sequenceType: "PRODUCTION_KICKOFF",
+    product: "Fully Automatic Double Die Dona Pattal Machine",
+    advanceAmount: "12,500",
+    totalBudget: "1,25,000",
+    status: "Read",
+    sentAt: "2026-10-15T14:20:00.000Z",
+    preview: "Production kicked off on Assembly Floor A for your Double Die Dona Machine. Job Card: JC-0992.",
+    lastEvent: "Read by client"
   },
   {
-    id: 'msg-003',
-    leadId: 'LEAD-003',
-    recipientName: 'Tata Motors Vendor (Sunil Patil)',
-    phone: '+91 99334 55667',
-    templateId: 'factory_production_release',
-    sequenceType: 'Factory Dispatch & Milestone Sync',
-    product: 'VMC Machining Center',
-    advanceAmount: '₹18,500',
-    status: 'Delivered',
-    timestamp: new Date(Date.now() - 43200000).toISOString(),
-    responseRate: 'Scheduled'
+    messageId: "WA-003",
+    leadId: "LEAD-018",
+    leadName: "Alok Mishra",
+    phone: "+91 98390 44551",
+    sequenceType: "DISPATCH_NOTICE",
+    product: "Automatic High-Speed Paper Cup Making Machine",
+    advanceAmount: "75,000",
+    totalBudget: "7,50,000",
+    status: "Read",
+    sentAt: "2026-10-16T09:25:00.000Z",
+    preview: "Great news! Your Paper Cup Machine has been dispatched via VRL Logistics. Tracking: APS-TRK-882910.",
+    lastEvent: "Read by client"
   },
   {
-    id: 'msg-004',
-    leadId: 'LEAD-008',
-    recipientName: 'Reliance Automation (Deepak Verma)',
-    phone: '+91 98445 66778',
-    templateId: 'lead_qualification_outreach',
-    sequenceType: 'Lead Follow-up & Inquiry Verification',
-    product: 'Laser Sheet Cutting Machine',
-    advanceAmount: '₹12,000',
-    status: 'Sent',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    responseRate: 'In Progress'
+    messageId: "WA-004",
+    leadId: "LEAD-014",
+    leadName: "Sanjay Tiwari",
+    phone: "+91 97550 33442",
+    sequenceType: "BOOKING_CONFIRMATION",
+    product: "Fully Automatic Double Die Dona Pattal Machine",
+    advanceAmount: "12,500",
+    totalBudget: "1,25,000",
+    status: "Delivered",
+    sentAt: "2026-10-16T10:50:00.000Z",
+    preview: "Payment received! ₹12,500 advance confirmed via Tally. Factory order released for manufacturing.",
+    lastEvent: "Delivered to handset"
+  },
+  {
+    messageId: "WA-005",
+    leadId: "LEAD-001",
+    leadName: "Rajesh Sharma",
+    phone: "+91 98260 12345",
+    sequenceType: "CATALOG_BROCHURE",
+    product: "Fully Automatic Double Die Dona Pattal Machine",
+    advanceAmount: "12,500",
+    totalBudget: "1,25,000",
+    status: "Read",
+    sentAt: "2026-10-15T09:40:00.000Z",
+    preview: "Hello Rajesh ji, here is the full machinery technical catalog and operating video for APS-DD-01.",
+    lastEvent: "Read by client"
   }
 ];
 
@@ -123,210 +141,14 @@ const DEFAULT_TEMPLATES = [
 ];
 
 const DEFAULT_ANALYTICS = {
-  totalSent: 342,
-  deliveryRate: '99.4%',
-  readRate: '94.8%',
-  advanceRecoveryRate: '88.5%',
-  totalRevenueRecovered: '₹4,85,000'
+  totalSent: 1248,
+  deliveryRate: '100%',
+  readRate: '100%',
+  advanceRecoveryRate: '100%',
+  totalRevenueRecovered: '₹14,50,000'
 };
 
-const INITIAL_CLIENT_THREADS = {
-  'LEAD-001': {
-    id: 'LEAD-001',
-    name: 'John Doe',
-    company: 'Acme Machinery Corp',
-    phone: '+91 98765 43210',
-    product: 'CNC Machine v2 (4-Axis)',
-    stage: 'Confirmed Lead',
-    advanceAmount: '4,200',
-    unreadCount: 0,
-    avatarColor: '#2563eb',
-    avatarLetter: 'JD',
-    messages: [
-      {
-        id: 'msg-101',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Order Advance Notice',
-        text: 'Hello John Doe, your booking for CNC Machine v2 (Total ₹42,000) is approved! To release your machine order to the manufacturing queue, please confirm the 10% advance payment of ₹4,200. Click the payment link below or reply to this message.',
-        buttons: ['Verify & Pay Advance', 'Speak to Account Manager'],
-        time: '11:51 AM',
-        status: 'read'
-      },
-      {
-        id: 'msg-102',
-        sender: 'customer',
-        senderName: 'John Doe (Customer)',
-        text: 'Hello APS Team, I have initiated the 10% advance (₹4,200) via HDFC UPI Ref #UPI-982143. Kindly verify.',
-        time: '11:53 AM'
-      },
-      {
-        id: 'msg-103',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        text: 'Payment received & verified via Tally ERP Sync! Production Job Card #MFG-8821 generated for CNC Machine v2. Estimated dispatch: 4 business days.',
-        time: '11:54 AM',
-        status: 'read'
-      }
-    ]
-  },
-  'LEAD-002': {
-    id: 'LEAD-002',
-    name: 'Priya Patel',
-    company: 'Apex Precision Tech',
-    phone: '+91 98112 33445',
-    product: 'Hydraulic Press HP-50',
-    stage: 'Qualified',
-    advanceAmount: '3,500',
-    unreadCount: 1,
-    avatarColor: '#7c3aed',
-    avatarLetter: 'PP',
-    messages: [
-      {
-        id: 'msg-201',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Quote & Proposal',
-        text: 'Hello Priya, here is the technical quotation and performance sheet for Hydraulic Press HP-50 (₹35,000). Please review the spec sheet and let us know if you need customized tooling.',
-        buttons: ['Download Spec PDF', 'Request Callback'],
-        time: '12:15 PM',
-        status: 'read'
-      },
-      {
-        id: 'msg-202',
-        sender: 'customer',
-        senderName: 'Priya Patel (Apex Precision Tech)',
-        text: 'Received the quotation. Our engineering team has reviewed the specs. We will proceed with the 10% booking advance after tomorrow morning call.',
-        time: '12:23 PM'
-      }
-    ]
-  },
-  'LEAD-003': {
-    id: 'LEAD-003',
-    name: 'Rajesh Nair',
-    company: 'Dynamic Motors Corp',
-    phone: '+91 98220 12345',
-    product: 'Industrial Lathe L-200',
-    stage: 'In Production',
-    advanceAmount: '8,500',
-    unreadCount: 0,
-    avatarColor: '#059669',
-    avatarLetter: 'RN',
-    messages: [
-      {
-        id: 'msg-301',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Production Update',
-        text: 'Dear Rajesh Nair, Batch #MFG-8821 for Industrial Lathe L-200 has completed CNC roughing and is now in QA testing stage. Expected dispatch date: 24th Aug.',
-        buttons: ['Track Batch Progress', 'Download QA Certificate'],
-        time: '10:15 AM',
-        status: 'read'
-      },
-      {
-        id: 'msg-302',
-        sender: 'customer',
-        senderName: 'Rajesh Nair (Dynamic Motors)',
-        text: 'Received the QA checklist. Please ensure calibration certificates are included with shipping consignment.',
-        time: '10:42 AM'
-      },
-      {
-        id: 'msg-303',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        text: 'Confirmed. Hard copies & digital certificates attached to ERP shipping bill.',
-        time: '11:05 AM',
-        status: 'read'
-      }
-    ]
-  },
-  'LEAD-004': {
-    id: 'LEAD-004',
-    name: 'Amit Verma',
-    company: 'Global Tech Ltd',
-    phone: '+91 98330 99887',
-    product: 'Laser Cutter LC-100',
-    stage: 'Booked',
-    advanceAmount: '6,000',
-    unreadCount: 0,
-    avatarColor: '#d97706',
-    avatarLetter: 'AV',
-    messages: [
-      {
-        id: 'msg-401',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Dual Approval Confirmation',
-        text: 'Booking for Laser Cutter LC-100 approved by Sales & Operations. Please verify the 10% advance deposit (₹6,000) to clear factory release gate.',
-        buttons: ['Verify & Pay Advance', 'Contact Operations'],
-        time: 'Yesterday',
-        status: 'read'
-      },
-      {
-        id: 'msg-402',
-        sender: 'customer',
-        senderName: 'Amit Verma (Global Tech)',
-        text: 'We are processing the RTGS payment through our corporate account today by 3 PM.',
-        time: '09:30 AM'
-      }
-    ]
-  },
-  'LEAD-005': {
-    id: 'LEAD-005',
-    name: 'Vikram Malhotra',
-    company: 'Precision Engineering Works',
-    phone: '+91 98450 77665',
-    product: 'Milling Machine M-40',
-    stage: 'Enquiry',
-    advanceAmount: '2,500',
-    unreadCount: 0,
-    avatarColor: '#0891b2',
-    avatarLetter: 'VM',
-    messages: [
-      {
-        id: 'msg-501',
-        sender: 'customer',
-        senderName: 'Vikram Malhotra',
-        text: 'Hello APS Team, is 0% financing or EMI option available for Milling Machine M-40?',
-        time: '10:20 AM'
-      },
-      {
-        id: 'msg-502',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Flexible Financing Plans',
-        text: 'Hello Vikram, yes! We offer 0% interest 6-month EMI on Milling Machine M-40 with just 10% booking advance. Would you like a call from our finance desk?',
-        buttons: ['Request EMI Callback', 'Download EMI Calculator'],
-        time: '10:25 AM',
-        status: 'read'
-      }
-    ]
-  },
-  'LEAD-006': {
-    id: 'LEAD-006',
-    name: 'Sanjay Singhal',
-    company: 'Nexus Automation Plant',
-    phone: '+91 98201 55667',
-    product: 'Robotic Welding Arm R-5',
-    stage: 'Enquiry',
-    advanceAmount: '12,000',
-    unreadCount: 0,
-    avatarColor: '#dc2626',
-    avatarLetter: 'SS',
-    messages: [
-      {
-        id: 'msg-601',
-        sender: 'business',
-        senderName: 'APS Enterprise Verified',
-        header: 'APS Enterprise — Product Brochure',
-        text: 'Hello Nexus Automation Team! Thank you for your interest in Robotic Welding Arm R-5. Attached is the robotic integration catalog.',
-        buttons: ['View Catalog', 'Schedule Technical Demo'],
-        time: '09:10 AM',
-        status: 'read'
-      }
-    ]
-  }
-};
+const INITIAL_CLIENT_THREADS = {};
 
 export default function WhatsAppAutomation() {
   const navigate = useNavigate();
@@ -444,6 +266,16 @@ export default function WhatsAppAutomation() {
 
   useEffect(() => {
     loadData();
+    const handleWaUpdate = (e) => {
+      loadData();
+      if (e.detail) {
+        const msg = e.detail;
+        setMessages(prev => [msg, ...prev]);
+        showToast('New WhatsApp message dispatched to ' + (msg.leadName || 'client'));
+      }
+    };
+    window.addEventListener('aps_whatsapp_updated', handleWaUpdate);
+    return () => window.removeEventListener('aps_whatsapp_updated', handleWaUpdate);
   }, []);
 
   const handleSelectClient = (clientId) => {
@@ -1016,9 +848,9 @@ export default function WhatsAppAutomation() {
 
       {/* ── TAB 4: MANUAL TRIGGER & WHATSAPP MULTI-CLIENT LIVE INBOX ── */}
       {activeTab === 'broadcast' && (
-        <div style={s.waAppContainer}>
+        <div className="whatsapp-app-container" style={s.waAppContainer}>
           {/* ──── LEFT PANE: WHATSAPP INBOX CHATS LIST (Matching User Reference Image) ──── */}
-          <div style={s.waInboxPane}>
+          <div className="whatsapp-inbox-pane" style={s.waInboxPane}>
             {/* Top Bar Header */}
             <div style={s.waInboxHeader}>
               <div style={s.waInboxTitleRow}>
@@ -1200,7 +1032,7 @@ export default function WhatsAppAutomation() {
                 onClick={() => setShowQuickTemplateModal(true)}
                 style={s.waTriggerHsmBtn}
               >
-                ⚡ Dispatch HSM Template
+                Dispatch HSM Template
               </button>
             </div>
 
@@ -1275,7 +1107,7 @@ export default function WhatsAppAutomation() {
             {/* Incoming Customer Message Simulator Bar */}
             <div style={s.quickSimSection}>
               <span style={s.quickSimLabel}>
-                📥 Simulate Customer Response ({activeClientThread?.name}):
+                Simulate Customer Response ({activeClientThread?.name}):
               </span>
               <div style={s.quickSimPillsWrap}>
                 <button
@@ -1284,7 +1116,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer confirming advance payment"
                 >
-                  ✓ "Payment Done via UPI"
+                  "Payment Done via UPI"
                 </button>
                 <button
                   type="button"
@@ -1292,7 +1124,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer requesting documentation"
                 >
-                  📄 "Request Warranty PDF"
+                  "Request Warranty PDF"
                 </button>
                 <button
                   type="button"
@@ -1300,7 +1132,7 @@ export default function WhatsAppAutomation() {
                   style={s.quickSimBtn}
                   title="Simulate customer asking about delivery schedule"
                 >
-                  🚚 "Delivery Schedule Query"
+                  "Delivery Schedule Query"
                 </button>
               </div>
             </div>
@@ -1309,7 +1141,6 @@ export default function WhatsAppAutomation() {
             <form onSubmit={handleSendChatMessage} style={s.chatInputForm}>
               {/* Fixed APS Enterprise Admin Sender Badge */}
               <div style={s.adminSenderBadge} title="You are typing and sending this message as APS Enterprise (Admin)">
-                <span style={{ fontSize: '0.85rem' }}>🏢</span>
                 <span style={{ fontWeight: 800, color: '#15803d', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>APS Enterprise</span>
               </div>
 

@@ -9,12 +9,14 @@ const authorize = (allowedRoles = []) => {
       });
     }
 
-    // Admin role has full access to all endpoints
-    if (req.user.role === 'Admin') {
+    const currentRole = (req.user.role || '').toLowerCase().trim();
+    // Admin / Super Admin role has full access to all endpoints
+    if (['admin', 'super admin', 'superadmin'].includes(currentRole)) {
       return next();
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(req.user.role)) {
+    const normalizedAllowed = allowedRoles.map(r => r.toLowerCase().trim());
+    if (normalizedAllowed.length > 0 && !normalizedAllowed.includes(currentRole)) {
       return res.status(403).json({
         error: 'Forbidden',
         code: 'FORBIDDEN',

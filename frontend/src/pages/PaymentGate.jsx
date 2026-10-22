@@ -52,6 +52,15 @@ export default function PaymentGate() {
 
   useEffect(() => {
     fetchPayments();
+    const handleUpdate = () => {
+      fetchPayments();
+    };
+    window.addEventListener('aps_leads_updated', handleUpdate);
+    window.addEventListener('aps_tally_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('aps_leads_updated', handleUpdate);
+      window.removeEventListener('aps_tally_updated', handleUpdate);
+    };
   }, []);
 
   const handleVerify = async (pay) => {
@@ -118,7 +127,7 @@ export default function PaymentGate() {
       : `${pendingPayments.slice(0, 3).map(p => `${p.lead} (${p.amount})`).join(', ')} + ${pendingPayments.length - 3} other account(s)`;
 
   return (
-    <div style={{ ...s.page, padding: undefined }} className="page-container">
+    <div style={s.page} className="page-container">
       {/* In-app Toast Banner */}
       {toast && (
         <div style={{
@@ -139,7 +148,11 @@ export default function PaymentGate() {
           gap: 10,
           animation: 'fadeIn 0.2s ease-out'
         }}>
-          <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          {toast.type === 'error' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          )}
           <span>{toast.msg}</span>
           <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '1rem', marginLeft: 8 }}>×</button>
         </div>
@@ -223,8 +236,8 @@ export default function PaymentGate() {
 }
 
 const s = {
-  page: { padding:'2rem', fontFamily:'var(--font-body)' },
-  pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.25rem' },
+  page: { padding: '2rem 2.5rem', fontFamily: 'var(--font-body)', maxWidth: 1440, margin: '0 auto', boxSizing: 'border-box' },
+  pageHead: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' },
   title: { fontSize:'1.8rem', fontWeight:800, fontFamily:'var(--font-heading)', color:'#09090b', margin:0 },
   sub: { fontSize:'0.78rem', color:'#71717a', marginTop:4 },
   alertBox: { border:'1px solid', borderRadius:14, padding:'1rem 1.25rem', display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.25rem' },

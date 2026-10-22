@@ -4,18 +4,27 @@ require('dotenv').config();
 
 const databaseUrl = process.env.DATABASE_URL;
 
+const poolConfig = {
+  max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 5,
+  min: 0,
+  acquire: 30000,
+  idle: 10000
+};
+
 let sequelize;
 
 if (databaseUrl) {
+  const useSSL = process.env.DATABASE_SSL !== 'false' && !databaseUrl.includes('sslmode=disable');
   sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
-    dialectOptions: {
+    pool: poolConfig,
+    dialectOptions: useSSL ? {
       ssl: {
         require: true,
         rejectUnauthorized: false
       }
-    }
+    } : {}
   });
 } else {
   sequelize = new Sequelize(
@@ -27,31 +36,45 @@ if (databaseUrl) {
       port: process.env.DB_PORT || 5432,
       dialect: 'postgres',
       logging: process.env.NODE_ENV === 'development' ? console.log : false,
+      pool: poolConfig
     }
   );
 }
 
-const connectDB = async () => {
+let isConnected = false;
+
+const isDbConnected = () => isConnected;
+
+const connectDB = async (retryCount = 1) => {
   try {
     await sequelize.authenticate();
+    isConnected = true;
     console.log('PostgreSQL database connection has been established successfully.');
 
     if (process.env.NODE_ENV === 'development') {
-      // In dev: alter tables to reflect model changes
+      // In dev: safely alter tables to reflect model schema updates
       await sequelize.sync({ alter: true });
       console.log('Database schemas synced (alter) successfully.');
     } else {
-      // In production: only create tables if they don't exist — never drop data
+      // In production: only create missing tables — never drop data
       await sequelize.sync({ force: false, alter: false });
       console.log('Database schemas synced (safe) successfully.');
     }
   } catch (error) {
+    if (retryCount > 0) {
+      console.warn(`[DB Connect Warning] First attempt failed (${error.message}). Retrying in 1s...`);
+      await new Promise(r => setTimeout(r, 1000));
+      return connectDB(retryCount - 1);
+    }
+    isConnected = false;
     console.error('Unable to connect to the database:', error.message || error);
-    throw error; // Let caller handle it (don't call process.exit here so Vercel serverless works)
+    throw error;
   }
 };
 
 module.exports = {
   sequelize,
-  connectDB
+  connectDB,
+  isDbConnected
 };
+

@@ -22,17 +22,17 @@ const mockWhatsAppSequences = store.mockWhatsAppSequences;
 const mockWhatsAppTemplates = store.mockWhatsAppTemplates;
 const systemConfig = store.systemConfig;
 
-// ─── Meta Cloud API Config ─────────────────────────────────────────────────────
+// ─── Dual-Provider WhatsApp Configuration (DoubleTick & Meta Cloud API) ─────
+const WA_PROVIDER = (process.env.WHATSAPP_PROVIDER || 'doubletick').toLowerCase();
+const DOUBLETICK_KEY = process.env.DOUBLETICK_API_KEY || '';
+const DOUBLETICK_BASE_URL = process.env.DOUBLETICK_API_BASE_URL || 'https://web.doubletick.io/v1';
+
 const WA_TOKEN = process.env.WHATSAPP_TOKEN || '';
 const WA_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
 const WA_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'aps_webhook_verify_2026';
 
 // ─── Helper: call Meta WhatsApp Cloud API ─────────────────────────────────────
 async function callMetaAPI(payload) {
-  if (!WA_TOKEN || !WA_PHONE_ID) {
-    console.log('[WhatsApp] No WHATSAPP_TOKEN set — simulating send (mock mode)');
-    return { messages: [{ id: `wamid.mock_${Date.now()}` }] };
-  }
   return new Promise((resolve, reject) => {
     const body = JSON.stringify(payload);
     const options = {
@@ -59,26 +59,121 @@ async function callMetaAPI(payload) {
   });
 }
 
+// ─── Helper: Dispatch WhatsApp via active provider or simulated fallback ─────
+async function dispatchWhatsApp(payload, type = 'template') {
+  // 1. DoubleTick Provider
+  if (WA_PROVIDER === 'doubletick' && DOUBLETICK_KEY) {
+    try {
+      const axios = require('axios');
+      const endpoint = type === 'template'
+        ? `${DOUBLETICK_BASE_URL}/whatsapp/message/template`
+        : `${DOUBLETICK_BASE_URL}/whatsapp/message/text`;
+
+      let dtPayload = payload;
+      // Transform Meta schema to DoubleTick native schema if necessary
+      if (payload.messaging_product === 'whatsapp') {
+        if (type === 'template') {
+          const bodyParams = (payload.template?.components || [])
+            .flatMap(c => c.parameters || [])
+            .map(p => p.text || '');
+
+          dtPayload = {
+            messages: [{
+              to: payload.to,
+              content: {
+                templateName: payload.template?.name,
+                language: payload.template?.language?.code || 'en',
+                templateData: {
+                  body: {
+                    placeholders: bodyParams
+                  }
+                }
+              }
+            }]
+          };
+        } else {
+          dtPayload = {
+            messages: [{
+              to: payload.to,
+              content: {
+                text: payload.text?.body || ''
+              }
+            }]
+          };
+        }
+      }
+
+      const res = await axios.post(endpoint, dtPayload, {
+        headers: {
+          'Authorization': `Bearer ${DOUBLETICK_KEY}`,
+          'x-api-key': DOUBLETICK_KEY,
+          'Content-Type': 'application/json'
+        },
+        timeout: 8000
+      });
+      return res.data;
+    } catch (err) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error(`[DoubleTick WhatsApp CRITICAL] Live delivery failed: ${err.message}`);
+        throw new Error(`DoubleTick WhatsApp delivery failure: ${err.message}`);
+      }
+      console.warn(`[DoubleTick WhatsApp Warning] (${err.message}). Safe simulated dispatch in dev/test.`);
+      return { messages: [{ id: `dt.sim_${Date.now()}` }], mode: 'simulated' };
+    }
+  }
+
+  // 2. Meta Cloud API
+  if (WA_TOKEN && WA_PHONE_ID) {
+    try {
+      return await callMetaAPI(payload);
+    } catch (err) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error(`[Meta WhatsApp CRITICAL] Live delivery failed: ${err.message}`);
+        throw new Error(`Meta Cloud API delivery failure: ${err.message}`);
+      }
+      console.warn(`[Meta WhatsApp Warning] (${err.message}). Safe simulated dispatch in dev/test.`);
+      return { messages: [{ id: `wamid.mock_${Date.now()}` }], mode: 'simulated' };
+    }
+  }
+
+  // 3. Fallback: Simulated Mock Mode for demos/tests
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Production WhatsApp credentials missing (set DOUBLETICK_API_KEY or WHATSAPP_TOKEN)');
+  }
+  console.log('[WhatsApp] No live provider key set — simulating send (mock mode)');
+  return { messages: [{ id: `wamid.mock_${Date.now()}` }], mode: 'simulated' };
+}
+
+// ─── Helper: phone number normalizer ─────────────────────────────────────────
+function normalizePhone(to) {
+  let cleaned = String(to || '').replace(/[\s\-\+]/g, '').replace(/^0+/, '');
+  if (cleaned.length === 10) cleaned = '91' + cleaned;
+  return cleaned;
+}
+
+// ─── Helper: live provider check ─────────────────────────────────────────────
+const isLiveWhatsApp = () => (WA_PROVIDER === 'doubletick' ? Boolean(DOUBLETICK_KEY) : Boolean(WA_TOKEN));
+
 // ─── Helper: send a template message ─────────────────────────────────────────
 async function sendTemplateMessage(to, templateName, components = [], language = 'en_IN') {
   const payload = {
     messaging_product: 'whatsapp',
-    to: to.replace(/[\s\-\+]/g, '').replace(/^0/, '+91'),
+    to: normalizePhone(to),
     type: 'template',
     template: { name: templateName, language: { code: language }, components }
   };
-  return callMetaAPI(payload);
+  return dispatchWhatsApp(payload, 'template');
 }
 
 // ─── Helper: send a free-text message ────────────────────────────────────────
 async function sendTextMessage(to, text) {
   const payload = {
     messaging_product: 'whatsapp',
-    to: to.replace(/[\s\-\+]/g, '').replace(/^0/, '+91'),
+    to: normalizePhone(to),
     type: 'text',
     text: { body: text }
   };
-  return callMetaAPI(payload);
+  return dispatchWhatsApp(payload, 'text');
 }
 
 class WhatsAppService {
@@ -94,6 +189,33 @@ class WhatsAppService {
   // ── Webhook event processing (POST) ────────────────────────────────────────
   async processWebhookEvent(body) {
     try {
+      if (!body) return;
+
+      // Case A: DoubleTick Webhook Event
+      if (body.event || body.messageId || body.status) {
+        const msgId = body.messageId || body.id;
+        const status = (body.status || '').toUpperCase();
+        const incomingText = body.text || body.message || body.content?.text;
+        const from = body.from || body.sender || body.recipient;
+
+        if (incomingText && from) {
+          console.log(`[DoubleTick Webhook] Incoming message from ${from}: ${incomingText}`);
+          const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(String(from).slice(-10)));
+          if (existing) existing.status = 'Replied';
+        }
+
+        if (msgId && status) {
+          const existing = mockWhatsAppMessages.find(m => m.wamid === msgId || m.messageId === msgId);
+          if (existing) {
+            existing.status = status === 'READ' ? 'Read' : status === 'DELIVERED' ? 'Delivered' : status === 'FAILED' ? 'Failed' : 'Sent';
+            existing.lastEvent = status;
+          }
+          console.log(`[DoubleTick Webhook] Status update: ${msgId} → ${status}`);
+        }
+        return;
+      }
+
+      // Case B: Meta Cloud API Webhook Event
       const entry = body?.entry?.[0];
       const changes = entry?.changes?.[0]?.value;
       if (!changes) return;
@@ -102,7 +224,6 @@ class WhatsAppService {
       if (changes.messages) {
         for (const msg of changes.messages) {
           console.log(`[WhatsApp Webhook] Incoming from ${msg.from}: ${msg.text?.body || msg.type}`);
-          // Update message status in mock store
           const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(msg.from.slice(-10)));
           if (existing) existing.status = 'Replied';
         }
@@ -136,6 +257,12 @@ class WhatsAppService {
     const read = mockWhatsAppMessages.filter(m => m.status === 'Read').length;
     const activeSequences = mockWhatsAppSequences.filter(s => s.status === 'Active').length;
 
+    const isDoubleTick = WA_PROVIDER === 'doubletick';
+    const isLive = isDoubleTick ? Boolean(DOUBLETICK_KEY) : Boolean(WA_TOKEN);
+    const providerName = isDoubleTick
+      ? (DOUBLETICK_KEY ? 'DoubleTick Enterprise API (Live)' : 'DoubleTick API (Simulation Mode)')
+      : (WA_TOKEN ? 'Meta Cloud API (WABA Live)' : 'Meta Cloud API (Simulation Mode)');
+
     return {
       totalMessagesSent: 1248 + totalSent,
       deliveredCount: 1230 + delivered,
@@ -144,9 +271,9 @@ class WhatsAppService {
       conversionRate: '41.2%',
       activeSequencesCount: activeSequences,
       totalSequencesCount: mockWhatsAppSequences.length,
-      provider: WA_TOKEN ? 'Meta Cloud API (WABA Live)' : 'Simulation Mode (No Token)',
+      provider: providerName,
       wabaPhoneNumber: systemConfig.wabaPhoneNumber || '+91 99880 01122',
-      webhookStatus: WA_TOKEN ? 'Active (200 OK)' : 'Simulation Mode'
+      webhookStatus: isLive ? 'Active (200 OK)' : 'Simulation Mode'
     };
   }
 
@@ -191,10 +318,11 @@ class WhatsAppService {
 
     if (!lead) {
       const storeLeads = store.mockLeads || [];
-      lead = storeLeads.find(l => l.id === leadId || l.id === `LEAD-${String(leadId).padStart(3, '0')}` || (l.name && l.name.toLowerCase().includes(String(leadId).toLowerCase()))) ||
-        storeLeads.find(l => l.stage === 'Confirmed Lead') ||
-        storeLeads[0] ||
-        { id: leadId || 'LEAD-001', name: 'Valued Customer', budget: 42000, phone: '+919988001122', interest: 'CNC Machinery' };
+      lead = storeLeads.find(l => l.id === leadId || l.id === `LEAD-${String(leadId).padStart(3, '0')}` || (l.name && l.name.toLowerCase().includes(String(leadId).toLowerCase())));
+    }
+
+    if (!lead) {
+      throw new Error(`Lead not found: ${leadId}`);
     }
 
     const advanceAmount = (parseFloat(lead.budget || 20000) * 0.10).toLocaleString('en-IN');
@@ -223,24 +351,32 @@ class WhatsAppService {
       product: lead.interest || 'Machinery Unit',
       advanceAmount,
       totalBudget,
-      status: wamid ? 'Sent' : 'Delivered',
+      status: isLiveWhatsApp() ? 'Sent' : 'Delivered',
       sentAt: new Date(),
       preview: `10% Advance Reminder → ${lead.name} | ₹${advanceAmount}`,
-      lastEvent: wamid ? 'Sent to Meta API' : 'Delivered to handset (✓✓)'
+      lastEvent: isLiveWhatsApp()
+        ? (WA_PROVIDER === 'doubletick' ? 'Sent via DoubleTick API' : 'Sent to Meta API')
+        : 'Delivered to handset (✓✓)'
     };
 
     mockWhatsAppMessages.unshift(msg);
 
+    const logEntry = {
+      id: `log-${Date.now()}`,
+      employeeId: 'e3',
+      leadId: lead.id,
+      action: `WhatsApp 10% advance reminder sent to ${lead.name} (${wamid ? 'Live API' : 'Simulated'})`,
+      fromStage: lead.stage,
+      toStage: lead.stage
+    };
+
     try {
-      await ActivityLog.create({
-        id: `log-${Date.now()}`,
-        employeeId: 'e3',
-        leadId: lead.id,
-        action: `WhatsApp 10% advance reminder sent to ${lead.name} (${wamid ? 'Live API' : 'Simulated'})`,
-        fromStage: lead.stage,
-        toStage: lead.stage
-      });
+      await ActivityLog.create(logEntry);
     } catch {}
+
+    if (store.mockActivityLogs) {
+      store.mockActivityLogs.unshift({ ...logEntry, createdAt: new Date().toISOString() });
+    }
 
     return { success: true, message: msg };
   }
@@ -284,7 +420,7 @@ class WhatsAppService {
 
     try {
       await sendTextMessage(phone,
-        `Dear ${name},\n\nYour *${product}* is now in active production at our factory floor! 🏭\n\nExpected completion: 15-21 working days.\nYou will receive dispatch tracking details once ready.\n\n— APS Enterprises, Indore`
+        `Dear ${name},\n\nYour *${product}* is now in active production at our factory floor.\n\nExpected completion: 15-21 working days.\nYou will receive dispatch tracking details once ready.\n\n— APS Enterprises, Indore`
       );
     } catch {}
 
@@ -310,7 +446,7 @@ class WhatsAppService {
 
     try {
       await sendTextMessage(phone,
-        `Dear ${name},\n\nGreat news! Your *${product}* has been dispatched! 🚚\n\nTracking: APS-TRK-${Date.now().toString().slice(-6)}\nExpected delivery: 3-5 working days.\n\nFor any queries: +91 99880 01122\n\n— APS Enterprises, Indore`
+        `Dear ${name},\n\nGreat news! Your *${product}* has been dispatched.\n\nTracking: APS-TRK-${Date.now().toString().slice(-6)}\nExpected delivery: 3-5 working days.\n\nFor any queries: +91 99880 01122\n\n— APS Enterprises, Indore`
       );
     } catch {}
 
@@ -336,6 +472,10 @@ class WhatsAppService {
         lead = await Lead.findByPk(leadId);
         if (!lead) lead = await Lead.findByPk(`LEAD-${String(leadId).padStart(3, '0')}`);
       } catch {}
+      if (!lead) {
+        const storeLeads = store.mockLeads || [];
+        lead = storeLeads.find(l => l.id === leadId || l.id === `LEAD-${String(leadId).padStart(3, '0')}` || (l.name && l.name.toLowerCase().includes(String(leadId).toLowerCase())));
+      }
     }
 
     const targetName = recipientName || lead?.name || 'Valued Customer';
@@ -359,18 +499,20 @@ class WhatsAppService {
     const msg = {
       messageId: `WA-${String(mockWhatsAppMessages.length + 1).padStart(3, '0')}`,
       wamid,
-      leadId: lead?.id || 'DIRECT',
+      leadId: lead?.id || leadId || 'DIRECT',
       leadName: targetName,
       phone: targetPhone,
-      template: template?.id || templateId,
-      sequenceType: 'CUSTOM',
+      template: template?.id || templateId || 'custom_message',
+      sequenceType: template?.category === 'PAYMENT' ? 'PAYMENT_REMINDER' : (template?.category === 'SHIPPING' ? 'DISPATCH_NOTICE' : 'CUSTOM_BROADCAST'),
       product: productName,
       advanceAmount,
       totalBudget: lead?.budget || '25,000',
-      status: wamid ? 'Sent' : 'Delivered',
+      status: isLiveWhatsApp() ? 'Sent' : 'Delivered',
       sentAt: new Date(),
       preview: messageText.slice(0, 120),
-      lastEvent: wamid ? 'Sent to Meta API' : 'Delivered to handset (✓✓)'
+      lastEvent: isLiveWhatsApp()
+        ? (WA_PROVIDER === 'doubletick' ? 'Sent via DoubleTick API' : 'Sent to Meta API')
+        : 'Delivered to handset (✓✓)'
     };
     mockWhatsAppMessages.unshift(msg);
 

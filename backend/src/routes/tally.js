@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tallyService = require('../services/tallyService');
+const { authorize } = require('../middleware/rbacMiddleware');
 
 // GET /api/tally/status — ping Tally server health
 router.get('/status', async (req, res) => {
@@ -25,7 +26,7 @@ router.get('/vouchers', async (req, res) => {
 });
 
 // POST /api/tally/vouchers — create/insert a new voucher record
-router.post('/vouchers', async (req, res) => {
+router.post('/vouchers', authorize(['admin', 'manager', 'accountant']), async (req, res) => {
   try {
     const newVoucher = tallyService.addVoucher(req.body);
     res.status(201).json({ success: true, voucher: newVoucher });
@@ -35,7 +36,7 @@ router.post('/vouchers', async (req, res) => {
 });
 
 // GET /api/tally/sync — trigger immediate sync
-router.get('/sync', async (req, res) => {
+router.get('/sync', authorize(['admin', 'manager', 'accountant']), async (req, res) => {
   try {
     const result = await tallyService.syncVouchers();
     res.json({ success: true, ...result });

@@ -65,7 +65,7 @@ async function testAllEndpoints() {
   await request('POST', '/api/config/approval-policy', { policy: 'single-action' });
 
   server.close();
-  console.log('\n🎉 ALL MODULE A2 CONTROL COCKPIT TESTS PASSED WITH 100% SUCCESS!');
+  console.log('\nALL MODULE A2 CONTROL COCKPIT TESTS PASSED WITH 100% SUCCESS!');
 }
 
 testAllEndpoints().catch(err => {

@@ -364,6 +364,11 @@ export default function CRMLeads() {
   useEffect(() => {
     fetchLeads();
     fetchConfig();
+    const handleLeadsUpdated = () => {
+      fetchLeads();
+    };
+    window.addEventListener('aps_leads_updated', handleLeadsUpdated);
+    return () => window.removeEventListener('aps_leads_updated', handleLeadsUpdated);
   }, []);
 
   // Arrow Horizontal Scroll Handlers
@@ -681,7 +686,7 @@ export default function CRMLeads() {
       )}
 
       {/* ── Main Kanban Swimlane Columns (Horizontally Scrollable) ─── */}
-      <div ref={boardRef} style={s.kanbanBoard}>
+      <div ref={boardRef} className="pipeline-kanban crm-leads-board" style={s.kanbanBoard}>
         {STAGES.map(stage => {
           const meta = STAGE_META[stage];
           const columnLeads = leadsByStage[stage] || [];
@@ -711,7 +716,7 @@ export default function CRMLeads() {
               </div>
 
               {/* Column Cards Container */}
-              <div style={s.columnBody}>
+              <div className="crm-kanban-column-body" style={s.columnBody}>
                 {columnLeads.map((lead) => {
                   const priorityStyle = PRIORITY_THEMES[lead.priority] || PRIORITY_THEMES['Warm'];
                   const sourceStyle = SOURCE_THEMES[lead.source] || SOURCE_THEMES['Default'];
@@ -843,7 +848,7 @@ export default function CRMLeads() {
                   <input
                     required
                     style={s.formInput}
-                    placeholder="e.g. Bhavya"
+                    placeholder="Name"
                     value={newLead.name}
                     onChange={e => setNewLead({ ...newLead, name: e.target.value })}
                   />
@@ -1077,7 +1082,7 @@ export default function CRMLeads() {
 
               <div style={{ marginTop: 12 }}>
                 <label style={s.formLabel}>Initiating Officer</label>
-                <input disabled value="Bhavya (Primary Admin)" style={{ ...s.formInput, backgroundColor: '#f1f5f9' }} />
+                <input disabled value="Super Admin (Primary Admin)" style={{ ...s.formInput, backgroundColor: '#f1f5f9' }} />
               </div>
 
               <div style={{ marginTop: 12 }}>

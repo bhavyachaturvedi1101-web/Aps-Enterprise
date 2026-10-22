@@ -1,14 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MOCK_INVOICES } from '../mockData';
 
-const INITIAL_TAX_INVOICES = [
-  { id: 'INV-2026-8801', client: 'Apex Metalcraft', gstNo: '27AAAAA1122A1Z1', poNo: 'PO-9912', product: 'Heavy Duty CNC Router 500T', hsnCode: '8466', baseAmount: 150000, gst: 27000, issued: '2026-08-01', due: '2026-08-31', status: 'Sent', paymentTerms: 'Net 30 Days' },
-  { id: 'INV-2026-8802', client: 'Tata Heavy Tools', gstNo: '27BBBBB3344B1Z2', poNo: 'PO-9915', product: '200T Hydraulic Press Machine', hsnCode: '8462', baseAmount: 420000, gst: 75600, issued: '2026-08-03', due: '2026-08-18', status: 'Draft', paymentTerms: 'Immediate Deposit' },
-  { id: 'INV-2026-8803', client: 'Kirloskar Forge', gstNo: '27CCCC5566C1Z3', poNo: 'PO-9920', product: 'Laser Cutting Automation Arm', hsnCode: '8456', baseAmount: 280000, gst: 50400, issued: '2026-08-05', due: '2026-09-05', status: 'Paid', paymentTerms: '10% Advance Paid' },
-  { id: 'INV-2026-8804', client: 'Godrej Process Eq', gstNo: '27DDDDD7788D1Z4', poNo: 'PO-9924', product: 'Factory Automated Conveyor Line', hsnCode: '8428', baseAmount: 95000, gst: 17100, issued: '2026-08-07', due: '2026-09-07', status: 'Sent', paymentTerms: 'Net 30 Days' }
-];
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API = isLocal ? 'http://localhost:5000/api' : '/api';
+
+const normalizeInvoice = (inv = {}) => {
+  const base = Number(inv.baseAmount ?? inv.baseRate ?? 0) || 0;
+  const gst = Number(inv.gst ?? inv.gstAmount ?? Math.round(base * 0.18)) || 0;
+  const total = Number(inv.totalAmount ?? (base + gst)) || (base + gst);
+  const client = inv.client || inv.clientName || inv.company || 'Valued Customer';
+  return {
+    ...inv,
+    client,
+    clientName: client,
+    baseAmount: base,
+    gst,
+    gstAmount: gst,
+    totalAmount: total,
+    poNo: inv.poNo || 'PO-9940',
+    product: inv.product || 'Industrial Equipment',
+    hsnCode: inv.hsnCode || '8466',
+    gstNo: inv.gstNo || '27AAAAA0000A1Z5',
+    status: inv.status || 'Sent',
+    paymentTerms: inv.paymentTerms || 'Net 30 Days',
+    issued: inv.issued || inv.issuedDate || (inv.createdAt ? inv.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+    due: inv.due || inv.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  };
+};
+
+const formatINR = (val) => {
+  const num = Number(val);
+  return isNaN(num) ? '0' : num.toLocaleString('en-IN');
+};
 
 export default function Invoices() {
-  const [invoices, setInvoices] = useState(INITIAL_TAX_INVOICES);
+  const [invoices, setInvoices] = useState(() => (Array.isArray(MOCK_INVOICES) ? MOCK_INVOICES.map(normalizeInvoice) : []));
   const [viewInvoice, setViewInvoice] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -19,31 +45,99 @@ export default function Invoices() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleCreateInvoice = (e) => {
+  useEffect(() => {
+    fetch(`${API}/invoices`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.invoices) && data.invoices.length > 0) {
+          setInvoices(data.invoices.map(normalizeInvoice));
+        }
+      })
+      .catch(() => {});
+
+    try {
+      const saved = localStorage.getItem('aps_custom_invoices');
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list) && list.length > 0) {
+          setInvoices(prev => {
+            const ids = new Set(prev.map(i => i.id));
+            const newOnes = list.filter(i => !ids.has(i.id)).map(normalizeInvoice);
+            return [...newOnes, ...prev];
+          });
+        }
+      }
+    } catch {}
+
+    const handleInvoiceCreated = (e) => {
+      if (e?.detail) {
+        const norm = normalizeInvoice(e.detail);
+        setInvoices(prev => [norm, ...prev]);
+        try {
+          const saved = localStorage.getItem('aps_custom_invoices');
+          const list = saved ? JSON.parse(saved) : [];
+          if (!list.some(i => i.id === norm.id)) {
+            list.unshift(norm);
+            localStorage.setItem('aps_custom_invoices', JSON.stringify(list));
+          }
+        } catch {}
+        showToast(`New GST Tax Invoice "${norm.id}" received from AI Assistant!`);
+      }
+    };
+
+    window.addEventListener('aps_invoices_updated', handleInvoiceCreated);
+    return () => window.removeEventListener('aps_invoices_updated', handleInvoiceCreated);
+  }, []);
+
+  const handleCreateInvoice = async (e) => {
     e.preventDefault();
     if (!newInv.client || !newInv.product) return;
-    const base = parseFloat(newInv.baseAmount);
-    const invObj = {
-      id: `INV-2026-880${invoices.length + 1}`,
+    const base = parseFloat(newInv.baseAmount) || 0;
+    const gstAmt = Math.round(base * 0.18);
+    const total = base + gstAmt;
+    const id = `INV-2026-880${invoices.length + 1}`;
+    const invObj = normalizeInvoice({
+      id,
       client: newInv.client,
+      clientName: newInv.client,
       gstNo: '27AAAAA0000A1Z5',
       poNo: newInv.poNo || 'PO-9940',
       product: newInv.product,
       hsnCode: '8466',
       baseAmount: base,
-      gst: Math.round(base * 0.18),
+      gst: gstAmt,
+      gstAmount: gstAmt,
+      totalAmount: total,
       issued: new Date().toISOString().split('T')[0],
+      issuedDate: new Date().toISOString().split('T')[0],
       due: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       status: 'Sent',
       paymentTerms: 'Net 30 Days'
-    };
+    });
     setInvoices(prev => [invObj, ...prev]);
     setShowModal(false);
     showToast(`Invoice "${invObj.id}" generated & saved!`);
+
+    try {
+      await fetch(`${API}/invoices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: newInv.client,
+          product: newInv.product,
+          baseAmount: base,
+          poNo: newInv.poNo || 'PO-9940'
+        })
+      });
+    } catch (err) {
+      console.warn('[Invoices] Local creation retained, API sync failed:', err);
+    }
   };
 
   const handleDispatchWhatsAppPDF = (inv) => {
-    showToast(`GST Tax Invoice PDF "${inv.id}" dispatched to ${inv.client} via WhatsApp!`);
+    const norm = normalizeInvoice(inv);
+    showToast(`GST Tax Invoice PDF "${norm.id}" dispatched to ${norm.clientName || norm.client} via WhatsApp!`);
   };
 
   return (
@@ -67,60 +161,71 @@ export default function Invoices() {
 
       {/* Invoice Visual Cards Grid */}
       <div style={s.cardsGrid}>
-        {invoices.map(inv => {
-          const grandTotal = inv.baseAmount + inv.gst;
-          const isPaid = inv.status === 'Paid';
-          return (
-            <div key={inv.id} style={s.invoiceCard}>
-              <div style={s.cardHead}>
-                <div>
-                  <span style={s.invBadge}>{inv.id}</span>
-                  <div style={s.clientTitle}>{inv.client}</div>
-                  <div style={s.poText}>PO Ref: {inv.poNo}</div>
-                </div>
-                <span style={{
-                  padding: '4px 10px',
-                  borderRadius: 20,
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
-                  color: isPaid ? '#16a34a' : '#2563eb'
-                }}>
-                  {inv.status}
-                </span>
-              </div>
-
-              <div style={s.cardBody}>
-                <div style={s.productName}>{inv.product}</div>
-                <div style={s.hsnText}>HSN Code: {inv.hsnCode} | GST Rate: 18%</div>
-                
-                <div style={s.amountRow}>
+        {invoices.length === 0 ? (
+          <div style={{ gridColumn: '1 / -1', padding: '3.5rem 1.5rem', textAlign: 'center', backgroundColor: '#fff', borderRadius: 18, border: '1px solid #e4e4e7', color: '#71717a' }}>
+            <p style={{ fontWeight: 700, color: '#09090b', margin: '0 0 6px 0', fontSize: '1rem' }}>No Invoices Generated Yet</p>
+            <p style={{ margin: 0, fontSize: '0.85rem' }}>Create a tax invoice using "+ Create Tax Invoice" or generate one automatically via the AI Assistant.</p>
+          </div>
+        ) : (
+          invoices.map(rawInv => {
+            const inv = normalizeInvoice(rawInv);
+            const baseAmount = Number(inv.baseAmount || 0);
+            const gstAmount = Number(inv.gstAmount ?? inv.gst ?? Math.round(baseAmount * 0.18));
+            const grandTotal = Number(inv.totalAmount || (baseAmount + gstAmount));
+            const clientName = inv.clientName || inv.client || 'Valued Client';
+            const isPaid = inv.status === 'Paid';
+            return (
+              <div key={inv.id} style={s.invoiceCard}>
+                <div style={s.cardHead}>
                   <div>
-                    <div style={s.subLbl}>Base Rate</div>
-                    <div style={s.subVal}>₹{inv.baseAmount.toLocaleString('en-IN')}</div>
+                    <span style={s.invBadge}>{inv.id}</span>
+                    <div style={s.clientTitle}>{clientName}</div>
+                    <div style={s.poText}>PO Ref: {inv.poNo || 'N/A'}</div>
                   </div>
-                  <div>
-                    <div style={s.subLbl}>GST Amount</div>
-                    <div style={s.subVal}>₹{inv.gst.toLocaleString('en-IN')}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={s.subLbl}>Grand Total</div>
-                    <div style={s.totalVal}>₹{grandTotal.toLocaleString('en-IN')}</div>
+                  <span style={{
+                    padding: '4px 10px',
+                    borderRadius: 20,
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    backgroundColor: isPaid ? '#f0fdf4' : '#eff6ff',
+                    color: isPaid ? '#16a34a' : '#2563eb'
+                  }}>
+                    {inv.status || 'Draft'}
+                  </span>
+                </div>
+
+                <div style={s.cardBody}>
+                  <div style={s.productName}>{inv.product || 'Industrial Equipment'}</div>
+                  <div style={s.hsnText}>HSN Code: {inv.hsnCode || '8466'} | GST Rate: 18%</div>
+                  
+                  <div style={s.amountRow}>
+                    <div>
+                      <div style={s.subLbl}>Base Rate</div>
+                      <div style={s.subVal}>₹{formatINR(baseAmount)}</div>
+                    </div>
+                    <div>
+                      <div style={s.subLbl}>GST Amount</div>
+                      <div style={s.subVal}>₹{formatINR(gstAmount)}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={s.subLbl}>Grand Total</div>
+                      <div style={s.totalVal}>₹{formatINR(grandTotal)}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div style={s.cardFooter}>
-                <button onClick={() => setViewInvoice(inv)} style={s.previewBtn}>
-                  Preview & Print PDF
-                </button>
-                <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
-                  Send WhatsApp PDF
-                </button>
+                <div style={s.cardFooter}>
+                  <button onClick={() => setViewInvoice({ ...inv, baseAmount, gstAmount, grandTotal, clientName })} style={s.previewBtn}>
+                    Preview & Print PDF
+                  </button>
+                  <button onClick={() => handleDispatchWhatsAppPDF(inv)} style={s.waBtn}>
+                    Send WhatsApp PDF
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {/* New Invoice Modal */}
@@ -176,71 +281,78 @@ export default function Invoices() {
       )}
 
       {/* Printable Tax Invoice Modal */}
-      {viewInvoice && (
-        <div style={s.modalOverlay}>
-          <div style={{ ...s.modalContent, maxWidth: 640, padding: '2.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #08060d', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#08060d', fontFamily: 'var(--font-heading)' }}>APS ENTERPRISE CO.</h2>
-                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>Industrial Machinery & Automation Systems</div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {viewInvoice.hsnCode}</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' }}>TAX INVOICE</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#09090b' }}>{viewInvoice.id}</div>
-                <div style={{ fontSize: '0.75rem', color: '#71717a' }}>PO Ref: {viewInvoice.poNo}</div>
-              </div>
-            </div>
-
-            <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 12, marginBottom: '1.5rem', fontSize: '0.8rem' }}>
-              <div style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.68rem', textTransform: 'uppercase' }}>Billed To Client:</div>
-              <div style={{ fontWeight: 800, color: '#08060d', fontSize: '0.95rem', marginTop: 2 }}>{viewInvoice.client}</div>
-              <div style={{ color: '#64748b', marginTop: 2 }}>GSTIN: {viewInvoice.gstNo} | Terms: {viewInvoice.paymentTerms}</div>
-            </div>
-
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', fontSize: '0.8rem' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
-                  <th style={{ padding: '8px 12px', color: '#475569' }}>Machine Specs</th>
-                  <th style={{ padding: '8px 12px', color: '#475569' }}>Base Rate</th>
-                  <th style={{ padding: '8px 12px', color: '#475569' }}>GST (18%)</th>
-                  <th style={{ padding: '8px 12px', color: '#475569', textAlign: 'right' }}>Total (₹)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '10px 12px', fontWeight: 700, color: '#08060d' }}>{viewInvoice.product}</td>
-                  <td style={{ padding: '10px 12px' }}>₹{viewInvoice.baseAmount.toLocaleString('en-IN')}</td>
-                  <td style={{ padding: '10px 12px' }}>₹{viewInvoice.gst.toLocaleString('en-IN')}</td>
-                  <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800 }}>₹{(viewInvoice.baseAmount + viewInvoice.gst).toLocaleString('en-IN')}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                <div><strong>Bank:</strong> HDFC Bank Ltd (Commercial Banking)</div>
-                <div><strong>A/C No:</strong> 50200098765432</div>
-                <div><strong>IFSC:</strong> HDFC0001234</div>
-              </div>
-              <div style={{ textAlign: 'right', fontSize: '0.85rem' }}>
-                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#09090b' }}>
-                  Grand Total: ₹{(viewInvoice.baseAmount + viewInvoice.gst).toLocaleString('en-IN')}
+      {viewInvoice && (() => {
+        const inv = normalizeInvoice(viewInvoice);
+        const baseAmount = Number(inv.baseAmount || 0);
+        const gstAmount = Number(inv.gstAmount ?? inv.gst ?? Math.round(baseAmount * 0.18));
+        const grandTotal = Number(inv.totalAmount || (baseAmount + gstAmount));
+        const clientName = inv.clientName || inv.client || 'Valued Client';
+        return (
+          <div style={s.modalOverlay}>
+            <div style={{ ...s.modalContent, maxWidth: 640, padding: '2.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #08060d', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#08060d', fontFamily: 'var(--font-heading)' }}>APS ENTERPRISE CO.</h2>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>Industrial Machinery & Automation Systems</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>GSTIN: 27AAAAA0000A1Z5 | HSN: {inv.hsnCode || '8466'}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#09090b', fontFamily: 'monospace' }}>TAX INVOICE</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#09090b' }}>{inv.id}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#71717a' }}>PO Ref: {inv.poNo || 'N/A'}</div>
                 </div>
               </div>
-            </div>
 
-            <div style={s.modalActions}>
-              <button onClick={() => window.print()} style={{ ...s.submitBtn, backgroundColor: '#09090b' }}>
-                Print Tax Invoice
-              </button>
-              <button onClick={() => setViewInvoice(null)} style={s.cancelBtn}>
-                Close
-              </button>
+              <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 12, marginBottom: '1.5rem', fontSize: '0.8rem' }}>
+                <div style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.68rem', textTransform: 'uppercase' }}>Billed To Client:</div>
+                <div style={{ fontWeight: 800, color: '#08060d', fontSize: '0.95rem', marginTop: 2 }}>{clientName}</div>
+                <div style={{ color: '#64748b', marginTop: 2 }}>GSTIN: {inv.gstNo || '27AAAAA0000A1Z5'} | Terms: {inv.paymentTerms || 'Net 30 Days'}</div>
+              </div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', fontSize: '0.8rem' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                    <th style={{ padding: '8px 12px', color: '#475569' }}>Machine Specs</th>
+                    <th style={{ padding: '8px 12px', color: '#475569' }}>Base Rate</th>
+                    <th style={{ padding: '8px 12px', color: '#475569' }}>GST (18%)</th>
+                    <th style={{ padding: '8px 12px', color: '#475569', textAlign: 'right' }}>Total (₹)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '10px 12px', fontWeight: 700, color: '#08060d' }}>{inv.product || 'Industrial Machine'}</td>
+                    <td style={{ padding: '10px 12px' }}>₹{formatINR(baseAmount)}</td>
+                    <td style={{ padding: '10px 12px' }}>₹{formatINR(gstAmount)}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800 }}>₹{formatINR(grandTotal)}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                  <div><strong>Bank:</strong> HDFC Bank Ltd (Commercial Banking)</div>
+                  <div><strong>A/C No:</strong> 50200098765432</div>
+                  <div><strong>IFSC:</strong> HDFC0001234</div>
+                </div>
+                <div style={{ textAlign: 'right', fontSize: '0.85rem' }}>
+                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#09090b' }}>
+                    Grand Total: ₹{formatINR(grandTotal)}
+                  </div>
+                </div>
+              </div>
+
+              <div style={s.modalActions}>
+                <button onClick={() => window.print()} style={{ ...s.submitBtn, backgroundColor: '#09090b' }}>
+                  Print Tax Invoice
+                </button>
+                <button onClick={() => setViewInvoice(null)} style={s.cancelBtn}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

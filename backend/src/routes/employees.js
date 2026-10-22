@@ -9,23 +9,26 @@ const {
   deleteEmployee 
 } = require('../controllers/employeesController');
 
+const { validateBody, createEmployeeSchema } = require('../middleware/validate');
+const { authorize } = require('../middleware/rbacMiddleware');
+
 // GET all employees (A4 module)
 router.get('/', getEmployees);
 
-// POST create employee (A4 module)
-router.post('/', createEmployee);
+// POST create employee (Admin & Manager only)
+router.post('/', authorize(['admin', 'manager']), validateBody(createEmployeeSchema), createEmployee);
 
 // GET employee detailed performance profile (A4 module)
 router.get('/:id/performance', getEmployeePerformance);
 
 // POST mark task complete and auto-assign next task from queue (A4 module)
-router.post('/:id/complete-task', completeTask);
+router.post('/:id/complete-task', authorize(['admin', 'manager', 'employee']), completeTask);
 
-// POST manually assign/queue task to employee (A4 module)
-router.post('/:id/assign-task', assignTask);
+// POST manually assign/queue task to employee (Admin & Manager only)
+router.post('/:id/assign-task', authorize(['admin', 'manager']), assignTask);
 
-// DELETE employee member (A4 module)
-router.delete('/:id', deleteEmployee);
+// DELETE employee member (Admin only)
+router.delete('/:id', authorize(['admin']), deleteEmployee);
 
 module.exports = router;
 

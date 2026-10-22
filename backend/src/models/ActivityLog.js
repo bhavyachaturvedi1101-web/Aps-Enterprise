@@ -26,6 +26,10 @@ const ActivityLog = sequelize.define('ActivityLog', {
   toStage: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  countersignedBy: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'activity_logs',
