@@ -1,5 +1,50 @@
 [
   {
+    "id": "mem-1792682506580-j7lp",
+    "timestamp": "2026-10-22T15:21:46.580Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Assign task to Animesh",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 119
+    }
+  },
+  {
+    "id": "mem-1792666399356-gq32",
+    "timestamp": "2026-10-22T10:53:19.356Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Assign task to Animesh",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 118
+    }
+  },
+  {
+    "id": "mem-1792666327785-gsnk",
+    "timestamp": "2026-10-22T10:52:07.785Z",
+    "type": "TASK_REJECTED",
+    "topic": "task_assignment",
+    "query": "Assign task to Animesh",
+    "summary": "Task assignment to \"Animesh\" rejected: \"Animesh\" is not an employee or team member of APS Enterprise.",
+    "target": "Animesh",
+    "status": "rejected",
+    "details": {
+      "requestedName": "Animesh",
+      "reason": "Person not present in employee roster",
+      "activeTeamCount": 118
+    }
+  },
+  {
     "id": "mem-1792394451874-d5f8",
     "timestamp": "2026-10-19T07:20:51.874Z",
     "type": "TASK_ASSIGNED",

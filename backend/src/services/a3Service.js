@@ -46,7 +46,7 @@ const LLM_PROVIDER = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
  * @param {string} query User natural language command or question
  * @param {string} conversationId Optional multi-turn conversation thread ID
  */
-async function processQuery(query, conversationId = 'default') {
+async function processQuery(query, conversationId = 'default', userContext = {}) {
   if (!query || typeof query !== 'string' || !query.trim()) {
     return {
       text: 'Please provide a valid query or command.',
@@ -59,9 +59,178 @@ async function processQuery(query, conversationId = 'default') {
   const cleanQuery = query.trim();
   const convId = conversationId || 'default';
   const lastResult = getLastResult(convId);
+  const isEmployee = (userContext.userRole || '').toLowerCase() === 'employee';
+
+  // ── Employee Role-Based Dedicated Handlers & Access Guard ─────────────────
+  if (isEmployee) {
+    // 1. My Assigned Leads
+    if (/my (assigned )?leads|leads assigned to me|meri leads/i.test(cleanQuery)) {
+      const store = require('../config/inMemoryStore');
+      const allLeads = store.mockLeads || [];
+      const empId = userContext.employeeId;
+      const empName = (userContext.userName || '').toLowerCase();
+      const myLeads = allLeads.filter(l =>
+        (empId && l.assignedEmployeeId === empId) ||
+        (l.assignedEmployeeId && l.assignedEmployeeId.toLowerCase().includes(empName)) ||
+        (!empId && (l.assignedEmployeeId === 'EMP-001' || l.assignedEmployeeId === 'EMP-002'))
+      );
+      const targetList = myLeads.length > 0 ? myLeads : allLeads.slice(0, 5);
+      return {
+        text: `### 📋 Assigned Leads for ${userContext.userName || 'Your Desk'}\n\nHere are the customer inquiries assigned directly to your desk (${targetList.length} deals):`,
+        table: targetList.map(l => ({
+          ID: l.id,
+          Customer: l.name,
+          Company: l.company || '—',
+          Stage: l.stage,
+          Budget: l.budget ? `₹${Number(l.budget).toLocaleString('en-IN')}` : '—',
+          Interest: l.interest || '—',
+          Phone: l.phone || '—'
+        })),
+        options: ['Who should I call next?', 'What are my active tasks?', 'Search CNC 500T specification manual'],
+        chart: null,
+        intent: 'employee_my_leads'
+      };
+    }
+
+    // 2. My Active Tasks
+    if (/my (active )?tasks?|tasks? assigned to me|mera kaam|meri duties/i.test(cleanQuery)) {
+      const store = require('../config/inMemoryStore');
+      const employees = store.mockEmployees || [];
+      const emp = employees.find(e =>
+        (userContext.employeeId && e.id === userContext.employeeId) ||
+        (userContext.userName && e.name.toLowerCase().includes(userContext.userName.toLowerCase()))
+      ) || employees[0];
+
+      return {
+        text: `### 🎯 Active Workplace Tasks — ${emp?.name || userContext.userName || 'Executive'}\n\n• **Active Primary Task:** ${emp?.activeTask || 'Follow up with verified IndiaMart buyers'}\n• **KPI Adherence:** **${emp?.kpiScore || 'A'}** (${emp?.callsHandled || 184} calls logged)\n• **Today's Action Focus:** Call 3 pending advance accounts and log follow-up notes.`,
+        table: [
+          { 'Priority': 'HIGH', 'Task': 'Follow-up with Confirmed Leads for 10% advance deposit', 'Due': 'Today' },
+          { 'Priority': 'NORMAL', 'Task': 'Send WhatsApp quote for Automatic Paper Bag machine', 'Due': 'Today' },
+          { 'Priority': 'NORMAL', 'Task': 'Review CRM call notes & schedule next follow-up dates', 'Due': 'Tomorrow' }
+        ],
+        options: ['Show priority calling list', 'Show my assigned leads', 'Check my KPI score'],
+        chart: null,
+        intent: 'employee_my_tasks'
+      };
+    }
+
+    // 3. My Personal Performance & KPI Score
+    if (/my (kpi|performance|score|sales closed|conversion)/i.test(cleanQuery)) {
+      const store = require('../config/inMemoryStore');
+      const employees = store.mockEmployees || [];
+      const emp = employees.find(e =>
+        (userContext.employeeId && e.id === userContext.employeeId) ||
+        (userContext.userName && e.name.toLowerCase().includes(userContext.userName.toLowerCase()))
+      ) || employees[0];
+
+      return {
+        text: `### 🏆 Personal Performance Scorecard — ${emp?.name || userContext.userName || 'Executive'}\n\n• **Current KPI Rating:** **${emp?.kpiScore || 'A'}**\n• **Sales Deals Closed:** **${emp?.salesClosed || 14}**\n• **Calls Handled:** **${emp?.callsHandled || 184} calls**\n• **Average Call Response Time:** ${emp?.avgResponseTimeMin || 4.2} mins`,
+        table: [
+          { Metric: 'KPI Rating', Value: emp?.kpiScore || 'A' },
+          { Metric: 'Calls Handled', Value: emp?.callsHandled || 184 },
+          { Metric: 'Deals Closed', Value: emp?.salesClosed || 14 },
+          { Metric: 'Lead Conversion', Value: emp?.conversionRate || '82%' }
+        ],
+        options: ['Show my assigned leads', 'What are my active tasks?', 'Who should I call next?'],
+        chart: null,
+        intent: 'employee_my_kpi'
+      };
+    }
+
+    // 4. Who should I call next / Priority Dialer
+    if (/who should i call( next)?|call next|priority call(ing)?( list| queue)?|calling queue|next call|mera agla call/i.test(cleanQuery)) {
+      const store = require('../config/inMemoryStore');
+      const allLeads = store.mockLeads || [];
+      const priorityLead = allLeads.find(l => l.stage === 'CONFIRMED' || l.stage === 'NEGOTIATION') || allLeads[0];
+      return {
+        text: `### 📞 Next Priority Calling Target — ${userContext.userName || 'Executive'}\n\n• **Customer:** **${priorityLead?.name || 'Rajesh Sharma'}** (${priorityLead?.company || 'Apex Packaging Ltd'})\n• **Phone:** \`${priorityLead?.phone || '+91 98260 12345'}\`\n• **Current Stage:** **${priorityLead?.stage || 'CONFIRMED'}** (10% Advance Follow-up)\n• **Interest:** ${priorityLead?.interest || 'Automatic Paper Bag Machine (Model APB-450)'}\n• **Action Guidance:** Call now to confirm RTGS transfer of 10% booking advance and dispatch production job card.`,
+        table: [
+          { Field: 'Customer Name', Details: priorityLead?.name || 'Rajesh Sharma' },
+          { Field: 'Company', Details: priorityLead?.company || 'Apex Packaging Ltd' },
+          { Field: 'Machine Model', Details: priorityLead?.interest || 'Automatic Paper Bag Machine' },
+          { Field: 'Contact Number', Details: priorityLead?.phone || '+91 98260 12345' },
+          { Field: 'Follow-up Reason', Details: 'Pending 10% Advance Payment verification' }
+        ],
+        options: ['Show my assigned leads', 'What are my active tasks?', 'Send WhatsApp quote for Automatic Paper Bag machine', 'Search CNC 500T specification manual'],
+        chart: null,
+        intent: 'employee_calling_queue'
+      };
+    }
+
+    // 5. Machine Specs / Catalog Manual
+    if (/manual|specification|specs|brochure|cnc 500t|paper bag machine|corrugated/i.test(cleanQuery)) {
+      return {
+        text: `### 📘 Technical Specifications Manual — Machinery Catalog\n\n• **Equipment Model:** **APS CNC 500T Hydraulic Forming Press**\n• **Rated Capacity:** 500 Metric Tons | Dual Cylinder Pressure Control\n• **Power Requirement:** 45 kW, 415V, 3-Phase 50Hz\n• **Production Output:** 28 cycles/minute with PLC Servo automation\n• **Warranty & Service:** 2 Years Comprehensive on-site warranty\n\n*You can send this specification sheet directly to your lead via WhatsApp.*`,
+        table: [
+          { Parameter: 'Clamping Force', Value: '5000 kN (500 Tons)' },
+          { Parameter: 'Bed Size', Value: '1800 mm × 1200 mm' },
+          { Parameter: 'Max Daylight', Value: '1100 mm' },
+          { Parameter: 'Stroke Length', Value: '750 mm' },
+          { Parameter: 'Controller Unit', Value: 'Siemens Simatic S7-1200 PLC' }
+        ],
+        options: ['Send WhatsApp quote for Automatic Paper Bag machine', 'Show my assigned leads', 'Who should I call next?'],
+        chart: null,
+        intent: 'employee_specs_manual'
+      };
+    }
+
+    // 6. Comprehensive Employee Restriction Guard on Admin Functions
+    const isRestrictedForEmployee =
+      /\b(assign task|assign tasks|reassign|all employees|team performance|team leaderboard|sales leaderboard|create user|add user|new user|delete user|hire user|invite user|system roles|user permissions|profit margin|company profit|total profit|margin calculator|revenue summary|company revenue|predict revenue|revenue forecast|sales forecast|executive report|executive pdf|lead churn|churn risk|sentiment audit|delete memory|clear memory|reset memory|audit log|security log|system audit|tally post|post to tally|tally sync|tally voucher|financial audit|p&l|balance sheet|all invoices|billing generator)\b/i.test(cleanQuery);
+
+    if (isRestrictedForEmployee) {
+      return {
+        text: `### 🔒 Access Restricted for Employee Role\n\nHello **${userContext.userName || 'Team Member'}**, as an **Employee / Sales Executive**, your chatbot workspace is specifically tailored for:\n• **Your assigned leads & customer inquiries**\n• **Your daily tasks & priority calling queue**\n• **Machine specifications & customer WhatsApp updates**\n• **Your personal KPI and performance scorecard**\n\nAdministrative actions (such as company profit margin audits, revenue forecasts, onboarding new users, reallocating team workloads, or altering Tally vouchers) are restricted to **Managers & Administrators**.\n\n*If you require this action, please coordinate with your Administrator.*`,
+        table: null,
+        chart: null,
+        options: [
+          'Show my assigned leads',
+          'What are my active tasks?',
+          'Who should I call next?',
+          'Search CNC 500T specification manual'
+        ],
+        intent: 'employee_restricted'
+      };
+    }
+  }
 
   // 1. Classify Intent
   const intent = detectIntent(cleanQuery, lastResult, convId);
+
+  // Guard against intent-level admin actions for employees
+  if (isEmployee) {
+    const restrictedIntents = [
+      'action_create_user',
+      'assign_employee_tasks',
+      'action_post_tally',
+      'ai_memory_teach',
+      'sales_team_report',
+      'sales_leaderboard',
+      'revenue_summary',
+      'pipeline_summary',
+      'margin_calculator',
+      'generate_report',
+      'predictive_forecast',
+      'predictive_sales',
+      'lead_churn_audit',
+      'system_audit_log',
+      'tally_status'
+    ];
+    if (restrictedIntents.includes(intent)) {
+      return {
+        text: `### 🔒 Access Restricted for Employee Role\n\nHello **${userContext.userName || 'Team Member'}**, administrative operations (like creating users, reallocating team workloads, company profit audits, or altering company accounts) are reserved for **Management**.\n\nPlease select an authorized action from your employee workspace:`,
+        table: null,
+        chart: null,
+        options: [
+          'Show my assigned leads',
+          'What are my active tasks?',
+          'Who should I call next?',
+          'Search CNC 500T specification manual'
+        ],
+        intent: 'employee_restricted'
+      };
+    }
+  }
 
   let result = null;
 

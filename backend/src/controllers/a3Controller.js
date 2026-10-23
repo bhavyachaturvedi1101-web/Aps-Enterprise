@@ -10,13 +10,21 @@ const { Lead } = require('../models');
  */
 async function query(req, res, next) {
   try {
-    const { query: userQuery, conversationId } = req.body;
+    const { query: userQuery, conversationId, userRole, userName, employeeId } = req.body;
     if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
       return res.status(400).json({ error: 'query field is required and must be a non-empty string.' });
     }
 
+    const effectiveRole = (userRole || req.user?.role || '').toLowerCase().trim();
+    const effectiveName = userName || req.user?.name || 'User';
+    const effectiveEmpId = employeeId || req.user?.employeeId || req.user?.id || null;
+
     const t0 = Date.now();
-    const result = await processQuery(userQuery.trim(), conversationId || null);
+    const result = await processQuery(userQuery.trim(), conversationId || null, {
+      userRole: effectiveRole,
+      userName: effectiveName,
+      employeeId: effectiveEmpId
+    });
     const processingMs = Date.now() - t0;
 
     return res.json({

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { useAuth } from '../context/AuthContext';
 
 const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 const API = isLocal ? 'http://localhost:5000/api/a3' : '/api/a3';
@@ -1334,7 +1335,7 @@ function MessageCard({ msg, onSelectOption }) {
         </div>
       )}
 
-      <div style={isUser ? s.userBubble : s.botBubble}>
+      <div className={isUser ? "apsai-user-bubble" : "apsai-bot-bubble"} style={isUser ? s.userBubble : s.botBubble}>
         {msg.loading ? (
           <div style={s.dotsContainer}>
             <span style={s.dot} />
@@ -1422,12 +1423,43 @@ function MessageCard({ msg, onSelectOption }) {
 }
 
 // ─── Welcome Message ──────────────────────────────────────────────────────────
-function buildWelcomeText() {
+function buildWelcomeText(user) {
   const h = new Date().getHours();
   const greet = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
   const date = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const isEmp = (user?.role || '').toLowerCase() === 'employee';
+  const name = user?.name || (isEmp ? 'Team Member' : 'Bhavya');
+
+  if (isEmp) {
+    const lines = [
+      `### ${greet}, ${name}`,
+      `**${date}** — Welcome to your **APS Employee Workspace**.`,
+      '',
+      '---',
+      '',
+      "I'm your **Sales & Calling Co-Pilot** at APS Enterprise.",
+      'You can ask me anything about your assigned leads, tasks, customer calls, or machine specs in **Hindi, English, or Hinglish**.',
+      '',
+      '**Quick Actions for your shift:**',
+      '',
+      '| Workplace Task | What to Ask |',
+      '|---|---|',
+      '| View your customer leads | *"Show my assigned leads"* |',
+      '| Check today\'s assigned work | *"What are my active tasks?"* |',
+      '| High-priority calling queue | *"Who should I call next?"* |',
+      '| Check your personal score | *"Check my KPI score and performance"* |',
+      '| Schedule client follow-up | *"Schedule a call for my lead"* |',
+      '| Send WhatsApp reminder | *"Send WhatsApp message to lead"* |',
+      '| Technical machine specs | *"Search CNC 500T specification manual"* |',
+      '',
+      '---',
+      '*Need administrative changes or role permissions? Please contact your Manager or Administrator.*'
+    ];
+    return lines.join('\n');
+  }
+
   const lines = [
-    `### ${greet}, Bhavya`,
+    `### ${greet}, ${name}`,
     `**${date}** — APS Enterprise AI is fully online.`,
     '',
     '---',
@@ -1562,14 +1594,44 @@ const SIDEBAR_COMMON_QUERIES = [
   { label: 'Export Leads Data to CSV', query: 'Export leads to CSV', category: 'sales', icon: 'file' }
 ];
 
+// ─── Employee Curated Queries (Restricted Role Catalog) ──────────────────────
+const EMPLOYEE_COMMON_QUERIES = [
+  // My Leads & Tasks
+  { label: 'My Assigned Leads', query: 'Show my assigned leads', category: 'crm', icon: 'file' },
+  { label: 'My Active Tasks Today', query: 'What are my active tasks?', category: 'crm', icon: 'award' },
+  { label: 'Upcoming Client Follow-ups', query: 'Show my upcoming follow-ups', category: 'crm', icon: 'trending' },
+
+  // Calling & Customer Communication
+  { label: 'Who Should I Call Next?', query: 'Show priority calling list', category: 'comms', icon: 'mic' },
+  { label: 'Schedule Follow-Up Call', query: 'Schedule call for client', category: 'comms', icon: 'mic' },
+  { label: 'Send WhatsApp Update', query: 'Send WhatsApp message to lead', category: 'comms', icon: 'message' },
+
+  // Product & Performance
+  { label: 'Check My Personal KPI Score', query: 'Show my personal KPI score and performance', category: 'performance', icon: 'award' },
+  { label: 'Search CNC Machine Specs', query: 'Search CNC 500T specification manual', category: 'products', icon: 'search' },
+  { label: 'Factory Assembly Job Card Status', query: 'Track factory job card assembly status', category: 'products', icon: 'factory' }
+];
+
 // ─── MAIN APS AI PAGE COMPONENT ───────────────────────────────────────────────
 export default function APSAIPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const userRole = (currentUser?.role || '').toLowerCase().trim();
+  const isEmployee = userRole === 'employee';
+  const userName = currentUser?.name || (isEmployee ? 'Sales Executive' : 'Administrator');
+  const employeeId = currentUser?.employeeId || currentUser?.id || null;
+
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState(() => {
     const saved = loadHistory();
-    return saved && saved.length > 0 ? saved : [WELCOME_MSG];
+    return saved && saved.length > 0 ? saved : [{
+      role: 'bot',
+      isWelcome: true,
+      text: buildWelcomeText(currentUser),
+      table: null,
+      chart: null
+    }];
   });
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1582,15 +1644,17 @@ export default function APSAIPage() {
   const [queryCategory, setQueryCategory] = useState('all');
   const [querySearch, setQuerySearch] = useState('');
 
+  const activeCatalog = isEmployee ? EMPLOYEE_COMMON_QUERIES : SIDEBAR_COMMON_QUERIES;
+
   const filteredQueries = useMemo(() => {
-    return SIDEBAR_COMMON_QUERIES.filter(item => {
+    return activeCatalog.filter(item => {
       const matchCat = queryCategory === 'all' || item.category === queryCategory;
       const matchSearch = !querySearch.trim() ||
         item.label.toLowerCase().includes(querySearch.toLowerCase()) ||
         item.query.toLowerCase().includes(querySearch.toLowerCase());
       return matchCat && matchSearch;
     });
-  }, [queryCategory, querySearch]);
+  }, [activeCatalog, queryCategory, querySearch]);
 
   // ─── Persistent AI Memory State ──────────────────────────────────────────
   const [showMemoryModal, setShowMemoryModal] = useState(false);
@@ -1694,7 +1758,13 @@ export default function APSAIPage() {
     localStorage.removeItem(HISTORY_KEY);
     sessionStorage.removeItem('apsai_conv_id');
     convId.current = getConversationId();
-    setMessages([WELCOME_MSG]);
+    setMessages([{
+      role: 'bot',
+      isWelcome: true,
+      text: buildWelcomeText(currentUser),
+      table: null,
+      chart: null
+    }]);
   };
 
   // Auto focus input on mount and when loading finishes
@@ -1721,7 +1791,10 @@ export default function APSAIPage() {
     try {
       const { data } = await axios.post(`${API}/query`, {
         query: q,
-        conversationId: convId.current
+        conversationId: convId.current,
+        userRole: userRole,
+        userName: userName,
+        employeeId: employeeId
       });
 
       // Synchronize created users to client storage (for cross-page & Vercel persistence)
@@ -1874,8 +1947,8 @@ export default function APSAIPage() {
   return (
     <div className="apsai-page-wrapper" style={s.pageWrapper}>
       {/* ─── Top Page Header ────────────────────────────────────────── */}
-      <div style={s.headerBanner}>
-        <div style={s.headerLeft}>
+      <div className="apsai-header-banner" style={s.headerBanner}>
+        <div className="apsai-header-left" style={s.headerLeft}>
           <div style={s.headerIconWrap}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2C6.48 2 2 6.25 2 11.5c0 2.3.87 4.4 2.3 6.03L3 21l4.2-1.15A10.45 10.45 0 0 0 12 21c5.52 0 10-4.25 10-9.5S17.52 2 12 2z" />
@@ -1883,30 +1956,32 @@ export default function APSAIPage() {
             </svg>
           </div>
           <div>
-            <h1 style={s.headerTitle}>APS AI — Business Intelligence Agent</h1>
+            <h1 className="apsai-header-title" style={s.headerTitle}>APS AI — Business Intelligence Agent</h1>
           </div>
         </div>
 
-        <div style={s.headerRight}>
-          <button
-            onClick={() => {
-              setShowMemoryModal(true);
-              fetchMemories();
-            }}
-            style={s.memoryHeaderBtn}
-            title="View & Manage AI Persistent Memory"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="4" y="4" width="16" height="16" rx="2" />
-              <rect x="9" y="9" width="6" height="6" />
-              <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
-              <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
-              <line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" />
-              <line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
-            </svg>
-            <span style={{ fontWeight: 700 }}>AI Memory</span>
-            <span style={s.memoryBadgeCount}>{memoriesList.length}</span>
-          </button>
+        <div className="apsai-header-right" style={s.headerRight}>
+          {!isEmployee && (
+            <button
+              onClick={() => {
+                setShowMemoryModal(true);
+                fetchMemories();
+              }}
+              style={s.memoryHeaderBtn}
+              title="View & Manage AI Persistent Memory"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <rect x="9" y="9" width="6" height="6" />
+                <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+                <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+                <line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" />
+                <line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
+              </svg>
+              <span style={{ fontWeight: 700 }}>AI Memory</span>
+              <span style={s.memoryBadgeCount}>{memoriesList.length}</span>
+            </button>
+          )}
 
           <button onClick={clearHistory} style={s.actionBtn} title="Reset Chat">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -1936,12 +2011,18 @@ export default function APSAIPage() {
 
             {/* Category Filter Pills */}
             <div style={{ display: 'flex', gap: 4, marginBottom: '0.6rem', overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
-              {[
+              {(isEmployee ? [
+                { id: 'all', label: 'All' },
+                { id: 'crm', label: 'My Leads' },
+                { id: 'comms', label: 'Calling' },
+                { id: 'performance', label: 'My KPI' },
+                { id: 'products', label: 'Products' }
+              ] : [
                 { id: 'all', label: 'All' },
                 { id: 'ops', label: 'Ops' },
                 { id: 'finance', label: 'Finance' },
                 { id: 'sales', label: 'Sales' }
-              ].map(cat => (
+              ]).map(cat => (
                 <button
                   key={cat.id}
                   type="button"
@@ -2051,38 +2132,64 @@ export default function APSAIPage() {
             </div>
           </div>
 
-          <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-              <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="4" y="4" width="16" height="16" rx="2" />
-                  <rect x="9" y="9" width="6" height="6" />
-                </svg>
-                <span>AI Persistent Memory</span>
+          {isEmployee ? (
+            <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Employee Desk</span>
+                </div>
+                <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#dcfce7', color: '#166534', fontWeight: 700 }}>
+                  Active
+                </span>
               </div>
-              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>
-                {memoriesList.length} items
-              </span>
-            </div>
-            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
-              APS AI saves learned facts, employee boundaries, and actions across all sessions.
-            </p>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+                Logged in as <strong>{userName}</strong> (Sales & Calling Executive). Only your authorized workspace items are accessible.
+              </p>
               <button
-                onClick={() => { setShowMemoryModal(true); fetchMemories(); }}
-                style={{ flex: 1, padding: '6px 10px', borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                onClick={() => sendQuery("Show my assigned leads")}
+                style={{ width: '100%', padding: '6px 10px', borderRadius: 8, background: '#059669', color: '#fff', border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
               >
-                Open Memory Hub
-              </button>
-              <button
-                onClick={() => sendQuery("Show AI memory")}
-                style={{ padding: '6px 10px', borderRadius: 8, background: '#fff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
-                title="Print memory in chat"
-              >
-                Log to Chat
+                View My Leads
               </button>
             </div>
-          </div>
+          ) : (
+            <div style={{ ...s.sideCard, marginTop: '1rem', background: '#f8fafc', borderColor: '#cbd5e1' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <div style={{ ...s.sideCardTitle, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#1e293b' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <rect x="9" y="9" width="6" height="6" />
+                  </svg>
+                  <span>AI Persistent Memory</span>
+                </div>
+                <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>
+                  {memoriesList.length} items
+                </span>
+              </div>
+              <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+                APS AI saves learned facts, employee boundaries, and actions across all sessions.
+              </p>
+              <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                <button
+                  onClick={() => { setShowMemoryModal(true); fetchMemories(); }}
+                  style={{ flex: 1, padding: '6px 10px', borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Open Memory Hub
+                </button>
+                <button
+                  onClick={() => sendQuery("Show AI memory")}
+                  style={{ padding: '6px 10px', borderRadius: 8, background: '#fff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                  title="Print memory in chat"
+                >
+                  Log to Chat
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Side: Chat Conversation Area */}
@@ -2133,99 +2240,278 @@ export default function APSAIPage() {
             #apsai-page-messages::-webkit-scrollbar-thumb:hover {
               background: #94a3b8;
             }
+
+            /* ─── Fully Responsive Layout for Mobile, Tablet, & Desktop ─── */
+            @media (max-width: 1024px) {
+              .apsai-page-wrapper {
+                padding: 0.75rem 1rem !important;
+              }
+            }
+            @media (max-width: 960px) {
+              .apsai-page-wrapper {
+                height: auto !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+                padding: 0.75rem !important;
+              }
+              .apsai-main-grid {
+                grid-template-columns: 1fr !important;
+                overflow: visible !important;
+                gap: 0.85rem !important;
+              }
+              .apsai-side-nav {
+                max-height: 240px !important;
+                overflow-y: auto !important;
+                margin-bottom: 0.25rem !important;
+              }
+              .apsai-chat-container {
+                height: 70vh !important;
+                min-height: 520px !important;
+              }
+              .apsai-landing-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+              }
+            }
+            @media (max-width: 640px) {
+              .apsai-page-wrapper {
+                padding: 0.4rem !important;
+              }
+              .apsai-header-banner {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+                padding: 0.75rem 0.85rem !important;
+              }
+              .apsai-header-left {
+                gap: 10px !important;
+                width: 100% !important;
+              }
+              .apsai-header-title {
+                font-size: 1.1rem !important;
+              }
+              .apsai-header-right {
+                width: 100% !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+              }
+              .apsai-chat-container {
+                height: 75vh !important;
+                min-height: 450px !important;
+              }
+              .apsai-messages-area {
+                padding: 0.85rem 0.75rem !important;
+              }
+              .apsai-welcome-header {
+                font-size: 1.35rem !important;
+              }
+              .apsai-welcome-sub {
+                font-size: 0.78rem !important;
+                margin-bottom: 1rem !important;
+              }
+              .apsai-landing-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.6rem !important;
+              }
+              .apsai-landing-card {
+                padding: 10px 12px !important;
+              }
+              .apsai-user-bubble {
+                max-width: 92% !important;
+                padding: 10px 14px !important;
+              }
+              .apsai-bot-bubble {
+                max-width: 98% !important;
+                padding: 12px 14px !important;
+              }
+              .apsai-input-wrapper {
+                padding: 0.75rem 0.85rem !important;
+              }
+              .apsai-input-actions {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+              }
+              .apsai-input-actions > div:first-child {
+                justify-content: space-between !important;
+              }
+              .apsai-modal-container {
+                max-height: 94vh !important;
+                border-radius: 14px !important;
+              }
+              .apsai-memory-stats-row {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 6px !important;
+                padding: 0.75rem !important;
+              }
+              .apsai-teach-inputs-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+              }
+              .apsai-filter-bar {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+                padding: 0.6rem 0.85rem !important;
+              }
+              .apsai-modal-footer {
+                flex-direction: column !important;
+                gap: 8px !important;
+                padding: 0.75rem !important;
+              }
+            }
           `}</style>
           {/* Messages scroll area */}
           <div className="apsai-messages-area" style={s.messagesArea} id="apsai-page-messages">
             {messages.length === 1 && messages[0].isWelcome ? (
-              <div style={s.welcomeLanding}>
-                <h1 style={s.welcomeHeader}>How can I help you today?</h1>
-                <p style={s.welcomeSub}>
+              <div className="apsai-welcome-landing" style={s.welcomeLanding}>
+                <h1 className="apsai-welcome-header" style={s.welcomeHeader}>How can I help you today?</h1>
+                <p className="apsai-welcome-sub" style={s.welcomeSub}>
                   Your real-time operations co-pilot for <strong>APS Enterprise</strong>. Control tasks, dialers, CRM, invoices, and Tally in English, Hindi, or Hinglish.
                 </p>
                 
-                <div style={s.landingGrid}>
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("assign team tasks options")}>
-                    <div style={{ ...s.cardIcon, color: '#2563eb', background: '#eff6ff', borderColor: '#dbeafe' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                        <path d="M9 14l2 2 4-4" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>Assign Team Tasks</div>
-                      <div style={s.cardDesc}>Allocate role-based task backlogs to all staff members instantly.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("billing & invoices options")}>
-                    <div style={{ ...s.cardIcon, color: '#7c3aed', background: '#f5f3ff', borderColor: '#ede9fe' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2 3-2 3 2V4a2 2 0 0 0-2-2z" />
-                        <line x1="8" y1="7" x2="16" y2="7" />
-                        <line x1="8" y1="11" x2="16" y2="11" />
-                        <line x1="8" y1="15" x2="12" y2="15" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>Billing & Invoices</div>
-                      <div style={s.cardDesc}>Generate proforma or tax invoices with 18% GST splits.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("voice dialer options")}>
-                    <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>Voice Dialer</div>
-                      <div style={s.cardDesc}>Schedule follow-up calls or run sentiment audits on call logs.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("production progress options")}>
-                    <div style={{ ...s.cardIcon, color: '#d97706', background: '#fffbeb', borderColor: '#fef3c7' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
-                        <path d="M17 18h1" />
-                        <path d="M12 18h1" />
-                        <path d="M7 18h1" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>Production Progress</div>
-                      <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
-                    </div>
-                  </div>
+                <div className="apsai-landing-grid" style={s.landingGrid}>
+                  {isEmployee ? (
+                    <>
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show my assigned leads")}>
+                        <div style={{ ...s.cardIcon, color: '#2563eb', background: '#eff6ff', borderColor: '#dbeafe' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>My Assigned Leads</div>
+                          <div style={s.cardDesc}>View your active customer leads, contact numbers, and deal stages.</div>
+                        </div>
+                      </div>
 
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => { setShowMemoryModal(true); fetchMemories(); }}>
-                    <div style={{ ...s.cardIcon, color: '#0284c7', background: '#f0f9ff', borderColor: '#e0f2fe' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="4" width="16" height="16" rx="2" />
-                        <rect x="9" y="9" width="6" height="6" />
-                        <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
-                        <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>AI Persistent Memory Space</div>
-                      <div style={s.cardDesc}>View what the AI has remembered, teach new operational directives, or check action logs.</div>
-                    </div>
-                  </div>
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show priority calling list")}>
+                        <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Priority Calling Queue</div>
+                          <div style={s.cardDesc}>Find high-value clients to call next and schedule follow-ups.</div>
+                        </div>
+                      </div>
 
-                  <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show WhatsApp campaign performance analytics")}>
-                    <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                      </svg>
-                    </div>
-                    <div style={s.cardContent}>
-                      <div style={s.cardTitle}>WhatsApp Automation</div>
-                      <div style={s.cardDesc}>Broadcast message templates and view real-time delivery logs.</div>
-                    </div>
-                  </div>
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show my personal KPI score and performance")}>
+                        <div style={{ ...s.cardIcon, color: '#7c3aed', background: '#f5f3ff', borderColor: '#ede9fe' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="8" r="7" />
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>My KPI Scorecard</div>
+                          <div style={s.cardDesc}>Track your closed deals, call volume, and personal rating.</div>
+                        </div>
+                      </div>
+
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Search CNC 500T specification manual")}>
+                        <div style={{ ...s.cardIcon, color: '#d97706', background: '#fffbeb', borderColor: '#fef3c7' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Machine Specifications</div>
+                          <div style={s.cardDesc}>Instant technical parameters, capacity, and catalog specs for clients.</div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("assign team tasks options")}>
+                        <div style={{ ...s.cardIcon, color: '#2563eb', background: '#eff6ff', borderColor: '#dbeafe' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                            <path d="M9 14l2 2 4-4" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Assign Team Tasks</div>
+                          <div style={s.cardDesc}>Allocate role-based task backlogs to all staff members instantly.</div>
+                        </div>
+                      </div>
+                      
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("billing & invoices options")}>
+                        <div style={{ ...s.cardIcon, color: '#7c3aed', background: '#f5f3ff', borderColor: '#ede9fe' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2 3-2 3 2V4a2 2 0 0 0-2-2z" />
+                            <line x1="8" y1="7" x2="16" y2="7" />
+                            <line x1="8" y1="11" x2="16" y2="11" />
+                            <line x1="8" y1="15" x2="12" y2="15" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Billing & Invoices</div>
+                          <div style={s.cardDesc}>Generate proforma or tax invoices with 18% GST splits.</div>
+                        </div>
+                      </div>
+                      
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("voice dialer options")}>
+                        <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Voice Dialer</div>
+                          <div style={s.cardDesc}>Schedule follow-up calls or run sentiment audits on call logs.</div>
+                        </div>
+                      </div>
+                      
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("production progress options")}>
+                        <div style={{ ...s.cardIcon, color: '#d97706', background: '#fffbeb', borderColor: '#fef3c7' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+                            <path d="M17 18h1" />
+                            <path d="M12 18h1" />
+                            <path d="M7 18h1" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>Production Progress</div>
+                          <div style={s.cardDesc}>Track factory assembly status and release manufacturing job cards.</div>
+                        </div>
+                      </div>
+
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => { setShowMemoryModal(true); fetchMemories(); }}>
+                        <div style={{ ...s.cardIcon, color: '#0284c7', background: '#f0f9ff', borderColor: '#e0f2fe' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <rect x="9" y="9" width="6" height="6" />
+                            <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+                            <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>AI Persistent Memory Space</div>
+                          <div style={s.cardDesc}>View what the AI has remembered, teach new operational directives, or check action logs.</div>
+                        </div>
+                      </div>
+
+                      <div className="apsai-landing-card" style={s.landingCard} onClick={() => sendQuery("Show WhatsApp campaign performance analytics")}>
+                        <div style={{ ...s.cardIcon, color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                          </svg>
+                        </div>
+                        <div style={s.cardContent}>
+                          <div style={s.cardTitle}>WhatsApp Automation</div>
+                          <div style={s.cardDesc}>Broadcast message templates and view real-time delivery logs.</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
@@ -2235,7 +2521,7 @@ export default function APSAIPage() {
           </div>
 
           {/* Input Box */}
-          <div style={s.inputWrapper}>
+          <div className="apsai-input-wrapper" style={s.inputWrapper}>
             <textarea
               ref={inputRef}
               value={input}
@@ -2251,7 +2537,7 @@ export default function APSAIPage() {
               disabled={loading}
             />
 
-            <div style={s.inputActions}>
+            <div className="apsai-input-actions" style={s.inputActions}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button
                   type="button"
@@ -2293,7 +2579,7 @@ export default function APSAIPage() {
       {/* ─── AI Persistent Memory Modal & Knowledge Space ────────────────── */}
       {showMemoryModal && (
         <div style={s.modalBackdrop} onClick={() => setShowMemoryModal(false)}>
-          <div style={s.modalContainer} onClick={(e) => e.stopPropagation()}>
+          <div className="apsai-modal-container" style={s.modalContainer} onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div style={s.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -2322,7 +2608,7 @@ export default function APSAIPage() {
             </div>
 
             {/* Quick KPI Stats Summary */}
-            <div style={s.memoryStatsRow}>
+            <div className="apsai-memory-stats-row" style={s.memoryStatsRow}>
               <div style={s.memoryStatCard}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div>
@@ -2363,7 +2649,7 @@ export default function APSAIPage() {
                   {memoryAlert.text}
                 </div>
               )}
-              <div style={s.teachInputsRow}>
+              <div className="apsai-teach-inputs-row" style={s.teachInputsRow}>
                 <input
                   type="text"
                   placeholder="e.g. Animesh is our machinery raw material vendor from Bhopal..."
@@ -2389,7 +2675,7 @@ export default function APSAIPage() {
             </form>
 
             {/* Search and Category Filters */}
-            <div style={s.filterBar}>
+            <div className="apsai-filter-bar" style={s.filterBar}>
               <div style={s.filterChips}>
                 {[
                   { key: 'ALL', label: `All (${memoriesList.length})` },
@@ -2494,7 +2780,7 @@ export default function APSAIPage() {
             </div>
 
             {/* Modal Footer */}
-            <div style={s.modalFooter}>
+            <div className="apsai-modal-footer" style={s.modalFooter}>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
