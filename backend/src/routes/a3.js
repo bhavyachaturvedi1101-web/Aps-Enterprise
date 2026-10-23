@@ -24,10 +24,19 @@ router.delete('/memory', clearMemories);
 // POST /api/a3/stream — Server-Sent Events streaming response
 router.post('/stream', async (req, res) => {
   try {
-    const { query: userQuery, conversationId } = req.body;
+    const { query: userQuery, conversationId, userRole, userName, employeeId } = req.body;
     if (!userQuery || !userQuery.trim()) {
       return res.status(400).json({ error: 'query is required' });
     }
+
+    const effectiveRole = (userRole || req.user?.role || '').toLowerCase().trim();
+    const effectiveName = userName || req.user?.name || 'User';
+    const effectiveEmpId = employeeId || req.user?.employeeId || req.user?.id || null;
+
+    const rawUserScope = `${effectiveRole || 'user'}_${String(effectiveEmpId || effectiveName).toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`;
+    const safeConvId = conversationId && conversationId.includes(rawUserScope)
+      ? conversationId
+      : `conv_${rawUserScope}_${conversationId || Date.now()}`;
 
     // Set SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -41,7 +50,11 @@ router.post('/stream', async (req, res) => {
     };
 
     try {
-      const result = await processQuery(userQuery.trim(), conversationId || null);
+      const result = await processQuery(userQuery.trim(), safeConvId, {
+        userRole: effectiveRole,
+        userName: effectiveName,
+        employeeId: effectiveEmpId
+      });
       const text = result.text || '';
 
       // Stream words with slight delay for typewriter effect

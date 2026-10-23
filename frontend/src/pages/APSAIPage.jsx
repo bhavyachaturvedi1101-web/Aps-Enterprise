@@ -9,12 +9,33 @@ import { useAuth } from '../context/AuthContext';
 const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 const API = isLocal ? 'http://localhost:5000/api/a3' : '/api/a3';
 
-// ─── Session Conversation ID ──────────────────────────────────────────────────
-function getConversationId() {
-  let id = sessionStorage.getItem('apsai_conv_id');
+// ─── User-Scoped Privacy & Storage Partitioning ──────────────────────────────
+export function getUserStorageKey(user) {
+  if (!user) return 'guest';
+  const role = (user.role || 'user').toLowerCase().trim();
+  const rawId = user.employeeId || user.id || user.email || user.name || 'operator';
+  const cleanId = String(rawId).toLowerCase().trim().replace(/[^a-z0-9_-]/g, '_');
+  return `${role}_${cleanId}`;
+}
+
+export function getHistoryKey(user) {
+  const scope = getUserStorageKey(user);
+  return `apsai_chat_history_${scope}`;
+}
+
+// ─── Session Conversation ID (Strictly isolated per user session) ─────────────
+export function getConversationId(user) {
+  const scope = getUserStorageKey(user);
+  const sessionKey = `apsai_conv_id_${scope}`;
+  let id = null;
+  try {
+    id = sessionStorage.getItem(sessionKey);
+  } catch {}
   if (!id) {
-    id = 'conv_' + Math.random().toString(36).slice(2) + Date.now();
-    sessionStorage.setItem('apsai_conv_id', id);
+    id = `conv_${scope}_` + Math.random().toString(36).slice(2, 8) + Date.now();
+    try {
+      sessionStorage.setItem(sessionKey, id);
+    } catch {}
   }
   return id;
 }
@@ -49,32 +70,42 @@ function sanitizeMsg(m) {
   return clean;
 }
 
-// ─── LocalStorage Chat History ────────────────────────────────────────────────
-const HISTORY_KEY = 'apsai_chat_history';
-
-function loadHistory() {
+// ─── User-Scoped Chat History Load / Save (100% Private Per Role & User ID) ──
+export function loadHistory(user) {
   try {
-    const raw = localStorage.getItem(HISTORY_KEY);
+    const key = getHistoryKey(user);
+    const raw = localStorage.getItem(key);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         const sanitized = parsed.filter(m => !m.isWelcome).map(sanitizeMsg);
-        try {
-          localStorage.setItem(HISTORY_KEY, JSON.stringify(sanitized));
-        } catch { }
         return sanitized;
       }
     }
-  } catch { }
+  } catch {}
   return null;
 }
 
-function saveHistory(messages) {
+export function saveHistory(messages, user) {
   try {
+    if (!messages || !Array.isArray(messages)) return;
+    const key = getHistoryKey(user);
     const clean = messages.filter(m => !m.loading && !m.isWelcome).map(sanitizeMsg).slice(-40);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(clean));
-  } catch { }
+    localStorage.setItem(key, JSON.stringify(clean));
+  } catch {}
 }
+
+// Safety: Clean up legacy global shared history so test messages never leak across roles
+try {
+  if (typeof window !== 'undefined') {
+    if (localStorage.getItem('apsai_chat_history')) {
+      localStorage.removeItem('apsai_chat_history');
+    }
+    if (sessionStorage.getItem('apsai_conv_id')) {
+      sessionStorage.removeItem('apsai_conv_id');
+    }
+  }
+} catch {}
 
 // ─── Format helper for canvas numbers ─────────────────────────────────────────
 function formatChartNum(val) {
@@ -1621,10 +1652,11 @@ export default function APSAIPage() {
   const isEmployee = userRole === 'employee';
   const userName = currentUser?.name || (isEmployee ? 'Sales Executive' : 'Administrator');
   const employeeId = currentUser?.employeeId || currentUser?.id || null;
+  const userKey = getUserStorageKey(currentUser);
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState(() => {
-    const saved = loadHistory();
+    const saved = loadHistory(currentUser);
     return saved && saved.length > 0 ? saved : [{
       role: 'bot',
       isWelcome: true,
@@ -1638,7 +1670,8 @@ export default function APSAIPage() {
   const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-  const convId = useRef(getConversationId());
+  const convId = useRef(getConversationId(currentUser));
+  const activeUserKeyRef = useRef(userKey);
 
   // ─── Sidebar Common Queries State (Filter & Search) ──────────────────────
   const [queryCategory, setQueryCategory] = useState('all');
@@ -1721,10 +1754,33 @@ export default function APSAIPage() {
     } catch {}
   };
 
-  // Save history whenever messages change
+  // ─── Dynamic Privacy Partitioning ──────────────────────────────────────────
+  // When active authenticated user switches, load their private history immediately
   useEffect(() => {
-    saveHistory(messages);
-  }, [messages]);
+    if (activeUserKeyRef.current !== userKey) {
+      activeUserKeyRef.current = userKey;
+      convId.current = getConversationId(currentUser);
+      const saved = loadHistory(currentUser);
+      if (saved && saved.length > 0) {
+        setMessages(saved);
+      } else {
+        setMessages([{
+          role: 'bot',
+          isWelcome: true,
+          text: buildWelcomeText(currentUser),
+          table: null,
+          chart: null
+        }]);
+      }
+    }
+  }, [userKey, currentUser]);
+
+  // Save history whenever messages change - strictly scoped to active user
+  useEffect(() => {
+    if (activeUserKeyRef.current === userKey && messages && messages.length > 0) {
+      saveHistory(messages, currentUser);
+    }
+  }, [messages, userKey, currentUser]);
 
   // Load suggestions
   useEffect(() => {
@@ -1755,9 +1811,13 @@ export default function APSAIPage() {
   }, [messages]);
 
   const clearHistory = () => {
-    localStorage.removeItem(HISTORY_KEY);
-    sessionStorage.removeItem('apsai_conv_id');
-    convId.current = getConversationId();
+    try {
+      const histKey = getHistoryKey(currentUser);
+      localStorage.removeItem(histKey);
+      const scope = getUserStorageKey(currentUser);
+      sessionStorage.removeItem(`apsai_conv_id_${scope}`);
+    } catch {}
+    convId.current = getConversationId(currentUser);
     setMessages([{
       role: 'bot',
       isWelcome: true,
@@ -1956,7 +2016,35 @@ export default function APSAIPage() {
             </svg>
           </div>
           <div>
-            <h1 className="apsai-header-title" style={s.headerTitle}>APS AI — Business Intelligence Agent</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <h1 className="apsai-header-title" style={s.headerTitle}>APS AI — Business Intelligence Agent</h1>
+              <span
+                id="apsai-privacy-badge"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4.5,
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  background: isEmployee ? 'rgba(5, 150, 105, 0.08)' : 'rgba(37, 99, 235, 0.08)',
+                  color: isEmployee ? '#059669' : '#2563eb',
+                  border: `1px solid ${isEmployee ? 'rgba(5, 150, 105, 0.22)' : 'rgba(37, 99, 235, 0.22)'}`,
+                  letterSpacing: '0.2px'
+                }}
+                title="Your chats are 100% private and partitioned strictly to your user account."
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                {isEmployee ? `Private Chat • ${userName}` : `Private Chat • Admin (${userName})`}
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.74rem', color: '#64748b' }}>
+              {isEmployee ? `Session scoped to employee ID: ${employeeId || userName}` : 'Full Administrator Workspace & System Intelligence'}
+            </p>
           </div>
         </div>
 

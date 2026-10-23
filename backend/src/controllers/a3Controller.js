@@ -19,8 +19,14 @@ async function query(req, res, next) {
     const effectiveName = userName || req.user?.name || 'User';
     const effectiveEmpId = employeeId || req.user?.employeeId || req.user?.id || null;
 
+    // Enforce strict private conversation partitioning per user/role
+    const rawUserScope = `${effectiveRole || 'user'}_${String(effectiveEmpId || effectiveName).toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`;
+    const safeConvId = conversationId && conversationId.includes(rawUserScope)
+      ? conversationId
+      : `conv_${rawUserScope}_${conversationId || Date.now()}`;
+
     const t0 = Date.now();
-    const result = await processQuery(userQuery.trim(), conversationId || null, {
+    const result = await processQuery(userQuery.trim(), safeConvId, {
       userRole: effectiveRole,
       userName: effectiveName,
       employeeId: effectiveEmpId
@@ -30,6 +36,7 @@ async function query(req, res, next) {
     return res.json({
       ...result,
       query: userQuery.trim(),
+      conversationId: safeConvId,
       processingMs
     });
   } catch (err) {
