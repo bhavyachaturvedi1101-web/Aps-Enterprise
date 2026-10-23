@@ -88,6 +88,9 @@ function getMemories(req, res) {
  */
 function addMemory(req, res) {
   try {
+    if (req.user?.role === 'employee') {
+      return res.status(403).json({ success: false, error: 'Access Denied', message: 'AI Persistent Memory modification is restricted to Administrators.' });
+    }
     const { fact, topic, target, type } = req.body;
     if (!fact || !fact.trim()) {
       return res.status(400).json({ success: false, error: 'fact field is required' });
@@ -118,6 +121,9 @@ function addMemory(req, res) {
  */
 function deleteMemory(req, res) {
   try {
+    if (req.user?.role === 'employee') {
+      return res.status(403).json({ success: false, error: 'Access Denied', message: 'AI Persistent Memory modification is restricted to Administrators.' });
+    }
     const { id } = req.params;
     const ok = aiMemory.deleteMemory(id);
     return res.json({ success: ok });
@@ -132,6 +138,9 @@ function deleteMemory(req, res) {
  */
 function clearMemories(req, res) {
   try {
+    if (req.user?.role === 'employee') {
+      return res.status(403).json({ success: false, error: 'Access Denied', message: 'AI Persistent Memory modification is restricted to Administrators.' });
+    }
     const reset = aiMemory.clearMemories();
     return res.json({ success: true, memories: reset });
   } catch (err) {
