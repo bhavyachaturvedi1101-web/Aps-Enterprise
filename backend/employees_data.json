@@ -1,5 +1,44 @@
 [
   {
+    "id": "e122",
+    "name": "Zod Employee Contract",
+    "email": "zod.employee@apsenterprises.in",
+    "phone": "+91 99112 23344",
+    "role": "Operations Engineer",
+    "department": "Shopfloor",
+    "kpiScore": "85%",
+    "kpiScoreNum": 85,
+    "tasksCompleted": 0,
+    "callsHandled": 0,
+    "salesClosed": 0,
+    "totalRevenue": 0,
+    "status": "Active",
+    "conversionRate": "34.5%",
+    "avgCallDurationSec": 112,
+    "avgResponseTimeMin": 4,
+    "weeklyKpiHistory": [
+      85,
+      88,
+      90,
+      92
+    ],
+    "activeTask": {
+      "id": "task-e122-1",
+      "title": "Onboarding & initial pipeline sync for Zod Employee Contract",
+      "priority": "Normal",
+      "type": "System Onboarding",
+      "stage": "Onboarding",
+      "dueIn": "1 hour",
+      "assignedAt": "2026-10-23T13:24:48.189Z"
+    },
+    "taskQueue": [
+      {
+        "title": "Review Shopfloor SOP",
+        "priority": "Normal"
+      }
+    ]
+  },
+  {
     "id": "e121",
     "name": "Count Test Emp",
     "email": "count@aps.com",
