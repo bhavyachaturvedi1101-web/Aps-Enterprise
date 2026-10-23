@@ -146,13 +146,26 @@ function getDefaultStore() {
   }
 }
 
-async function buildFullContext(query, getStore) {
+async function buildFullContext(query, getStore, isEmployee = false) {
   const storeFn = typeof getStore === 'function' ? getStore : getDefaultStore;
   const store = await storeFn();
   const leads = store.mockLeads || [];
   const employees = store.mockEmployees || [];
   const actLogs = store.mockActivityLogs || [];
   const qLower = (query || '').toLowerCase().trim();
+
+  // If user is Employee, NEVER leak company financial balance sheets or revenue!
+  if (isEmployee) {
+    return `═══ APS ENTERPRISE SALES & WORKPLACE CONTEXT [${new Date().toLocaleDateString('en-IN')}] ═══
+• Company: APS Enterprise, 832 Old Loha Mandi, Indore MP | Phone: +91-7869755871 | info@apsenterprises.in
+• Core Machinery Catalog:
+  - APS CNC 500T Hydraulic Forming Press (Dual Cylinder, 5000 kN clamping, 45 kW, Siemens S7-1200 PLC)
+  - Automatic Paper Bag Machine (Model APB-450, 28 cycles/min servo control)
+  - Fully Automatic Double Die Paper Plate Machine & Dona Pattal Plant
+  - High-Speed Paper Cup Machine & Roll Cutters
+• Policy Guidance: 10% advance deposit required for production release. Official quotations sent via WhatsApp.
+• Note for Assistant: You are assisting a Sales Executive. Company profit margins, overall revenue, and management financials are confidential.`;
+  }
 
   const closedStages = ['Client (Paid)', 'In Production', 'Dispatched'];
   const closedLeads = leads.filter(l => closedStages.includes(l.stage));
@@ -218,13 +231,25 @@ ${recentActivity}
 ${memorySnippet}`;
 }
 
-async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHandler) {
+async function processWithLLM(query, historyOrConvId, getStore, fallbackReportHandler, isEmployee = false) {
   const provider = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
   if (provider === 'mock') return null;
 
   try {
-    const context = await buildFullContext(query, getStore);
-    const systemPrompt = `You are APS AI — Executive Operations Intelligence Copilot for APS Enterprise, Indore.
+    const context = await buildFullContext(query, getStore, isEmployee);
+    const systemPrompt = isEmployee
+      ? `You are APS AI — Sales & Telecalling Co-Pilot for APS Enterprise, Indore.
+You assist sales executives and telecallers with assigned leads, machine specs, and customer calling workflows.
+
+EMPLOYEE POLICY ENFORCEMENT:
+1. NEVER disclose company profit margins, overall company revenue, company gross/net profit, or administrative settings.
+2. If the user asks about company profit, margin, or revenue, state clearly: "Company profit margins and total revenue are restricted to Administrators."
+3. Focus exclusively on sales outreach, product specifications, customer follow-up guidance, and telecalling assistance.
+4. Tone: Helpful, professional, and operational. Match user language (English, Hindi, Hinglish).
+5. No emojis in headers or tables.
+
+${context}`
+      : `You are APS AI — Executive Operations Intelligence Copilot for APS Enterprise, Indore.
 
 EXECUTIVE ANSWER PROTOCOL:
 1. **Key Takeaway First**: Always start with a 1-2 sentence executive summary (TL;DR) or bottom-line figure before diving into details.

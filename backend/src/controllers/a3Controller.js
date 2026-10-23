@@ -49,7 +49,8 @@ async function query(req, res, next) {
  * Returns quick-access suggestion chips for the chat panel UI.
  */
 function suggestions(req, res) {
-  return res.json({ suggestions: getSuggestions() });
+  const userRole = (req.query.role || req.user?.role || '').toLowerCase().trim();
+  return res.json({ suggestions: getSuggestions(userRole) });
 }
 
 /**

@@ -1782,12 +1782,12 @@ export default function APSAIPage() {
     }
   }, [messages, userKey, currentUser]);
 
-  // Load suggestions
+  // Load suggestions (scoped by user role)
   useEffect(() => {
-    axios.get(`${API}/suggestions`)
+    axios.get(`${API}/suggestions?role=${encodeURIComponent(userRole)}`)
       .then(r => setSuggestions(r.data.suggestions || []))
       .catch(() => { });
-  }, []);
+  }, [userRole]);
 
   // Handle URL query parameter if navigated with `?q=...`
   useEffect(() => {

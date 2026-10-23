@@ -180,19 +180,59 @@ async function processQuery(query, conversationId = 'default', userContext = {})
       });
     }
 
-    // 6. Comprehensive Employee Restriction Guard on Admin Functions
-    const isRestrictedForEmployee =
-      /\b(assign task|assign tasks|reassign|all employees|team performance|team leaderboard|sales leaderboard|create user|add user|new user|delete user|hire user|invite user|system roles|user permissions|profit margin|company profit|total profit|margin calculator|revenue summary|company revenue|predict revenue|revenue forecast|sales forecast|executive report|executive pdf|lead churn|churn risk|sentiment audit|delete memory|clear memory|reset memory|audit log|security log|system audit|tally post|post to tally|tally sync|tally voucher|financial audit|p&l|balance sheet|all invoices|billing generator)\b/i.test(cleanQuery);
+    // ── 6. STRICT RESTRICTION ON ADMIN CAPABILITIES (5 Categories) ───────────
+    // Category 1: Company Profit Margins & Revenue (Total profit, revenue forecasts, margin calculator)
+    const isProfitRevenueRestricted =
+      /\b(profit|revenue|margin|margins|turnover|ebitda|p&l|balance sheet|earnings|financials|annual income|gross profit|net profit|profitability|munafa|kamai|aamdani)\b/i.test(cleanQuery);
 
-    if (isRestrictedForEmployee) {
+    // Category 2: User Management & System Permissions (New user, role change, delete user)
+    const isUserManagementRestricted =
+      /\b(create user|add user|new user|delete user|remove user|hire user|invite user|manage user|edit user|all users|list users|system role|user role|system roles|user roles|permissions|role change|change role|access level|user permissions|naya user|user banao|user delete)\b/i.test(cleanQuery);
+
+    // Category 3: Team Workload Reassignment & Staff Audits (Assign tasks, company-wide staff audits)
+    const isTeamWorkloadRestricted =
+      /\b(assign task|assign tasks|reassign|delegate task|give task|task assign|all employees|list employees|show employees|every employee|team performance|team leaderboard|sales leaderboard|leaderboard|top performer|top performers|best employee|employee audit|staff audit|other employee|other staff|workload|team workload)\b/i.test(cleanQuery);
+
+    // Category 4: Tally Accounting & Tax Setup (Tally XML voucher, GST settings, invoices)
+    const isTallyTaxRestricted =
+      /\b(tally|tally prime|tally erp|tally post|post to tally|tally sync|sync tally|tally voucher|xml voucher|gst settings|tax settings|company gst|all invoices|company invoices|billing generator|financial audit)\b/i.test(cleanQuery);
+
+    // Category 5: AI Persistent Memory & System Audit (Delete memory, reset memory, audit logs)
+    const isMemoryAuditRestricted =
+      /\b(memory|remember|audit log|security log|system audit|audit logs|lead churn|churn risk|sentiment audit|executive report|executive pdf)\b/i.test(cleanQuery);
+
+    if (
+      isProfitRevenueRestricted ||
+      isUserManagementRestricted ||
+      isTeamWorkloadRestricted ||
+      isTallyTaxRestricted ||
+      isMemoryAuditRestricted
+    ) {
+      let categoryName = 'Company Profit Margins & Revenue';
+      if (isProfitRevenueRestricted) categoryName = '1. Company Profit Margins & Revenue (Total Profit, Revenue Forecasts & Margins)';
+      else if (isUserManagementRestricted) categoryName = '2. User Management (Add User, Role Change, Delete User)';
+      else if (isTeamWorkloadRestricted) categoryName = '3. Team Workload Reassignment (Assign Tasks & Staff Audits)';
+      else if (isTallyTaxRestricted) categoryName = '4. Tally Accounting & Tax Setup (Tally XML Vouchers & GST Settings)';
+      else if (isMemoryAuditRestricted) categoryName = '5. AI Persistent Memory & System Audits (Knowledge Memory & Audit Logs)';
+
       return finalizeAndRecord({
-        text: `### 🔒 Access Restricted for Employee Role\n\nHello **${userContext.userName || 'Team Member'}**, as an **Employee / Sales Executive**, your chatbot workspace is specifically tailored for:\n• **Your assigned leads & customer inquiries**\n• **Your daily tasks & priority calling queue**\n• **Machine specifications & customer WhatsApp updates**\n• **Your personal KPI and performance scorecard**\n\nAdministrative actions (such as company profit margin audits, revenue forecasts, onboarding new users, reallocating team workloads, or altering Tally vouchers) are restricted to **Managers & Administrators**.\n\n*If you require this action, please coordinate with your Administrator.*`,
+        text: `### 🔒 Access Restricted for Employee Role\n\n` +
+          `Hello **${userContext.userName || 'Team Member'}**, this capability is **strictly locked** for the **Employee / Sales Executive** workspace.\n\n` +
+          `**Restricted Administrative Category:** **${categoryName}**\n\n` +
+          `> ⚠️ **Enforced Policy Restrictions:**\n` +
+          `> • **Company Profit & Revenue:** Total profit, company revenue forecasts, and margin calculations are confidential to Management.\n` +
+          `> • **User Management:** Adding users, changing roles, or deleting accounts is blocked.\n` +
+          `> • **Team Workload:** Reassigning tasks to colleagues or accessing company-wide performance audits is blocked.\n` +
+          `> • **Tally & Tax:** Altering Tally accounting vouchers, company GST settings, or invoices is blocked.\n` +
+          `> • **AI Memory:** Modifying or resetting persistent company intelligence is blocked.\n\n` +
+          `*If your assigned duties require this data, please coordinate with your Administrator.*`,
         table: null,
         chart: null,
         options: [
           'Show my assigned leads',
           'What are my active tasks?',
           'Who should I call next?',
+          'Check my KPI score and performance',
           'Search CNC 500T specification manual'
         ],
         intent: 'employee_restricted'
@@ -210,6 +250,7 @@ async function processQuery(query, conversationId = 'default', userContext = {})
       'assign_employee_tasks',
       'action_post_tally',
       'ai_memory_teach',
+      'ai_memory_recall',
       'sales_team_report',
       'sales_leaderboard',
       'revenue_summary',
@@ -220,17 +261,22 @@ async function processQuery(query, conversationId = 'default', userContext = {})
       'predictive_sales',
       'lead_churn_audit',
       'system_audit_log',
-      'tally_status'
+      'tally_status',
+      'order_margin',
+      'invoice_generation'
     ];
     if (restrictedIntents.includes(intent)) {
       return finalizeAndRecord({
-        text: `### 🔒 Access Restricted for Employee Role\n\nHello **${userContext.userName || 'Team Member'}**, administrative operations (like creating users, reallocating team workloads, company profit audits, or altering company accounts) are reserved for **Management**.\n\nPlease select an authorized action from your employee workspace:`,
+        text: `### 🔒 Access Restricted for Employee Role\n\n` +
+          `Hello **${userContext.userName || 'Team Member'}**, administrative operations (like company profit margins, creating users, reallocating team workloads, or altering company accounts) are reserved for **Management**.\n\n` +
+          `Please select an authorized action from your employee workspace:`,
         table: null,
         chart: null,
         options: [
           'Show my assigned leads',
           'What are my active tasks?',
           'Who should I call next?',
+          'Check my KPI score and performance',
           'Search CNC 500T specification manual'
         ],
         intent: 'employee_restricted'
@@ -281,7 +327,7 @@ async function processQuery(query, conversationId = 'default', userContext = {})
   // 2. Direct LLM execution if provider configured and active
   if (!result && LLM_PROVIDER !== 'mock') {
     try {
-      result = await processWithLLM(cleanQuery, convId, intent);
+      result = await processWithLLM(cleanQuery, convId, null, null, isEmployee);
     } catch (llmErr) {
       console.warn(`[A3 LLM Warning] (${llmErr.message}). Fallback to domain handler.`);
     }
@@ -375,9 +421,21 @@ async function processQuery(query, conversationId = 'default', userContext = {})
 }
 
 /**
- * Return quick suggestion chips for dashboard UI
+ * Return quick suggestion chips for dashboard UI (scoped by role)
  */
-function getSuggestions() {
+function getSuggestions(role = 'admin') {
+  if (role === 'employee') {
+    return [
+      { label: 'My Assigned Leads', query: 'Show my assigned leads' },
+      { label: 'My Active Tasks Today', query: 'What are my active tasks?' },
+      { label: 'Priority Calling Queue', query: 'Who should I call next?' },
+      { label: 'My Personal KPI Score', query: 'Show my personal KPI score and performance' },
+      { label: 'Search CNC 500T Specs', query: 'Search CNC 500T specification manual' },
+      { label: 'Track Factory Job Card', query: 'Track factory job card assembly status' },
+      { label: 'Schedule Follow-Up Call', query: 'Schedule call for client' },
+      { label: 'Send WhatsApp Update', query: 'Send WhatsApp message to lead' }
+    ];
+  }
   return [
     { label: 'Factory Job Card Tracker', query: 'Track factory job card assembly status' },
     { label: 'Generate GST Tax Invoice', query: 'Generate GST tax invoice for 42000' },
