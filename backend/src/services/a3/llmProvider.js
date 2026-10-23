@@ -6,11 +6,25 @@
 
 const https = require('https');
 
+// Persistent Keep-Alive agent to pool TCP/TLS connections and drastically reduce latency
+const keepAliveAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 30,
+  maxFreeSockets: 10,
+  timeout: 60000
+});
+
 function httpsPost(hostname, path, headers, body) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body);
     const req = https.request(
-      { hostname, path, method: 'POST', headers: { ...headers, 'Content-Length': Buffer.byteLength(data) } },
+      {
+        hostname,
+        path,
+        method: 'POST',
+        agent: keepAliveAgent,
+        headers: { ...headers, 'Content-Length': Buffer.byteLength(data) }
+      },
       (res) => {
         let raw = '';
         res.on('data', c => raw += c);
@@ -32,12 +46,13 @@ async function callGroq(messages) {
 
   const envModel = process.env.GROQ_MODEL;
   const fallbackChain = [
+    'qwen/qwen3.8-27b',
     'openai/gpt-oss-120b',
-    'openai/gpt-oss-20b',
-    'qwen/qwen3.8-27b'
+    'openai/gpt-oss-20b'
   ];
-  const models = envModel
-    ? [envModel, ...fallbackChain.filter(m => m !== envModel)]
+  const validEnvModel = envModel && envModel !== 'groq/compound' && !envModel.includes('compound') ? envModel : null;
+  const models = validEnvModel
+    ? [validEnvModel, ...fallbackChain.filter(m => m !== validEnvModel)]
     : fallbackChain;
   let lastError = null;
 

@@ -117,7 +117,7 @@ function formatChartNum(val) {
 }
 
 // ─── Bar Chart (Canvas) ───────────────────────────────────────────────────────
-function MiniBarChart({ chart }) {
+const MiniBarChart = React.memo(function MiniBarChart({ chart }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -235,10 +235,10 @@ function MiniBarChart({ chart }) {
       <canvas ref={canvasRef} style={{ width: '100%', height: 200, display: 'block' }} />
     </div>
   );
-}
+});
 
 // ─── Donut Chart (Canvas) ─────────────────────────────────────────────────────
-function MiniDonutChart({ chart }) {
+const MiniDonutChart = React.memo(function MiniDonutChart({ chart }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -318,15 +318,15 @@ function MiniDonutChart({ chart }) {
       <canvas ref={canvasRef} style={{ width: '100%', height: 180, display: 'block' }} />
     </div>
   );
-}
+});
 
-function SmartChart({ chart }) {
+const SmartChart = React.memo(function SmartChart({ chart }) {
   if (!chart) return null;
   return chart.type === 'donut' ? <MiniDonutChart chart={chart} /> : <MiniBarChart chart={chart} />;
-}
+});
 
 // ─── Data Table ───────────────────────────────────────────────────────────────
-function MiniTable({ rows }) {
+const MiniTable = React.memo(function MiniTable({ rows }) {
   if (!rows || rows.length === 0) return null;
   const [showAll, setShowAll] = React.useState(false);
   const headers = Object.keys(rows[0]);
@@ -378,10 +378,10 @@ function MiniTable({ rows }) {
       </table>
     </div>
   );
-}
+});
 
 // ─── Native Markdown Table Component ──────────────────────────────────────────
-function MarkdownTable({ headers, rows, isUser }) {
+const MarkdownTable = React.memo(function MarkdownTable({ headers, rows, isUser }) {
   if (!headers || headers.length === 0) return null;
   return (
     <div style={{
@@ -439,10 +439,10 @@ function MarkdownTable({ headers, rows, isUser }) {
       </table>
     </div>
   );
-}
+});
 
 // ─── Enhanced Markdown Text Renderer ───────────────────────────────────────────
-function RenderText({ text, isUser }) {
+const RenderText = React.memo(function RenderText({ text, isUser }) {
   if (!text) return null;
 
   // Normalize special Unicode space variants and zero-width characters to standard ASCII characters
@@ -725,7 +725,7 @@ function RenderText({ text, isUser }) {
       })}
     </div>
   );
-}
+});
 
 function parseInlineStyles(str, isUser) {
   if (!str) return '';
@@ -1340,7 +1340,7 @@ function ExportFileCard({ exportFile, tableData }) {
 }
 
 // ─── Message Component ────────────────────────────────────────────────────────
-function MessageCard({ msg, onSelectOption }) {
+const MessageCard = React.memo(function MessageCard({ msg, onSelectOption }) {
   const isUser = msg.role === 'user';
   const [copied, setCopied] = useState(false);
 
@@ -1451,7 +1451,7 @@ function MessageCard({ msg, onSelectOption }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Welcome Message ──────────────────────────────────────────────────────────
 function buildWelcomeText(user) {
@@ -1775,10 +1775,13 @@ export default function APSAIPage() {
     }
   }, [userKey, currentUser]);
 
-  // Save history whenever messages change - strictly scoped to active user
+  // Save history whenever messages change - strictly scoped to active user (debounced for UI efficiency)
   useEffect(() => {
     if (activeUserKeyRef.current === userKey && messages && messages.length > 0) {
-      saveHistory(messages, currentUser);
+      const timer = setTimeout(() => {
+        saveHistory(messages, currentUser);
+      }, 300);
+      return () => clearTimeout(timer);
     }
   }, [messages, userKey, currentUser]);
 

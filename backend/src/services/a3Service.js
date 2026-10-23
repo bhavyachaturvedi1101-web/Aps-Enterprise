@@ -41,6 +41,33 @@ const { getHandler } = require('./a3/handlers');
 
 const LLM_PROVIDER = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
 
+// High-efficiency in-memory query response cache for read-only queries (30s TTL)
+const queryCache = new Map();
+const CACHE_TTL_MS = 30000;
+const MAX_CACHE_SIZE = 120;
+
+function getCachedResponse(key) {
+  const item = queryCache.get(key);
+  if (!item) return null;
+  if (Date.now() - item.timestamp > CACHE_TTL_MS) {
+    queryCache.delete(key);
+    return null;
+  }
+  return JSON.parse(JSON.stringify(item.data));
+}
+
+function setCachedResponse(key, data) {
+  if (queryCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = queryCache.keys().next().value;
+    queryCache.delete(oldestKey);
+  }
+  queryCache.set(key, { data, timestamp: Date.now() });
+}
+
+function clearQueryCache() {
+  queryCache.clear();
+}
+
 /**
  * Main query processor entry point
  * @param {string} query User natural language command or question
@@ -61,9 +88,31 @@ async function processQuery(query, conversationId = 'default', userContext = {})
   const lastResult = getLastResult(convId);
   const isEmployee = (userContext.userRole || '').toLowerCase() === 'employee';
 
+  const isMutating = /^(create|add|delete|remove|assign|post|send|update|reassign|reset|clear)\b/i.test(cleanQuery)
+    || /action_|assign_employee|ai_memory_teach/i.test(cleanQuery);
+
+  if (isMutating) {
+    clearQueryCache();
+  }
+
+  const roleScope = isEmployee ? `emp_${userContext.employeeId || userContext.userName || 'user'}` : 'admin';
+  const cacheKey = `${roleScope}:${cleanQuery.toLowerCase()}`;
+
+  if (!isMutating) {
+    const cached = getCachedResponse(cacheKey);
+    if (cached) {
+      setLastResult(convId, cached);
+      addToHistory(convId, cleanQuery, cached.text);
+      return cached;
+    }
+  }
+
   const finalizeAndRecord = (res) => {
     setLastResult(convId, res);
     addToHistory(convId, cleanQuery, res.text);
+    if (!isMutating && res && res.text) {
+      setCachedResponse(cacheKey, res);
+    }
     return res;
   };
 
@@ -414,10 +463,14 @@ async function processQuery(query, conversationId = 'default', userContext = {})
   }
 
   // 6. Record State in Session Store
-  setLastResult(convId, { ...result, intent });
+  const finalResult = { ...result, intent };
+  setLastResult(convId, finalResult);
   addToHistory(convId, cleanQuery, result.text);
+  if (!isMutating && result && result.text) {
+    setCachedResponse(cacheKey, finalResult);
+  }
 
-  return { ...result, intent };
+  return finalResult;
 }
 
 /**
