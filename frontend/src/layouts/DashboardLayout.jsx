@@ -73,6 +73,10 @@ const ALL_NAV_GROUPS = [
     group: 'PRODUCTIVITY',
     items: [
       {
+        key: 'tasks', label: 'Google Tasks', badge: null,
+        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><polyline points="8 12 11 15 16 9"/></svg>
+      },
+      {
         key: 'build', label: 'Team & KPIs', badge: null,
         icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
       },
@@ -220,7 +224,7 @@ export default function DashboardLayout() {
         },
         {
           group: 'PRODUCTIVITY',
-          items: ALL_NAV_GROUPS[4].items.filter(i => ['build', 'activity'].includes(i.key))
+          items: ALL_NAV_GROUPS[4].items.filter(i => ['tasks', 'build', 'activity'].includes(i.key))
         }
       ].filter(g => g.items.length > 0);
     }
@@ -238,7 +242,7 @@ export default function DashboardLayout() {
         },
         {
           group: 'PRODUCTIVITY',
-          items: ALL_NAV_GROUPS[4].items.filter(i => ['activity'].includes(i.key))
+          items: ALL_NAV_GROUPS[4].items.filter(i => ['tasks', 'activity'].includes(i.key))
         }
       ].filter(g => g.items.length > 0);
     }
@@ -256,13 +260,14 @@ export default function DashboardLayout() {
       {
         group: 'PRODUCTIVITY',
         items: [
+          ALL_NAV_GROUPS[4].items[0], // Google Tasks
           {
             key: 'build',
             label: 'My Tasks & KPIs',
             badge: null,
-            icon: ALL_NAV_GROUPS[4].items[0].icon
+            icon: ALL_NAV_GROUPS[4].items[1].icon
           },
-          ALL_NAV_GROUPS[4].items[1] // activity
+          ALL_NAV_GROUPS[4].items[2] // activity
         ]
       }
     ].filter(g => g.items.length > 0);
@@ -426,27 +431,29 @@ export default function DashboardLayout() {
   const path = location.pathname;
   const queryParams = new URLSearchParams(location.search);
   const activeTab =
-    (path === '/crm' ? 'pipeline' :
-      path === '/ai' ? 'ai' :
-        path === '/chatbot' ? 'ai' :
-          path === '/users' ? 'users' :
-            path === '/bookings' ? 'bookings' :
-              path === '/payments' ? 'payments' :
-                path === '/voice' ? 'voice' :
-                  path === '/whatsapp' ? 'whatsapp' :
-                    path === '/dialer' ? 'dialer' :
-                      path === '/tally' ? 'tally' :
-                        path === '/invoices' ? 'invoices' :
-                          path === '/employees' ? 'build' :
-                            path === '/activity' ? 'activity' :
-                              path === '/settings' ? 'settings' :
-                                queryParams.get('tab') || 'analytics');
+    (path === '/tasks' ? 'tasks' :
+      path === '/crm' ? 'pipeline' :
+        path === '/ai' ? 'ai' :
+          path === '/chatbot' ? 'ai' :
+            path === '/users' ? 'users' :
+              path === '/bookings' ? 'bookings' :
+                path === '/payments' ? 'payments' :
+                  path === '/voice' ? 'voice' :
+                    path === '/whatsapp' ? 'whatsapp' :
+                      path === '/dialer' ? 'dialer' :
+                        path === '/tally' ? 'tally' :
+                          path === '/invoices' ? 'invoices' :
+                            path === '/employees' ? 'build' :
+                              path === '/activity' ? 'activity' :
+                                path === '/settings' ? 'settings' :
+                                  queryParams.get('tab') || 'analytics');
 
 
   const handleTabChange = (key) => {
     const routes = {
       analytics: '/dashboard',
       pipeline: '/crm',
+      tasks: '/tasks',
       ai: '/ai',
       users: '/users',
       bookings: '/bookings',

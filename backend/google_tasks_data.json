@@ -1,0 +1,59 @@
+{
+  "lists": [
+    {
+      "id": "aps-default-list",
+      "title": "APS Enterprise Tasks & Follow-ups",
+      "updated": "2026-10-23T11:55:01.265Z"
+    },
+    {
+      "id": "crm-leads-list",
+      "title": "Hot CRM Leads Follow-up",
+      "updated": "2026-10-23T11:55:01.265Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "gtask-1",
+      "title": "Follow-up with Rahul Sharma on Double Die Machine quotation",
+      "notes": "Lead ID: LEAD-1002 | Phone: +91 98260 12345 | Discuss 10% token advance & delivery schedule to Indore.",
+      "status": "needsAction",
+      "due": "2026-10-24T11:55:01.262Z",
+      "updated": "2026-10-23T11:55:01.265Z",
+      "priority": "high",
+      "leadId": "LEAD-1002",
+      "leadName": "Rahul Sharma"
+    },
+    {
+      "id": "gtask-2",
+      "title": "Verify 10% payment gate receipt for Global Tech Ltd",
+      "notes": "Invoice #APS-2026-089. Amount: ₹42,000 for Hydraulic Thali Press. Confirm UTR with accounts team.",
+      "status": "needsAction",
+      "due": "2026-10-23T16:55:01.265Z",
+      "updated": "2026-10-23T11:55:01.265Z",
+      "priority": "high",
+      "leadId": "LEAD-1004",
+      "leadName": "Global Tech Ltd"
+    },
+    {
+      "id": "gtask-3",
+      "title": "Dispatch WhatsApp machine video catalogue to Vikram Patel",
+      "notes": "Send 4-minute demonstration of Single Die High Speed Crank Machine.",
+      "status": "completed",
+      "completed": "2026-10-23T08:55:01.265Z",
+      "due": "2026-10-23T11:55:01.265Z",
+      "updated": "2026-10-23T11:55:01.265Z",
+      "priority": "medium",
+      "leadId": "LEAD-1005",
+      "leadName": "Vikram Patel"
+    },
+    {
+      "id": "gtask-4",
+      "title": "Reorder 120 GSM Raw Silver Craft Paper Rolls for Factory",
+      "notes": "Stock level at Indore Warehouse Bay B-1 is low (under 10 bundles). Vendor: MP Paper Mills.",
+      "status": "needsAction",
+      "due": "2026-10-25T11:55:01.265Z",
+      "updated": "2026-10-23T11:55:01.265Z",
+      "priority": "medium"
+    }
+  ]
+}

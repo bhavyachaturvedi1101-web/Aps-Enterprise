@@ -17,12 +17,18 @@ const INTENTS = [
     /^(?!.*(task|assign|kaam|work|duty|bhejo|allot)).*?\banimesh\b/i
   ] },
 
-  // ── Options Flow Intents ──
-  { name: 'landing_assign_tasks_options', patterns: [/assign team tasks options/i] },
-  { name: 'landing_invoices_options',     patterns: [/billing & invoices options/i] },
-  { name: 'landing_voice_dialer_options', patterns: [/voice dialer options/i] },
-  { name: 'landing_factory_options',      patterns: [/production progress options/i] },
-  
+  // ── Google Tasks Integration Intents ──
+  { name: 'action_create_google_task', patterns: [
+    /(create|add|schedule|insert|make|new)\s*(a|an)?\s*(google\s+task|task\s+in\s+google)/i,
+    /google\s+task\s*(add|create|banao|entry|schedule)/i,
+    /(task|followup|follow-up).*?(google\s+tasks?|calendar)/i
+  ] },
+  { name: 'show_google_tasks', patterns: [
+    /(show|list|get|view|display|check)\s*(my\s+)?(google\s+tasks?|tasks\s+in\s+google)/i,
+    /google\s+tasks?\s*(list|dikhao|show|pending|status)/i,
+    /my\s+google\s+tasks/i
+  ] },
+
   // ── Action Creation & Mutation Intents (Must be evaluated FIRST) ──
   { name: 'action_create_lead', patterns: [
     /(create|generate|add|register|insert|make|new|naya|nayi)\s*(\d+)?\s*(new)?\s*(lead|client|prospect|customer|inquiry|deal|grahak)/i,

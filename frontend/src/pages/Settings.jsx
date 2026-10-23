@@ -45,6 +45,9 @@ const DEFAULT_SETTINGS = {
   indiamartApiKey: 'APS_IM_LIVE_KEY_9821',
   whatsappProvider: 'DoubleTick / Meta Cloud API',
   voiceTrunk: 'TeleForce / Exotel Voice Trunk',
+  googleClientId: '',
+  googleClientSecret: '',
+  googleTasksAutoSync: true,
 
   // Security & Backups
   highValueAlertThreshold: '500000',
@@ -886,6 +889,90 @@ export default function Settings() {
                   onChange={e => handleChange('voiceTrunk', e.target.value)}
                   style={s.input}
                 />
+              </div>
+            </div>
+
+            {/* Google Tasks & Workspace Cloud Integration */}
+            <div style={{ marginTop: 24, padding: 18, borderRadius: 14, backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 8, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#4285F4"/>
+                      <path d="M9.5 16.5l-4-4 1.41-1.41 2.59 2.58 7.09-7.09 1.41 1.41-8.5 8.51z" fill="#ffffff"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '0.9rem', color: '#09090b', display: 'block' }}>
+                      Google Tasks & Workspace Integration
+                    </strong>
+                    <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                      Enables real-time follow-up task syncing between CRM leads and Google Tasks cloud.
+                    </span>
+                  </div>
+                </div>
+
+                <a
+                  href="/tasks"
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 8,
+                    backgroundColor: '#0f172a',
+                    color: '#ffffff',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  Open Tasks Workspace →
+                </a>
+              </div>
+
+              <div style={s.grid2}>
+                <div style={s.formGroup}>
+                  <label style={s.label}>Google OAuth Client ID</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 123456789-abc.apps.googleusercontent.com"
+                    value={settings.googleClientId || ''}
+                    onChange={e => handleChange('googleClientId', e.target.value)}
+                    style={s.input}
+                  />
+                  <span style={s.fieldHint}>From Google Cloud Console → APIs & Services → Credentials.</span>
+                </div>
+
+                <div style={s.formGroup}>
+                  <label style={s.label}>Google OAuth Client Secret</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Google Client Secret"
+                    value={settings.googleClientSecret || ''}
+                    onChange={e => handleChange('googleClientSecret', e.target.value)}
+                    style={s.input}
+                  />
+                  <span style={s.fieldHint}>Stored securely for server-side OAuth2 token exchange.</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={settings.googleTasksAutoSync}
+                    onChange={e => handleChange('googleTasksAutoSync', e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: '#2563eb' }}
+                  />
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#09090b' }}>
+                    Auto-create Google Task when new high-value lead arrives
+                  </span>
+                </label>
+
+                <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                  Redirect URI: <code style={{ backgroundColor: '#ffffff', padding: '2px 6px', borderRadius: 4, border: '1px solid #cbd5e1' }}>http://localhost:5000/api/google-tasks/oauth/callback</code>
+                </div>
               </div>
             </div>
           </div>
