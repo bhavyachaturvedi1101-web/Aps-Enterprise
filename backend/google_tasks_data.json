@@ -29,10 +29,11 @@
       "notes": "Invoice #APS-2026-089. Amount: ₹42,000 for Hydraulic Thali Press. Confirm UTR with accounts team.",
       "status": "needsAction",
       "due": "2026-10-23T16:55:01.265Z",
-      "updated": "2026-10-23T11:55:01.265Z",
+      "updated": "2026-10-23T16:19:46.041Z",
       "priority": "high",
       "leadId": "LEAD-1004",
-      "leadName": "Global Tech Ltd"
+      "leadName": "Global Tech Ltd",
+      "completed": null
     },
     {
       "id": "gtask-3",
