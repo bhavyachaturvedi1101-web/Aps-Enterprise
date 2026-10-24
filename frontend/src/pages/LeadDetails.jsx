@@ -113,6 +113,32 @@ export default function LeadDetails() {
     }
   };
 
+  const handleCreateGoogleTask = async () => {
+    try {
+      const res = await fetch(`${API}/google-tasks/sync-lead`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId: lead.id,
+          leadName: lead.name,
+          phone: lead.phone,
+          machineInterest: lead.interest,
+          notes: `Lead stage: ${lead.stage}. Budget: ₹${lead.budget || 0}. Source: ${lead.source || 'CRM'}`
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (window.confirm('✅ Follow-up task created in Google Tasks!\n\nWould you like to open your Google Tasks Workspace?')) {
+          navigate('/tasks');
+        }
+      } else {
+        alert(data.error || 'Failed to create Google task');
+      }
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
   if (loading) {
     return <div style={{ padding: '4rem', textAlign: 'center', color: '#64748b' }}>Loading lead details...</div>;
   }
@@ -280,6 +306,16 @@ export default function LeadDetails() {
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                 <span>Send WhatsApp Reminder</span>
+              </button>
+              <button
+                onClick={handleCreateGoogleTask}
+                style={{ ...styles.actionButton, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#4285F4"/>
+                  <path d="M9.5 16.5l-4-4 1.41-1.41 2.59 2.58 7.09-7.09 1.41 1.41-8.5 8.51z" fill="#ffffff"/>
+                </svg>
+                <span>Schedule Google Task</span>
               </button>
               {lead.stage === 'Confirmed Lead' && (
                 <button

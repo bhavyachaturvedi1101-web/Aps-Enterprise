@@ -6,8 +6,13 @@ const operations = require('./operationsHandlers');
 const finance = require('./financeHandlers');
 const comms = require('./commsHandlers');
 const memory = require('./memoryHandlers');
+const googleTasks = require('./googleTasksHandlers');
 
 const HANDLERS = {
+  // Google Tasks Integration
+  show_google_tasks: googleTasks.handleShowGoogleTasks,
+  action_create_google_task: googleTasks.handleActionCreateGoogleTask,
+
   // AI Persistent Memory
   ai_memory_teach: memory.handleAiMemoryTeach,
   ai_memory_recall: memory.handleAiMemoryRecall,
