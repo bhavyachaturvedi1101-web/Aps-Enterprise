@@ -21,6 +21,7 @@ const Invoices = lazy(() => import('./pages/Invoices'));
 const WhatsAppAutomation = lazy(() => import('./pages/WhatsAppAutomation'));
 const VoiceAgent = lazy(() => import('./pages/AgentPages').then(m => ({ default: m.VoiceAgent })));
 const APSAIPage = lazy(() => import('./pages/APSAIPage'));
+const GoogleTasksPage = lazy(() => import('./pages/GoogleTasksPage'));
 
 // Loading Fallback Component
 function RouteLoadingFallback() {
@@ -149,6 +150,10 @@ function AppRoutes() {
           />
 
           {/* Productivity */}
+          <Route
+            path="/tasks"
+            element={<ProtectedRoute element={<GoogleTasksPage />} allowedRoles={['admin', 'manager', 'employee', 'accountant']} />}
+          />
           <Route
             path="/employees"
             element={<ProtectedRoute element={<TeamKPIs />} allowedRoles={['admin', 'manager', 'employee']} />}

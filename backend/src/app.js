@@ -197,6 +197,9 @@ app.use('/api/jobcards', require('./routes/jobcards'));
 // Tally ERP Bridge
 app.use('/api/tally', require('./routes/tally'));
 
+// Google Tasks Integration
+app.use('/api/google-tasks', require('./routes/googleTasks'));
+
 // Catch unmatched API routes with 404
 app.use(notFoundHandler);
 

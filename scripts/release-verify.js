@@ -44,7 +44,14 @@ console.log(`${colors.bold}1. Runtime & Environment Compatibility:${colors.reset
 const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
 recordCheck('Node.js LTS Version Check', nodeMajor >= 18, `Node v${process.versions.node}`);
 
-const hasBackendEnv = fs.existsSync(path.join(BACKEND_DIR, '.env'));
+const envFile = path.join(BACKEND_DIR, '.env');
+const envExampleFile = path.join(BACKEND_DIR, '.env.example');
+if (!fs.existsSync(envFile) && fs.existsSync(envExampleFile)) {
+  try {
+    fs.copyFileSync(envExampleFile, envFile);
+  } catch {}
+}
+const hasBackendEnv = fs.existsSync(envFile);
 recordCheck('Backend Environment Configuration', hasBackendEnv, hasBackendEnv ? '.env present' : '.env missing');
 
 // ─── 2. CI/CD & Container Configurations ──────────────────────────────────────
@@ -68,6 +75,11 @@ recordCheck('Docker Compose Orchestration Spec', hasCompose, 'docker-compose.yml
 console.log(`\n${colors.bold}3. Backend Integration & Contract Verification (Jest):${colors.reset}`);
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 try {
+  // Ensure backend node_modules exist
+  if (!fs.existsSync(path.join(BACKEND_DIR, 'node_modules'))) {
+    execSync(`${npmCmd} install`, { cwd: BACKEND_DIR, stdio: 'pipe', shell: true });
+  }
+
   const testOutput = execSync(`${npmCmd} test -- src/tests/contracts.test.js src/tests/resilience.test.js`, {
     cwd: BACKEND_DIR,
     stdio: 'pipe',
@@ -85,6 +97,11 @@ try {
 // ─── 4. Frontend Production Build Verification ────────────────────────────────
 console.log(`\n${colors.bold}4. Frontend Production Distribution Build (Vite):${colors.reset}`);
 try {
+  // Ensure frontend node_modules exist
+  if (!fs.existsSync(path.join(FRONTEND_DIR, 'node_modules'))) {
+    execSync(`${npmCmd} install`, { cwd: FRONTEND_DIR, stdio: 'pipe', shell: true });
+  }
+
   execSync(`${npmCmd} run build`, {
     cwd: FRONTEND_DIR,
     stdio: 'pipe',

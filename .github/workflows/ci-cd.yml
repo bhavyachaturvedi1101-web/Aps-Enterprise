@@ -2,9 +2,9 @@ name: APS Enterprise CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, annapurna-updates ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, annapurna-updates ]
   workflow_dispatch:
 
 concurrency:
@@ -90,13 +90,25 @@ jobs:
         with:
           node-version: 20.x
 
-      - name: Install Root Dependencies
-        run: npm ci || npm install
+      - name: Setup Backend Environment File (.env)
+        run: |
+          if [ ! -f backend/.env ] && [ -f backend/.env.example ]; then
+            cp backend/.env.example backend/.env
+          fi
+
+      - name: Install Dependencies (Root, Backend, Frontend)
+        run: |
+          npm ci || npm install
+          npm ci --prefix backend || npm install --prefix backend
+          npm ci --prefix frontend || npm install --prefix frontend
 
       - name: Run Automated Release Verifier
         run: node scripts/release-verify.js
         env:
           NODE_ENV: test
+          PORT: 5000
+          API_KEY: admin-key-123
+          JWT_SECRET: supersecret_ci_key_2026
 
   # ─── 4. Docker Build Gate ──────────────────────────────────────────────────
   docker-check:

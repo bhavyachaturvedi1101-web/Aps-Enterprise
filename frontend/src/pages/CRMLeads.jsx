@@ -525,6 +525,26 @@ export default function CRMLeads() {
     }
   };
 
+  const handleSyncToGoogleTasks = async () => {
+    try {
+      const res = await fetch(`${API}/google-tasks/sync-pending`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leads: leads.slice(0, 15) })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (window.confirm(`✅ Synced ${data.syncedCount || 0} CRM lead follow-ups to Google Tasks!\n\nOpen Google Tasks Workspace now?`)) {
+          navigate('/tasks');
+        }
+      } else {
+        alert(data.error || 'Failed to sync to Google Tasks');
+      }
+    } catch (err) {
+      alert(`Sync error: ${err.message}`);
+    }
+  };
+
   // Filter leads by search & source
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
@@ -662,6 +682,32 @@ export default function CRMLeads() {
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             <span>Bulk Import CSV</span>
+          </button>
+
+          {/* Sync to Google Tasks */}
+          <button
+            onClick={handleSyncToGoogleTasks}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              backgroundColor: '#eff6ff',
+              color: '#1d4ed8',
+              border: '1px solid #bfdbfe',
+              borderRadius: '10px',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            }}
+            title="Sync high-priority and pending leads to Google Tasks"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#4285F4"/>
+              <path d="M9.5 16.5l-4-4 1.41-1.41 2.59 2.58 7.09-7.09 1.41 1.41-8.5 8.51z" fill="#ffffff"/>
+            </svg>
+            <span>Google Tasks Sync</span>
           </button>
 
           {/* Add New Lead Button */}
