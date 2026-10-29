@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BASE_API_URL } from '../services/api';
 
@@ -22,12 +22,22 @@ export default function GoogleTasksPage() {
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'due_today' | 'completed'
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Quick Add State
+  // Quick Add State & Ref
+  const titleInputRef = useRef(null);
   const [newTitle, setNewTitle] = useState('');
   const [newNotes, setNewNotes] = useState('');
   const [newDue, setNewDue] = useState('');
   const [newPriority, setNewPriority] = useState('medium');
   const [isAdding, setIsAdding] = useState(false);
+
+  // Add Task Modal State
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalNotes, setModalNotes] = useState('');
+  const [modalDue, setModalDue] = useState('');
+  const [modalPriority, setModalPriority] = useState('medium');
+  const [modalListId, setModalListId] = useState('@default');
+  const [isModalAdding, setIsModalAdding] = useState(false);
 
   // New List Modal
   const [showNewListModal, setShowNewListModal] = useState(false);
@@ -132,10 +142,28 @@ export default function GoogleTasksPage() {
     }
   };
 
-  // Create Task
+  // Create Task (from quick add form or direct click)
   const handleCreateTask = async (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+
+    if (!newTitle.trim()) {
+      if (titleInputRef.current) {
+        titleInputRef.current.focus();
+        titleInputRef.current.style.borderColor = '#2563eb';
+        titleInputRef.current.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.25)';
+        setTimeout(() => {
+          if (titleInputRef.current) {
+            titleInputRef.current.style.borderColor = '#cbd5e1';
+            titleInputRef.current.style.boxShadow = 'none';
+          }
+        }, 1500);
+      }
+      showToast('Please type a task title first, or use "+ Add Task" button above.');
+      return;
+    }
+
     setIsAdding(true);
 
     try {
@@ -165,6 +193,48 @@ export default function GoogleTasksPage() {
       showToast(`Network error: ${err.message}`);
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  // Create Task from Modal
+  const handleModalCreateTask = async (e) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (!modalTitle.trim()) {
+      showToast('Please enter a task title.');
+      return;
+    }
+    setIsModalAdding(true);
+
+    try {
+      const res = await fetch(`${BASE_API_URL}/google-tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          listId: modalListId || selectedListId,
+          title: modalTitle.trim(),
+          notes: modalNotes.trim(),
+          due: modalDue || null,
+          priority: modalPriority
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.task) {
+        setTasks(prev => [data.task, ...prev]);
+        setModalTitle('');
+        setModalNotes('');
+        setModalDue('');
+        setModalPriority('medium');
+        setShowAddTaskModal(false);
+        showToast('Task added to Google Tasks!');
+      } else {
+        showToast(data.error || 'Failed to create task');
+      }
+    } catch (err) {
+      showToast(`Network error: ${err.message}`);
+    } finally {
+      setIsModalAdding(false);
     }
   };
 
@@ -376,6 +446,19 @@ export default function GoogleTasksPage() {
         <div style={styles.headerActions}>
           <button
             type="button"
+            onClick={() => setShowAddTaskModal(true)}
+            style={styles.headerAddTaskBtn}
+            title="Create a new task in Google Tasks"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>+ Add Task</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleSyncPendingLeads}
             disabled={isSyncingLeads}
             style={styles.syncBtn}
@@ -537,11 +620,11 @@ export default function GoogleTasksPage() {
         <form onSubmit={handleCreateTask} style={styles.addForm}>
           <div style={styles.addFormRow}>
             <input
+              ref={titleInputRef}
               type="text"
               placeholder="Add a new task (e.g., Call Indore dealer for Single Die machine demo)..."
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              required
               style={styles.titleInput}
             />
 
@@ -565,8 +648,13 @@ export default function GoogleTasksPage() {
 
             <button
               type="submit"
-              disabled={isAdding || !newTitle.trim()}
-              style={styles.addSubmitBtn}
+              disabled={isAdding}
+              style={{
+                ...styles.addSubmitBtn,
+                opacity: isAdding ? 0.7 : 1,
+                cursor: isAdding ? 'wait' : 'pointer'
+              }}
+              title="Add task to Google Tasks"
             >
               {isAdding ? 'Adding...' : '+ Add Task'}
             </button>
@@ -745,6 +833,124 @@ export default function GoogleTasksPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── Modal: Add Task Modal ────────────────────────────────────────── */}
+      {showAddTaskModal && (
+        <div style={styles.modalBackdrop} onClick={() => setShowAddTaskModal(false)}>
+          <div style={{ ...styles.modalCard, maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHead}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 24, height: 24, borderRadius: 6, backgroundColor: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px', fontWeight: 800 }}>
+                  +
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#09090b', fontWeight: 800 }}>Create New Task</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddTaskModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '18px' }}
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleModalCreateTask} style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: 5 }}>
+                  Task Title <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Follow up with Ramesh regarding 10% advance"
+                  value={modalTitle}
+                  onChange={(e) => setModalTitle(e.target.value)}
+                  required
+                  autoFocus
+                  style={styles.modalInput}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: 5 }}>
+                    Task List
+                  </label>
+                  <select
+                    value={modalListId}
+                    onChange={(e) => setModalListId(e.target.value)}
+                    style={{ ...styles.modalInput, padding: '8px 10px', fontSize: '0.8rem', fontWeight: 600 }}
+                  >
+                    <option value="@default">Default List</option>
+                    {taskLists.map(l => (
+                      <option key={l.id} value={l.id}>{l.title}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: 5 }}>
+                    Priority
+                  </label>
+                  <select
+                    value={modalPriority}
+                    onChange={(e) => setModalPriority(e.target.value)}
+                    style={{ ...styles.modalInput, padding: '8px 10px', fontSize: '0.8rem', fontWeight: 600 }}
+                  >
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority ⚡</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: 5 }}>
+                  Due Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={modalDue}
+                  onChange={(e) => setModalDue(e.target.value)}
+                  style={{ ...styles.modalInput, fontSize: '0.8rem' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: 5 }}>
+                  Task Details & Notes (Optional)
+                </label>
+                <textarea
+                  placeholder="Add notes, client contact numbers, machine quotation specifics..."
+                  value={modalNotes}
+                  onChange={(e) => setModalNotes(e.target.value)}
+                  rows={3}
+                  style={{ ...styles.modalInput, resize: 'vertical', fontFamily: 'inherit' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddTaskModal(false)}
+                  style={styles.modalCancelBtn}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isModalAdding}
+                  style={{
+                    ...styles.modalSubmitBtn,
+                    opacity: isModalAdding ? 0.7 : 1,
+                    cursor: isModalAdding ? 'wait' : 'pointer'
+                  }}
+                >
+                  {isModalAdding ? 'Creating...' : '+ Create Task'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ─── Modal: New Task List ────────────────────────────────────────── */}
       {showNewListModal && (
@@ -969,6 +1175,21 @@ const styles = {
     alignItems: 'center',
     gap: 10,
     flexWrap: 'wrap'
+  },
+  headerAddTaskBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 16px',
+    borderRadius: 8,
+    border: 'none',
+    backgroundColor: '#0f172a',
+    color: '#ffffff',
+    fontSize: '0.8rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    transition: 'all 0.15s ease'
   },
   syncBtn: {
     display: 'flex',
