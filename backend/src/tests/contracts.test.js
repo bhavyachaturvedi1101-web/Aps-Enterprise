@@ -294,6 +294,37 @@ describe('Phase 3: Strict API Contracts & Schema Validation', () => {
         expect(syncResult).toHaveProperty('success');
         expect(syncResult.success).toBe(true);
       });
+
+      it('should return teleforceLeadId on lead creation and resolve it for transitions', async () => {
+        const createResult = await crmService.createLead({
+          name: 'Test Customer',
+          phone: '+91 98765 43210',
+          interest: 'Paper Plate Machine',
+          budget: 150000
+        });
+        expect(createResult).toHaveProperty('success');
+        expect(createResult.success).toBe(true);
+        expect(createResult).toHaveProperty('teleforceLeadId');
+      });
+
+      it('should strictly format status updates with leadid (no underscore)', async () => {
+        const syncResult = await crmService.syncLeadStatus('LEAD-001', 'Qualified', {
+          teleforceLeadId: 'TF-9988'
+        });
+        expect(syncResult).toHaveProperty('leadid');
+        expect(syncResult.leadid).toBe('TF-9988');
+      });
+
+      it('should sync CRM edits (phone, budget, notes) via updateLead', async () => {
+        const editResult = await crmService.updateLead('LEAD-001', {
+          name: 'Updated Customer Name',
+          phone: '+91 99887 76655',
+          budget: 250000,
+          notes: 'Customer requested 10% advance invoice.'
+        });
+        expect(editResult).toHaveProperty('success');
+        expect(editResult.success).toBe(true);
+      });
     });
   });
 

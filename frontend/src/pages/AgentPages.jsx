@@ -22,10 +22,10 @@ export function VoiceAgent() {
   const [phone, setPhone] = useState('');
   const [leadName, setLeadName] = useState('');
   const [logs, setLogs] = useState([
-    { id: 1, phone: '+91 98260 12345', name: 'Rajesh Sharma (Sharma Dona Udhyog)', status: 'Completed', outcome: 'Interested — Machinery Video Demo Sent' },
-    { id: 2, phone: '+91 98290 56789', name: 'Vikram Singh (Rajput Paper Cups)', status: 'Completed', outcome: 'Qualified — 100 BPM Paper Cup Machine' },
-    { id: 3, phone: '+91 98270 67890', name: 'Manoj Kumar (Kisan Disposable Center)', status: 'Completed', outcome: 'Interested — Hydraulic Buffet Plate Press' },
-    { id: 4, phone: '+91 98930 89012', name: 'Deepak Agarwal (Agarwal Disposable)', status: 'Completed', outcome: 'Quoted — Double Cylinder Press ₹2.45L' }
+    { id: 1, phone: '+91 78280 89672', name: 'RAM LAL (Teleforce Inbound)', status: 'Completed', outcome: 'Interested — Machinery Video Demo Sent' },
+    { id: 2, phone: '+91 93994 16558', name: 'MOHIT YADAV (Teleforce Inbound)', status: 'Completed', outcome: 'Qualified — 100 BPM Paper Cup Machine' },
+    { id: 3, phone: '+91 82370 51514', name: 'ATUL (Teleforce Inbound)', status: 'Completed', outcome: 'Interested — Hydraulic Buffet Plate Press' },
+    { id: 4, phone: '+91 88153 51309', name: 'Bablu Babluraj (Teleforce Inbound)', status: 'Completed', outcome: 'Quoted — Double Cylinder Press ₹2.45L' }
   ]);
   const [calling, setCalling] = useState(false);
 

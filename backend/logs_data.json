@@ -54,7 +54,7 @@
     "leadId": "LEAD-001",
     "employeeId": "e4",
     "employeeName": "Sales Telecaller",
-    "action": "New enquiry received from Rajesh Sharma (Sharma Dona Udhyog, Bhopal) via IndiaMART.",
+    "action": "New enquiry received from IndiaMART buyer via Teleforce inbound.",
     "fromStage": "None",
     "toStage": "Enquiry",
     "createdAt": "2026-10-15T09:30:00.000Z"

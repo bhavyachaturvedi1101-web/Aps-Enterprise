@@ -22,6 +22,9 @@ const { safeReadJson, safeWriteJson } = require('../utils/safeStorage');
 
 // Helper to load employees from disk or in-memory
 function loadEmployeesFromFile() {
+  if (Array.isArray(store.mockEmployees) && store.mockEmployees.length > 0) {
+    return store.mockEmployees;
+  }
   const list = safeReadJson(EMPLOYEES_FILE, null);
   if (Array.isArray(list) && list.length > 0) {
     store.mockEmployees = list;
@@ -33,7 +36,9 @@ function loadEmployeesFromFile() {
 // Helper to save employees safely
 function saveEmployeesToFile(list) {
   store.mockEmployees = list;
-  safeWriteJson(EMPLOYEES_FILE, list);
+  if (process.env.NODE_ENV !== 'test') {
+    safeWriteJson(EMPLOYEES_FILE, list);
+  }
 }
 
 // Helper to decorate employee with mock UI fields
@@ -309,7 +314,9 @@ const createEmployee = async (req, res) => {
           status: 'Online',
           createdAt: new Date().toISOString()
         });
-        safeWriteJson(USERS_FILE, usersList);
+        if (process.env.NODE_ENV !== 'test') {
+          safeWriteJson(USERS_FILE, usersList);
+        }
         store.mockUsers = usersList;
       }
     } catch (err) {
@@ -486,7 +493,9 @@ const deleteEmployee = async (req, res) => {
       try {
         let users = safeReadJson(USERS_FILE, []);
         users = users.filter(u => u.email !== target.email);
-        safeWriteJson(USERS_FILE, users);
+        if (process.env.NODE_ENV !== 'test') {
+          safeWriteJson(USERS_FILE, users);
+        }
         store.mockUsers = users;
       } catch {}
     }

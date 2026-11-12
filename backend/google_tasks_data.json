@@ -13,6 +13,127 @@
   ],
   "tasks": [
     {
+      "id": "gtask-1794375947985",
+      "title": "Follow-up: Anand Joshi (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-010\nClient: Anand Joshi\nPhone: +91 98261 01234\nProduct Interest: APS Machinery\nNotes: Token intent confirmed. Awaiting proforma invoice and bank transfer details.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.984Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.985Z",
+      "priority": "high",
+      "leadId": "LEAD-010",
+      "leadName": "Anand Joshi"
+    },
+    {
+      "id": "gtask-1794375947984",
+      "title": "Follow-up: Pradeep Chauhan (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-009\nClient: Pradeep Chauhan\nPhone: +91 98250 90123\nProduct Interest: APS Machinery\nNotes: Quotation approved by technical partner. Expected booking within 48 hours.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.983Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.984Z",
+      "priority": "high",
+      "leadId": "LEAD-009",
+      "leadName": "Pradeep Chauhan"
+    },
+    {
+      "id": "gtask-1794375947983",
+      "title": "Follow-up: Deepak Agarwal (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-008\nClient: Deepak Agarwal\nPhone: +91 98930 89012\nProduct Interest: APS Machinery\nNotes: Formal commercial quote sent with transportation and 1-year motor warranty.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.983Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.983Z",
+      "priority": "high",
+      "leadId": "LEAD-008",
+      "leadName": "Deepak Agarwal"
+    },
+    {
+      "id": "gtask-1794375947982",
+      "title": "Follow-up: Sunita Devi (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-007\nClient: Sunita Devi\nPhone: +91 94140 78901\nProduct Interest: APS Machinery\nNotes: Self-help group enterprise in Kota. Submitting PM Mudra loan application.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.981Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.982Z",
+      "priority": "high",
+      "leadId": "LEAD-007",
+      "leadName": "Sunita Devi"
+    },
+    {
+      "id": "gtask-1794375947980",
+      "title": "Follow-up: Manoj Kumar (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-006\nClient: Manoj Kumar\nPhone: +91 98270 67890\nProduct Interest: APS Machinery\nNotes: Needs double cylinder hydraulic machine for 12-inch buffet plates.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.980Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.980Z",
+      "priority": "high",
+      "leadId": "LEAD-006",
+      "leadName": "Manoj Kumar"
+    },
+    {
+      "id": "gtask-1794375947979",
+      "title": "Follow-up: Vikram Singh (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-005\nClient: Vikram Singh\nPhone: +91 98290 56789\nProduct Interest: APS Machinery\nNotes: Qualified via A1 Voice Agent. Ready with warehouse shed in Jaipur Industrial Area.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.979Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.979Z",
+      "priority": "high",
+      "leadId": "LEAD-005",
+      "leadName": "Vikram Singh"
+    },
+    {
+      "id": "gtask-1794375947978",
+      "title": "Follow-up: Ramesh Gupta (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-004\nClient: Ramesh Gupta\nPhone: +91 97550 45678\nProduct Interest: APS Machinery\nNotes: Initial budget constraint. Enquired about finance and EMI options.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.978Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.978Z",
+      "priority": "high",
+      "leadId": "LEAD-004",
+      "leadName": "Ramesh Gupta"
+    },
+    {
+      "id": "gtask-1794375947977",
+      "title": "Follow-up: Amit Verma (Dona Pattal Machine)",
+      "notes": "Lead ID: LEAD-003\nClient: Amit Verma\nPhone: +91 94250 34567\nProduct Interest: APS Machinery\nNotes: Planning paper cup manufacturing for tea stalls and canteens in Indore bypass.\nScheduled via APS Enterprise Cockpit",
+      "due": "2026-11-12T05:45:47.977Z",
+      "status": "needsAction",
+      "updated": "2026-11-11T05:45:47.977Z",
+      "priority": "high",
+      "leadId": "LEAD-003",
+      "leadName": "Amit Verma"
+    },
+    {
+      "id": "gtask-1792847377095",
+      "title": "google task add high priority payment follow up",
+      "notes": "Created via A3 Assistant query: \"google task add high priority payment follow up\"",
+      "due": "2026-10-24T13:09:37.094Z",
+      "status": "needsAction",
+      "updated": "2026-10-24T13:09:37.095Z",
+      "priority": "high",
+      "leadId": null,
+      "leadName": null
+    },
+    {
+      "id": "gtask-1792847377093",
+      "title": "urgent meeting with Indore dealer",
+      "notes": "Created via A3 Assistant query: \"schedule a task in google: urgent meeting with Indore dealer\"",
+      "due": "2026-10-24T13:09:37.093Z",
+      "status": "needsAction",
+      "updated": "2026-10-24T13:09:37.093Z",
+      "priority": "high",
+      "leadId": null,
+      "leadName": null
+    },
+    {
+      "id": "gtask-1792847377091",
+      "title": "call Sharma Ji for dona machine quote",
+      "notes": "Created via A3 Assistant query: \"create a google task to call Sharma Ji for dona machine quote\"",
+      "due": "2026-10-25T13:09:37.090Z",
+      "status": "needsAction",
+      "updated": "2026-10-24T13:09:37.091Z",
+      "priority": "medium",
+      "leadId": null,
+      "leadName": null
+    },
+    {
       "id": "gtask-1",
       "title": "Follow-up with Rahul Sharma on Double Die Machine quotation",
       "notes": "Lead ID: LEAD-1002 | Phone: +91 98260 12345 | Discuss 10% token advance & delivery schedule to Indore.",

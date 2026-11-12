@@ -54,6 +54,10 @@ const Lead = sequelize.define('Lead', {
     type: DataTypes.STRING,
     defaultValue: 'Direct Web'
   },
+  teleforceLeadId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   crmSynced: {
     type: DataTypes.BOOLEAN,
     defaultValue: true

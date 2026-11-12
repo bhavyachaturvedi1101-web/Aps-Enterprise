@@ -99,7 +99,13 @@ const executeTransition = async (lead, toStage, options = {}) => {
   }
 
   // ─── CRM Sync: Always sync status on any transition ────────────────────
-  const crmResult = await crmService.syncLeadStatus(lead.id, toStage);
+  // Uses Teleforce's assigned ID if available and strictly spells "leadid"
+  const targetLeadId = lead.teleforceLeadId || lead.id;
+  const crmResult = await crmService.syncLeadStatus(targetLeadId, toStage, {
+    teleforceLeadId: lead.teleforceLeadId,
+    name: lead.name,
+    phone: lead.phone
+  });
   integrationData.crm = crmResult;
 
   return {

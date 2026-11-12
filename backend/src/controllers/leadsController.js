@@ -141,8 +141,39 @@ const createLead = async (req, res) => {
       }
     }
 
-    // Background push to Teleforce CRM API
-    crmService.createLead(lead).catch(err => {
+    // Background push to Teleforce CRM API & save returned Teleforce leadid
+    crmService.createLead(lead).then(async (crmRes) => {
+      const tfId = crmRes?.teleforceLeadId ||
+        crmRes?.data?.leadid ||
+        crmRes?.data?.lead_id ||
+        crmRes?.data?.id ||
+        crmRes?.data?.data?.leadid ||
+        crmRes?.data?.data?.id;
+
+      if (tfId) {
+        const idStr = String(tfId);
+        lead.teleforceLeadId = idStr;
+        lead.crmSynced = true;
+
+        if (isDbConnected()) {
+          try {
+            const dbLead = await Lead.findByPk(lead.id);
+            if (dbLead) await dbLead.update({ teleforceLeadId: idStr, crmSynced: true });
+          } catch (e) {
+            console.warn('[CRM Lead ID Save Error]', e.message);
+          }
+        }
+        const { mockLeads } = require('../config/inMemoryStore');
+        if (mockLeads) {
+          const mLead = mockLeads.find(l => l.id === lead.id);
+          if (mLead) {
+            mLead.teleforceLeadId = idStr;
+            mLead.crmSynced = true;
+          }
+        }
+        console.log(`[Teleforce CRM] Saved Teleforce Lead ID "${idStr}" for Lead ${lead.id}`);
+      }
+    }).catch(err => {
       console.warn('[CRM Push Error]', err.message);
     });
 
@@ -205,6 +236,30 @@ const updateLead = async (req, res) => {
     }
 
     if (!lead) return res.status(404).json({ error: 'Lead not found' });
+
+    // Sync updated details (phone, budget, interest, notes, etc.) to Teleforce CRM
+    crmService.updateLead(lead.teleforceLeadId || lead.id, {
+      name: lead.name,
+      phone: lead.phone,
+      mobile: lead.phone,
+      company: lead.company,
+      interest: lead.interest,
+      budget: lead.budget,
+      notes: lead.notes,
+      stage: lead.stage,
+      priority: lead.priority,
+      teleforceLeadId: lead.teleforceLeadId
+    }).then(async (crmRes) => {
+      if (crmRes?.success) {
+        lead.crmSynced = true;
+        if (isDbConnected() && typeof lead.update === 'function') {
+          try { await lead.update({ crmSynced: true }); } catch {}
+        }
+      }
+    }).catch(err => {
+      console.warn('[CRM Update Error]', err.message);
+    });
+
     res.json({ success: true, lead });
   } catch (error) {
     console.error(error);

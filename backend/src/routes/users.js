@@ -33,7 +33,9 @@ function loadUsers() {
 // Helper to save users safely
 function saveUsers(usersList) {
   store.mockUsers = usersList;
-  safeWriteJson(USERS_FILE, usersList);
+  if (process.env.NODE_ENV !== 'test') {
+    safeWriteJson(USERS_FILE, usersList);
+  }
 }
 
 // GET /api/users — List all system users & roles (Admin only)
@@ -150,7 +152,9 @@ router.post('/', authorize(['admin']), async (req, res) => {
           taskQueue: []
         };
         empList.unshift(newEmp);
-        safeWriteJson(EMPLOYEES_FILE, empList);
+        if (process.env.NODE_ENV !== 'test') {
+          safeWriteJson(EMPLOYEES_FILE, empList);
+        }
         store.mockEmployees = empList;
       }
     } catch (err) {
@@ -234,7 +238,9 @@ router.delete('/:id', authorize(['admin']), async (req, res) => {
             e.email?.toLowerCase() !== targetUser.email?.toLowerCase() &&
             e.name?.toLowerCase() !== targetUser.name?.toLowerCase()
           );
-          safeWriteJson(EMPLOYEES_FILE, updatedEmps);
+          if (process.env.NODE_ENV !== 'test') {
+            safeWriteJson(EMPLOYEES_FILE, updatedEmps);
+          }
           if (store.mockEmployees) {
             store.mockEmployees = updatedEmps;
           }

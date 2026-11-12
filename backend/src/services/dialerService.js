@@ -62,6 +62,7 @@ async function initQueue() {
       return {
         id: `C${String(i + 1).padStart(3, '0')}`,
         leadId: l.id,
+        teleforceLeadId: l.teleforceLeadId || null,
         name: l.name || l.company,
         phone: l.phone || '+91 98765 43210',
         product: l.interest || 'Machine Enquiry',
@@ -125,6 +126,7 @@ class DialerService {
     const entry = {
       id: `C${String(callQueue.length + 1).padStart(3, '0')}`,
       leadId: lead.id || lead.leadId,
+      teleforceLeadId: lead.teleforceLeadId || null,
       name: lead.name,
       phone: lead.phone || '+91 98765 43210',
       product: lead.interest || lead.product || 'Machine Enquiry',
@@ -163,13 +165,44 @@ class DialerService {
       try {
         const axios = require('axios');
         console.log(`[Teleforce Dialer] Initiating outbound call to ${call.name} (${call.phone}) via Caller ID ${TELEFORCE_CALLER_ID}...`);
+
+        const clientSecret = process.env.TELEFORCE_DIALER_SECRET || 
+                             process.env.TELEFORCE_DIALER_CLIENT_SECRET || 
+                             process.env.TELEFORCE_CRM_CLIENT_SECRET || '';
+        const clientId = process.env.TELEFORCE_DIALER_CLIENT_ID || 
+                         process.env.TELEFORCE_CRM_CLIENT_ID || 'apsenter';
+
+        let targetLeadId = call.teleforceLeadId || call.leadId;
+        if (typeof targetLeadId === 'string' && targetLeadId.startsWith('LEAD-')) {
+          try {
+            const { mockLeads } = require('../config/inMemoryStore');
+            const found = mockLeads?.find(l => l.id === targetLeadId);
+            if (found?.teleforceLeadId) targetLeadId = found.teleforceLeadId;
+          } catch {}
+        }
+
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        if (clientSecret) {
+          headers['Authorization'] = `Bearer ${clientSecret}`;
+          headers['client_secret'] = clientSecret;
+          headers['x-teleforce-secret'] = clientSecret;
+        }
+        if (clientId) {
+          headers['client_id'] = clientId;
+        }
+
         const resp = await axios.post(`${TELEFORCE_URL}/call`, {
           account_sid: TELEFORCE_SID,
           caller_id: TELEFORCE_CALLER_ID,
           to: call.phone,
-          lead_id: call.leadId,
+          leadid: targetLeadId, // Teleforce strictly expects "leadid" without underscore
           product: call.product
-        }, { timeout: 6000 }).catch(e => ({ data: { sid: `TF-${Date.now()}` } }));
+        }, {
+          headers,
+          timeout: 8000
+        }).catch(e => ({ data: { sid: `TF-${Date.now()}` } }));
 
         call.callSid = resp.data?.sid || `TF-${Date.now()}`;
         console.log(`[Teleforce Dialer] Outbound call session established (${call.callSid})`);

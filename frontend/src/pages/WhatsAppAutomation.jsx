@@ -64,15 +64,15 @@ const DEFAULT_MESSAGES = [
   {
     messageId: "WA-005",
     leadId: "LEAD-001",
-    leadName: "Rajesh Sharma",
-    phone: "+91 98260 12345",
+    leadName: "IndiaMART Machine Buyer",
+    phone: "+91 78280 89672",
     sequenceType: "CATALOG_BROCHURE",
     product: "Fully Automatic Double Die Dona Pattal Machine",
     advanceAmount: "12,500",
     totalBudget: "1,25,000",
     status: "Read",
     sentAt: "2026-10-15T09:40:00.000Z",
-    preview: "Hello Rajesh ji, here is the full machinery technical catalog and operating video for APS-DD-01.",
+    preview: "Hello, here is the full machinery technical catalog and operating video for APS-DD-01.",
     lastEvent: "Read by client"
   }
 ];

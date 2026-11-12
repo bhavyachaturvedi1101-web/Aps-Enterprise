@@ -197,13 +197,17 @@ async function processQuery(query, conversationId = 'default', userContext = {})
       const store = require('../config/inMemoryStore');
       const allLeads = store.mockLeads || [];
       const priorityLead = allLeads.find(l => l.stage === 'CONFIRMED' || l.stage === 'NEGOTIATION') || allLeads[0];
+      const leadName = priorityLead?.name || 'Customer';
+      const companyName = priorityLead?.company || 'Machinery Client';
+      const phoneNum = priorityLead?.phone || '+91 78697 55871';
+      const interest = priorityLead?.interest || 'Double Die Dona Machine';
       return finalizeAndRecord({
-        text: `### 📞 Next Priority Calling Target — ${userContext.userName || 'Executive'}\n\n• **Customer:** **${priorityLead?.name || 'Rajesh Sharma'}** (${priorityLead?.company || 'Apex Packaging Ltd'})\n• **Phone:** \`${priorityLead?.phone || '+91 98260 12345'}\`\n• **Current Stage:** **${priorityLead?.stage || 'CONFIRMED'}** (10% Advance Follow-up)\n• **Interest:** ${priorityLead?.interest || 'Automatic Paper Bag Machine (Model APB-450)'}\n• **Action Guidance:** Call now to confirm RTGS transfer of 10% booking advance and dispatch production job card.`,
+        text: `### 📞 Next Priority Calling Target — ${userContext.userName || 'Executive'}\n\n• **Customer:** **${leadName}** (${companyName})\n• **Phone:** \`${phoneNum}\`\n• **Current Stage:** **${priorityLead?.stage || 'Enquiry'}** (10% Advance Follow-up)\n• **Interest:** ${interest}\n• **Action Guidance:** Call now to confirm RTGS transfer of 10% booking advance and dispatch production job card.`,
         table: [
-          { Field: 'Customer Name', Details: priorityLead?.name || 'Rajesh Sharma' },
-          { Field: 'Company', Details: priorityLead?.company || 'Apex Packaging Ltd' },
-          { Field: 'Machine Model', Details: priorityLead?.interest || 'Automatic Paper Bag Machine' },
-          { Field: 'Contact Number', Details: priorityLead?.phone || '+91 98260 12345' },
+          { Field: 'Customer Name', Details: leadName },
+          { Field: 'Company', Details: companyName },
+          { Field: 'Machine Model', Details: interest },
+          { Field: 'Contact Number', Details: phoneNum },
           { Field: 'Follow-up Reason', Details: 'Pending 10% Advance Payment verification' }
         ],
         options: ['Show my assigned leads', 'What are my active tasks?', 'Send WhatsApp quote for Automatic Paper Bag machine', 'Search CNC 500T specification manual'],
