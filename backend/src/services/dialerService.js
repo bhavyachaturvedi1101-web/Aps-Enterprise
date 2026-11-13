@@ -26,6 +26,7 @@ function rebuildStats() {
 }
 
 function persistQueue() {
+  if (process.env.NODE_ENV === 'test') return;
   safeWriteJson(DIALER_QUEUE_FILE, callQueue);
 }
 

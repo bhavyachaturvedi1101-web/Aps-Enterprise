@@ -81,6 +81,9 @@ tmp/
 uploads/
 coverage/
 .nyc_output/
+*.tmp
+.*.tmp
+
 
 # 7. OS & Editor Specific Files
 .DS_Store

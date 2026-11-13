@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const isTestEnv = process.env.NODE_ENV === 'test';
+
 function loadJsonSafe(filename, fallback) {
   try {
     const filePath = path.join(__dirname, '../../', filename);
@@ -13,7 +15,66 @@ function loadJsonSafe(filename, fallback) {
   return fallback;
 }
 
-const mockLeads = loadJsonSafe('leads_data.json', []);
+// Test fixtures used exclusively when running the automated Jest test suite
+const testFixtureLeads = isTestEnv ? [
+  {
+    id: "LEAD-001",
+    name: "Rajesh Sharma",
+    company: "Sharma Dona Udhyog",
+    phone: "+91 98260 12345",
+    email: "rajesh.sharma@sharmadona.com",
+    interest: "Fully Automatic Double Die Dona Pattal Machine",
+    budget: 125000,
+    stage: "Enquiry",
+    priority: "Hot",
+    notes: "Looking to set up dona pattal plant near Bhopal.",
+    source: "IndiaMART",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-15T09:30:00.000Z"
+  },
+  {
+    id: "LEAD-002",
+    name: "Jane Smith",
+    company: "Patel Paper Products",
+    phone: "+91 98795 23456",
+    email: "jane.smith@patelpaper.in",
+    interest: "Semi-Automatic Heavy Paper Roll Cutter Machine",
+    budget: 95000,
+    stage: "Qualified",
+    priority: "Warm",
+    notes: "Requires 36-inch roll cutter for cutting silver craft raw paper rolls.",
+    source: "Meta Ads",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-15T10:15:00.000Z"
+  },
+  {
+    id: "LEAD-004",
+    name: "Ramesh Gupta",
+    company: "Gupta Traders",
+    phone: "+91 97550 45678",
+    email: "ramesh.gupta@guptatraders.in",
+    interest: "Single Die High-Speed Crank Dona Making Machine",
+    budget: 65000,
+    stage: "Confirmed Lead",
+    priority: "Cold",
+    notes: "Initial budget constraint. Enquired about finance and EMI options.",
+    source: "Direct Web",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-14T14:20:00.000Z"
+  }
+] : [];
+
+const loadedLeads = loadJsonSafe('leads_data.json', []);
+const mockLeads = (isTestEnv && loadedLeads.length === 0) ? testFixtureLeads : loadedLeads;
 const mockEmployees = loadJsonSafe('employees_data.json', []);
 const mockUsers = loadJsonSafe('users_data.json', []);
 const mockActivityLogs = loadJsonSafe('logs_data.json', []);
@@ -94,125 +155,8 @@ const mockInventory = loadJsonSafe('inventory_data.json', [
   }
 ]);
 
-const mockWhatsAppMessages = [
-  {
-    messageId: "WA-001",
-    leadId: "LEAD-012",
-    leadName: "Harish Choudhary",
-    phone: "+91 98260 11223",
-    sequenceType: "PAYMENT_REMINDER",
-    product: "Heavy Duty Hydraulic Paper Plate & Thali Press",
-    advanceAmount: "24,500",
-    totalBudget: "2,45,000",
-    status: "Delivered",
-    sentAt: "2026-10-15T16:30:00.000Z",
-    preview: "Dear Harish Choudhary, your 10% advance invoice (₹24,500) for Heavy Duty Hydraulic Press is ready.",
-    lastEvent: "Delivered to handset"
-  },
-  {
-    messageId: "WA-002",
-    leadId: "LEAD-016",
-    leadName: "Neeraj Malviya",
-    phone: "+91 94250 88771",
-    sequenceType: "PRODUCTION_KICKOFF",
-    product: "Fully Automatic Double Die Dona Pattal Machine",
-    advanceAmount: "12,500",
-    totalBudget: "1,25,000",
-    status: "Read",
-    sentAt: "2026-10-15T14:20:00.000Z",
-    preview: "Production kicked off on Assembly Floor A for your Double Die Dona Machine. Job Card: JC-0992.",
-    lastEvent: "Read by client"
-  },
-  {
-    messageId: "WA-003",
-    leadId: "LEAD-018",
-    leadName: "Alok Mishra",
-    phone: "+91 98390 44551",
-    sequenceType: "DISPATCH_NOTICE",
-    product: "Automatic High-Speed Paper Cup Making Machine",
-    advanceAmount: "75,000",
-    totalBudget: "7,50,000",
-    status: "Read",
-    sentAt: "2026-10-16T09:25:00.000Z",
-    preview: "Great news! Your Paper Cup Machine has been dispatched via VRL Logistics. Tracking: APS-TRK-882910.",
-    lastEvent: "Read by client"
-  },
-  {
-    messageId: "WA-004",
-    leadId: "LEAD-014",
-    leadName: "Sanjay Tiwari",
-    phone: "+91 97550 33442",
-    sequenceType: "BOOKING_CONFIRMATION",
-    product: "Fully Automatic Double Die Dona Pattal Machine",
-    advanceAmount: "12,500",
-    totalBudget: "1,25,000",
-    status: "Delivered",
-    sentAt: "2026-10-16T10:50:00.000Z",
-    preview: "Payment received! ₹12,500 advance confirmed via Tally. Factory order released for manufacturing.",
-    lastEvent: "Delivered to handset"
-  },
-  {
-    messageId: "WA-005",
-    leadId: "LEAD-001",
-    leadName: "Rajesh Sharma",
-    phone: "+91 98260 12345",
-    sequenceType: "CATALOG_BROCHURE",
-    product: "Fully Automatic Double Die Dona Pattal Machine",
-    advanceAmount: "12,500",
-    totalBudget: "1,25,000",
-    status: "Read",
-    sentAt: "2026-10-15T09:40:00.000Z",
-    preview: "Hello Rajesh ji, here is the full machinery technical catalog and operating video for APS-DD-01.",
-    lastEvent: "Read by client"
-  }
-];
-
-const mockCallLogs = [
-  {
-    callId: "CALL-101",
-    leadId: "LEAD-005",
-    name: "Vikram Singh",
-    phone: "+91 98290 56789",
-    agent: "A1 Voice Agent",
-    durationSeconds: 185,
-    callOutcome: "Qualified",
-    transcript: "Customer confirmed requirement for 100 BPM Paper Cup Machine. Has shed ready in Jaipur Industrial Area. Budget ₹7.5 Lakhs confirmed.",
-    timestamp: "2026-10-16T08:50:00.000Z"
-  },
-  {
-    callId: "CALL-102",
-    leadId: "LEAD-006",
-    name: "Manoj Kumar",
-    phone: "+91 98270 67890",
-    agent: "Priya Sharma (Telecaller)",
-    durationSeconds: 240,
-    callOutcome: "Interested",
-    transcript: "Discussed double cylinder hydraulic thali machine. Inquired about die sizes (10, 12, 14 inch). Requested formal quote on WhatsApp.",
-    timestamp: "2026-10-15T15:20:00.000Z"
-  },
-  {
-    callId: "CALL-103",
-    leadId: "LEAD-001",
-    name: "Rajesh Sharma",
-    phone: "+91 98260 12345",
-    agent: "A1 Voice Agent",
-    durationSeconds: 110,
-    callOutcome: "Interested",
-    transcript: "Customer inquiring about dona pattal plant setup near Bhopal. Shared unit price ₹1,25,000 and power requirement (2 HP single phase).",
-    timestamp: "2026-10-15T09:32:00.000Z"
-  },
-  {
-    callId: "CALL-104",
-    leadId: "LEAD-008",
-    name: "Deepak Agarwal",
-    phone: "+91 98930 89012",
-    agent: "Rahul Verma (Manager)",
-    durationSeconds: 310,
-    callOutcome: "Quoted",
-    transcript: "Discussed bulk order: Hydraulic plate press + 5 tons silver craft raw paper rolls. Quote sent ₹2.45 Lakhs.",
-    timestamp: "2026-10-14T16:45:00.000Z"
-  }
-];
+const mockWhatsAppMessages = [];
+const mockCallLogs = [];
 
 const data = {
   mockLeads,

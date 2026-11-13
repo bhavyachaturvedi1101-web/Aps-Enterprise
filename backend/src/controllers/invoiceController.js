@@ -48,6 +48,7 @@ function loadInvoicesFromFile() {
 }
 
 function saveInvoicesToFile(invoices) {
+  if (process.env.NODE_ENV === 'test') return;
   safeWriteJson(INVOICES_FILE, invoices);
 }
 
