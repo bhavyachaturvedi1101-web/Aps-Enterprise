@@ -17,7 +17,7 @@ class CRMService {
     }
 
     try {
-      console.log(`[Teleforce CRM] Creating lead "${leadData.name}" (${leadData.phone}) in Teleforce CRM...`);
+      console.log('[Teleforce CRM] Creating lead in Teleforce CRM...');
 
       const payload = {
         name: leadData.name,

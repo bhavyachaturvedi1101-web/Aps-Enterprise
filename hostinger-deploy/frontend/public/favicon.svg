@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="favOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A00" />
+      <stop offset="100%" stop-color="#E03E00" />
+    </linearGradient>
+    <linearGradient id="favCharcoal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+  </defs>
+
+  <!-- Crisp white rounded background badge so it is 100% visible on dark browser tabs -->
+  <rect width="64" height="64" rx="14" fill="#ffffff" />
+  <rect width="62" height="62" x="1" y="1" rx="13" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <g transform="translate(3, 4) scale(0.18)">
+    <!-- Letter A -->
+    <polygon points="40,118 64,118 142,10 116,10" fill="url(#favOrange)" />
+    <polygon points="122,10 144,10 148,118 126,118" fill="url(#favOrange)" />
+    <path d="M 18 74 Q 85 70 178 116 L 164 124 Q 78 82 18 74 Z" fill="url(#favOrange)" />
+
+    <!-- Letter P -->
+    <rect x="148" y="10" width="22" height="108" rx="2" fill="url(#favCharcoal)" />
+    <path d="M 168 10 H 202 C 224 10 236 24 236 44 C 236 64 224 76 202 76 H 168 Z" fill="url(#favCharcoal)" />
+    <path d="M 170 28 H 198 C 208 28 214 34 214 43 C 214 52 208 58 198 58 H 170 Z" fill="#ffffff" />
+
+    <!-- Letter S -->
+    <path d="M 268 28 C 256 28 244 32 238 40 C 232 47 236 57 248 62 L 264 68 C 278 74 286 82 286 94 C 286 109 271 120 250 120 C 235 120 223 114 218 106 L 232 94 C 236 100 242 104 250 104 C 258 104 266 100 266 94 C 266 88 261 84 251 80 L 236 74 C 221 68 215 57 215 45 C 215 31 228 14 252 14 C 265 14 274 19 280 26 Z" fill="url(#favCharcoal)" />
+
+    <!-- 4 Orange Nodes -->
+    <line x1="184" y1="112" x2="200" y2="120" stroke="#FF5400" stroke-width="2.5" />
+    <line x1="184" y1="112" x2="176" y2="128" stroke="#FF5400" stroke-width="2.5" />
+    <line x1="200" y1="120" x2="192" y2="136" stroke="#FF5400" stroke-width="2.5" />
+    <line x1="176" y1="128" x2="192" y2="136" stroke="#FF5400" stroke-width="2.5" />
+    <circle cx="184" cy="112" r="6" fill="url(#favOrange)" />
+    <circle cx="200" cy="120" r="6" fill="url(#favOrange)" />
+    <circle cx="176" cy="128" r="6" fill="url(#favOrange)" />
+    <circle cx="192" cy="136" r="6" fill="url(#favOrange)" />
+
+    <!-- Subtitle -->
+    <text x="165" y="156" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" letter-spacing="7" text-anchor="middle" fill="#0F172A">
+      ENTERPRISES
+    </text>
+  </g>
+</svg>

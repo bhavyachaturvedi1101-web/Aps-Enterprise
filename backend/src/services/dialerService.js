@@ -163,7 +163,7 @@ class DialerService {
     if (DIALER_PROVIDER === 'teleforce' && TELEFORCE_URL) {
       try {
         const axios = require('axios');
-        console.log(`[Teleforce Dialer] Initiating outbound call to ${call.name} (${call.phone}) via Caller ID ${TELEFORCE_CALLER_ID}...`);
+        console.log('[Teleforce Dialer] Initiating outbound call via configured caller ID...');
         const resp = await axios.post(`${TELEFORCE_URL}/call`, {
           account_sid: TELEFORCE_SID,
           caller_id: TELEFORCE_CALLER_ID,
