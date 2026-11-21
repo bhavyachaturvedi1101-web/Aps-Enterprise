@@ -90,6 +90,9 @@ router.get('/webhook', (req, res) => {
 
 // POST /api/whatsapp/webhook — Receive incoming messages & delivery status updates
 router.post('/webhook', async (req, res) => {
+  if (!whatsappService.verifyWebhookSignature(req)) {
+    return res.sendStatus(401);
+  }
   // Must respond 200 immediately to Meta (within 5 sec)
   res.sendStatus(200);
   await whatsappService.processWebhookEvent(req.body);

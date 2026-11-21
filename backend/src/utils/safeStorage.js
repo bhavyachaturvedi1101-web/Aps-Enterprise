@@ -64,15 +64,19 @@ function safeWriteJson(filePath, data) {
   const serialized = JSON.stringify(data, null, 2);
 
   // Strategy A: Try writing directly to requested file location atomically
+  let tempFile = null;
   try {
     const dir = path.dirname(filePath);
     ensureDir(dir);
 
-    const tempFile = path.join(dir, `.${filename}.${Date.now()}.${Math.random().toString(36).slice(2, 7)}.tmp`);
+    tempFile = path.join(dir, `.${filename}.${Date.now()}.${Math.random().toString(36).slice(2, 7)}.tmp`);
     fs.writeFileSync(tempFile, serialized, 'utf8');
     fs.renameSync(tempFile, filePath);
     return true;
   } catch (err) {
+    if (tempFile && fs.existsSync(tempFile)) {
+      try { fs.unlinkSync(tempFile); } catch {}
+    }
     // If filesystem is read-only (EROFS) or write is blocked by serverless environment
     if (err.code === 'EROFS' || isServerless) {
       try {

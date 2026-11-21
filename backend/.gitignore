@@ -28,6 +28,9 @@ uploads/
 temp/
 tmp/
 coverage/
+*.tmp
+.*.tmp
+
 
 # OS / Editor
 .DS_Store

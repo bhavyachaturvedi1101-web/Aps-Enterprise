@@ -4,12 +4,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_aps_key_2026';
-const ADMIN_EMAIL = (process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in').toLowerCase();
-const ADMIN_API_KEY = process.env.API_KEY || 'admin-key-123';
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in').toLowerCase();
 
 // Configurable Operator Passwords via Environment (with safe fallback for demo/development)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-const OPERATOR_PASSWORD = process.env.OPERATOR_PASSWORD || 'aps2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123@';
 
 // Production Operator Registry for APS Enterprises (Dedicated User per Panel)
 const OPERATORS = [
@@ -127,7 +125,7 @@ router.post('/login', async (req, res) => {
 
     // 2. Find operator matching primary or alternative email
     const operator = OPERATORS.find(
-      op => op.email === cleanEmail || (op.altEmail && op.altEmail === cleanEmail)
+      op => op.role === 'admin' && (op.email === cleanEmail || (op.altEmail && op.altEmail === cleanEmail))
     );
 
     if (!operator && !dbUser) {
@@ -151,10 +149,10 @@ router.post('/login', async (req, res) => {
     // Check against environment-configured operator passwords
     if (!isMatch && operator) {
       const isProduction = process.env.NODE_ENV === 'production';
-      const expectedPass = operator.role === 'admin' ? ADMIN_PASSWORD : OPERATOR_PASSWORD;
+      const expectedPass = ADMIN_PASSWORD;
       
       // In production, reject known insecure defaults if not explicitly overridden
-      if (isProduction && (cleanPass === 'admin123' || cleanPass === 'aps2026') && !process.env.ALLOW_DEFAULT_PASSWORDS_IN_PROD) {
+      if (isProduction && !ADMIN_PASSWORD) {
         return res.status(403).json({
           success: false,
           error: 'Insecure Default Password Blocked',
@@ -163,22 +161,9 @@ router.post('/login', async (req, res) => {
       }
 
       // Allow operator's designated password, universal admin password, or demo operator passwords
-      const acceptedPasswords = [
-        expectedPass,
-        ADMIN_PASSWORD,
-        OPERATOR_PASSWORD,
-        'admin123',
-        'aps2026'
-      ].filter(Boolean);
-
-      if (acceptedPasswords.includes(cleanPass)) {
+      if (expectedPass && cleanPass === expectedPass) {
         isMatch = true;
       }
-    }
-
-    // Check static API key direct authentication
-    if (!isMatch && ADMIN_API_KEY && cleanPass === ADMIN_API_KEY) {
-      isMatch = true;
     }
 
     if (!isMatch) {

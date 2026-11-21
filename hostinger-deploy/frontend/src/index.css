@@ -1,0 +1,914 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --border-color: #e4e4e7;
+  --accent-black: #09090b;
+  --accent-black-hover: #27272a;
+  --accent-gray: #f4f4f5;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+
+  --font-heading: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  height: 100dvh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Unified Single Scroll Surface Architecture                                */
+/* ───────────────────────────────────────────────────────────────────────── */
+.dashboard-app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.dashboard-body-wrapper {
+  display: flex;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-main-content,
+main {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative;
+  background-color: var(--bg-primary);
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y;
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* Page container layout */
+.page-container {
+  padding: 2rem 2.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Scrollbar reset */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Professional Transparent Grey Hover & Interactive States                */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+/* Sidebar Navigation Items */
+.sidebar-nav-item {
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.12s ease-out !important;
+}
+
+.sidebar-nav-item:not(.active):hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+}
+
+.sidebar-nav-item:not(.active):hover .nav-icon {
+  color: #18181b !important;
+}
+
+.sidebar-nav-item:not(.active):hover .nav-label {
+  color: #09090b !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-nav-item.active:hover {
+  background-color: #18181b !important;
+}
+
+.sidebar-nav-item:active {
+  transform: scale(0.985);
+}
+
+/* Header Strategy/Pipeline/KPI Pills */
+.header-pill-btn {
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.12s ease !important;
+}
+
+.header-pill-btn:not(.active):hover {
+  background-color: rgba(9, 9, 11, 0.06) !important;
+  color: #09090b !important;
+}
+
+.header-pill-btn.active:hover {
+  background-color: #18181b !important;
+}
+
+/* Header Notification Bell & User Card */
+.notif-bell-btn,
+.header-user-card {
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.notif-bell-btn:hover,
+.header-user-card:hover {
+  background-color: rgba(9, 9, 11, 0.04) !important;
+  border-color: #d4d4d8 !important;
+}
+
+/* Dropdown Menu Items */
+.dropdown-menu-item {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.dropdown-menu-item:hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+  color: #09090b !important;
+}
+
+/* Sidebar User Footer & Logout */
+.sidebar-user-card {
+  transition: background-color 0.18s ease, border-color 0.18s ease !important;
+}
+
+.sidebar-user-card:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.sidebar-logout-btn {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.sidebar-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
+/* Table Row & Button Hover for Users & Roles */
+.table-row-hover {
+  transition: background-color 0.15s ease !important;
+}
+
+.table-row-hover:hover {
+  background-color: #f8fafc !important;
+}
+
+.edit-btn-hover {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+}
+
+.edit-btn-hover:hover {
+  background-color: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+}
+
+/* Custom & Native Select Enterprise Styling */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  color: #09090b;
+  font-family: var(--font-body);
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+select:focus {
+  border-color: #09090b;
+  box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.08);
+}
+
+select option {
+  background-color: #ffffff;
+  color: #09090b;
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.custom-select-trigger:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+.custom-select-option {
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.custom-select-option:hover {
+  background-color: rgba(9, 9, 11, 0.05) !important;
+  color: #09090b !important;
+}
+
+/* Primary Blue Action Buttons */
+.btn-blue-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease !important;
+}
+
+.btn-blue-primary:hover {
+  background-color: #1d4ed8 !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+}
+
+.btn-blue-primary:active {
+  transform: scale(0.975);
+}
+
+/* Red Reset Filters Button Only */
+.btn-red-reset {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25) !important;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease !important;
+}
+
+.btn-red-reset:hover {
+  background-color: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important;
+}
+
+.btn-red-reset:active {
+  transform: scale(0.975);
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Mobile Bottom Navigation Bar                                             */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-top: 1px solid #e4e4e7;
+  z-index: 998;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.18s ease;
+  min-width: 0;
+}
+
+.mobile-bottom-nav-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-bottom-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+  color: #71717a;
+}
+
+.mobile-bottom-nav-item.active .mobile-bottom-nav-icon {
+  background: #09090b;
+  color: #ffffff;
+}
+
+.mobile-bottom-nav-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #94a3b8;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 56px;
+  text-align: center;
+}
+
+.mobile-bottom-nav-item.active .mobile-bottom-nav-label {
+  color: #09090b;
+  font-weight: 800;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Responsive Grid Utilities                                                */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+.grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+/* Notification dropdown */
+.notif-dropdown-panel {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 340px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.12);
+  z-index: 100;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* User dropdown */
+.user-dropdown-panel {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 260px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.12);
+  z-index: 100;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Hero card base */
+.responsive-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Tablet Breakpoint (<=1024px)                                             */
+/* ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .grid-4col {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .grid-3col {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  main {
+    padding: 1.25rem !important;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Mobile Breakpoint (<=768px) — ALL FIXES ARE MOBILE-ONLY                 */
+/* ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* ─── Bottom Nav ──────────────────────────────────────────────────────── */
+  .mobile-bottom-nav {
+    display: flex !important;
+    /* Safe area for iPhone home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ─── Main Content Single Scroll Surface ───────────────────────────── */
+  .dashboard-main-content,
+  main {
+    padding: 0 !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y;
+    transform: translateZ(0);
+    will-change: scroll-position;
+  }
+
+  /* ─── ELIMINATE DOUBLE SCROLLING ───────────────────────────────────── */
+  /* CRITICAL: Do NOT set overflow-x: hidden on main > div.
+     In CSS specification, setting overflow-x: hidden forces overflow-y to compute to auto,
+     which creates a competing nested vertical scroll container and causes double scrolling.
+     Instead, use overflow: visible with overflow-x: clip so child pages NEVER create
+     a secondary scroll container while still preventing horizontal bleed! */
+  main > div {
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    flex: none !important;
+  }
+
+  .page-container {
+    padding: 1rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* ─── Neutralize In-Page Nested Scroll Traps (Mobile) ─────────────── */
+  /* Machinery stock list in Dashboard: expand fully in mobile flow */
+  .machinery-stock-scroll-list {
+    max-height: none !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+  }
+
+  /* CRM Leads Kanban Column: expand cards vertically in column */
+  .crm-kanban-column-body {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* APS AI Page Mobile Layout */
+  .apsai-page-wrapper {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0.75rem 0.5rem 1rem !important;
+  }
+
+  .apsai-main-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .apsai-chat-container {
+    order: 1 !important;
+    height: calc(100dvh - 190px) !important;
+    min-height: 480px !important;
+  }
+
+  .apsai-messages-area {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y;
+  }
+
+  .apsai-side-nav {
+    order: 2 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* WhatsApp Automation Mobile Layout */
+  .whatsapp-app-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 520px !important;
+    max-height: none !important;
+  }
+
+  /* ─── Typography ──────────────────────────────────────────────────────── */
+  h1 {
+    font-size: 1.4rem !important;
+    letter-spacing: -0.3px !important;
+  }
+
+  h2 {
+    font-size: 1.15rem !important;
+  }
+
+  /* ─── Grids: Single Column ────────────────────────────────────────────── */
+  .grid-4col,
+  .grid-3col,
+  .grid-2col {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ─── Hero Card ───────────────────────────────────────────────────────── */
+  .responsive-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+    padding: 1.25rem !important;
+    min-height: auto !important;
+    border-radius: 16px !important;
+  }
+
+  /* Hide decorative circle graphic to save space */
+  .hero-circle-graphic {
+    display: none !important;
+  }
+
+  /* Hero left section full width */
+  .hero-left {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  /* Hero title scale */
+  .hero-title-text {
+    font-size: 1.5rem !important;
+    letter-spacing: -0.5px !important;
+  }
+
+  /* ─── Dropdowns ───────────────────────────────────────────────────────── */
+  /* Notification dropdown: full-width fixed overlay */
+  .notif-dropdown-panel {
+    position: fixed !important;
+    top: 66px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-height: calc(100vh - 150px) !important;
+    overflow-y: auto !important;
+    border-radius: 12px !important;
+  }
+
+  /* User dropdown: full-width fixed overlay */
+  .user-dropdown-panel {
+    position: fixed !important;
+    top: 66px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    border-radius: 12px !important;
+  }
+
+  /* ─── Pipeline Kanban ─────────────────────────────────────────────────── */
+  .pipeline-kanban {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 1rem !important;
+  }
+
+  /* ─── Tables: All flex-based tables ──────────────────────────────────── */
+  .responsive-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  .responsive-table-content {
+    min-width: 680px !important;
+  }
+
+  /* Users & Roles table */
+  .users-roles-table-card {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  .users-roles-table-header,
+  .users-roles-table-row {
+    min-width: 720px !important;
+  }
+
+  /* Payment Gate table */
+  .payment-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  .payment-table-inner {
+    min-width: 640px !important;
+  }
+
+  /* Bookings table */
+  .bookings-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  .bookings-table-inner {
+    min-width: 680px !important;
+  }
+
+  /* ─── Page Headers ────────────────────────────────────────────────────── */
+  .mobile-stack-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ─── Filter Toolbar ──────────────────────────────────────────────────── */
+  .mobile-filter-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Search bar inside filter toolbar stays full width */
+  .mobile-filter-toolbar > div:first-child {
+    width: 100% !important;
+  }
+
+  /* Filter group pairs — display as 2-col grid inside a wrapper */
+  .mobile-filter-groups {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .mobile-filter-groups .filter-group-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    width: 100% !important;
+  }
+
+  .mobile-filter-groups .filter-group-row > button,
+  .mobile-filter-groups .filter-group-row > div {
+    width: 100% !important;
+  }
+
+  /* Filter pills scrollable */
+  .filter-pills-row {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* ─── Alert Boxes ─────────────────────────────────────────────────────── */
+  .mobile-alert-wrap {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+
+  .mobile-alert-wrap > button {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* ─── Modals ──────────────────────────────────────────────────────────── */
+  .modal-content-responsive {
+    width: 94% !important;
+    max-width: none !important;
+    padding: 1.25rem !important;
+    border-radius: 16px !important;
+  }
+
+  /* ─── Section Headers ─────────────────────────────────────────────────── */
+  .section-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ─── Stat Chips ──────────────────────────────────────────────────────── */
+  .stat-chips-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  /* ─── Action Rows ─────────────────────────────────────────────────────── */
+  .action-row {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  /* ─── Machinery Stock Breakdown (Mobile) ─────────────────────────── */
+  .machinery-stock-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+
+  .machinery-stock-item {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+    padding: 0.85rem !important;
+  }
+
+  .machinery-stock-title {
+    grid-column: span 2 !important;
+  }
+
+  .machinery-stock-price {
+    grid-column: span 1 !important;
+  }
+
+  .machinery-stock-qty {
+    grid-column: span 1 !important;
+    text-align: right !important;
+  }
+
+  .machinery-stock-progress {
+    grid-column: span 2 !important;
+  }
+
+  .machinery-stock-status {
+    grid-column: span 2 !important;
+    text-align: left !important;
+  }
+
+  /* ─── iOS Input Zoom Prevention ───────────────────────────────────────── */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* ─── Touch-Friendly Buttons ──────────────────────────────────────────── */
+  button {
+    min-height: 38px;
+  }
+
+  /* ─── Prevent Body Rubberband & Window Scroll Contention ──────────────── */
+  body {
+    overflow: hidden !important;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Extra Small Phone (<=480px)                                              */
+/* ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  main > div {
+    padding: 0.75rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+
+  .page-container {
+    padding: 0.75rem !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+
+  .stat-chips-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .machinery-stock-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  .machinery-stock-title,
+  .machinery-stock-price,
+  .machinery-stock-qty,
+  .machinery-stock-progress,
+  .machinery-stock-status {
+    grid-column: span 1 !important;
+    text-align: left !important;
+  }
+
+  h1 {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* Machinery Stock Scrollable List Custom Scrollbar                          */
+/* ───────────────────────────────────────────────────────────────────────── */
+.machinery-stock-scroll-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.machinery-stock-scroll-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

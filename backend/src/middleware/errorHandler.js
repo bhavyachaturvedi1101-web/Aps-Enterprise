@@ -77,10 +77,10 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // 4. Log the error with structured context
-  logger.error(`[API Error] ${req.method} ${req.originalUrl || req.url}: ${message}`, {
+  logger.error(`[API Error] ${req.method} ${req.path}: ${message}`, {
     statusCode,
     errorCode,
-    url: req.originalUrl || req.url,
+    url: req.path,
     method: req.method,
     stack: statusCode >= 500 ? err.stack : undefined,
     ip: req.ip || req.headers['x-forwarded-for']

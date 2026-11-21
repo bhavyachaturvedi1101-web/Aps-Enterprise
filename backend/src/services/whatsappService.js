@@ -1,5 +1,6 @@
 // A5 WhatsApp Automation Service — Meta Cloud API Integration
 const https = require('https');
+const crypto = require('crypto');
 const store = require('../config/inMemoryStore');
 const { Lead, ActivityLog } = require('../models');
 
@@ -29,7 +30,9 @@ const DOUBLETICK_BASE_URL = process.env.DOUBLETICK_API_BASE_URL || 'https://web.
 
 const WA_TOKEN = process.env.WHATSAPP_TOKEN || '';
 const WA_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
-const WA_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'aps_webhook_verify_2026';
+const isProduction = process.env.NODE_ENV === 'production';
+const WA_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || (!isProduction ? 'aps_webhook_verify_2026' : '');
+const WEBHOOK_SECRET = process.env.WHATSAPP_WEBHOOK_SECRET || process.env.META_APP_SECRET || '';
 
 // ─── Helper: call Meta WhatsApp Cloud API ─────────────────────────────────────
 async function callMetaAPI(payload) {
@@ -186,6 +189,16 @@ class WhatsAppService {
     return null;
   }
 
+  verifyWebhookSignature(req) {
+    if (!WEBHOOK_SECRET) return !isProduction;
+    const signature = req.get('x-hub-signature-256') || req.get('x-webhook-signature');
+    if (!signature || !req.rawBody) return false;
+    const provided = signature.replace(/^sha256=/i, '').trim();
+    const expected = crypto.createHmac('sha256', WEBHOOK_SECRET).update(req.rawBody).digest('hex');
+    if (provided.length !== expected.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+  }
+
   // ── Webhook event processing (POST) ────────────────────────────────────────
   async processWebhookEvent(body) {
     try {
@@ -199,7 +212,7 @@ class WhatsAppService {
         const from = body.from || body.sender || body.recipient;
 
         if (incomingText && from) {
-          console.log(`[DoubleTick Webhook] Incoming message from ${from}: ${incomingText}`);
+          console.log('[DoubleTick Webhook] Incoming message received.');
           const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(String(from).slice(-10)));
           if (existing) existing.status = 'Replied';
         }
@@ -223,7 +236,7 @@ class WhatsAppService {
       // Incoming messages
       if (changes.messages) {
         for (const msg of changes.messages) {
-          console.log(`[WhatsApp Webhook] Incoming from ${msg.from}: ${msg.text?.body || msg.type}`);
+          console.log('[WhatsApp Webhook] Incoming message received.');
           const existing = mockWhatsAppMessages.find(m => m.phone?.replace(/\D/g, '').endsWith(msg.from.slice(-10)));
           if (existing) existing.status = 'Replied';
         }

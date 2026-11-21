@@ -26,6 +26,7 @@ function rebuildStats() {
 }
 
 function persistQueue() {
+  if (process.env.NODE_ENV === 'test') return;
   safeWriteJson(DIALER_QUEUE_FILE, callQueue);
 }
 
@@ -192,7 +193,6 @@ class DialerService {
         if (clientId) {
           headers['client_id'] = clientId;
         }
-
         const resp = await axios.post(`${TELEFORCE_URL}/call`, {
           account_sid: TELEFORCE_SID,
           caller_id: TELEFORCE_CALLER_ID,

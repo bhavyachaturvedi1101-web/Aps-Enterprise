@@ -102,9 +102,9 @@ const httpLoggerMiddleware = (req, res, next) => {
     const statusCode = res.statusCode;
     const logLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'http';
 
-    logger[logLevel](`${req.method} ${req.originalUrl || req.url} ${statusCode} - ${durationMs}ms`, {
+    logger[logLevel](`${req.method} ${req.path} ${statusCode} - ${durationMs}ms`, {
       method: req.method,
-      url: req.originalUrl || req.url,
+      url: req.path,
       status: statusCode,
       durationMs: parseFloat(durationMs),
       ip: req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress,

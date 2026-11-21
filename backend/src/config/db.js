@@ -60,6 +60,24 @@ const connectDB = async (retryCount = 1) => {
       await sequelize.sync({ force: false, alter: false });
       console.log('Database schemas synced (safe) successfully.');
     }
+
+    if (process.env.ADMIN_PASSWORD || process.env.NODE_ENV === 'production') {
+      const bcrypt = require('bcryptjs');
+      const { User } = require('../models');
+      await User.upsert({
+        id: 'USR-001',
+        name: 'Super Admin',
+        email: (process.env.ADMIN_EMAIL || process.env.TELEFORCE_CRM_LOGIN_EMAIL || 'admin@apsenterprises.in').toLowerCase(),
+        passwordHash: await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123@', 12),
+        role: 'admin',
+        title: 'Chief System & Operations Admin',
+        department: 'Executive & AI Management',
+        avatar: 'A',
+        avatarBg: '#09090b',
+        isActive: true
+      });
+      console.log('[DB] Primary admin account synchronized.');
+    }
   } catch (error) {
     if (retryCount > 0) {
       console.warn(`[DB Connect Warning] First attempt failed (${error.message}). Retrying in 1s...`);

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const { connectDB, isDbConnected } = require('./config/db');
@@ -35,8 +36,26 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: false
 }));
-app.use(cors());
-app.use(express.json());
+const corsOrigins = new Set(
+  (process.env.CORS_ORIGINS || process.env.APP_ORIGIN || '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean)
+);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || process.env.NODE_ENV !== 'production') return callback(null, true);
+    return callback(null, corsOrigins.has(origin));
+  }
+}));
+app.use(express.json({
+  limit: '100kb',
+  verify: (req, res, buf) => {
+    if (req.originalUrl === '/api/whatsapp/webhook') {
+      req.rawBody = Buffer.from(buf);
+    }
+  }
+}));
 
 const { logger, httpLoggerMiddleware } = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
@@ -76,15 +95,35 @@ const authLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 
+// The browser application itself must remain public so users can reach the
+// login screen. API requests continue through authentication below.
+const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api/')) return next();
+    return res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
 // Auth verification & session parsing
 app.use(authenticate);
 
 // Initialize DB on cold start without blocking requests on failure
 app.use(async (req, res, next) => {
-  if (!_dbAttempted) {
-    await initDB();
+  try {
+    if (!_dbAttempted) await initDB();
+    if (process.env.NODE_ENV === 'production' && !isDbConnected()) {
+      return res.status(503).json({
+        error: 'Service Unavailable',
+        code: 'DATABASE_UNAVAILABLE',
+        message: 'Production database is unavailable.'
+      });
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 });
 
 // Disable caching for API responses

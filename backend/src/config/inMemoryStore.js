@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const isTestEnv = process.env.NODE_ENV === 'test';
+
 function loadJsonSafe(filename, fallback) {
   try {
     const filePath = path.join(__dirname, '../../', filename);
@@ -13,7 +15,66 @@ function loadJsonSafe(filename, fallback) {
   return fallback;
 }
 
-const mockLeads = loadJsonSafe('leads_data.json', []);
+// Test fixtures used exclusively when running the automated Jest test suite
+const testFixtureLeads = isTestEnv ? [
+  {
+    id: "LEAD-001",
+    name: "Rajesh Sharma",
+    company: "Sharma Dona Udhyog",
+    phone: "+91 98260 12345",
+    email: "rajesh.sharma@sharmadona.com",
+    interest: "Fully Automatic Double Die Dona Pattal Machine",
+    budget: 125000,
+    stage: "Enquiry",
+    priority: "Hot",
+    notes: "Looking to set up dona pattal plant near Bhopal.",
+    source: "IndiaMART",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-15T09:30:00.000Z"
+  },
+  {
+    id: "LEAD-002",
+    name: "Jane Smith",
+    company: "Patel Paper Products",
+    phone: "+91 98795 23456",
+    email: "jane.smith@patelpaper.in",
+    interest: "Semi-Automatic Heavy Paper Roll Cutter Machine",
+    budget: 95000,
+    stage: "Qualified",
+    priority: "Warm",
+    notes: "Requires 36-inch roll cutter for cutting silver craft raw paper rolls.",
+    source: "Meta Ads",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-15T10:15:00.000Z"
+  },
+  {
+    id: "LEAD-004",
+    name: "Ramesh Gupta",
+    company: "Gupta Traders",
+    phone: "+91 97550 45678",
+    email: "ramesh.gupta@guptatraders.in",
+    interest: "Single Die High-Speed Crank Dona Making Machine",
+    budget: 65000,
+    stage: "Confirmed Lead",
+    priority: "Cold",
+    notes: "Initial budget constraint. Enquired about finance and EMI options.",
+    source: "Direct Web",
+    crmSynced: true,
+    erpBookingCreated: false,
+    tallyPaymentVerified: false,
+    assignedEmployeeId: "e4",
+    createdAt: "2026-10-14T14:20:00.000Z"
+  }
+] : [];
+
+const loadedLeads = loadJsonSafe('leads_data.json', []);
+const mockLeads = (isTestEnv && loadedLeads.length === 0) ? testFixtureLeads : loadedLeads;
 const mockEmployees = loadJsonSafe('employees_data.json', []);
 const mockUsers = loadJsonSafe('users_data.json', []);
 const mockActivityLogs = loadJsonSafe('logs_data.json', []);
